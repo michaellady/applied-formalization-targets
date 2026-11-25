@@ -28,11 +28,12 @@ What is proved: the Hadamard code `x ↦ (⟨a, x⟩ mod 2)_{a ∈ {0,1}ᵏ}` of
 `(2, δ, 1/2 - 2δ)`-LDC for every `δ` (`isLDC_hadamardCode`; decoder: pick `a` uniformly, read
 positions `a` and `a + eᵢ`, add the answers); consequently two-query LDCs of length `2ᵏ` exist
 (`exists_isLDC_two_pow`); the definition is monotone in `δ` and `ε` and invariant under
-renaming positions (`IsLDC.mono`, `IsLDC.reindex`).
+renaming positions (`IsLDC.mono`, `IsLDC.reindex`). Zero-query codes do not exist for
+`k ≥ 1`, `δ ≥ 0`, `ε > 0`, so `PolyLengthLDC 0` is false (`Targets/Coding/LocallyDecodableZeroQuery.lean`).
 
 Known but NOT formalized here: for `q = 2` every LDC has `n ≥ exp(Ω(k))` (Kerenidis–de Wolf),
-so `PolyLengthLDC 2` is false, and `PolyLengthLDC 1`, `PolyLengthLDC 0` are false
-(Katz–Trevisan); for `q = 3` the best constructions have subexponential length
+so `PolyLengthLDC 2` is false, and `PolyLengthLDC 1` is false (Katz–Trevisan; the
+trivial case `PolyLengthLDC 0` is formalized, see above); for `q = 3` the best constructions have subexponential length
 (Yekhanin, Efremenko) and the best lower bound is polynomial (about `k³`; to be confirmed).
 
 Review notes (modelling choices to check).
