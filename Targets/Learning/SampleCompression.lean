@@ -27,10 +27,16 @@ and satisfies Sauer–Shelah (`Targets/Learning/SauerShelahVC.lean`); every fini
 scheme of size `⌊log₂ |𝒞|⌋` (`CompressionHalving.lean`); a scheme of size `k` forces
 `vcDim 𝒞 ≤ 5 k`, so the conjectured bound would be optimal up to the constant
 (`CompressionLowerBound.lean`); thresholds on a finite linear order have a scheme of size `1`
-(`CompressionThresholds.lean`); and a scheme of size `k` gives the Littlestone–Warmuth
-generalization bound (`CompressionGeneralization.lean`). None of these bounds the scheme size
-by a function of the VC dimension alone, so the conjecture is untouched. Known on paper and
-not formalized: schemes of size exponential in `d` (Moran–Yehudayoff).
+(`CompressionThresholds.lean`); intervals on a finite linear order have a scheme of size `2`
+and axis-parallel rectangles in a finite grid one of size `4` (`CompressionIntervals.lean`,
+`CompressionRectangles.lean`); and a scheme of size `k` gives the Littlestone–Warmuth
+generalization bound (`CompressionGeneralization.lean`). The only result that bounds the
+scheme size by the VC dimension alone is the case `d ≤ 1` (`CompressionVCOne.lean`): every
+class with `vcDim 𝒞 ≤ 1` has a scheme of size `vcDim 𝒞`, so the bound `K * vcDim 𝒞 + K` holds
+with `K = 1` for those classes (`sampleCompression_of_vcDim_le_one`). The conjecture itself,
+which needs one constant `K` for all `d`, is untouched for every `d ≥ 2`. Known on paper and
+not formalized: schemes of size exponential in `d` (Moran–Yehudayoff), and schemes of size `d`
+for maximum classes (Floyd–Warmuth).
 -/
 
 namespace Targets.Learning

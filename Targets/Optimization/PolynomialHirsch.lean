@@ -30,6 +30,17 @@ so the adjacency relation is satisfiable. Nothing is proved about polyhedra `{x 
 specifically, and no diameter bound of any kind (not even finiteness or connectedness of the
 graph) is proved.
 
+Partial results in other files (none of them proves or refutes the conjecture).
+* `Targets/Optimization/PolytopeGraphDimOne.lean`: for ambient dimension `d ≤ 1`, any two
+  extreme points of `{x | A x ≤ b}` are joined by a walk of at most one edge
+  (`polyhedron_vertexDistLE_one_of_dim_le_one`), with no boundedness hypothesis; so the
+  diameter bound holds trivially in dimension at most one. Nothing is proved for `d ≥ 2`.
+* `Targets/Optimization/ConnectedLayerFamilyBound.lean`: in the abstract combinatorial setting
+  of Eisenbrand, Hähnle, Razborov and Rothvoß (connected layer families of `d`-sets on `n`
+  elements), every family has length at most `n * (d + 1) ^ ⌊log₂ n⌋ ≤ n ^ (1 + log₂ (d + 1))`
+  (Kalai–Kleitman style argument). The link from polytope graphs to that setting is NOT
+  formalized, so this gives no bound on polytope diameters here.
+
 Review notes (modelling choices to check).
 * The polytope is given by `m` inequalities, not by its facets, and the bound is in the number
   `m` of inequalities and the ambient dimension `d`. A polytope of dimension `d'` with `n`

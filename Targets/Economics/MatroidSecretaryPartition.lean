@@ -46,9 +46,9 @@ What is proved.
 * `partitionOne_conclusion`: the conclusion of `MatroidSecretaryConjecture`, restricted to
   partition matroids with capacities one, with `c = 1/4`.
 
-Not covered: partition matroids with capacities larger than one (each block a uniform matroid
-of rank `kᵢ ≥ 2`; this would follow from `HasCompetitiveRandomized.blockSum` once uniform
-matroids of rank `k` are done, which they are not here); the optimal constant `1/e`; the
+Partition matroids with capacities larger than one are covered, with the weaker constant
+`e⁻²`, in `Targets/Economics/MatroidSecretaryUniform.lean` (`hasCompetitiveRandomized_partitionCap`).
+Not covered: the optimal constant `1/e`; the
 model where the algorithm does not know the blocks in advance.
 -/
 
