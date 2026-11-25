@@ -35,6 +35,15 @@ conditioning-on-`p ≤ t` form of positive regression dependence used in this li
 between "jointly normal with arbitrary correlation" and that dependence condition. Whether
 two-sided p-values of correlated normals satisfy it in general is not established here; the
 literature treats the two-sided case as not covered by the positive-dependence results.
+
+Further partial results (`Targets/Statistics/TwoSidedSimesBivariate.lean`, library file
+`Applied/Statistics/TwoSidedSimes.lean`): `SimesTwoSidedGaussian` holds for at most two
+statistics with any correlation in `[-1, 1]` (`simesTwoSidedGaussian_of_le_two`, a known result
+for `m = 2`); the Simes bound holds for any number of statistics that agree in absolute value
+(perfect correlation `± 1`); and Hochberg's and Hommel's procedures on two-sided p-values control
+the family-wise error rate whenever at most two hypotheses are true nulls with jointly normal
+statistics. Neither the case of three or more correlated statistics nor `BHTwoSidedGaussian` is
+touched by these results.
 -/
 
 open MeasureTheory ProbabilityTheory Finset

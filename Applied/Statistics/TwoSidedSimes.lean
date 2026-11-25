@@ -8,14 +8,20 @@ import Mathlib.Probability.Distributions.Gaussian.HasGaussianLaw.Independence
 
 Two-sided p-values `p j = 2 (1 - Φ(|Z j|))` of correlated normal statistics are not covered by
 the positive-dependence results of `Applied/Statistics/PRDS.lean`: `p j` is not a monotone
-function of `Z j`. This file proves the Simes inequality in two situations.
+function of `Z j`. This file proves the Simes inequality in the following situations.
 
-* `measure_simes_twoSided_oneFactor_two`: **two statistics, any correlation in `(-1, 1)`.**
+* `measure_simes_twoSided_bivariateGaussian`: **two statistics, any correlation.** `Z 0`, `Z 1`
+  jointly Gaussian (`IsGaussian` law on `Fin 2 → ℝ`), each standard normal, correlation
+  `ρ ∈ [-1, 1]` arbitrary.
+* `measure_simes_twoSided_oneFactor_two`: the same in an explicit one-factor form
   `Z j = a j W + b j ε j` (`j = 0, 1`) with `W`, `ε 0`, `ε 1` independent standard normal,
-  `a j ^ 2 + b j ^ 2 = 1` and `b j ≠ 0`. The loadings `a j` may have either sign, so the
-  correlation `a 0 a 1` ranges over all of `(-1, 1)`.
+  `a j ^ 2 + b j ^ 2 = 1` and `b j ≠ 0`; loadings of either sign, correlation `a 0 a 1 ∈ (-1, 1)`.
 * `measure_simes_twoSided_abs_eq`: **perfectly correlated statistics.** If `|Z j| = |Z₀|` for
   every `j` (for example `Z j = ± Z₀`, correlation `±1`) with `Z₀` standard normal.
+* `fwer_hommel_twoSided_le_of_card_le_two`, `fwer_hochberg_twoSided_le_of_card_le_two`:
+  Hommel's and Hochberg's procedures on two-sided p-values control the family-wise error rate
+  when at most two hypotheses are true nulls and their statistics are jointly Gaussian and
+  standard normal.
 
 ## Proof for two statistics
 
@@ -23,9 +29,11 @@ For `m = 2` the Simes test rejects when `p₍₁₎ ≤ α / 2` or `p₍₂₎ �
 `A j = {p j ≤ α / 2}` and `B j = {p j ≤ α}`, the rejection probability is at most
 `P (B 0 ∩ B 1) + P (A 0) - P (A 0 ∩ B 1) + P (A 1) - P (A 1 ∩ B 0)`, and the bound `α` follows
 from validity (`P (A j) ≤ α / 2`, `P (B j) ≤ α`) and the two inequalities
-`P (A i ∩ B k) P (B i) ≥ P (B i ∩ B k) P (A i)` (`twoSided_key_ineq`). For the latter, condition
-on `W = w`: `|Z 0|` and `|Z 1|` become independent folded normal variables whose location is
-`|a j w|`. The folded normal family has a monotone likelihood ratio in the location
+`P (A i ∩ B k) P (B i) ≥ P (B i ∩ B k) P (A i)` (`measure_simes_two_of_key`). For the latter
+(`twoSided_key_ineq`, `twoSided_key_ineq_direct`; for a bivariate normal pair with `|ρ| < 1`,
+`twoSided_key_ineq_gaussianPair` writes `Z k = ρ Z i + √(1 - ρ²) Y` with `Y` independent of
+`Z i`), condition on the common factor `W = w`: `|Z 0|` and `|Z 1|` become independent folded
+normal variables whose location is `|a j w|`. The folded normal family has a monotone likelihood ratio in the location
 (`foldedPDF_mul_le`, from `cosh (a x) cosh (b y) ≥ cosh (a y) cosh (b x)` for `a ≥ b ≥ 0`,
 `x ≥ y ≥ 0`), so both conditional probabilities increase with `|w|` in the right sense, and a
 symmetrisation over two independent copies of `W` (`lintegral_mixture_mul_le`) concludes.
