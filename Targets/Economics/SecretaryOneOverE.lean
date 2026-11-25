@@ -50,12 +50,15 @@ Differences from the textbook statement.
   the textbook; the library's `thresholdRule` formulates the same decision as a function of the
   arrivals so far only.
 
-Not covered: optimality of the threshold rule among all online stopping rules (Lindley's and
-Dynkin's optimality theorem, that no rule beats `max_r` of the formula) in the arrival-order
-model of this file (a version for rules that see only relative ranks, stated in the
-relative-rank model, is in `Targets/Economics/SecretaryRankOptimal.lean`); the limit
-`max_r P(r) → 1/e`; the strict inequality `> 1/e`; the full-information and cardinal-payoff
-variants.
+Not covered in this file: optimality of the threshold rule (Lindley's and Dynkin's theorem,
+that no rule observing only relative ranks beats `max_r` of the formula); it is proved in the
+relative-rank model in `Targets/Economics/SecretaryRankOptimal.lean` and in the arrival-order
+model of this file, for ordinal online algorithms used as stopping rules, in
+`Targets/Economics/SecretaryArrivalOptimal.lean` (`secretary_optimal`). The limit
+`max_r P(r) → 1/e`, with `1/e ≤ max_r P(r) ≤ 1/e + 1/n`, is in
+`Targets/Economics/SecretaryOptimalLimit.lean`. Still not covered: optimality among rules that
+use the values or randomization; the strict inequality `> 1/e`; the full-information and
+cardinal-payoff variants.
 -/
 
 namespace Targets.Economics

@@ -35,6 +35,13 @@ every achievable rate is at most `log |X|` (`relayAchievable_le_log_card`), so
 `0 ≤ relayCapacity W ≤ log |X|` (`relayCapacity_bounds`) and the supremum is that of a bounded
 nonempty set.
 
+Partial result elsewhere: the *cut-set upper bound* (Cover–El Gamal 1979),
+`relayCapacity W ≤ sup_{p(x, x₁)} min {I(X, X₁; Y), I(X; Y, Y₁ | X₁)}` for finite alphabets
+with `Y`, `Y₁` (and, for the capacity statement, `X`, `X₁`) nonempty, together with the
+per-code bound `(1 - Pₑ) log M ≤ n · (cut-set bound) + log 2`, is proved in
+`Targets/InformationTheory/RelayCutSetBound.lean` (`relayCapacity_le_relayCutSet`). This is
+an upper bound only; it does not determine `relayCapacity W`.
+
 Review notes (modelling choices to check).
 
 * Causality: the relay function at time `t` is a function `(Fin n → Y₁) → X₁` together with a
@@ -49,7 +56,7 @@ Review notes (modelling choices to check).
   achievable rates.
 * Finite alphabets only (no Gaussian relay channel); no feedback to the sender.
 
-Not covered: the cut-set bound; decode-forward and compress-forward; any special class for
+Not covered here: decode-forward and compress-forward; any special class for
 which the capacity is known.
 -/
 
