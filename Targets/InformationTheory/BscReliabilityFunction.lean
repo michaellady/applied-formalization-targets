@@ -52,6 +52,9 @@ Review notes (modelling choices to check).
 * If `q ∈ {0, 1}` then `P_e(n, R)` can be `0`, `Real.log 0 = 0`, and `bscReliability` is `0`
   rather than `+∞`; the quantity is meaningful for `0 < q < 1`, and the open problem concerns
   `0 < q < 1/2`.
+* For `R ≤ 0` the condition `exp (n R) ≤ M` allows a one-message code with error `0`, so
+  `bscReliability q R = 0` (including `R = 0`, where the true exponent is `+∞`). The quantity is
+  meaningful only for `R > 0`, which is what `bscReliability_le` assumes.
 * `bscCriticalRate q = log 2 - h(√q / (√q + √(1 - q)))` is recorded from memory of the
   standard formula and should be checked against the source; nothing is proved about it.
 

@@ -45,7 +45,9 @@ Differences from the textbook statements. The dependence condition is the weak f
 The design is balanced with known variance (each comparison has the same weight `1/√2` on the
 control); unequal group sizes give loadings `a j ≠ 1/√2` and are covered by
 `Targets/Statistics/BHOneFactor.lean` only after rewriting the statistics in that form, which
-is not done here. Estimated variances (Dunnett's multivariate `t` statistics) are not covered.
+is not done here. Estimated variances (Dunnett's multivariate `t` statistics) are not covered. True nulls are
+point nulls (`μ i = 0`); composite one-sided nulls `μ i ≤ 0` are not covered for the error
+bounds (the PRDS part allows any shift, but p-value validity is proved only at `μ i = 0`).
 Shifts `μ j` of false nulls are arbitrary reals.
 
 Not covered: Dunnett's own simultaneous procedure (its critical values); `t` statistics with

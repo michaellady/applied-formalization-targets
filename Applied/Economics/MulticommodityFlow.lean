@@ -22,7 +22,8 @@ defined here.
 Proved: `routable_zero`; `Routable.smul` (scaling down); `Routable.combo` and
 `convex_routable` (time sharing);
 `Routable.rate_le_source_cap` (a session's rate is at most the total capacity at its source),
-so the routable region is a bounded convex set containing `0`.
+so the routable region is a convex set containing `0` whose rates are bounded above (negative
+rates are not excluded by the definition, and no lower bound is stated as a theorem).
 -/
 
 open Finset

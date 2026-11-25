@@ -29,7 +29,9 @@ same for `m - mean`, and `P(|mean - m| ≥ ε) ≤ 2 exp(-2 n ε² / (b - a)²)`
 
 Differences from textbook statements. The variables need not be identically distributed: only
 a common mean (and a common variance for Chebyshev) is assumed; corollaries for pairwise
-independent identically distributed variables are included for Chebyshev. When `a = b` the
+independent identically distributed variables are included for Chebyshev; there the hypotheses
+are imposed on the whole sequence (`X i` pairwise independent for all `i, j ∈ ℕ`, and every
+`X i` distributed as `X 0`), not only on the first `n` variables. When `a = b` the
 exponent `-2 n ε² / (b - a)²` is `0` by Lean's division convention, so the Hoeffding tail bounds
 are then trivial (`≤ 1`, `≤ 2`); the confidence interval therefore assumes `a < b`. Probabilities
 are real numbers (`Measure.real`).
