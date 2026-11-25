@@ -62,6 +62,7 @@ structure IsRouting (G : Network V) (σ : K → Session V) (r : K → ℝ) (f : 
 def Routable (G : Network V) (σ : K → Session V) (r : K → ℝ) : Prop :=
   ∃ f, IsRouting G σ r f
 
+/-- Net outflow is linear in the flow. -/
 lemma netOut_combo (g g' : V → V → ℝ) (a b : ℝ) (v : V) :
     netOut (fun u w => a * g u w + b * g' u w) v = a * netOut g v + b * netOut g' v := by
   simp only [netOut, Finset.sum_add_distrib, ← Finset.mul_sum]

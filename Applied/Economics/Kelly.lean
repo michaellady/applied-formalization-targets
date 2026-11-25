@@ -31,17 +31,21 @@ noncomputable def kellyGrowth (p b f : ℝ) : ℝ :=
 /-- The Kelly fraction `(p (b + 1) - 1) / b`, also written `p - (1 - p) / b`. -/
 noncomputable def kellyFraction (p b : ℝ) : ℝ := (p * (b + 1) - 1) / b
 
+/-- The Kelly fraction in the form `p - (1 - p) / b` (win probability minus loss probability
+over the odds). -/
 lemma kellyFraction_eq (p b : ℝ) (hb : b ≠ 0) : kellyFraction p b = p - (1 - p) / b := by
   unfold kellyFraction
   field_simp
   ring
 
+/-- Wealth factor after a win when betting the Kelly fraction: `1 + b f* = p (b + 1)`. -/
 lemma one_add_mul_kellyFraction (p b : ℝ) (hb : b ≠ 0) :
     1 + b * kellyFraction p b = p * (b + 1) := by
   unfold kellyFraction
   field_simp
   ring
 
+/-- Wealth factor after a loss when betting the Kelly fraction: `1 - f* = (1 - p)(b + 1)/b`. -/
 lemma one_sub_kellyFraction (p b : ℝ) (hb : b ≠ 0) :
     1 - kellyFraction p b = (1 - p) * (b + 1) / b := by
   unfold kellyFraction

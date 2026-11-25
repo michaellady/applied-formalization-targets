@@ -42,16 +42,19 @@ maximum over all `T ⊆ S` of `min (u T) (u (S \ T))`. -/
 def mms2 (u : G → ℝ) (S : Finset G) : ℝ :=
   S.powerset.sup' S.powerset_nonempty fun T => min (∑ h ∈ T, u h) (∑ h ∈ S \ T, u h)
 
+/-- Every split `(T, S \ T)` of `S` gives a lower bound for the two-agent maximin share. -/
 lemma min_le_mms2 (u : G → ℝ) {S T : Finset G} (hT : T ⊆ S) :
     min (∑ h ∈ T, u h) (∑ h ∈ S \ T, u h) ≤ mms2 u S :=
   Finset.le_sup' (fun T => min (∑ h ∈ T, u h) (∑ h ∈ S \ T, u h)) (mem_powerset.2 hT)
 
+/-- The two-agent maximin share is attained by some split. -/
 lemma exists_mms2_eq (u : G → ℝ) (S : Finset G) :
     ∃ T ⊆ S, mms2 u S = min (∑ h ∈ T, u h) (∑ h ∈ S \ T, u h) := by
   obtain ⟨T, hT, h⟩ := Finset.exists_mem_eq_sup' S.powerset_nonempty
     (fun T => min (∑ h ∈ T, u h) (∑ h ∈ S \ T, u h))
   exact ⟨T, mem_powerset.1 hT, h⟩
 
+/-- To bound the two-agent maximin share from above it suffices to bound every split. -/
 lemma mms2_le {u : G → ℝ} {S : Finset G} {c : ℝ}
     (h : ∀ T ⊆ S, min (∑ h ∈ T, u h) (∑ h ∈ S \ T, u h) ≤ c) : mms2 u S ≤ c :=
   Finset.sup'_le _ _ fun T hT => h T (mem_powerset.1 hT)

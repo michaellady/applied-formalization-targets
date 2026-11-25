@@ -45,6 +45,8 @@ lemma mixedPayoff_fin_two (u : Fin 2 → (∀ j, S j) → ℝ) (σ : ∀ j, S j 
   simp only [piFinTwoEquiv_symm_apply, Fin.cons_zero, Fin.cons_one]
   ring
 
+/-- For two players, the expected payoff of player `i` under the mixed profile `σ` is the
+bilinear form `(σ 0)ᵀ Aᵢ (σ 1)` of player `i`'s payoff matrix `Aᵢ = twoPlayerMatrix u i`. -/
 lemma mixedPayoff_fin_two_eq_gamePayoff (u : Fin 2 → (∀ j, S j) → ℝ) (σ : ∀ j, S j → ℝ)
     (i : Fin 2) : mixedPayoff u σ i = gamePayoff (twoPlayerMatrix u i) (σ 0) (σ 1) := by
   rw [mixedPayoff_fin_two, gamePayoff_eq_sum]
@@ -221,6 +223,8 @@ namespace Applied.Economics
 
 variable {S : Fin 2 → Type*} [∀ i, Fintype (S i)]
 
+/-- Replacing every entry `A a b` of the payoff matrix by `c - A a b` replaces the expected
+payoff of a pair of mixed strategies by `c` minus the old expected payoff. -/
 lemma gamePayoff_const_sub {m n : Type*} [Fintype m] [Fintype n] (A : Matrix m n ℝ) (c : ℝ)
     {p : m → ℝ} {q : n → ℝ} (hp : p ∈ mixedStrategies m) (hq : q ∈ mixedStrategies n) :
     gamePayoff (Matrix.of fun a b => c - A a b) p q = c - gamePayoff A p q := by

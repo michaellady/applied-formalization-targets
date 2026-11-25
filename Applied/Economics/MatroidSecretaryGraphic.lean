@@ -470,11 +470,12 @@ theorem hasCompetitiveRandomized_partitionOne_inv_exp {ι : Type*} (f : E → ι
   obtain ⟨A, hA, hc⟩ := exists_isCompetitive_partitionOne_inv_exp f
   exact hc.hasCompetitiveRandomized hA
 
-/-- **Graphic matroids of loopless multigraphs: constant `1/(2e)`.** For every finite loopless
-multigraph (vertex type `V`, edge type `E`, edge `e` joining `src e ≠ tgt e`), the graphic
-matroid has a feasible randomized online algorithm that is `1/(2e)`-competitive: draw a
-uniformly random vertex order, orient every edge towards its later endpoint and run the
-`⌊nᵥ/e⌋` rule independently among the edges entering each vertex `v`. -/
+/-- **Graphic matroids: constant `1/(2e)`.** For every finite multigraph (vertex type `V`,
+edge type `E`, edge `e` joining `src e` and `tgt e`; parallel edges and loops are allowed, and
+no hypothesis `src e ≠ tgt e` is needed because loops are dependent and are never accepted),
+the graphic matroid has a feasible randomized online algorithm that is `1/(2e)`-competitive:
+draw a uniformly random vertex order, orient every non-loop edge towards its later endpoint
+and run the `⌊nᵥ/e⌋` rule independently among the edges entering each vertex `v`. -/
 theorem hasCompetitiveRandomized_graphic {V : Type} [Fintype V] (src tgt : E → V) :
     HasCompetitiveRandomized (graphic src tgt) (1 / (2 * Real.exp 1)) := by
   have := hasCompetitiveRandomized_graphic_of_partition (src := src) (tgt := tgt)

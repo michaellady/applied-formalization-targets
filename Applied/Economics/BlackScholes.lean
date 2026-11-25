@@ -33,13 +33,16 @@ noncomputable def stdNormalCDF (x : ℝ) : ℝ := cdf (gaussianReal 0 1) x
 /-- Standard normal density. -/
 noncomputable def stdNormalPDF (x : ℝ) : ℝ := gaussianPDFReal 0 1 x
 
+/-- The standard normal density is `exp (-x² / 2) / √(2π)`. -/
 lemma stdNormalPDF_eq (x : ℝ) : stdNormalPDF x = (√(2 * π))⁻¹ * exp (-x ^ 2 / 2) := by
   simp [stdNormalPDF, gaussianPDFReal]
 
+/-- The standard normal density is continuous. -/
 lemma continuous_stdNormalPDF : Continuous stdNormalPDF := by
   have : stdNormalPDF = fun x => (√(2 * π))⁻¹ * exp (-x ^ 2 / 2) := funext stdNormalPDF_eq
   rw [this]; fun_prop
 
+/-- The standard normal distribution function is the integral of the density over `(-∞, x]`. -/
 lemma stdNormalCDF_eq_integral (x : ℝ) :
     stdNormalCDF x = ∫ t in Set.Iic x, stdNormalPDF t := by
   rw [stdNormalCDF, cdf_eq_real, measureReal_def,
