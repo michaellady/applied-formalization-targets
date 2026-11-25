@@ -36,14 +36,16 @@ Not covered: the Lovász theta function and the bound `Θ ≤ ϑ` (so `Θ(C₅) 
 (Fekete's lemma); the link between `Θ` and zero-error codes for a channel.
 
 Lovász's bound (added later; it supersedes the "Not covered" sentence above as far as the
-bound `Θ ≤ ϑ` for single representations, `Θ(C₅) = √5` and `Θ(C₇) < 3.3177` go). Lovász's
-orthonormal-representation bound `Θ(G) ≤ max_v 1/⟪c, u v⟫²` is formalized in
-`Targets/InformationTheory/LovaszThetaBound.lean` (`shannonCapacity_le_of_isOrthonormalRep`),
-together with `Θ(C₇) ≤ 70000/21099 ≈ 3.3176928` (`shannonCapacityC7_le`) from an explicit
-orthonormal representation of `C₇` in `ℝ⁷`; this is about `2.6 · 10⁻⁵` above
-`ϑ(C₇) ≈ 3.3176672`, and the exact bound `Θ(C₇) ≤ ϑ(C₇)` is still not formalized. `Θ(C₅) = √5`
-is in `Targets/InformationTheory/ShannonCapacityC5.lean`. The Lovász theta function itself is
-not defined.
+bound `Θ ≤ ϑ`, `Θ(C₅) = √5` and `Θ(C₇) ≤ 7 cos(π/7)/(1 + cos(π/7))` go). Lovász's
+orthonormal-representation bound `Θ(G) ≤ max_v 1/⟪c, u v⟫²`, for one representation at a time,
+is formalized in `Targets/InformationTheory/LovaszThetaBound.lean`
+(`shannonCapacity_le_of_isOrthonormalRep`). The `≤` half of `ShannonCapacityC7EqLovaszTheta`,
+`shannonCapacityC7 ≤ 7 cos(π/7)/(1 + cos(π/7))`, is `shannonCapacityC7_le_lovaszTheta` in
+`Targets/InformationTheory/LovaszOddCycle.lean` (from the bound for all odd cycles); a purely
+rational bound `shannonCapacityC7 ≤ 70000/21099 ≈ 3.3176928` is `shannonCapacityC7_le` in
+`LovaszThetaBound.lean`. `Θ(C₅) = √5` is in `Targets/InformationTheory/ShannonCapacityC5.lean`.
+The Lovász theta function itself is not defined, and the reverse inequality (the open part)
+is untouched.
 -/
 
 open Applied.InformationTheory

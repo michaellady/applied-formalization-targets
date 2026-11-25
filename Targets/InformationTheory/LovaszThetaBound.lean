@@ -52,11 +52,15 @@ claim `0 ≤ M` for arbitrary `M`). The strong-power bound needs the representat
 finite-dimensional `EuclideanSpace ℝ ι`; products `G ⊠ H` of two different graphs are not
 treated. The bound for `C₇` is the rational `70000/21099`, which exceeds Lovász's
 `ϑ(C₇) = 7 cos(π/7)/(1 + cos(π/7)) ≈ 3.3176672` by about `2.6 · 10⁻⁵`; the exact value is not
-proved here (it needs `t = 1/(2 cos(π/7))`, which is irrational).
+proved in this file (it needs `t = 1/(2 cos(π/7))`, which is irrational; see below).
+
+The exact bound `Θ(C₇) ≤ 7 cos(π/7)/(1 + cos(π/7))`, and the bound for every odd cycle, are in
+`Targets/InformationTheory/LovaszOddCycle.lean`; the rational bound here is an independent,
+purely rational check.
 
 Not covered: the definition of `ϑ` and its other characterizations (eigenvalue and
 semidefinite-programming forms); `ϑ(G) ϑ(Ḡ) ≥ |V|`; any lower bound on `Θ(C₇)` beyond the
-library's `3 ≤ Θ(C₇)`; the exact bound `Θ(C₇) ≤ ϑ(C₇)`; general odd cycles.
+library's `3 ≤ Θ(C₇)`.
 -/
 
 namespace Targets.InformationTheory
