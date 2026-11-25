@@ -85,10 +85,16 @@ Further results in separate registry entries.
   `c`-competitive randomized algorithm is closed under direct sums (along a given block
   decomposition) and restriction; competitiveness is monotone in `c`; `c ≤ 1` whenever the
   matroid has a non-loop.
+* `Targets/Economics/MatroidSecretaryUniform.lean`: the conclusion holds with `c = e⁻²` for
+  uniform matroids of every rank `k` (random colouring with `k` colours, then the `1/e` rule in
+  each colour class) and, via direct sums, for partition matroids with arbitrary capacities
+  (finite index type). The known constant for uniform matroids is better (`1/e`, and
+  `1 - O(1/√k)` for large `k`).
 
 Not proved: optimality of the `1/e` rule among all online rules for the classical problem;
-any constant for general matroids or for other classes (uniform matroids of rank `k ≥ 2`,
-graphic, transversal, laminar, …); the known `O(log log rank)`-competitive algorithms.
+any constant for general matroids or for other classes (graphic, transversal, laminar, …);
+the known constants for uniform matroids; the known `O(log log rank)`-competitive
+algorithms.
 -/
 
 namespace Targets.Economics
