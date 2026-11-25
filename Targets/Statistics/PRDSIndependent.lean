@@ -30,8 +30,8 @@ The dependence condition. `Applied.MultipleTesting.IsPRDSOn` is the
 conditioning-on-`pᵢ ≤ t` form used by Blanchard and Roquain (sometimes called weak PRDS),
 cleared of denominators: `P(D, pᵢ ≤ s) · P(pᵢ ≤ t) ≤ P(D, pᵢ ≤ t) · P(pᵢ ≤ s)` for `s ≤ t`.
 It is not the definition of Benjamini and Yekutieli, whose PRDS conditions on `pᵢ = t`. The
-classical condition is believed to imply this form (standard in the literature), but that
-implication is not formalized here. Every theorem named "under PRDS" or "of_prds" in this
+classical condition implies this form: `Applied.MultipleTesting.IsClassicalPRDSOn.isPRDSOn`
+(`Targets/Statistics/ClassicalPRDS.lean`). Every theorem named "under PRDS" or "of_prds" in this
 project is proved under this form.
 
 Not covered: no validity of the p-values is needed or used for the dependence statement; the

@@ -25,8 +25,8 @@ The dependence condition, stated plainly. `Applied.MultipleTesting.IsPRDSOn` is 
 conditioning-on-`pᵢ ≤ t` form used by Blanchard and Roquain (sometimes called weak PRDS),
 cleared of denominators: `P(D, pᵢ ≤ s) · P(pᵢ ≤ t) ≤ P(D, pᵢ ≤ t) · P(pᵢ ≤ s)` for `s ≤ t`.
 It is not the definition of Benjamini and Yekutieli, whose PRDS conditions on `pᵢ = t`. The
-classical condition is believed to imply this form (standard in the literature), but that
-implication is not formalized here. Every theorem named "under PRDS" or "of_prds" in this
+classical condition implies this form: `Applied.MultipleTesting.IsClassicalPRDSOn.isPRDSOn`
+(`Targets/Statistics/ClassicalPRDS.lean`). Every theorem named "under PRDS" or "of_prds" in this
 project is proved under this form. So the first alias below is Benjamini–Yekutieli's Theorem 1.2 with their
 hypothesis replaced by this form, not with their hypothesis verbatim.
 
@@ -34,8 +34,9 @@ Hochberg's procedure here is the textbook step-up rule, including its treatment 
 p-values (a block of ties uses the divisor of its last position); see
 `Targets/Statistics/Simes.lean`.
 
-Not yet covered: that specific distributions (for example one-sided tests of positively
-correlated normals) satisfy the condition.
+Specific distributions satisfying the condition: independent and factor-model families (see
+the `PRDS*` registry files) and, in general, one-sided tests on jointly normal statistics with
+non-negative covariances (`Targets/Statistics/PRDSGaussian.lean`).
 -/
 
 namespace Targets.Statistics
