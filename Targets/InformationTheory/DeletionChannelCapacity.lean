@@ -1,4 +1,4 @@
-import Applied.InformationTheory.DeletionChannel
+import Applied.InformationTheory.DeletionUpperBound
 
 /-!
 # Open: the capacity of the binary deletion channel
@@ -27,10 +27,13 @@ together with what is proved about it; no proposition is asserted.
 
 What is proved: the kernel is row-stochastic for `d ∈ [0, 1]`
 (`isStochastic_deletionChannel`); `0 ≤ C(d) ≤ log 2` (`deletionCapacity_bounds`);
-`C(0) = log 2` (`deletionCapacity_zero`) and `C(1) = 0` (`deletionCapacity_one`).
+`C(0) = log 2` (`deletionCapacity_zero`) and `C(1) = 0` (`deletionCapacity_one`); and the
+erasure upper bound `C(d) ≤ (1 - d) log 2` for `d ∈ [0, 1]` (`deletionCapacity_le_erasure`,
+proved in `Targets/InformationTheory/DeletionErasureBound.lean` by writing the deletion kernel
+as the erasure kernel followed by removal of the erasure symbols, then applying data
+processing and the weak converse of `Targets/InformationTheory/ChannelCodingConverse.lean`).
 
-Known but NOT formalized here: `C(d) ≤ (1 - d) log 2` (a genie revealing the deleted positions
-turns the channel into an erasure channel); `C(d) > 0` for every `d < 1`, with lower bounds of
+Known but NOT formalized here: `C(d) > 0` for every `d < 1`, with lower bounds of
 order `(1 - d)/9` (in bits; constant to be confirmed) for `d → 1`; `C(d) = 1 - (1 + o(1)) h(d)`
 bits as `d → 0` (to be confirmed); Dobrushin's theorem that `C(d) = lim (1/n) max I(Xⁿ; Y)`.
 
@@ -48,7 +51,8 @@ Review notes (modelling choices to check).
 * No feedback; the decoder knows `n` (it is a function on `DelOut n`) but not the deletion
   pattern.
 
-Not covered: every non-trivial bound on `C(d)`; insertion and substitution errors; non-binary
+Not covered: every non-trivial bound on `C(d)` other than the erasure upper bound (in
+particular every positive lower bound); insertion and substitution errors; non-binary
 alphabets.
 -/
 
@@ -74,5 +78,10 @@ theorem deletionCapacity_zero : deletionCapacity 0 = Real.log 2 :=
 /-- If every bit is deleted the capacity is `0`. -/
 theorem deletionCapacity_one : deletionCapacity 1 = 0 :=
   Applied.InformationTheory.deletionCapacity_one
+
+/-- Erasure upper bound: `C(d) ≤ (1 - d) log 2` for `d ∈ [0, 1]`. -/
+theorem deletionCapacity_le_erasure {d : ℝ} (h0 : 0 ≤ d) (h1 : d ≤ 1) :
+    deletionCapacity d ≤ (1 - d) * Real.log 2 :=
+  Applied.InformationTheory.deletionCapacity_le_one_sub_mul_log_two h0 h1
 
 end Targets.InformationTheory
