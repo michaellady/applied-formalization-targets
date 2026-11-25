@@ -3,6 +3,38 @@ import Applied.InformationTheory.MultiTerminal
 
 /-!
 # The cut-set upper bound for the discrete memoryless relay channel
+
+All logarithms are natural (nats). Alphabets are finite. The relay channel, relay codes,
+achievable rates and `relayCapacity` are those of `Applied/InformationTheory/MultiTerminal.lean`
+(strictly causal deterministic relay, maximal error criterion in `RelayAchievable`).
+
+Single-letter quantities, for an input law `p` on `X × X₁`:
+
+* `relayRecv W`: the channel `V(y | x, x₁) = ∑_{y₁} W(y, y₁ | x, x₁)` to the receiver alone.
+* `cutMAC W p = I(X, X₁; Y)`, the mutual information of `p` through `relayRecv W`.
+* `cutBC W p = I(X; Y, Y₁ | X₁) = H(Y, Y₁ | X₁) - H(Y, Y₁ | X, X₁)`, where
+  `H(Y, Y₁ | X₁)` is `condEntropy` of the joint law `relayJointX1 W p` of `X₁` and `(Y, Y₁)`
+  and `H(Y, Y₁ | X, X₁) = ∑ₐ p(a) H(W(· | a))`.
+* `relayCutSet W = sup_p min {cutMAC W p, cutBC W p}` over probability vectors `p` on
+  `X × X₁` (a supremum; that it is attained is not proved).
+
+Results.
+
+* `sum_prod_causal_mul`: for a causally generated sequence, the letter at time `t` may be
+  replaced by its conditional law given the past (the memorylessness step).
+* `RelayCode.timeInput W c t`: the law of `(Xₜ, X₁ₜ)` under the code with a uniform message;
+  `RelayCode.sum_outProb_mul_at`: the time-`t` outputs have law `W` given the time-`t` inputs.
+* `RelayCode.mutualInfo_recvJoint_le`: `I(message; Yⁿ) ≤ ∑ₜ I(Xₜ, X₁ₜ; Yₜ)`.
+* `RelayCode.mutualInfo_fullJoint_le`: `I(message; Yⁿ, Y₁ⁿ) ≤ ∑ₜ I(Xₜ; Yₜ, Y₁ₜ | X₁ₜ)`.
+* `RelayCode.one_sub_avgError_mul_log_le_mutualInfo` (Fano):
+  `(1 - Pₑ) log M ≤ I(message; Yⁿ) + log 2` with `Pₑ` the average error probability.
+* `entropy_concave`, `condEntropy_concave`, `cutMAC_concave`, `cutBC_concave`: both cuts are
+  concave in `p`, so the time average of the `timeInput`s single-letterizes the bound.
+* `RelayCode.one_sub_avgError_mul_log_le_relayCutSet`: **per-code cut-set bound**
+  `(1 - Pₑ) log M ≤ n · relayCutSet W + log 2` for every relay code of length `n` with
+  `M ≥ 1` messages.
+* `RelayAchievable.le_relayCutSet`, `relayCapacity_le_relayCutSet`: **cut-set bound**
+  (Cover–El Gamal 1979) `relayCapacity W ≤ relayCutSet W`.
 -/
 
 open Finset Real
