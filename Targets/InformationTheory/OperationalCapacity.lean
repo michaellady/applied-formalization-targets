@@ -66,10 +66,11 @@ converse half `opCapacity (memoryless W) ≤ capacity W`, together with the weak
 `(1 - Pₑ) log M ≤ capacity (F.kernel n) + log 2` for a single code and
 `opCapacity F ≤ limsup capacity (F.kernel n) / n` for a general family, is proved in
 `Targets/InformationTheory/ChannelCodingConverse.lean`; achievability is not formalized in
-general. It is proved for the binary erasure channel, giving the full coding theorem
-`opCapacity (memoryless (bec e)) = (1 - e) log 2` (`Targets/InformationTheory/BecCodingTheorem.lean`),
-and for the BSC at `q = 0, 1/2, 1` and letter-wise zero-error-decodable channels
-(`Targets/InformationTheory/ZeroErrorCodingEndpoints.lean`). Also
+general. It is proved for the binary erasure channel and the binary symmetric channel, giving
+the full coding theorems `opCapacity (memoryless (bec e)) = (1 - e) log 2`
+(`Targets/InformationTheory/BecCodingTheorem.lean`) and `opCapacity (memoryless (bsc q)) =
+log 2 - h(q)` (`Targets/InformationTheory/BscCodingTheorem.lean`), and for letter-wise
+zero-error-decodable channels (`Targets/InformationTheory/ZeroErrorCodingEndpoints.lean`). Also
 not covered: the equivalence of maximal and average error criteria; strong converses.
 -/
 

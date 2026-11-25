@@ -24,13 +24,13 @@ Also recorded: for every input distribution `p`, `I(p, bsc q) = H(output) - h(q)
 attains equality (`mutualInfo_bsc_uniform`).
 
 Difference from the textbook statement: none in content; units are nats, not bits. This is the
-*information* capacity; the coding theorem identifying it with the operational capacity is not
-formalized.
+*information* capacity; the coding theorem identifying it with the operational capacity is in
+`Targets/InformationTheory/BscCodingTheorem.lean`.
 
-Not covered: uniqueness of the maximizing input (for `q ≠ 1/2`); the coding theorem for
-`q ∉ {0, 1/2, 1}` (the converse half is in `Targets/InformationTheory/ChannelCodingConverse.lean`;
-the full coding theorem at `q = 0, 1/2, 1` is in
-`Targets/InformationTheory/ZeroErrorCodingEndpoints.lean`); error exponents.
+Not covered here: uniqueness of the maximizing input (for `q ≠ 1/2`); the coding theorem, which
+is proved in `Targets/InformationTheory/BscCodingTheorem.lean` (`opCapacity (memoryless (bsc q))
+= log 2 - h(q)` for all `0 ≤ q ≤ 1`; converse half in
+`Targets/InformationTheory/ChannelCodingConverse.lean`); error exponents.
 -/
 
 namespace Targets.InformationTheory

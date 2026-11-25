@@ -39,7 +39,8 @@ For a non-stochastic `W` the first item is a statement about the library's `Achi
 predicate only (error "probabilities" are then just sums of matrix entries). Units are nats.
 Maximal error criterion.
 
-Not covered: the BSC for `q ∉ {0, 1/2, 1}` (random coding, typical sets, Gallager's bound);
+Not covered here: the BSC for `q ∉ {0, 1/2, 1}` (now proved in
+`Targets/InformationTheory/BscCodingTheorem.lean`, which supersedes the BSC items here);
 general memoryless channels, i.e. the achievability half `capacity W ≤ opCapacity (memoryless W)`
 of Shannon's theorem; zero-error capacity of channels that are not letter-wise decodable.
 -/
