@@ -18,6 +18,10 @@ control the family-wise error rate under arbitrary dependence between the p-valu
 * `measure_exists_le_le`: union bound for valid p-values.
 * `fwer_bonferroni_le`, `fwer_holm_le`: both procedures have FWER at most `α`.
 
+`holm` is written without sorting; `holmSorted_eq_holm` in
+`Applied.Statistics.SortedProcedures` proves that it agrees with the textbook step-down rule on
+sorted p-values (for `α ≥ 0`, any tie-breaking).
+
 ## Conventions
 
 No measurability of the p-values is assumed; statements use the (outer) measure of the event.

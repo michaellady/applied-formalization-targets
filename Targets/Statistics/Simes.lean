@@ -22,13 +22,16 @@ Hochberg's procedure as formalized: reject `i` when some `j` with `pᵢ ≤ pⱼ
 the divisor is `m - k + 1` for the p-value at position `k`. A block of tied p-values uses the
 divisor of its last position, so for `α ≥ 0` the rejection set is the one the sorted rule
 gives under every ordering of the ties; for example two p-values both equal to `x` with
-`α / 2 < x ≤ α` are both rejected. The equivalence with the sorted formulation is a paper
-argument and is not formalized. Proved instead: the rule rejects at least what the more
-conservative rule with divisor `#{l : pⱼ ≤ p_l}` (first position of the tie block) rejects;
-equal p-values `x ≤ α` are all rejected, while the conservative rule rejects none of them
-when `x > α / m`.
+`α / 2 < x ≤ α` are both rejected. The equivalence with the sorted formulation (for
+`α ≥ 0`, hypotheses indexed by `Fin m`, every sorting permutation) is proved in
+`Targets/Statistics/SortedProcedures.lean` (`hochbergSorted_eq_hochberg`). Also proved: the
+rule rejects at least what the more conservative rule with divisor `#{l : pⱼ ≤ p_l}` (first
+position of the tie block) rejects; equal p-values `x ≤ α` are all rejected, while the
+conservative rule rejects none of them when `x > α / m`.
 
-All three are proved here under mutual independence only. Their validity under positive
+The Simes inequality is an equality for independent, exactly uniform p-values
+(`Targets/Statistics/SimesIdentity.lean`). All three are proved here under mutual
+independence only. Their validity under positive
 dependence is a later rung of the ladder.
 -/
 

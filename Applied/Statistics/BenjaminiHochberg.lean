@@ -17,6 +17,12 @@ For a vector of p-values `q : ι → ℝ` with `m = |ι|`:
 * `bhK_update_eq`: the leave-one-out lemma. If hypothesis `i` is rejected, setting its p-value
   to zero does not change the number of rejections.
 * `fdp_bhReject_le`: pointwise bound on the false discovery proportion.
+
+`bhReject` is written without sorting; `bhSorted_eq_bhReject` in
+`Applied.Statistics.SortedProcedures` proves that it agrees with the textbook step-up rule on
+sorted p-values (for `α ≥ 0`, any tie-breaking). `fdr_bhReject_eq` in
+`Applied.Statistics.SimesExact` shows that the bound `α m₀ / m` is attained for exactly uniform
+independent null p-values.
 -/
 
 open Finset
