@@ -438,6 +438,145 @@ theorem reducedCost_eq (b : ℕ → Bool) (hbn : b n = false) (k : Fin n) {d : F
   rw [show n - 1 - (k : ℕ) + 1 = (n - 1 - k) + 1 from rfl, pow_succ] at hc
   cases h : b k <;> simp [h] at hc ⊢ <;> linarith
 
+/-! ### One step of Dantzig's rule -/
+
+theorem eq_bs_of_mem (T : Fin n → Bool) {c : Fin (n + n)} (hc : c ∈ basisOf T) :
+    c = bs T (pairIdx c) := by
+  rcases col_cases c with ⟨j, rfl⟩ | ⟨k, rfl⟩
+  · simp only [xc_mem_basisOf] at hc; simp [bs, hc]
+  · simp only [sc_mem_basisOf] at hc; simp [bs, hc]
+
+/-- Flipping pair `k`: the basis obtained from `basisOf T` by letting `nb T k` enter and
+`bs T k` leave. -/
+theorem insert_erase_eq (T : Fin n → Bool) (k : Fin n) :
+    insert (nb T k) ((basisOf T).erase (bs T k)) = basisOf (Function.update T k (!T k)) := by
+  ext c
+  rcases col_cases c with ⟨j, rfl⟩ | ⟨j, rfl⟩ <;> by_cases hj : j = k
+  · subst hj; cases h : T j <;> simp [nb, bs, h, xc_ne_sc]
+  · have h1 : xc j ≠ nb T k := by
+      unfold nb; split_ifs
+      · exact xc_ne_sc _ _
+      · exact fun h => hj (xc_injective h)
+    have h2 : xc j ≠ bs T k := by
+      unfold bs; split_ifs
+      · exact fun h => hj (xc_injective h)
+      · exact xc_ne_sc _ _
+    simp [h1, h2, Function.update_of_ne hj]
+  · subst hj; cases h : T j <;> simp [nb, bs, h, (xc_ne_sc _ _).symm]
+  · have h1 : sc j ≠ nb T k := by
+      unfold nb; split_ifs
+      · exact fun h => hj (sc_injective h)
+      · exact (xc_ne_sc _ _).symm
+    have h2 : sc j ≠ bs T k := by
+      unfold bs; split_ifs
+      · exact (xc_ne_sc _ _).symm
+      · exact fun h => hj (sc_injective h)
+    simp [h1, h2, Function.update_of_ne hj]
+
+theorem pow_le_pow_of_le' {k k' : ℕ} (h : k ≤ k') :
+    (10 : ℚ) ^ (n - 1 - k') ≤ 10 ^ (n - 1 - k) :=
+  pow_le_pow_right₀ (by norm_num) (by omega)
+
+/-- At `basisOf (grayT b)` with `b n = false`, if `k₀` is the first index with `b k₀ = false`,
+then flipping pair `k₀` is a pivot of Dantzig's rule. -/
+theorem isDantzigPivot_flip (b : ℕ → Bool) (hbn : b n = false) (k₀ : Fin n)
+    (hk₀ : b k₀ = false) (hmin : ∀ j < (k₀ : ℕ), b j = true) :
+    (kleeMinty n).IsDantzigPivot (basisOf (grayT b))
+      (basisOf (Function.update (grayT b) k₀ (!grayT b k₀))) := by
+  set T := grayT (n := n) b with hT
+  obtain ⟨d, hd⟩ := (isBasis_basisOf T).exists_isEdgeDir (nb_not_mem T k₀)
+  have hrc := reducedCost_eq b hbn k₀ hd
+  rw [hk₀] at hrc
+  simp only [Bool.false_eq_true, ↓reduceIte, mul_one] at hrc
+  have hpos : (0 : ℚ) < (kleeMinty n).c ⬝ᵥ d := by rw [hrc]; positivity
+  have hdi := (edgeDir_low T k₀ hd).2.2.2
+  rw [← insert_erase_eq]
+  refine ⟨⟨isFeasibleBasis_basisOf T, ?_, bs T k₀, bs_mem T k₀, nb T k₀, nb_not_mem T k₀, rfl,
+    d, hd, hpos, by rw [hdi]; norm_num⟩, nb T k₀, mem_insert_self _ _, nb_not_mem T k₀, d, hd,
+    fun j' hj' d' hd' => ?_⟩
+  · rw [insert_erase_eq]; exact isFeasibleBasis_basisOf _
+  · rw [eq_nb_of_not_mem T hj'] at hd'
+    rw [reducedCost_eq b hbn _ hd', hrc]
+    cases h : b (pairIdx j')
+    · have : (k₀ : ℕ) ≤ pairIdx j' := by
+        by_contra hlt; have := hmin (pairIdx j') (by omega); rw [h] at this
+        exact absurd this (by simp)
+      simpa using pow_le_pow_of_le' this
+    · have : (0 : ℚ) ≤ 10 ^ (n - 1 - (k₀ : ℕ)) := by positivity
+      have : (0 : ℚ) ≤ 10 ^ (n - 1 - (pairIdx j' : ℕ)) := by positivity
+      simp; linarith
+
+/-- Conversely, every pivot of Dantzig's rule at `basisOf (grayT b)` flips pair `k₀`. -/
+theorem eq_of_isDantzigPivot (b : ℕ → Bool) (hbn : b n = false) (k₀ : Fin n)
+    (hk₀ : b k₀ = false) (hmin : ∀ j < (k₀ : ℕ), b j = true) {B' : Finset (Fin (n + n))}
+    (h : (kleeMinty n).IsDantzigPivot (basisOf (grayT b)) B') :
+    B' = basisOf (Function.update (grayT b) k₀ (!grayT b k₀)) := by
+  set T := grayT (n := n) b with hT
+  obtain ⟨⟨-, hB', i, hi, j, hj, rfl, -⟩, j₁, hj₁, hj₁B, d, hd, hmax⟩ := h
+  have hj₁j : j₁ = j := by
+    rcases mem_insert.1 hj₁ with h | h
+    · exact h
+    · exact absurd (mem_of_mem_erase h) hj₁B
+  subst hj₁j
+  -- the entering column is `nb T k₀`
+  obtain ⟨d₀, hd₀⟩ := (isBasis_basisOf T).exists_isEdgeDir (nb_not_mem T k₀)
+  have hrc₀ := reducedCost_eq b hbn k₀ hd₀
+  rw [hk₀] at hrc₀
+  simp only [Bool.false_eq_true, ↓reduceIte, mul_one] at hrc₀
+  have hge := hmax _ (nb_not_mem T k₀) d₀ hd₀
+  have hjeq := eq_nb_of_not_mem T hj₁B
+  set k' := pairIdx j₁ with hk'
+  rw [hjeq] at hd
+  rw [reducedCost_eq b hbn k' hd, hrc₀] at hge
+  have hk'eq : k' = k₀ := by
+    cases h : b k'
+    · simp only [h, Bool.false_eq_true, ↓reduceIte, mul_one] at hge
+      have h1 : n - 1 - (k₀ : ℕ) ≤ n - 1 - k' :=
+        (pow_le_pow_iff_right₀ (by norm_num : (1 : ℚ) < 10)).1 hge
+      have h2 : (k₀ : ℕ) ≤ k' := by
+        by_contra hlt; have := hmin k' (by omega); rw [h] at this; exact absurd this (by simp)
+      have := k'.2; have := k₀.2
+      exact Fin.ext (by omega)
+    · simp only [h, ↓reduceIte] at hge
+      have : (0 : ℚ) < 10 ^ (n - 1 - (k₀ : ℕ)) := by positivity
+      have : (0 : ℚ) < 10 ^ (n - 1 - (k' : ℕ)) := by positivity
+      linarith
+  rw [hk'eq] at hjeq
+  -- the leaving column is `bs T k₀`
+  have hieq := eq_bs_of_mem T hi
+  set p := pairIdx i with hp
+  have hpk : p = k₀ := by
+    by_contra hne
+    have hB'eq := eq_basisOf hB'
+    set T'' := fun q => decide (xc q ∈ insert j₁ ((basisOf T).erase i)) with hT''
+    have hmem : bs T'' p ∈ basisOf T'' := bs_mem T'' p
+    rw [← hB'eq] at hmem
+    have hnbj : nb T p ≠ j₁ := by rw [hjeq]; exact fun h => hne (nb_injective T h)
+    have hbsj : bs T p ≠ j₁ := by
+      rw [hjeq]; intro h; have := congrArg pairIdx h
+      rw [pairIdx_bs, pairIdx_nb] at this; exact hne this
+    have hcases : bs T'' p = bs T p ∨ bs T'' p = nb T p := by
+      unfold bs nb; cases T'' p <;> cases T p <;> simp
+    rcases mem_insert.1 hmem with h | h
+    · rcases hcases with h' | h' <;> rw [h'] at h
+      · exact hbsj h
+      · exact hnbj h
+    · rcases hcases with h' | h' <;> rw [h'] at h
+      · rw [← hieq] at h; simp at h
+      · exact nb_not_mem T p (mem_of_mem_erase h)
+  rw [hpk] at hieq
+  rw [hjeq, hieq]
+  exact insert_erase_eq T k₀
+
+/-- If `b k = true` for all `k < n`, then `basisOf (grayT b)` is optimal. -/
+theorem isOptimalBasis_of_all (b : ℕ → Bool) (hbn : b n = false) (hall : ∀ k : Fin n, b k = true) :
+    (kleeMinty n).IsOptimalBasis (basisOf (grayT b)) := by
+  refine (isFeasibleBasis_basisOf _).isOptimalBasis_of_reducedCost_nonpos fun j hj d hd => ?_
+  rw [eq_nb_of_not_mem _ hj] at hd
+  rw [reducedCost_eq b hbn _ hd, hall]
+  have : (0 : ℚ) ≤ 10 ^ (n - 1 - (pairIdx j : ℕ)) := by positivity
+  simp
+
 end KleeMinty
 
 end Applied.Optimization
