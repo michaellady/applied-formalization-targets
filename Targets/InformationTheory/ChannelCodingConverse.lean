@@ -70,8 +70,10 @@ Differences from the textbook statements.
   converse is not covered.
 * `I(Xⁿ; Y)` is defined from the joint mass function; there are no random variables.
 
-Not covered: achievability (`capacity W ≤ opCapacity (memoryless W)`), so the channel coding
-theorem itself is *not* proved, only its converse half; equality `opCapacity = lim C_n / n`
+Achievability, and hence the full coding theorem, is proved for the binary erasure and binary
+symmetric channels (`Targets/InformationTheory/BecCodingTheorem.lean`,
+`BscCodingTheorem.lean`). Not covered: achievability for general memoryless channels
+(`capacity W ≤ opCapacity (memoryless W)`); equality `opCapacity = lim C_n / n`
 for general families (Dobrushin); strong converses; channels with feedback; continuous
 alphabets.
 -/
