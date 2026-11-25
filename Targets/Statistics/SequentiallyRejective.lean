@@ -21,8 +21,10 @@ Two instances are proved: Holm's procedure is the equal-weights case, and the fa
 procedure (Wiens 2003), which passes the level of a rejected hypothesis to the next one in a
 fixed order, controls the family-wise error rate.
 
-Not yet covered: the general weight-update rule of the graphical approach and the proof that
-it produces monotone weights.
+The general weight-update rule of the graphical approach, its monotone weights and its
+equality with the closed test are in `Targets/Statistics/GraphicalApproach.lean`; Holm,
+fallback and fixed-sequence as graphical instances are in
+`Targets/Statistics/GraphicalInstances.lean`.
 -/
 
 namespace Targets.Statistics

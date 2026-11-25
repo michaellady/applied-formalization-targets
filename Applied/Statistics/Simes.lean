@@ -103,8 +103,9 @@ to `p j` occupy a block of consecutive positions and `#{l | p j < p l} + 1` is t
 when `α ≥ 0`. Hence for `α ≥ 0` every way of ordering tied p-values gives this same rejection
 set: if the textbook rule stops at position `k`, the last position of the block of `p₍ₖ₎`
 also passes, and everything at or below that block is rejected. (The equivalence with the
-sorted formulation is an argument on paper and is not formalized; for `α < 0` the sorted rule
-can depend on the order of ties and no claim is made.)
+sorted formulation, for `α ≥ 0`, `ι = Fin m` and every sorting permutation, is
+`hochbergSorted_eq_hochberg` in `Applied.Statistics.SortedProcedures`; for `α < 0` the sorted
+rule can depend on the order of ties and no claim is made.)
 
 `hochberg_firstPosition_subset` compares this with the more conservative rule that divides by
 `#{l | p j ≤ p l}` (the first position of the tie block), and `hochberg_eq_univ_of_forall_eq`

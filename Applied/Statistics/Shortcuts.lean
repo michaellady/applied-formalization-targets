@@ -9,6 +9,9 @@ import Applied.Statistics.SequentiallyRejective
   the weight of `i` in `I` is `a i` plus the weights of the hypotheses just before `i` that are
   no longer in `I`. They are monotone and sum to at most `∑ a`, so the fallback procedure
   (Wiens 2003) controls the family-wise error rate (`fwer_fallback_le`).
+
+`Applied.Statistics.GraphicalInstances` shows that both weight families are the graphical
+weights of explicit graphs (`graphWeights_holmGraph`, `graphWeights_fallbackGraph`).
 -/
 
 open MeasureTheory Finset
