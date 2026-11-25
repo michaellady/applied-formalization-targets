@@ -50,8 +50,10 @@ point nulls (`μ i = 0`); composite one-sided nulls `μ i ≤ 0` are not covered
 bounds (the PRDS part allows any shift, but p-value validity is proved only at `μ i = 0`).
 Shifts `μ j` of false nulls are arbitrary reals.
 
-Not covered: Dunnett's own simultaneous procedure (its critical values); `t` statistics with
-a pooled variance estimate; two-sided comparisons; the classical PRDS definition.
+Not covered: `t` statistics with a pooled variance estimate; two-sided comparisons; the
+classical PRDS definition. Dunnett's own simultaneous procedure for this model (critical
+values defined by Dunnett's integral, single-step and step-down, composite nulls `μ i ≤ 0`)
+is in `Targets/Statistics/Dunnett.lean`.
 -/
 
 namespace Targets.Statistics
