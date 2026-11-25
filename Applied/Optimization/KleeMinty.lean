@@ -313,6 +313,131 @@ theorem eq_basisOf {B : Finset (Fin (n + n))} (hB : (kleeMinty n).IsFeasibleBasi
     · intro hk hxk; rcases h2 k with h | h <;> contradiction
     · intro hxk; by_contra hk; exact hnot k ⟨hxk, hk⟩
 
+/-! ### Edge directions and reduced costs -/
+
+/-- The non-basic column of pair `k` in `basisOf T`. -/
+def nb (T : Fin n → Bool) (k : Fin n) : Fin (n + n) := if T k then sc k else xc k
+
+/-- The basic column of pair `k` in `basisOf T`. -/
+def bs (T : Fin n → Bool) (k : Fin n) : Fin (n + n) := if T k then xc k else sc k
+
+theorem nb_not_mem (T : Fin n → Bool) (k : Fin n) : nb T k ∉ basisOf T := by
+  unfold nb; cases h : T k <;> simp [h]
+
+theorem bs_mem (T : Fin n → Bool) (k : Fin n) : bs T k ∈ basisOf T := by
+  unfold bs; cases h : T k <;> simp [h]
+
+theorem eq_nb_of_not_mem (T : Fin n → Bool) {c : Fin (n + n)} (hc : c ∉ basisOf T) :
+    c = nb T (pairIdx c) := by
+  rcases col_cases c with ⟨j, rfl⟩ | ⟨k, rfl⟩
+  · simp only [xc_mem_basisOf, Bool.not_eq_true] at hc; simp [nb, hc]
+  · simp only [sc_mem_basisOf, Bool.not_eq_false] at hc; simp [nb, hc]
+
+theorem pairIdx_nb (T : Fin n → Bool) (k : Fin n) : pairIdx (nb T k) = k := by
+  unfold nb; split_ifs <;> simp
+
+theorem pairIdx_bs (T : Fin n → Bool) (k : Fin n) : pairIdx (bs T k) = k := by
+  unfold bs; split_ifs <;> simp
+
+theorem nb_injective (T : Fin n → Bool) : Function.Injective (nb T) := fun a b h => by
+  rw [← pairIdx_nb T a, h, pairIdx_nb]
+
+/-- The edge direction at `basisOf T` for the entering column `nb T k` vanishes on the pairs
+before `k`, and its `x_k`-coordinate is `-1` if `x_k` is basic and `1` otherwise. -/
+theorem edgeDir_low (T : Fin n → Bool) (k : Fin n) {d : Fin (n + n) → ℚ}
+    (hd : (kleeMinty n).IsEdgeDir (basisOf T) (nb T k) d) :
+    (∀ j < (k : ℕ), X d j = 0 ∧ S d j = 0) ∧ L d k = 0 ∧
+      X d k = (if T k then -1 else 1) ∧ d (bs T k) = -1 := by
+  have hrow : ∀ i, i < n → 2 * L d i + X d i + S d i = 0 := fun i hi => by
+    rw [row_eq hd.1 i hi]; rfl
+  -- the non-basic coordinate of every pair other than `k` vanishes
+  have hother : ∀ i (hi : i < n), i ≠ k → X d i = 0 ∨ S d i = 0 := by
+    intro i hi hik
+    have hne : (⟨i, hi⟩ : Fin n) ≠ k := fun h => hik (by rw [← h])
+    have h0 := hd.2.2 (nb T ⟨i, hi⟩) (nb_not_mem T _) (fun h => hne (nb_injective T h))
+    have h1 := X_xc d ⟨i, hi⟩
+    have h2 := S_sc d ⟨i, hi⟩
+    simp only at h1 h2
+    rw [h1, h2]
+    unfold nb at h0
+    cases h : T ⟨i, hi⟩
+    · simp [h] at h0; exact Or.inl h0
+    · simp [h] at h0; exact Or.inr h0
+  have key : ∀ i : ℕ, i ≤ (k : ℕ) → ∀ j : ℕ, j < i → X d j = 0 ∧ S d j = 0 := by
+    intro i
+    induction i with
+    | zero => intro _ j hj; omega
+    | succ i ih =>
+      intro hik j hj
+      rcases Nat.lt_succ_iff_lt_or_eq.1 hj with hj | rfl
+      · exact ih (by omega) j hj
+      have hL : L d j = 0 :=
+        sum_eq_zero fun l hl => by rw [(ih (by omega) l (mem_range.1 hl)).1, mul_zero]
+      have := hrow j (by omega)
+      rcases hother j (by omega) (by omega) with h | h <;> constructor <;> linarith
+  have hlow := key k le_rfl
+  have hL : L d k = 0 := sum_eq_zero fun l hl => by rw [(hlow l (mem_range.1 hl)).1, mul_zero]
+  have hk := hrow k k.2
+  have h1 := hd.2.1
+  rw [hL, X_xc, S_sc] at hk
+  unfold nb at h1
+  unfold bs
+  refine ⟨hlow, hL, ?_⟩
+  rw [X_xc]
+  cases h : T k
+  · simp [h] at h1 ⊢; constructor <;> linarith
+  · simp [h] at h1 ⊢; linarith
+
+/-- The choice of basic variables attached to a bit sequence `b`: `x_k` is basic iff
+`b k ≠ b (k+1)` (the reflected Gray code of the number with binary digits `b`). -/
+def grayT (b : ℕ → Bool) : Fin n → Bool := fun k => b k != b (k + 1)
+
+/-- The reduced cost of the entering column `nb T k` at `basisOf T`, for `T = grayT b` with
+`b n = false`, is `10^(n-1-k)` if `b k = false` and `-10^(n-1-k)` if `b k = true`. -/
+theorem reducedCost_eq (b : ℕ → Bool) (hbn : b n = false) (k : Fin n) {d : Fin (n + n) → ℚ}
+    (hd : (kleeMinty n).IsEdgeDir (basisOf (grayT b)) (nb (grayT b) k) d) :
+    (kleeMinty n).c ⬝ᵥ d = 10 ^ (n - 1 - k) * (if b k then -1 else 1) := by
+  obtain ⟨-, hLk, hXk, -⟩ := edgeDir_low (grayT b) k hd
+  have hrow : ∀ i, i < n → 2 * L d i + X d i + S d i = 0 := fun i hi => by
+    rw [row_eq hd.1 i hi]; rfl
+  have key : ∀ m, (k : ℕ) + 1 + m ≤ n →
+      L d (k + 1 + m) = 10 ^ (m + 1) * (if b k = b (k + 1 + m) then 1 else -1) := by
+    intro m
+    induction m with
+    | zero =>
+      intro _
+      rw [add_zero, L_succ, hLk, hXk]
+      simp only [grayT]
+      by_cases h1 : b k = true <;> by_cases h2 : b (k + 1) = true <;> simp [h1, h2]
+    | succ m ih =>
+      intro hm
+      set i := (k : ℕ) + 1 + m with hi
+      have hin : i < n := by omega
+      have ih' := ih (by omega)
+      rw [show (k : ℕ) + 1 + (m + 1) = i + 1 by omega, L_succ, ih']
+      have hne : (⟨i, hin⟩ : Fin n) ≠ k := fun h => by
+        have := congrArg Fin.val h; simp at this; omega
+      have h0 := hd.2.2 (nb (grayT b) ⟨i, hin⟩) (nb_not_mem _ _)
+        (fun h => hne (nb_injective _ h))
+      have hr := hrow i hin
+      have h1 := X_xc d ⟨i, hin⟩
+      have h2 := S_sc d ⟨i, hin⟩
+      simp only at h1 h2
+      have hnb : (if (b i != b (i + 1)) = true then S d i else X d i) = 0 := by
+        rw [h1, h2]
+        simp only [nb, grayT] at h0
+        split_ifs at h0 ⊢ <;> simp_all
+      rw [ih'] at hr
+      rw [pow_succ (10 : ℚ) (m + 1)]
+      by_cases hbi : b i = true <;> by_cases hbi1 : b (i + 1) = true <;>
+        by_cases hbk : b k = true <;> simp [hbi, hbi1, hbk] at hnb hr ⊢ <;> linarith
+  have hn := key (n - 1 - k) (by omega)
+  rw [show (k : ℕ) + 1 + (n - 1 - k) = n by omega, hbn] at hn
+  have hc := objective_mul d
+  rw [hn] at hc
+  rw [show n - 1 - (k : ℕ) + 1 = (n - 1 - k) + 1 from rfl, pow_succ] at hc
+  cases h : b k <;> simp [h] at hc ⊢ <;> linarith
+
 end KleeMinty
 
 end Applied.Optimization
