@@ -7,7 +7,9 @@ import Mathlib.MeasureTheory.Constructions.BorelSpace.Order
 # Šidák correction
 
 For mutually independent p-values, rejecting when `p i ≤ 1 - (1 - α) ^ (1 / m)` controls the
-family-wise error rate at level `α`. This threshold is slightly larger than Bonferroni's `α / m`.
+family-wise error rate at level `α`. This threshold is slightly larger than Bonferroni's `α / m`. Under the global null with
+independent, exactly uniform p-values the family-wise error rate is exactly `α`
+(`fwer_sidak_eq` in `Applied.Statistics.SidakExact`).
 -/
 
 open MeasureTheory ProbabilityTheory Finset

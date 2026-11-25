@@ -27,6 +27,8 @@ Main results.
 * `fwer_graphical_le`: the graphical procedure controls the family-wise error rate, and
   `graphical_eq_closedTest`: once it stops it has rejected exactly what the closed weighted
   Bonferroni test rejects.
+
+Holm, fallback and fixed-sequence testing as graphs: `Applied.Statistics.GraphicalInstances`.
 -/
 
 open MeasureTheory Finset
