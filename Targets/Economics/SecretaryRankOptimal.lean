@@ -39,16 +39,20 @@ Differences from the textbook statement. The textbook theorem says that no stopp
 employer who observes the arrival order (and only relative ranks) beats the best threshold
 rule. Here the rank rules live on the space of relative-rank sequences, not on arrival orders;
 that the relative ranks of a uniformly random arrival order are uniform on this space
-(equivalently, independent with `c_t` uniform on `{0, …, t}`) is classical but is **not**
-formalized, so the comparison in `exists_thresholdRule_ge` is between numbers computed in two
-models. Rules are deterministic (a randomized rule is a mixture of deterministic ones, which
+(equivalently, independent with `c_t` uniform on `{0, …, t}`) is not used in this file, so the
+comparison in `exists_thresholdRule_ge` is between numbers computed in two models. The bijection
+between arrival orders and relative-rank sequences, and the resulting optimality theorem stated
+entirely in the arrival-order model, are in `Targets/Economics/SecretaryArrivalOptimal.lean`
+(`rankSeqOf_bijective`, `ordinal_success_prob_le`, `secretary_optimal`). Rules are deterministic (a randomized rule is a mixture of deterministic ones, which
 cannot do better, but this is not formalized). The rule may use the full relative ranks, not
 only the "best so far" indicators.
 
-Not covered: the bijection between arrival orders and relative-rank sequences; rules that use
-the actual values (full-information problem) or randomization; that a threshold rule in the
-relative-rank model attains the bound; identification of the optimal `r` (≈ `n/e`) and the
-limit `1/e`.
+Not covered here: the bijection between arrival orders and relative-rank sequences (see
+`Targets/Economics/SecretaryArrivalOptimal.lean`); rules that use the actual values
+(full-information problem) or randomization; that a threshold rule in the relative-rank model
+attains the bound (it does in the arrival-order model, `secretary_optimal`); identification of
+the optimal `r` (≈ `n/e`). The limit `max_r P(r) → 1/e` is in
+`Targets/Economics/SecretaryOptimalLimit.lean`.
 -/
 
 namespace Targets.Economics
