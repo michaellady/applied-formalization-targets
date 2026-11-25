@@ -26,6 +26,15 @@ on `i`.
 Also: positive regression dependence on `H₀` holds if and only if it holds on `{i}` for every
 `i` in `H₀`.
 
+The dependence condition. "Positively regression dependent" above always means
+`Applied.MultipleTesting.IsPRDSOn`, which is the conditioning-on-`pᵢ ≤ t` form used by Blanchard and Roquain (sometimes called weak PRDS),
+cleared of denominators: `P(D, pᵢ ≤ s) · P(pᵢ ≤ t) ≤ P(D, pᵢ ≤ t) · P(pᵢ ≤ s)` for `s ≤ t`.
+It is not the definition of Benjamini and Yekutieli, whose PRDS conditions on `pᵢ = t`. The
+classical condition is believed to imply this form (standard in the literature), but that
+implication is not formalized here. Every theorem named "under PRDS" or "of_prds" in this
+project is proved under this form. In particular the facts above are about this form and are
+not claimed for the classical definition.
+
 Not covered: jointly normal test statistics with correlations strictly between zero and one
 (for example the equicorrelated model `Zᵢ = √ρ W + √(1-ρ) εᵢ`), which is the main case of
 interest in the cited paper. Only the two extremes (independence, and one common statistic)

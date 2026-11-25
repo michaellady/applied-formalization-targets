@@ -12,8 +12,8 @@ formulas for the hypothesis at position `r` are
 
 usually capped at one. Here they are written without sorting:
 
-* `hochbergAdjusted p ω i`: the minimum of `#{l | p j ≤ p l} * p j` over `j` with
-  `p i ≤ p j`; `mem_hochberg_iff_hochbergAdjusted_le`: `hochberg α p` rejects `i` exactly when
+* `hochbergAdjusted p ω i`: the minimum of `(#{l | p j < p l} + 1) * p j` over `j` with
+  `p i ≤ p j` (tied p-values use the multiplier of the last position in the tie); `mem_hochberg_iff_hochbergAdjusted_le`: `hochberg α p` rejects `i` exactly when
   this is at most `α`.
 * `bhAdjusted q i`: the minimum of `m / #{l | q l ≤ q j} * q j` over `j` with `q i ≤ q j`;
   `mem_bhReject_iff_bhAdjusted_le`: for `α ≥ 0`, `bhReject α q` rejects `i` exactly when this
@@ -30,16 +30,15 @@ variable {Ω ι : Type*} [Fintype ι]
 
 /-! ### Hochberg -/
 
-/-- The Hochberg multiplier of hypothesis `j`: the number of hypotheses whose p-value is at
-least `p j` (this is `m - l + 1` when `j` sits at position `l` and there are no ties). -/
+/-- The Hochberg multiplier of hypothesis `j`: one more than the number of hypotheses whose
+p-value is strictly larger than `p j`. This is `m - l + 1` when `j` sits at position `l` and
+there are no ties; tied p-values share the multiplier of the last position in the tie. -/
 noncomputable def hochbergFactor (p : ι → Ω → ℝ) (ω : Ω) (j : ι) : ℝ :=
-  (univ.filter fun l => p j ω ≤ p l ω).card
+  ((univ.filter fun l => p j ω < p l ω).card : ℝ) + 1
 
 lemma one_le_hochbergFactor (p : ι → Ω → ℝ) (ω : Ω) (j : ι) : 1 ≤ hochbergFactor p ω j := by
-  have : 1 ≤ (univ.filter fun l => p j ω ≤ p l ω).card :=
-    Finset.card_pos.mpr ⟨j, mem_filter.mpr ⟨mem_univ j, le_rfl⟩⟩
   unfold hochbergFactor
-  exact_mod_cast this
+  exact le_add_of_nonneg_left (Nat.cast_nonneg _)
 
 /-- The Hochberg-adjusted p-value of hypothesis `i` (not capped at one): the smallest value of
 `hochbergFactor p ω j * p j ω` among the hypotheses `j` with `p i ω ≤ p j ω`. -/
@@ -68,7 +67,7 @@ theorem mem_hochberg_iff_hochbergAdjusted_le (α : ℝ) (p : ι → Ω → ℝ) 
     i ∈ hochberg α p ω ↔ hochbergAdjusted p ω i ≤ α := by
   classical
   rw [hochbergAdjusted_le_iff]
-  simp only [hochberg, mem_filter, mem_univ, true_and]
+  rw [mem_hochberg]
   refine exists_congr fun j => and_congr_right fun _ => ?_
   have hpos : 0 < hochbergFactor p ω j := zero_lt_one.trans_le (one_le_hochbergFactor p ω j)
   change p j ω ≤ α / hochbergFactor p ω j ↔ _
@@ -95,6 +94,19 @@ theorem le_hochbergAdjusted (p : ι → Ω → ℝ) (ω : Ω) (i : ι) (hp : 0 �
   intro j hj
   have h1 := one_le_hochbergFactor p ω j
   nlinarith
+
+/-- If all p-values are equal to `x`, every Hochberg-adjusted p-value is `x`. -/
+theorem hochbergAdjusted_eq_of_forall_eq {p : ι → Ω → ℝ} {ω : Ω} {x : ℝ}
+    (hp : ∀ i, p i ω = x) (i : ι) : hochbergAdjusted p ω i = x := by
+  have hf : ∀ j, hochbergFactor p ω j * p j ω = x := by
+    intro j
+    have h0 : (univ.filter fun l => p j ω < p l ω) = ∅ :=
+      Finset.filter_eq_empty_iff.mpr fun l _ => by simp [hp]
+    rw [hochbergFactor, h0, hp j]
+    simp
+  refine le_antisymm ?_ ?_
+  · exact (hochbergAdjusted_le_iff p ω i x).mpr ⟨i, le_rfl, (hf i).le⟩
+  · exact (le_hochbergAdjusted_iff p ω i x).mpr fun j _ => (hf j).ge
 
 /-- The set rejected by Hochberg's procedure, in terms of adjusted p-values. -/
 theorem hochberg_eq_filter_hochbergAdjusted (α : ℝ) (p : ι → Ω → ℝ) (ω : Ω) :

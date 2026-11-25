@@ -17,7 +17,8 @@ Main results.
 * `IsGraph.update`: the update preserves the conditions on a graph (non-negative weights with
   sum at most one, non-negative edges, no loops, outgoing edges summing to at most one).
 * `weightUpdate_weightUpdate_comm`, `graphUpdate_graphUpdate_comm`: removing `j` and then `k`
-  gives the same graph as removing `k` and then `j`.
+  gives the same graph as removing `k` and then `j`. `GraphState.remove_remove`: removing
+  the same hypothesis twice is the same as removing it once.
 * `GraphState.removeAll`: the graph after removing a finite set of hypotheses, well defined
   because of the previous point; `GraphState.removeAll_toFinset` says that removing the
   elements of a list one after the other, in the order of the list, gives this graph.
@@ -396,6 +397,22 @@ theorem remove_comm (j k : ι) (s : GraphState ι) :
     (graphUpdate_graphUpdate_comm s.isGraph.trans k j)
 
 instance : LeftCommutative (remove (ι := ι)) := ⟨remove_comm⟩
+
+/-- Removing a hypothesis that has already been removed changes nothing. -/
+theorem remove_remove (j : ι) (s : GraphState ι) : remove j (remove j s) = remove j s := by
+  refine GraphState.ext ?_ ?_
+  · funext l
+    simp only [weights_remove, trans_remove]
+    by_cases hl : l = j
+    · subst hl; simp
+    · rw [weightUpdate_apply_of_ne _ _ hl]; simp
+  · funext l m
+    simp only [trans_remove]
+    by_cases h : l = j ∨ m = j ∨ l = m
+    · rcases h with rfl | rfl | rfl <;> simp
+    · push Not at h
+      rw [graphUpdate_apply_of_ne _ h.1 h.2.1 h.2.2]
+      simp
 
 /-- The graph after removing all hypotheses in `R`. By `remove_comm` no order has to be
 chosen. -/

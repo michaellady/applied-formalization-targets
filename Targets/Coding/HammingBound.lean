@@ -1,4 +1,5 @@
 import Applied.Coding.Bounds
+import Applied.Coding.BallCard
 
 /-!
 # Hamming (sphere-packing) bound for binary codes
@@ -23,5 +24,7 @@ Not covered: alphabets other than `{0, 1}`; the characterisation of equality (pe
 namespace Targets.Coding
 
 alias hamming_bound := Applied.Coding.IsCode.card_mul_ballCard_le
+
+alias ballCard_eq_sum_choose := Applied.Coding.ballCard_eq_sum_choose
 
 end Targets.Coding

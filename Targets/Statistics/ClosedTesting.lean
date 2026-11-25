@@ -11,11 +11,15 @@ import Applied.Statistics.ClosedTesting
 - prerequisites: none beyond the family-wise error rate
 - statement-review: unreviewed
 
-Informal statement. Give every intersection of null hypotheses a level-`α` local test, and
-reject an individual hypothesis only when every intersection containing it is rejected. Then
-the chance of rejecting any true null is at most `α`. Holm's procedure is exactly this
-construction with Bonferroni local tests. Weighted Bonferroni and fixed-sequence testing are
-the two other building blocks of graphical procedures.
+Informal statement. Give every intersection of null hypotheses a local test, and reject an
+individual hypothesis only when every intersection containing it is rejected. If the local test
+of the true intersection hypothesis has level `α` (the others need not), the chance of
+rejecting any true null is at most `α`. Holm's procedure is exactly this
+construction with Bonferroni local tests. Two further building blocks of graphical
+procedures are included, each for p-values that are valid under their nulls, any dependence,
+and `α ≥ 0`: weighted Bonferroni (reject `i` when `p i ≤ w i · α`, with weights `w ≥ 0` summing
+to at most one) and fixed-sequence testing (test in a fixed order at full level `α`, stopping
+at the first non-rejection). Each rejects a true null with probability at most `α`.
 -/
 
 namespace Targets.Statistics

@@ -20,8 +20,10 @@ correlation matrix, and let `p i = 2 (1 - Φ(|Z i|))` be the two-sided p-values.
 * `SimesTwoSidedGaussian`: under the global null, the Simes test rejects with probability at
   most `α`. Reported as a long-standing conjecture; no counterexample found in our search.
 * `BHTwoSidedGaussian`: Benjamini–Hochberg controls the false discovery rate at `α` when the
-  true nulls have mean zero. Long conjectured; a 2026 preprint claims a counterexample, which
-  we have not verified. Treat the truth value as unknown.
+  true nulls have mean zero. Long conjectured; a web search in November 2026 surfaced a
+  preprint attributed to E. Dobriban, titled "The Benjamini–Hochberg procedure can fail to
+  control the FDR for correlated two-sided Gaussian tests" (citation to be confirmed; we have
+  not read or verified it). Treat the truth value as unknown.
 
 Both are written as propositions, not theorems, so nothing here asserts them.
 
@@ -29,8 +31,9 @@ What is proved: two-sided p-values of a standard normal statistic are valid
 (`isValidPValue_twoSidedP`); the Simes bound holds for independent statistics
 (`simesTwoSidedGaussian_of_indep`) and whenever the two-sided p-values are positively
 regression dependent (`simesTwoSidedGaussian_of_prds`). The open content is exactly the gap
-between "jointly normal with arbitrary correlation" and that dependence condition. Two-sided
-p-values of positively correlated normals need not satisfy it.
+between "jointly normal with arbitrary correlation" and that dependence condition. Whether
+two-sided p-values of correlated normals satisfy it in general is not established here; the
+literature treats the two-sided case as not covered by the positive-dependence results.
 -/
 
 open MeasureTheory ProbabilityTheory Finset

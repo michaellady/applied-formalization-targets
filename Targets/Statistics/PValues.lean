@@ -11,7 +11,7 @@ import Applied.Statistics.PValues
 - prerequisites: cumulative distribution functions; the normal distribution has no point masses
 - statement-review: unreviewed
 
-Informal statement. If a test statistic `X` has a null distribution that gives no mass to
+Informal statement. If a measurable test statistic `X` has a null distribution that gives no mass to
 single points, with distribution function `F`, then `1 - F(X)` is a valid p-value: under the
 null, `P(1 - F(X) ≤ t) ≤ t`. If the null distribution is also symmetric about zero, then
 `2 (1 - F(|X|))` is valid. In particular the one- and two-sided z-test p-values are valid.

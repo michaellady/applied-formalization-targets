@@ -31,8 +31,16 @@ zero otherwise.
 
 Conventions that differ from the paper's presentation. The paper deletes a rejected hypothesis
 from the index set; here the index set is fixed and the weight, the row and the column of a
-removed hypothesis are set to zero. Removing an already removed hypothesis changes nothing.
-The rule "reject when `p ≤ w α`" uses a non-strict inequality.
+removed hypothesis are set to zero. Removing an already removed hypothesis changes nothing
+(`graph_remove_idempotent` below). The rule "reject when `p ≤ w α`" uses a non-strict
+inequality.
+
+Hypotheses of the two main theorems, as formalized. Both assume `0 ≤ α`. In
+`graphical_controls_fwer` the measure `P` is an arbitrary measure, not required to be a
+probability measure; "valid p-value" means `P(pᵢ ≤ t) ≤ t` for all `t ≥ 0`, and no
+measurability of the p-values or of the rejected set is assumed, so the "probabilities" are
+values of `P` as an outer measure. `graphical_eq_closedTest` is a statement about one fixed
+outcome and involves no measure at all.
 
 Not covered: graphs whose weights depend on a parameter `ε → 0`; weighted parametric or Simes
 tests of the intersection hypotheses; consonance; adjusted p-values of the graphical
@@ -48,6 +56,7 @@ alias graph_update_matrix_order_independent :=
 alias graph_update_weights_order_independent :=
   Applied.MultipleTesting.weightUpdate_weightUpdate_comm
 alias graph_update_order_independent := Applied.MultipleTesting.GraphState.remove_comm
+alias graph_remove_idempotent := Applied.MultipleTesting.GraphState.remove_remove
 alias graph_removal_in_list_order := Applied.MultipleTesting.GraphState.removeAll_toFinset
 alias graph_removal_list_order_irrelevant :=
   Applied.MultipleTesting.GraphState.foldr_remove_eq_of_toFinset_eq

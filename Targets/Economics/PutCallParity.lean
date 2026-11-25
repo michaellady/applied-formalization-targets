@@ -13,7 +13,10 @@ import Applied.Economics.Finance
 
 Informal statement. Under any pricing measure, the price of a European call minus the price of
 the put with the same strike and expiry equals the discounted expected asset price minus the
-discounted strike. No model of the asset price is assumed.
+discounted strike. No model of the asset price is assumed, but the four quantities involved
+(discounted call payoff, discounted put payoff, discounted asset price, discount factor) must
+be integrable under the pricing measure; without that the identity can fail in Lean, where a
+non-integrable function has integral zero.
 -/
 
 namespace Targets.Economics

@@ -9,8 +9,15 @@ import Applied.Statistics.Simes
 set `D` of p-value vectors, the conditional probability of `D` given `p i ≤ t` does not
 decrease in `t`. It is written without division, so no conditioning on null events is needed.
 
+This conditioning-on-`p i ≤ t` form (sometimes called weak PRDS) is not the definition of
+Benjamini and Yekutieli (2001), whose PRDS conditions on `p i = t`. The classical condition is
+believed to imply the form used here (standard in the literature), but that implication is
+not formalized in this project. All theorems below named "under positive dependence" or
+`_of_prds` are proved under `IsPRDSOn`, i.e. under this form.
+
 `fdr_bhReject_le_of_prds`: under this condition the Benjamini–Hochberg procedure at level `α`
-has false discovery rate at most `α m₀ / m` (Benjamini and Yekutieli 2001, Theorem 1.2).
+has false discovery rate at most `α m₀ / m` (the conclusion of Benjamini and Yekutieli 2001,
+Theorem 1.2, with their dependence hypothesis replaced by `IsPRDSOn`).
 -/
 
 open MeasureTheory Finset
@@ -113,7 +120,11 @@ variable {Ω : Type*} [MeasurableSpace Ω]
 /-- Positive regression dependence on the subset `H₀` of true nulls, in the
 conditioning-on-`p i ≤ t` form and cleared of denominators: for `i ∈ H₀`, an increasing
 measurable set `D` of p-value vectors and `s ≤ t`,
-`P (D, p i ≤ s) * P (p i ≤ t) ≤ P (D, p i ≤ t) * P (p i ≤ s)`. -/
+`P (D, p i ≤ s) * P (p i ≤ t) ≤ P (D, p i ≤ t) * P (p i ≤ s)`.
+
+This is the form of Blanchard and Roquain (2008), sometimes called weak PRDS. It is not
+Benjamini and Yekutieli's PRDS, which conditions on `p i = t`; the classical condition is
+believed to imply this one (standard in the literature), but that is not formalized here. -/
 def IsPRDSOn (P : Measure Ω) (p : ι → Ω → ℝ) (H₀ : Finset ι) : Prop :=
   ∀ i ∈ H₀, ∀ D : Set (ι → ℝ), MeasurableSet D → IsUpperSet D → ∀ s t : ℝ, s ≤ t →
     P ((fun ω j => p j ω) ⁻¹' D ∩ p i ⁻¹' Set.Iic s) * P (p i ⁻¹' Set.Iic t)
@@ -287,7 +298,8 @@ theorem fwer_hommel_le_of_prds (P : Measure Ω) [IsProbabilityMeasure P] (hα : 
     (measure_one_le_bhK_le_of_prds P hα (fun j : H₀ => p j) (fun j => hmeas j)
       (fun j => hvalid j j.2) hprds)
 
-/-- **Hochberg's procedure under positive dependence.** -/
+/-- **Hochberg's procedure under positive dependence** (in the form `IsPRDSOn`). `hochberg` is
+the textbook step-up rule, including its treatment of tied p-values. -/
 theorem fwer_hochberg_le_of_prds (P : Measure Ω) [IsProbabilityMeasure P] (hα : 0 ≤ α)
     (p : ι → Ω → ℝ) (hmeas : ∀ i, Measurable (p i)) (H₀ : Finset ι)
     (hvalid : ∀ i ∈ H₀, IsValidPValue P (p i))

@@ -50,4 +50,14 @@ alias exists_trifferent_length_three := Applied.Coding.exists_isTrifferent_three
 
 alias exists_trifferent_length_four := Applied.Coding.exists_isTrifferent_four
 
+/-- For every length `n ≥ 4` there is a trifferent code with 9 words (pad the tetracode). -/
+theorem exists_isTrifferent_card_nine (n : ℕ) (hn : 4 ≤ n) :
+    ∃ C : Finset (Fin n → Fin 3), Applied.Coding.IsTrifferent C ∧ C.card = 9 := by
+  induction n, hn using Nat.le_induction with
+  | base => exact Applied.Coding.exists_isTrifferent_four
+  | succ n _ ih =>
+    obtain ⟨C, hC, hcard⟩ := ih
+    obtain ⟨C', hC', hcard'⟩ := Applied.Coding.exists_isTrifferent_succ hC
+    exact ⟨C', hC', hcard'.trans hcard⟩
+
 end Targets.Coding
