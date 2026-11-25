@@ -295,50 +295,6 @@ section ZTests
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- The standard normal distribution function is strictly increasing. -/
-lemma strictMono_cdf_gaussianReal : StrictMono (cdf (gaussianReal 0 1)) := by
-  intro x y hxy
-  by_contra hcon
-  have hle : cdf (gaussianReal 0 1) y - cdf (gaussianReal 0 1) x ≤ 0 := by linarith
-  have h0 : gaussianReal 0 1 (Set.Ioc x y) = 0 := by
-    rw [← measure_cdf (gaussianReal 0 1), StieltjesFunction.measure_Ioc]
-    exact ENNReal.ofReal_eq_zero.mpr hle
-  have hvol := gaussianReal_absolutelyContinuous' 0 one_ne_zero h0
-  rw [Real.volume_Ioc, ENNReal.ofReal_eq_zero] at hvol
-  linarith
-
-lemma strictAnti_one_sub_cdf_gaussianReal :
-    StrictAnti fun z : ℝ => 1 - cdf (gaussianReal 0 1) z := fun x y hxy => by
-  have := strictMono_cdf_gaussianReal hxy
-  show 1 - _ < 1 - _
-  linarith
-
-lemma antitone_one_sub_cdf_gaussianReal :
-    Antitone fun z : ℝ => 1 - cdf (gaussianReal 0 1) z :=
-  strictAnti_one_sub_cdf_gaussianReal.antitone
-
-/-- **One-sided z-test with a composite null.** If `Z` is normal with unit variance and mean
-`m ≤ 0`, then `1 - Φ (Z)` is a valid p-value. -/
-theorem isValidPValue_zTest_upper_of_mean_nonpos (P : Measure Ω) (Z : Ω → ℝ) (hZ : Measurable Z)
-    {m : ℝ} (hm : m ≤ 0) (hlaw : P.map Z = gaussianReal m 1) :
-    IsValidPValue P fun ω => 1 - cdf (gaussianReal 0 1) (Z ω) := by
-  have hlaw' : P.map (fun ω => Z ω - m) = gaussianReal 0 1 := by
-    have : (fun ω => Z ω - m) = (fun z => z - m) ∘ Z := rfl
-    rw [this, ← Measure.map_map (measurable_sub_const m) hZ, hlaw,
-      gaussianReal_map_sub_const, sub_self]
-  intro t ht
-  refine (measure_mono ?_).trans
-    (isValidPValue_zTest_upper P _ (hZ.sub_const m) hlaw' t ht)
-  intro ω hω
-  have : cdf (gaussianReal 0 1) (Z ω) ≤ cdf (gaussianReal 0 1) (Z ω - m) :=
-    monotone_cdf _ (by linarith)
-  simp only [Set.mem_ofPred_eq] at hω ⊢
-  linarith
-
-lemma measurable_zTest {Z : Ω → ℝ} (hZ : Measurable Z) :
-    Measurable fun ω => 1 - cdf (gaussianReal 0 1) (Z ω) :=
-  antitone_one_sub_cdf_gaussianReal.measurable.comp hZ
-
 /-- **One-sided z-tests on non-negatively correlated normal statistics are classically PRDS.**
 For a jointly Gaussian vector `Z` of measurable statistics with `Cov (Z i, Z j) ≥ 0` for every
 true null `i` and every `j`, the p-values `1 - Φ (Z j)` satisfy Benjamini and Yekutieli's own

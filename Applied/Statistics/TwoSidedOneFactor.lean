@@ -158,19 +158,6 @@ theorem isPRDSOn_abs_gaussian_oneFactor (P : Measure Ω) [IsProbabilityMeasure P
 
 section TwoSided
 
-lemma antitone_twoSided : Antitone fun x : ℝ => 2 * (1 - cdf (gaussianReal 0 1) x) := by
-  intro x y hxy
-  have := monotone_cdf (gaussianReal 0 1) hxy
-  show 2 * (1 - _) ≤ 2 * (1 - _)
-  linarith
-
-lemma measurable_twoSided : Measurable fun x : ℝ => 2 * (1 - cdf (gaussianReal 0 1) x) :=
-  antitone_twoSided.measurable
-
-lemma measurable_twoSided_abs {Z : Ω → ℝ} (hZ : Measurable Z) :
-    Measurable fun ω => 2 * (1 - cdf (gaussianReal 0 1) |Z ω|) :=
-  measurable_twoSided.comp (measurable_norm.comp hZ)
-
 /-- **Two-sided p-values in a one-factor model are positively regression dependent.** Let
 `Z j = a j * W + b j * ε j + μ j`, with `W` (of any law) independent of the mutually independent
 `ε j`, and `p j = 2 (1 - Φ(|Z j|))`. If every hypothesis either does not load on the factor
