@@ -23,7 +23,8 @@ The two-agent case and the identical-valuations case are proved for this strong 
 `Targets/Economics/EFXTwoAgents.lean` (theorems `efx_exists_two` and `efx_exists_identical`).
 Further special cases are proved for this strong form in separate entries: a common ranking
 of the goods by all agents (`EFXCommonRanking.lean`, `efx_exists_common_ranking`), at most
-`n + 1` goods (`EFXFewGoods.lean`, `efx_exists_few_goods`), and valuations in `{0, 1}`
+`n + 1` goods (`EFXFewGoods.lean`, `efx_exists_few_goods`), at most `n + 2` goods
+(`EFXTwoExtraGoods.lean`, `efx_exists_two_extra_goods`), and valuations in `{0, 1}`
 (`EFXBinary.lean`, `efx_exists_binary`). This file itself contains only definitions. Conventions: valuations are real-valued and
 additive, allocations are complete (`a : Fin m → Fin n` gives every good to exactly one
 agent), and `EFXExists` assumes `0 < n` (with no agents and `m > 0` goods no allocation
