@@ -353,4 +353,114 @@ theorem secretary_optimal (hinj : Injective fun e => κ (e, w e)) (b : E)
 
 end Ordinal
 
+/-! ### Asymptotics: the optimal success probability tends to `1/e` -/
+
+lemma thrVal_le_M (n r : ℕ) : thrVal n r ≤ M n 0 := by
+  rcases le_or_gt r n with hrn | hnr
+  · exact le_M (Nat.zero_le r) hrn
+  · have : thrVal n r = 0 := by
+      unfold thrVal
+      split_ifs with h
+      · omega
+      · rw [Finset.Ico_eq_empty_of_le hnr.le, sum_empty, mul_zero]
+    rw [this]
+    exact M_nonneg (Nat.zero_le n)
+
+/-- `∑_{t=r}^{r+k} 1/t ≤ 1/r + log ((r + k)/r)`. -/
+lemma sum_inv_le_log (r : ℕ) (hr : 0 < r) (k : ℕ) :
+    ∑ t ∈ Ico r (r + 1 + k), (1 : ℝ) / t ≤ 1 / r + Real.log (((r + k : ℕ) : ℝ) / r) := by
+  have hr0 : (0 : ℝ) < r := by exact_mod_cast hr
+  induction k with
+  | zero =>
+    rw [add_zero, add_zero, Nat.Ico_succ_singleton, sum_singleton, div_self hr0.ne',
+      Real.log_one, add_zero]
+  | succ k ih =>
+    rw [show r + 1 + (k + 1) = (r + 1 + k) + 1 by ring, Finset.sum_Ico_succ_top (by omega)]
+    have hrk : (0 : ℝ) < (r : ℝ) + k := by positivity
+    set x : ℝ := ((r : ℝ) + k + 1) / ((r : ℝ) + k) with hxdef
+    have hx : 0 < x := by positivity
+    have h1 := Real.one_sub_inv_le_log_of_pos hx
+    have hsplit : Real.log (((r + (k + 1) : ℕ) : ℝ) / r) =
+        Real.log x + Real.log (((r + k : ℕ) : ℝ) / r) := by
+      rw [← Real.log_mul hx.ne' (by positivity)]
+      congr 1
+      rw [hxdef]
+      push_cast
+      field_simp
+      ring
+    have hinv : 1 - x⁻¹ = 1 / (((r + 1 + k : ℕ) : ℝ)) := by
+      rw [hxdef]
+      push_cast
+      field_simp
+      ring
+    rw [hsplit]
+    linarith
+
+lemma log_le_div_exp {y : ℝ} (hy : 0 < y) : Real.log y ≤ y / Real.exp 1 := by
+  have h := Real.log_le_sub_one_of_pos (div_pos hy (Real.exp_pos 1))
+  rw [Real.log_div hy.ne' (Real.exp_pos 1).ne', Real.log_exp] at h
+  linarith
+
+/-- Every threshold value is at most `1/e + 1/n`. -/
+lemma thrVal_le_inv_exp_add (n r : ℕ) (hn : 0 < n) :
+    thrVal n r ≤ 1 / Real.exp 1 + 1 / n := by
+  have he : 0 < 1 / Real.exp 1 := by positivity
+  unfold thrVal
+  split_ifs with hr0
+  · linarith
+  · rcases le_or_gt n r with hnr | hrn
+    · rw [Finset.Ico_eq_empty_of_le hnr, sum_empty, mul_zero]
+      positivity
+    · have hr : 0 < r := Nat.pos_of_ne_zero hr0
+      have hs := sum_inv_le_log r hr (n - 1 - r)
+      rw [show r + 1 + (n - 1 - r) = n by omega, show r + (n - 1 - r) = n - 1 by omega] at hs
+      have hnR : (0 : ℝ) < n := by exact_mod_cast hn
+      have hrR : (0 : ℝ) < r := by exact_mod_cast hr
+      have hn1 : (0 : ℝ) < ((n - 1 : ℕ) : ℝ) := by exact_mod_cast (by omega : 0 < n - 1)
+      have hlog : Real.log (((n - 1 : ℕ) : ℝ) / r) ≤ Real.log (n / r) := by
+        apply Real.log_le_log (div_pos hn1 hrR)
+        gcongr
+        exact_mod_cast Nat.sub_le n 1
+      have hl2 := log_le_div_exp (div_pos hnR hrR)
+      calc (r : ℝ) / n * ∑ t ∈ Ico r n, (1 : ℝ) / t ≤ r / n * (1 / r + Real.log (n / r)) := by
+            gcongr
+            linarith
+        _ ≤ r / n * (1 / r + (n / r) / Real.exp 1) := by gcongr
+        _ = 1 / Real.exp 1 + 1 / n := by field_simp; ring
+
+/-- **Upper bound:** the optimal success probability is at most `1/e + 1/n`. -/
+theorem M_le_inv_exp_add {n : ℕ} (hn : 0 < n) : M n 0 ≤ 1 / Real.exp 1 + 1 / n :=
+  (M_le_iff (Nat.zero_le n) _).2 fun r _ _ => thrVal_le_inv_exp_add n r hn
+
+/-- **Lower bound:** the optimal success probability is at least `1/e` (from the library's
+`1/e` bound for the threshold `⌊n/e⌋`). -/
+theorem inv_exp_le_M {n : ℕ} (hn : 0 < n) : 1 / Real.exp 1 ≤ M n 0 := by
+  obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero hn.ne'
+  have hw : Injective fun e : Fin (m + 1) => (Prod.snd (e, ((e : ℕ) : ℝ)) : ℝ) := by
+    intro a b h
+    simp only at h
+    exact Fin.ext (by exact_mod_cast h)
+  have hb : ∀ e : Fin (m + 1), (Prod.snd (e, ((e : ℕ) : ℝ)) : ℝ) ≤
+      Prod.snd (Fin.last m, (((Fin.last m : Fin (m + 1)) : ℕ) : ℝ)) := by
+    intro e
+    show ((e : ℕ) : ℝ) ≤ (((Fin.last m : Fin (m + 1)) : ℕ) : ℝ)
+    exact_mod_cast Fin.le_last e
+  have h1 := thresholdRule_success_prob_ge (E := Fin (m + 1)) Prod.snd
+    (fun e => ((e : ℕ) : ℝ)) hw (Fin.last m) hb
+  rw [← thrVal_eq_threshold_prob (E := Fin (m + 1)) Prod.snd (fun e => ((e : ℕ) : ℝ)) hw
+    (Fin.last m) hb] at h1
+  simp only [Fintype.card_fin] at h1
+  exact h1.trans (thrVal_le_M _ _)
+
+/-- **The optimal success probability tends to `1/e`.** -/
+theorem tendsto_M_inv_exp :
+    Filter.Tendsto (fun n => M n 0) Filter.atTop (nhds (1 / Real.exp 1)) := by
+  have hup : Filter.Tendsto (fun n : ℕ => 1 / Real.exp 1 + 1 / (n : ℝ)) Filter.atTop
+      (nhds (1 / Real.exp 1)) := by
+    simpa using (tendsto_const_nhds (x := 1 / Real.exp 1)).add
+      tendsto_one_div_atTop_nhds_zero_nat
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le' tendsto_const_nhds hup ?_ ?_
+  · filter_upwards [Filter.eventually_gt_atTop 0] with n hn using inv_exp_le_M hn
+  · filter_upwards [Filter.eventually_gt_atTop 0] with n hn using M_le_inv_exp_add hn
+
 end Applied.Economics.SecretaryRank
