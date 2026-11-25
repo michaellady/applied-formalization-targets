@@ -6,17 +6,33 @@ import Mathlib.Data.Fintype.CardEmbedding
 /-!
 # The Fredman–Komlós bound for perfect `k`-hash codes
 
+A code `C ⊆ {0,…,k-1}ⁿ` is a perfect `k`-hash code (`IsPerfectHashCode`) if any `k` distinct
+codewords take `k` pairwise distinct values in some coordinate. The main result,
+`IsPerfectHashCode.fredmanKomlos`, is the Fredman–Komlós bound in the finite form
+`N (N-1) ⋯ (N-k+2) · k^{k-1} · log₂ (N-k+2) ≤ n · k! · N^{k-1}` (`k ≥ 2`, `N = |C|`), proved by
+the reduction to Hansel's lemma (`Applied/Coding/Hansel.lean`): for `k - 2` fixed distinct
+codewords, the coordinates where they are pairwise distinct leave two free symbols, which
+split the other codewords into a complete bipartite graph; these graphs cover all pairs. Averaging
+over the choice of the `k - 2` codewords and bounding, coordinate by coordinate, the number of
+`(k-1)`-tuples with pairwise distinct symbols by Maclaurin's inequality gives the bound.
+
 ## Elementary symmetric polynomial of degree `|A| - 1`
 
-* `esymmTop A m = ∑_{a ∈ A} ∏_{b ∈ A \ {a}} m b` (the elementary symmetric polynomial of degree
-  `|A| - 1` in the values `m a`, `a ∈ A`).
+* `esymmTop A m = ∑_{a ∈ A} ∏_{b ∈ A \ {a}} m b`.
 * `prod_le_avg_pow`: AM-GM, `∏_{a ∈ A} m a ≤ (S / |A|)^{|A|}` with `S = ∑_{a ∈ A} m a`.
-* `esymmTop_le`: the special case of Maclaurin's inequality
+* `esymmTop_le`: the top-degree case of Maclaurin's inequality,
   `esymmTop A m ≤ |A| (S / |A|)^{|A| - 1}` for nonnegative `m`.
-* `injSum m A j = ∑_{g : Fin j ↪ A} ∏_t m (g t)` (sum over injective maps into `A`), and
-  `injSum_eq`: `injSum m A j = j! · esymmTop A m` when `|A| = j + 1`.
+* `injSum m A j = ∑` over injective `g : Fin j → ι` with values in `A` of `∏_t m (g t)`, and
+  `injSum_eq`: `injSum m A j = j! · esymmTop A m` when `|A| = j + 1`; `injSum_univ_le`.
 * `card_filter_injective_comp`: the number of `j`-tuples of elements of a finite type `β` whose
   images under `φ : β → ι` are pairwise distinct is `injSum (fiber sizes of φ) univ j`.
+
+## The bound
+
+* `hansel_fkFree`: Hansel's lemma applied to one tuple of `k - 2` distinct codewords.
+* `sum_card_fkFree`: summing over all tuples.
+* `fredmanKomlos_core`: the bound for an abstract finite family of codewords.
+* `IsPerfectHashCode.fredmanKomlos`: the bound for perfect `k`-hash codes.
 -/
 
 open Finset

@@ -26,11 +26,15 @@ Proved here (as theorems, from the library):
   Körner–Marton bound `(1/4) log₂ (9/5) ≈ 0.212 ≤ R` is proved in
   `Targets/Coding/TrifferenceKornerMarton.lean`.
 
+The Fredman–Komlós bound (`Targets/Coding/FredmanKomlos.lean`) gives `R ≤ 2/3` for `k = 3`,
+which is weaker than Körner's bound; it does not bear on `RateLtKorner`.
+
 Open, stated as a `Prop` and not asserted: `RateLtKorner`, i.e. `R < log₂ (3/2)`: can Körner's
 upper bound on the rate be improved at all? (Believed open; to be confirmed.)
 
-Not covered: the exact value of `R`; whether `(log₂ T(n)) / n` converges; the generalization
-to perfect `k`-hashing for `k ≥ 4`.
+Not covered: the exact value of `R`; whether `(log₂ T(n)) / n` converges. For perfect
+`k`-hashing with `k ≥ 4` only the Fredman–Komlós and elementary upper bounds are formalized
+(`Targets/Coding/FredmanKomlos.lean`).
 -/
 
 namespace Targets.Coding.TrifferenceOpen
