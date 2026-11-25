@@ -131,4 +131,12 @@ theorem myerson_exists_payment (x : ℝ → ℝ) (hx : Monotone x) :
       linarith
   linarith
 
+/-- **Revenue equivalence** (single bidder form): two truthful mechanisms with the same
+allocation rule and the same payment at value zero charge the same payment at every value. -/
+theorem revenue_equivalence (x p p' : ℝ → ℝ) (h : IsTruthful x p) (h' : IsTruthful x p')
+    (h0 : p 0 = p' 0) (v : ℝ) : p v = p' v := by
+  have e1 := myerson_payment_identity x p h v
+  have e2 := myerson_payment_identity x p' h' v
+  linarith
+
 end Targets.Economics

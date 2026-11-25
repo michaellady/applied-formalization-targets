@@ -68,8 +68,15 @@ foundations are the real next piece of work for this group.
 
 ## D. Backlog of results proved on paper (`BACKLOG.md`)
 
-About 40 results in statistics, optimization, privacy, information theory, economics and
-signal processing. None stated yet. Order of work: statistics first, then optimization.
+| Result | State | Missing |
+|---|---|---|
+| Perceptron mistake bound | done | — |
+| Differential privacy: basic composition, post-processing | done | Approximate privacy, advanced composition, mechanisms |
+| Gradient descent, strongly convex linear rate | done | Derivation from Mathlib's strong convexity |
+| Cramér–Rao inequality | partial | Regularity conditions linking the model to the inequality; matrix form |
+| Put–call parity | done | — |
+| Revenue equivalence | partial | Single-bidder form only |
+| Remaining backlog entries (about 34) | todo | Not yet stated |
 
 ## After the tracker is worked through
 
