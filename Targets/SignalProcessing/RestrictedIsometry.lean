@@ -9,7 +9,7 @@ import Applied.SignalProcessing.NullSpaceProperty
 - source: E. Candès, T. Tao, "Decoding by linear programming", IEEE Trans. Inform. Theory 51 (2005) (restricted isometry property and ℓ¹ recovery); the condition `δ_{2s} < 1/3` and the block argument used here follow S. Foucart, H. Rauhut, "A Mathematical Introduction to Compressive Sensing" (2013), Chapter 6 (theorem number to be confirmed)
 - used-in: compressed sensing with random matrices, sparse recovery guarantees, basis pursuit
 - prerequisites: inner product spaces; Cauchy–Schwarz for finite sums
-- formalized-elsewhere: not checked
+- formalized-elsewhere: lean-cksd `CKSD/Nonparametric/SparseRecovery/Nullspace.lean` :: `hasNullspaceProperty_of_hasRestrictedIsometry` (`δ ∈ [0, 1/3)`, as here); atlas-lean `MathlibExt/Analysis/Approximation/SparseRestrictedIsometry.lean` :: `restrictedNullspace_of_hasRIP` (`δ < √2 - 1`, a weaker hypothesis, so a stronger theorem than ours) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `A` be a real linear map from `ℝ^n` (functions `ι → ℝ`, `ι` finite)
@@ -26,7 +26,8 @@ identity matrix satisfies the hypothesis with `δ = 0` (`restrictedIsometry_one`
 statement is not vacuous.
 
 Not covered: sharper constants (the bound `δ_{2s} < 1/3` is not optimal; weaker sufficient
-conditions from the literature are not formalized), stable and robust recovery, the fact that
+conditions from the literature are not formalized here; atlas-lean has `δ < √2 - 1`, see
+`formalized-elsewhere`), stable and robust recovery, the fact that
 random Gaussian or Bernoulli matrices satisfy the restricted isometry property with high
 probability, and complex matrices.
 -/

@@ -9,7 +9,7 @@ import Applied.Learning.Massart
 - source: P. Massart, "Some applications of concentration inequalities to statistics", Ann. Fac. Sci. Toulouse Math. 9 (2000) (lemma number to be confirmed); textbook form in S. Shalev-Shwartz, S. Ben-David, "Understanding Machine Learning" (2014), Chapter 26 (lemma number to be confirmed)
 - used-in: Rademacher-complexity generalization bounds, growth-function and VC bounds
 - prerequisites: Jensen's inequality for finite sums; `cosh x ≤ exp (x²/2)` (in Mathlib)
-- formalized-elsewhere: not checked
+- formalized-elsewhere: cslib-frontier `CslibFrontier/MachineLearning/Rademacher/Basic.lean` :: `rademacherAverage_le`, `rademacherAverage_le_mul_sqrt` (the same bound, normalised by `1/m`); fltk `FLT_Proofs/Complexity/Rademacher.lean` :: `finite_massart_lemma` (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `a k ∈ ℝ^n` be finitely many vectors, indexed by a finite nonempty

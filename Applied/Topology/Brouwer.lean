@@ -337,4 +337,34 @@ theorem brouwer_stdSimplex {n : ℕ} (f : stdSimplex ℝ (Fin (n + 1)) → stdSi
     (hf : Continuous f) : ∃ p, f p = p :=
   brouwer_probSimplex (α := Fin (n + 1)) f hf
 
+/-- **Brouwer's fixed point theorem for the cube, self-map form.** A map that is continuous on
+the cube `[0,1]^m` and maps the cube into itself has a fixed point in the cube. This removes
+the requirement of `brouwer_cube` that `g` be continuous on all of `ℝ^m`: precompose with the
+coordinatewise clamp to `[0, 1]`. -/
+theorem brouwer_cube_of_continuousOn {m : ℕ} (g : (Fin m → ℝ) → (Fin m → ℝ))
+    (hg : ContinuousOn g (Set.pi Set.univ fun _ => Icc (0 : ℝ) 1))
+    (hmaps : MapsTo g (Set.pi Set.univ fun _ => Icc (0 : ℝ) 1)
+      (Set.pi Set.univ fun _ => Icc (0 : ℝ) 1)) :
+    ∃ y ∈ Set.pi Set.univ (fun _ : Fin m => Icc (0 : ℝ) 1), g y = y := by
+  set K : Set (Fin m → ℝ) := Set.pi Set.univ fun _ => Icc (0 : ℝ) 1 with hK
+  let c : (Fin m → ℝ) → (Fin m → ℝ) := fun y i => max 0 (min 1 (y i))
+  have hc : Continuous c := continuous_pi fun i =>
+    continuous_const.max (continuous_const.min (continuous_apply i))
+  have hcK : ∀ y, c y ∈ K := fun y => by
+    intro i _
+    exact ⟨le_max_left _ _, max_le zero_le_one (min_le_left _ _)⟩
+  have hcid : ∀ y ∈ K, c y = y := by
+    intro y hy
+    funext i
+    have := hy i (Set.mem_univ i)
+    simp only [c]
+    rw [min_eq_right this.2, max_eq_right this.1]
+  have hcont : Continuous (g ∘ c) := hg.comp_continuous hc hcK
+  obtain ⟨y, hy⟩ := brouwer_cube (g ∘ c) hcont (fun y i => hmaps (hcK y) i (Set.mem_univ i))
+  have hyK : y ∈ K := by rw [← hy]; exact hmaps (hcK y)
+  refine ⟨y, hyK, ?_⟩
+  have h := hy
+  simp only [Function.comp_apply, hcid y hyK] at h
+  exact h
+
 end Applied.Topology

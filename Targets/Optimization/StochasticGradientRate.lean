@@ -9,6 +9,7 @@ import Applied.Optimization.StochasticGradient
 - source: standard; see e.g. A. Nemirovski, A. Juditsky, G. Lan, A. Shapiro, "Robust stochastic approximation approach to stochastic programming", SIAM J. Optim. 19 (2009), Section 2.1, and S. Shalev-Shwartz, S. Ben-David, "Understanding Machine Learning" (2014), Theorem 14.8 (exact statements and numbers to be confirmed)
 - used-in: training of machine-learning models, stochastic approximation
 - prerequisites: Mathlib conditional expectation (pull-out property for bilinear maps), `gradient`, `ConvexOn`
+- formalized-elsewhere: different models: atlas-lean `MathlibExt/Analysis/Convex/StochasticGradientDescent.lean` :: `integral_sgd_average_sub_le` (i.i.d. oracle, decreasing steps); cslib-frontier `CslibFrontier/MachineLearning/LossMinimization/StochasticGradientDescent.lean` (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `f` be convex and differentiable on a real Hilbert space, `η > 0`, and

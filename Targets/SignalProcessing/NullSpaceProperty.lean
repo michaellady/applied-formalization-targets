@@ -9,7 +9,7 @@ import Applied.SignalProcessing.NullSpaceProperty
 - source: A. Cohen, W. Dahmen, R. DeVore, "Compressed sensing and best k-term approximation", J. Amer. Math. Soc. 22 (2009); textbook form in S. Foucart, H. Rauhut, "A Mathematical Introduction to Compressive Sensing" (2013), Chapter 4 (theorem number to be confirmed)
 - used-in: compressed sensing, basis pursuit, sparse regression, MRI reconstruction, error-correcting decoding by linear programming
 - prerequisites: finite sums and linear maps only
-- formalized-elsewhere: not checked
+- formalized-elsewhere: lean-cksd `CKSD/Nonparametric/SparseRecovery/Basic.lean` :: `hasNullspaceProperty_iff` (one support set at a time; ours is the uniform version over all supports of size at most `s`); atlas-lean `MathlibExt/Probability/Statistics/BasisPursuit.lean` :: `basisPursuit_unique_iff_restrictedNullspace` (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `A` be a real linear map on `ℝ^n` (in Lean: a linear map

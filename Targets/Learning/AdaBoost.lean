@@ -9,6 +9,7 @@ import Applied.Learning.AdaBoost
 - source: Y. Freund, R. Schapire, "A decision-theoretic generalization of on-line learning and an application to boosting", J. Comput. System Sci. 55 (1997); the bound by the product of normalisers is in R. Schapire, Y. Singer, "Improved boosting algorithms using confidence-rated predictions", Machine Learning 37 (1999) (theorem numbers to be confirmed)
 - used-in: boosting; the starting point of margin-based generalisation bounds for ensembles
 - prerequisites: finite sums, exponential, logarithm and square root
+- formalized-elsewhere: atlas-lean `CSLibExt/MachineLearning/AdaBoost.lean` :: `trainErr_le_prod_sqrt_of_round_errors`, `trainErr_le_exp_sum_sq`; cslib-frontier `CslibFrontier/MachineLearning/Boosting/AdaBoost.lean` :: `empiricalMiscount_adaBoost_le_prod`, `empiricalMiscount_adaBoost_le_exp_sum` (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. A finite nonempty sample has labels `y i`; in round `t` a weak hypothesis

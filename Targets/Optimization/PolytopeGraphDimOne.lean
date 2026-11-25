@@ -9,7 +9,7 @@ import Applied.Optimization.PolytopeGraphLowDim
 - source: elementary (folklore); the Hirsch bound `n - d` for `d ≤ 3` is classical (V. Klee, "Diameters of polyhedral graphs", Canad. J. Math. 16 (1964); to be confirmed), of which this is the trivial case `d ≤ 1`
 - used-in: small cases of the polynomial Hirsch conjecture (`Targets/Optimization/PolynomialHirsch.lean`)
 - prerequisites: `Set.extremePoints`, `IsExtreme`, `segment`, `openSegment_eq_Ioo` (Mathlib)
-- formalized-elsewhere: not checked
+- formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)
 - statement-review: unreviewed
 
 Informal statement. With the definitions of `PolynomialHirsch` (`polyhedron A b = {x ∈ ℝ ^ d |

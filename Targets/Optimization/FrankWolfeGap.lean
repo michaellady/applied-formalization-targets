@@ -9,7 +9,7 @@ import Applied.Optimization.FrankWolfeGap
 - source: M. Jaggi, "Revisiting Frank-Wolfe: projection-free sparse convex optimization", ICML 2013, Theorem 2 (stated there with the curvature constant and constant `27/4`-type factors; exact constant to be confirmed; the constant `8` here is the one this proof gives)
 - used-in: stopping criteria for conditional-gradient methods
 - prerequisites: Mathlib `gradient`, `ConvexOn`, `LipschitzWith`; descent lemma
-- formalized-elsewhere: Frank–Wolfe `O(1/t)` reportedly in EconCSLib (ConditionalGradient.lean); gap not checked
+- formalized-elsewhere: the `O(1/k)` rate is in econcslib-garg `AppliedModelingLib/Foundations/Optimization/ConditionalGradient.lean` :: `conditionalGradient_suboptimality_le_of_smoothness`; for the duality-gap rate: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)
 - statement-review: unreviewed
 
 Informal statement. Let `f` be convex and differentiable on a real Hilbert space and let `s`

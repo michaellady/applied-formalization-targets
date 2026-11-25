@@ -9,6 +9,7 @@ import Applied.Topology.SpernerOneDim
 - source: E. Sperner, "Neuer Beweis für die Invarianz der Dimensionszahl und des Gebietes", Abh. Math. Sem. Univ. Hamburg 6 (1928) (general dimension; the one-dimensional case is the base case of the usual induction, e.g. M. Aigner, G. M. Ziegler, "Proofs from THE BOOK", chapter on Sperner's lemma / Brouwer, numbering to be confirmed)
 - used-in: combinatorial proofs of Brouwer's fixed point theorem and hence Nash's theorem (`Targets/Economics/NashExistence.lean`); PPAD-completeness of Sperner/Nash
 - prerequisites: none beyond finite sets
+- formalized-elsewhere: subsumed by the cubical lemma in cslib-frontier `CslibFrontier/Foundations/Combinatorics/Sperner/Kuhn.lean`; see `Targets/Topology/SpernerCube.lean` (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. The segment is subdivided at the points `0, 1, …, n` (any `n : ℕ`); a

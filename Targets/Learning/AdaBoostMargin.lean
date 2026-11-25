@@ -9,7 +9,7 @@ import Applied.Learning.AdaBoostMargin
 - source: R. Schapire, Y. Freund, P. Bartlett, W. S. Lee, "Boosting the margin: a new explanation for the effectiveness of voting methods", Ann. Statist. 26 (1998), Theorem 5 (number to be confirmed); minimisation of `Z t` in R. Schapire, Y. Singer, Machine Learning 37 (1999)
 - used-in: margin-based generalisation bounds for boosting
 - prerequisites: finite sums, exponential, logarithm, real powers
-- formalized-elsewhere: AdaBoost training error reportedly in atlas-lean; margin version not checked
+- formalized-elsewhere: atlas-lean `CSLibExt/MachineLearning/AdaBoost.lean` :: `marginErr_le` (the same bound as `adaboost_margin_optimal`), `expLoss_score_succ_le` (optimality of the vote); cslib-frontier `CslibFrontier/MachineLearning/Boosting/Margin.lean` (training-margin bound in another form, and margin generalization bounds, which are not covered here) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. With the AdaBoost definitions of `Applied.Learning.AdaBoost` (finite

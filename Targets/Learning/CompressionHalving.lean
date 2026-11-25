@@ -9,6 +9,7 @@ import Applied.Learning.SampleCompressionBounds
 - source: N. Littlestone, M. Warmuth, "Relating data compression and learnability", technical report (1986); S. Floyd, M. Warmuth, "Sample compression, learnability, and the Vapnik–Chervonenkis dimension", Machine Learning 21 (1995) (the halving-based scheme of size `log₂ |𝒞|`; exact location to be confirmed)
 - used-in: compression schemes far below the trivial size `|X|`; Occam-type bounds
 - prerequisites: the definitions of `Applied.Learning.SampleCompression`
+- formalized-elsewhere: cslib-frontier `CslibFrontier/MachineLearning/PACLearning/Compression/MistakeBound.lean` :: `ofMistakeBound` together with `CslibFrontier/MachineLearning/OnlineLearning/MistakeBound/Halving.lean` (the composition is not stated there) — in a different scheme model (ordered list of kept examples; see "Scheme model" in `Targets/Learning/SampleCompression.lean`) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `X` be a finite type with decidable equality and `𝒞` a finite set of
@@ -27,6 +28,12 @@ As a corollary of this scheme and the lower bound of
 The reconstructed hypothesis need not belong to `𝒞` (the definition of a compression scheme
 allows any function `X → Bool`). Not covered: the sharper classical fact `vcDim 𝒞 ≤ log₂ |𝒞|`
 (only the factor-5 version above is proved), and schemes in terms of the VC dimension.
+
+Scheme model. `CompressionScheme` keeps an unordered **set** of labelled examples and
+reconstructs from that set alone (no order, no side information); cslib-frontier's
+`SampleCompressionScheme` keeps an ordered list. The existence result here is therefore the
+stronger form: it gives an ordered-list scheme of the same size (on paper), not conversely.
+See "Scheme model" in `Targets/Learning/SampleCompression.lean`.
 -/
 
 namespace Targets.Learning

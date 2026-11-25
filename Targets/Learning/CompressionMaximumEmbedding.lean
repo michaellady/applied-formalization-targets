@@ -10,6 +10,7 @@ import Targets.Learning.SampleCompression
 - source: S. Floyd, M. Warmuth, Machine Learning 21 (1995) (schemes for maximum classes restrict to subclasses; the question whether every class of VC dimension `d` embeds into a maximum class of dimension `O(d)` is raised there, exact location to be confirmed); see also B. Rubinstein, J. H. Rubinstein, P. Bartlett, "Bounding embeddings of VC classes into maximum classes", in Measures of Complexity (2015) (to be confirmed)
 - used-in: the sample compression conjecture via embeddings
 - prerequisites: `Targets/Learning/CompressionMaximum.lean`
+- formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)
 - statement-review: unreviewed
 
 Informal statement. Let `X` be a finite type with decidable equality.
@@ -38,6 +39,12 @@ and classes only; the library's notion of compression scheme.
 
 Not covered: any embedding theorem (no class is shown to embed into a maximum class, other
 than maximum classes themselves); ample / extremal classes.
+
+Scheme model. `CompressionScheme` keeps an unordered **set** of labelled examples and
+reconstructs from that set alone (no order, no side information); cslib-frontier's
+`SampleCompressionScheme` keeps an ordered list. The existence result here is therefore the
+stronger form: it gives an ordered-list scheme of the same size (on paper), not conversely.
+See "Scheme model" in `Targets/Learning/SampleCompression.lean`.
 -/
 
 namespace Targets.Learning

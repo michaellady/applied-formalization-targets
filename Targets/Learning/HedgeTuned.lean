@@ -9,7 +9,7 @@ import Applied.Learning.HedgeTuned
 - source: Y. Freund, R. Schapire, "A decision-theoretic generalization of on-line learning and an application to boosting", J. Comput. System Sci. 55 (1997); N. Cesa-Bianchi, G. Lugosi, "Prediction, Learning, and Games" (2006), Chapter 2 (the sharper constant `√(T log N / 2)` appears there; theorem numbers to be confirmed)
 - used-in: online learning, boosting, zero-sum game solving, exponentiated-gradient methods
 - prerequisites: `Applied.Learning.hedge_regret_bound`; the inequality `1 - e^{-η} ≥ η - η²/2`
-- formalized-elsewhere: not checked
+- formalized-elsewhere: atlas-lean `CSLibExt/MachineLearning/Hedge.lean` :: `regret_le`, `regret_le_two_sqrt` (constant `2 √(T log N)`, weaker than ours) and `CSLibExt/MachineLearning/HedgeHoeffding.lean` :: `algLoss_le_hoeffding` (`η T / 8 + log N / η`, which gives the sharper `√(T log N / 2)`); cslib-frontier `CslibFrontier/MachineLearning/OnlineLearning/Hedge.lean` :: `hedge_regret_le_sqrt` (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. `N ≥ 1` experts suffer losses `ℓ t i ∈ [0, 1]` in rounds `t = 0, 1, …`.
@@ -26,7 +26,9 @@ There is no range restriction on `η`, `T` or `N`. When `T = 0` or `N = 1` the t
 rate is `0` (in Lean `x / 0 = 0`); the bound still holds and is proved directly in those cases.
 
 Differences from the literature. The constant is `√2`; the optimal analysis through
-Hoeffding's lemma gives `√(T log N / 2)` (with `η = √(8 log N / T)`), which is not formalized.
+Hoeffding's lemma gives `√(T log N / 2)` (with `η = √(8 log N / T)`), which is not formalized
+here (atlas-lean has the Hoeffding form, see `formalized-elsewhere`; our bound is weaker than
+that one by the factor `2`).
 The learning rate depends on the horizon `T`; anytime versions (doubling trick, time-varying
 `η`) are not covered. The loss of Hedge is the expected loss; no high-probability statement
 for the realised loss of the randomised algorithm is made.

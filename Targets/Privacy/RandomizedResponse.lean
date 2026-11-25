@@ -9,6 +9,7 @@ import Applied.Privacy.RandomizedResponse
 - source: S. L. Warner, "Randomized response: a survey technique for eliminating evasive answer bias", J. Amer. Statist. Assoc. 60 (1965); privacy analysis as in C. Dwork, A. Roth, "The Algorithmic Foundations of Differential Privacy" (2014), Section 3.2 (the book analyses a coin-flipping variant; exact claim number to be confirmed)
 - used-in: local differential privacy, survey design, telemetry collection
 - prerequisites: probability mass functions
+- formalized-elsewhere: atlas-lean `CSLibExt/Privacy/DiscreteMechanisms.lean` :: `rrMech`, `isDP_rrMech` (general truth probability `p`); cslib-frontier `CslibFrontier/Privacy/DifferentialPrivacy/RandomizedResponse.lean` :: `differentiallyPrivate_randomizedResponse` (the coin-flip variant with `ε = ln 3`, a different mechanism) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `ε ≥ 0`. The mechanism that takes one bit and reports it truthfully with

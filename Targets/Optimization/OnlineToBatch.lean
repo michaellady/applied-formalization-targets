@@ -9,6 +9,7 @@ import Applied.Optimization.OnlineToBatchOGD
 - source: N. Cesa-Bianchi, A. Conconi, C. Gentile, "On the generalization ability of on-line learning algorithms", IEEE Trans. Inf. Theory 50 (2004) (the in-expectation convex form proved here is the standard textbook version, e.g. S. Shalev-Shwartz, "Online Learning and Online Convex Optimization", Found. Trends ML 4 (2012), Section 5; theorem numbers to be confirmed)
 - used-in: stochastic gradient descent analysis, generalization bounds for online learners
 - prerequisites: independence and product measures (`indepFun_iff_map_prod_eq_prod_map_map`, Fubini `integral_prod`), Jensen's inequality (`ConvexOn.map_sum_le`)
+- formalized-elsewhere: different probabilistic models: cslib-frontier `CslibFrontier/MachineLearning/OnlineLearning/ConvexOnlineToBatch.lean` :: `integral_trueRisk_average_le` (i.i.d. product sample, per-sample convexity on `K`); lmlexplore `LMLExplore/OnlineLearning/OnlineToBatch.lean` (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `P` be a probability measure on `Ω`, `E` a real vector space with a
