@@ -34,6 +34,16 @@ What is proved (in `Applied/`): `3 ≤ Θ(C₇) ≤ 7` (the trivial bounds `α(G
 Not covered: the Lovász theta function and the bound `Θ ≤ ϑ` (so `Θ(C₅) = √5` and
 `Θ(C₇) ≤ 3.3177` are not formalized); the lower bound `367^{1/5}`; that the supremum is a limit
 (Fekete's lemma); the link between `Θ` and zero-error codes for a channel.
+
+Lovász's bound (added later; it supersedes the "Not covered" sentence above as far as the
+bound `Θ ≤ ϑ` for single representations, `Θ(C₅) = √5` and `Θ(C₇) < 3.3177` go). Lovász's
+orthonormal-representation bound `Θ(G) ≤ max_v 1/⟪c, u v⟫²` is formalized in
+`Targets/InformationTheory/LovaszThetaBound.lean` (`shannonCapacity_le_of_isOrthonormalRep`),
+together with `Θ(C₇) ≤ 70000/21099 ≈ 3.3176928` (`shannonCapacityC7_le`) from an explicit
+orthonormal representation of `C₇` in `ℝ⁷`; this is about `2.6 · 10⁻⁵` above
+`ϑ(C₇) ≈ 3.3176672`, and the exact bound `Θ(C₇) ≤ ϑ(C₇)` is still not formalized. `Θ(C₅) = √5`
+is in `Targets/InformationTheory/ShannonCapacityC5.lean`. The Lovász theta function itself is
+not defined.
 -/
 
 open Applied.InformationTheory
