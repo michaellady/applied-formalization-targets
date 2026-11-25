@@ -65,7 +65,9 @@ Not covered here: the channel coding theorem `opCapacity (memoryless W) = capaci
 converse half `opCapacity (memoryless W) ≤ capacity W`, together with the weak converse
 `(1 - Pₑ) log M ≤ capacity (F.kernel n) + log 2` for a single code and
 `opCapacity F ≤ limsup capacity (F.kernel n) / n` for a general family, is proved in
-`Targets/InformationTheory/ChannelCodingConverse.lean`; achievability is not formalized. Also
+`Targets/InformationTheory/ChannelCodingConverse.lean`; achievability is not formalized in
+general (only for the binary erasure channel at the degenerate endpoints `e = 0, 1`, in
+`Targets/InformationTheory/BecCodingEndpoints.lean`). Also
 not covered: the equivalence of maximal and average error criteria; strong converses.
 -/
 

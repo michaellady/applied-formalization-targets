@@ -25,7 +25,10 @@ Also recorded: for every input distribution `p`, `I(p, bec e) = (1 - e) H(p)`
 Difference from the textbook statement: none in content; units are nats. This is the
 *information* capacity; the coding theorem is not formalized.
 
-Not covered: the coding theorem; erasure channels over larger alphabets.
+Not covered: the coding theorem for `0 < e < 1`; erasure channels over larger alphabets.
+The converse `opCapacity (memoryless (bec e)) ≤ (1 - e) log 2` is in
+`Targets/InformationTheory/ChannelCodingConverse.lean`, and the full coding theorem at the
+degenerate endpoints `e = 0, 1` is in `Targets/InformationTheory/BecCodingEndpoints.lean`.
 -/
 
 namespace Targets.InformationTheory
