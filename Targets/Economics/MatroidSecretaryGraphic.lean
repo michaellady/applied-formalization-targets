@@ -1,0 +1,113 @@
+import Applied.Economics.MatroidSecretaryGraphic
+import Targets.Economics.MatroidSecretary
+
+/-!
+# Matroid secretary problem: graphic matroids
+
+- id: econ-matroid-secretary-graphic
+- area: economics
+- status: formalized
+- source: N. Korula, M. Pál, "Algorithms for secretary problems on graphs and hypergraphs", ICALP 2009 (the random-vertex-order reduction and the constant `1/(2e)` for graphic matroids; exact statement and numbering to be confirmed); earlier constant-factor result for graphic matroids: M. Babaioff, N. Immorlica, R. Kleinberg, SODA 2007 (constant `1/16`, to be confirmed); the problem is from Babaioff–Immorlica–Kleinberg, SODA 2007. The proof formalized here follows the Korula–Pál idea; the constant is the known one, nothing new is claimed.
+- used-in: online selection of a maximum-weight forest (e.g. online network design / spanning-tree auctions in random order); the matroid secretary literature
+- prerequisites: `Applied/Economics/MatroidSecretary.lean` (model), `Applied/Economics/MatroidSecretaryDirectSum.lean` (`blockSum`, `partitionOne`, `restrictAlg`), `Applied/Economics/SecretaryOneOverE.lean` (the `1/e` rule); Mathlib's `IndepMatroid.ofFinite`, `LinearIndepOn`, Hall's theorem (`Finset.all_card_le_biUnion_card_iff_exists_injective`), `Measure.count`, `SimpleGraph`. Mathlib has no graphic matroid at this pin, so one is defined here.
+- statement-review: unreviewed
+
+Informal statement. Everything is in the random-order model of
+`Targets/Economics/MatroidSecretary.lean` (finite ground set, weights real, non-negative and
+adversarial, fixed before a uniformly random arrival order; the algorithm knows the matroid,
+sees identity and weight of each arrival, and may be randomized; expectation = average over
+all `n!` arrival orders, then over the random seed). Let `G` be a finite multigraph with vertex
+set `V` and edge set `E`, edge `e` joining `src e` and `tgt e` (parallel edges and loops
+allowed). Its graphic matroid (`graphic src tgt`, ground set all of `E`) has a feasible
+randomized online algorithm that is `1/(2e)`-competitive: for every non-negative weight
+function and every independent set `I`, the expected accepted weight is at least
+`w(I)/(2e)`. The algorithm: draw a uniformly random order of the vertices; orient each
+non-loop edge towards its later endpoint; among the edges entering each vertex `v` run,
+independently, the classical rule "skip the first `⌊nᵥ/e⌋` arrivals, then accept the first one
+that beats all earlier ones" (`nᵥ` = number of edges entering `v`; ties broken by a fixed
+order); never accept loops. The same holds for the graphic matroid of a finite simple graph
+(`simpleGraphic G`, ground type `G.edgeSet`).
+
+Lean hypotheses and conventions disclosed.
+* `graphic src tgt` is DEFINED as the matroid whose independent sets are the sets of edges with
+  linearly independent signed incidence vectors `𝟙_{tgt e} - 𝟙_{src e}` in `ℚ^V`
+  (`linearMatroid`). That this equals the cycle matroid ("independent = contains no cycle") is
+  a textbook fact (Oxley, *Matroid Theory*, Prop. 5.1.2) that is NOT formalized here. Proved
+  sanity checks: loops are dependent, two parallel edges are dependent, a directed triangle is
+  dependent, and every set of non-loop edges with pairwise distinct later endpoints for some
+  vertex order is independent (this last one is the direction used for feasibility).
+* `E : Type*` with `[Fintype E]`; `V : Type` (universe 0, because the random seed is a vertex
+  order and `HasCompetitiveRandomized` requires `Ω : Type`) with `[Fintype V]`. `V` and `E` may
+  be empty. For `simpleGraphic`, `[Fintype G.edgeSet]` is assumed and the endpoints of an edge
+  are taken from the representative `Quot.out e` (an arbitrary fixed orientation; the result
+  is proved for the multigraph `graphic src tgt` with arbitrary `src`, `tgt`, so it holds
+  whatever orientation is chosen).
+* The randomness of the algorithm is the uniform measure on `V ≃ Fin |V|` (discrete
+  measurable space, counting measure normalized).
+* The reduction theorem (`hasCompetitiveRandomized_graphic_of_partition`) needs, for every
+  `f : E → V`, a feasible deterministic `c`-competitive algorithm for `partitionOne f`; it is
+  instantiated with `c = 1/e` (`partitionSecretaryRule_isCompetitive`), giving `c/2 = 1/(2e)`.
+
+Differences from the textbook statement. The graphic matroid is the linear (signed incidence)
+representation, not the acyclicity definition (see above). The model is the base model's
+"matroid known in advance" variant (the algorithm knows the whole graph), which is the setting
+of Korula–Pál for graphic matroids as far as we know (to be confirmed). Competitiveness is
+against every independent set, equivalently the maximum-weight forest.
+
+What is proved (all in `Applied/Economics/MatroidSecretaryGraphic.lean`).
+* `hasCompetitiveRandomized_graphic`: `HasCompetitiveRandomized (graphic src tgt) (1/(2e))` for
+  every finite multigraph.
+* `hasCompetitiveRandomized_simpleGraphic`: the same for finite simple graphs.
+* `hasCompetitiveRandomized_graphic_of_partition`: the reduction, losing a factor `2`.
+* `graphic_indep_of_injOn_head`, `exists_endpoint_injOn`, `two_mul_card_head_eq`: the three
+  combinatorial ingredients (triangularity, Hall assignment of endpoints, probability `1/2`).
+* `partitionSecretaryRule_isCompetitive`: partition matroids with capacities one with constant
+  `1/e` (improving the `1/4` of `Targets/Economics/MatroidSecretaryPartition.lean`; by the
+  direct-sum theorem and the rank-one `1/e` rule).
+* `conclusion_graphic`: the conclusion of `MatroidSecretaryConjecture` restricted to graphic
+  matroids, with `c = 1/(2e)`.
+
+Not covered: the equivalence of `graphic` with the acyclicity definition; better constants for
+graphic matroids known in the literature; co-graphic,
+transversal, laminar and other matroid classes; models where the graph is revealed online.
+-/
+
+namespace Targets.Economics
+
+open Applied.Economics.MatroidSecretary
+
+alias graphic_indep_iff := Applied.Economics.MatroidSecretary.graphic_indep_iff
+
+alias graphic_indep_of_injOn_head := Applied.Economics.MatroidSecretary.graphic_indep_of_injOn_head
+
+alias exists_endpoint_injOn := Applied.Economics.MatroidSecretary.exists_endpoint_injOn
+
+alias src_ne_tgt_of_indep := Applied.Economics.MatroidSecretary.src_ne_tgt_of_indep
+
+alias graphic_not_indep_pair := Applied.Economics.MatroidSecretary.graphic_not_indep_pair
+
+alias graphic_not_indep_triangle := Applied.Economics.MatroidSecretary.graphic_not_indep_triangle
+
+alias two_mul_card_head_eq := Applied.Economics.MatroidSecretary.two_mul_card_head_eq
+
+alias hasCompetitiveRandomized_graphic_of_partition :=
+  Applied.Economics.MatroidSecretary.hasCompetitiveRandomized_graphic_of_partition
+
+alias partitionSecretaryRule_isCompetitive :=
+  Applied.Economics.MatroidSecretary.partitionSecretaryRule_isCompetitive
+
+alias hasCompetitiveRandomized_graphic :=
+  Applied.Economics.MatroidSecretary.hasCompetitiveRandomized_graphic
+
+alias hasCompetitiveRandomized_simpleGraphic :=
+  Applied.Economics.MatroidSecretary.hasCompetitiveRandomized_simpleGraphic
+
+/-- The conclusion of the matroid secretary conjecture holds with `c = 1/(2e)` for all graphic
+matroids of finite multigraphs (loops and parallel edges allowed). -/
+theorem conclusion_graphic :
+    ∃ c : ℝ, 0 < c ∧ ∀ (E : Type) [Fintype E] (V : Type) [Fintype V] (src tgt : E → V),
+      (graphic src tgt).E = Set.univ ∧ HasCompetitiveRandomized (graphic src tgt) c :=
+  ⟨1 / (2 * Real.exp 1), by positivity,
+    fun _ _ _ _ src tgt => ⟨rfl, hasCompetitiveRandomized_graphic src tgt⟩⟩
+
+end Targets.Economics
