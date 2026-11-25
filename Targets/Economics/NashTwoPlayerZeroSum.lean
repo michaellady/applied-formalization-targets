@@ -21,6 +21,9 @@ randomise independently, and no player raises their expected payoff by unilatera
 to another probability vector.
 
 * `nash_twoPlayer_zeroSum_exists_mixed`: the existence statement above.
+* `nash_twoPlayer_constSum_exists_mixed`: the same conclusion for constant-sum games, i.e. under
+  the hypothesis that `u 0 s + u 1 s = c` for one real `c` and every pure profile `s`
+  (finite non-empty strategy sets as above).
 * `mixedPayoff_twoPlayer_eq_gamePayoff` (no zero-sum or non-emptiness hypothesis): for two
   players, `mixedPayoff u σ i` equals the bimatrix payoff `(σ 0)ᵀ M (σ 1)`, where
   `M a b = u i (a, b)` (`twoPlayerMatrix u i`). This links `IsMixedNash` to the bimatrix
@@ -36,8 +39,8 @@ to another probability vector.
   or minimax theorem is used.
 
 Differences from the textbook statement: zero-sum is the exact condition `u 1 = -u 0`;
-constant-sum games (`u 0 + u 1 = c`) are not stated separately (they have the same equilibria,
-but this is not formalized here). Player set is literally `Fin 2`, so a two-player game indexed
+constant-sum games are handled by a separate theorem with hypothesis
+`∀ s, u 0 s + u 1 s = c`. Player set is literally `Fin 2`, so a two-player game indexed
 by another two-element type must be transported by hand.
 
 For the `2 × 2` results the pure strategy sets are literally `Fin 2`; games whose two-element
@@ -54,6 +57,11 @@ theorem nash_twoPlayer_zeroSum_exists_mixed {S : Fin 2 → Type*} [∀ i, Fintyp
     [∀ i, Nonempty (S i)] (u : Fin 2 → (∀ j, S j) → ℝ) (hu : u 1 = -u 0) :
     ∃ σ : ∀ j, S j → ℝ, Applied.Economics.IsMixedNash u σ :=
   Applied.Economics.exists_isMixedNash_twoPlayer_zeroSum u hu
+
+theorem nash_twoPlayer_constSum_exists_mixed {S : Fin 2 → Type*} [∀ i, Fintype (S i)]
+    [∀ i, Nonempty (S i)] (u : Fin 2 → (∀ j, S j) → ℝ) (c : ℝ) (hu : ∀ s, u 0 s + u 1 s = c) :
+    ∃ σ : ∀ j, S j → ℝ, Applied.Economics.IsMixedNash u σ :=
+  Applied.Economics.exists_isMixedNash_twoPlayer_constSum u c hu
 
 theorem mixedPayoff_twoPlayer_eq_gamePayoff {S : Fin 2 → Type*} [∀ i, Fintype (S i)]
     (u : Fin 2 → (∀ j, S j) → ℝ) (σ : ∀ j, S j → ℝ) (i : Fin 2) :

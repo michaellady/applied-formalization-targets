@@ -14,6 +14,8 @@ formulation `IsBimatrixNash`. Here we connect that formulation to the general `n
 * `exists_isMixedNash_twoPlayer_zeroSum`: a two-player game with finite non-empty strategy sets
   and `u 1 = -u 0` has a mixed Nash equilibrium (from von Neumann's minimax theorem
   `exists_saddle_point`, itself obtained from Mathlib's Sion theorem; no Brouwer or Kakutani).
+* `exists_isMixedNash_twoPlayer_constSum`: the same for constant-sum games
+  (`u 0 s + u 1 s = c` for all pure profiles `s`).
 * `isMixedNash_fin_two_iff`: for two players, `IsMixedNash u σ` is exactly
   `IsBimatrixNash` for the two payoff matrices and the strategies `σ 0`, `σ 1`.
 * `exists_isBimatrixNash_two_by_two`, `exists_isMixedNash_two_by_two`: every general-sum game
@@ -211,4 +213,38 @@ theorem exists_isMixedNash_two_by_two (u : Fin 2 → (Fin 2 → Fin 2) → ℝ) 
     (twoPlayerMatrix (S := fun _ => Fin 2) u 0) (twoPlayerMatrix (S := fun _ => Fin 2) u 1)
   exact exists_isMixedNash_fin_two_of_bimatrix (S := fun _ => Fin 2) u h
 
+end Applied.Economics
+
+/-! ### Two-player constant-sum games -/
+
+namespace Applied.Economics
+
+variable {S : Fin 2 → Type*} [∀ i, Fintype (S i)]
+
+lemma gamePayoff_const_sub {m n : Type*} [Fintype m] [Fintype n] (A : Matrix m n ℝ) (c : ℝ)
+    {p : m → ℝ} {q : n → ℝ} (hp : p ∈ mixedStrategies m) (hq : q ∈ mixedStrategies n) :
+    gamePayoff (Matrix.of fun a b => c - A a b) p q = c - gamePayoff A p q := by
+  rw [gamePayoff_eq_sum, gamePayoff_eq_sum]
+  have e : ∀ i j, p i * (c - A i j) * q j = p i * c * q j - p i * A i j * q j := fun i j => by
+    ring
+  simp only [Matrix.of_apply, e, Finset.sum_sub_distrib]
+  congr 1
+  calc ∑ i, ∑ j, p i * c * q j = (∑ i, p i) * c * (∑ j, q j) := by
+        rw [Finset.sum_mul, Finset.sum_mul]
+        exact Finset.sum_congr rfl fun i _ => by rw [Finset.mul_sum]
+    _ = c := by rw [hp.2, hq.2]; ring
+
+/-- **Two-player constant-sum games** (`u 0 s + u 1 s = c` for every pure profile `s`) have a
+mixed Nash equilibrium. -/
+theorem exists_isMixedNash_twoPlayer_constSum [∀ i, Nonempty (S i)]
+    (u : Fin 2 → (∀ j, S j) → ℝ) (c : ℝ) (hu : ∀ s, u 0 s + u 1 s = c) :
+    ∃ σ, IsMixedNash u σ := by
+  set A := twoPlayerMatrix u 0 with hA
+  have h1 : twoPlayerMatrix u 1 = Matrix.of fun a b => c - A a b := by
+    ext a b; simp only [hA, twoPlayerMatrix, Matrix.of_apply]; linarith [hu ((piFinTwoEquiv S).symm (a, b))]
+  obtain ⟨p, hp, q, hq, hrow, hcol⟩ := exists_saddle_point A
+  refine exists_isMixedNash_fin_two_of_bimatrix u (p := p) (q := q) ⟨hp, hq, hrow, ?_⟩
+  intro q' hq'
+  rw [h1, gamePayoff_const_sub A c hp hq', gamePayoff_const_sub A c hp hq]
+  linarith [hcol q' hq']
 end Applied.Economics
