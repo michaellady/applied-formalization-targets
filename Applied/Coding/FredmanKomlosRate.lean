@@ -14,7 +14,7 @@ import Applied.Coding.TrifferenceRate
 * `perfectHashRate_le_elementary`: rate `≤ log₂ (k / (k-1))` for `k ≥ 2` (from
   `IsPerfectHashCode.card_le`).
 * `logb_three_halves_lt_fredmanKomlos_three`: for `k = 3`, `log₂ (3/2) < 3!/3² = 2/3`, so
-  Körner's bound is stronger than Fredman–Komlós.
+  the elementary trifference bound is stronger than Fredman–Komlós.
 * `fredmanKomlos_four_lt_logb_four_thirds`: for `k = 4`, `4!/4³ = 3/8 < log₂ (4/3)`, so
   Fredman–Komlós is stronger than the elementary bound.
 -/
@@ -224,8 +224,8 @@ theorem perfectHashRate_le_elementary {k : ℕ} (hk : 2 ≤ k) :
   have h2 := Real.logb_le_logb_of_le (b := 2) (by norm_num) (by exact_mod_cast hpos) h
   rwa [Real.logb_mul hk1.ne' (by positivity), Real.logb_pow] at h2
 
-/-- For `k = 3` the Fredman–Komlós rate bound `3!/3² = 2/3` is weaker than Körner's
-`log₂ (3/2)`. -/
+/-- For `k = 3` the Fredman–Komlós rate bound `3!/3² = 2/3` is weaker than the
+elementary trifference bound `log₂ (3/2)`. -/
 theorem logb_three_halves_lt_fredmanKomlos_three :
     Real.logb 2 (3 / 2) < (Nat.factorial 3 : ℝ) / (3 : ℝ) ^ (3 - 1) := by
   have h1 : (Nat.factorial 3 : ℝ) / (3 : ℝ) ^ (3 - 1) = 2 / 3 := by

@@ -107,7 +107,7 @@ ShannonCapacity → LovaszTheta → LovaszOddCycle
 | `Varshamov` | Varshamov bound for linear codes |
 | `Delsarte`, `DelsarteExamples` | Krawtchouk polynomials, Delsarte inequalities and LP bound; `A(8,4) ≤ 16`, `A(16,6) ≤ 256`, `A(24,8) ≤ 4096` |
 | `VarshamovTenengolts`, `SingleDeletionUpper` | VT codes correct one deletion; Levenshtein's upper bound |
-| `Trifference`, `TrifferenceSmall`, `TrifferenceRate` | trifferent codes, Körner's bound, `T(1..4)`, the rate |
+| `Trifference`, `TrifferenceSmall`, `TrifferenceRate` | trifferent codes, the elementary bound `2(3/2)ⁿ`, `T(1..4)`, the rate |
 | `TripleAveraging` | **shared** first-moment lemma for the two lower bounds below |
 | `TrifferenceLower`, `TrifferenceKornerMarton` | random coding with alteration; the Körner–Marton bound |
 | `PerfectHash`, `Hansel`, `FredmanKomlos`, `FredmanKomlosRate` | perfect `k`-hash codes, Hansel's lemma, the Fredman–Komlós bound |
@@ -265,7 +265,7 @@ Not formalized:
   constant-weight Johnson bound; the parity-refined Plotkin bound and the case `n = 2d`; perfect
   codes; the asymptotic Varshamov bound for linear codes; whether `R(n)` converges; the primal
   Delsarte LP and strong duality; sharper finite bounds for single-deletion codes.
-- **Hashing.** Improvements of Fredman–Komlós for `k ≥ 4` and of Körner's bound for `k = 3`;
+- **Hashing.** Improvements of Fredman–Komlós for `k ≥ 4` and of the elementary bound `2(3/2)ⁿ` for `k = 3`;
   `T(5) ≤ 10`, `T(6) ≤ 13`.
 - **LDCs.** The reduction from an arbitrary 2-query decoder of a linear code to the matching
   form (so the exponential lower bound is not stated for `IsLDC`); non-linear codes; `q ≥ 3`;

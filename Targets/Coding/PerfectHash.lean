@@ -16,7 +16,7 @@ Informal statement. Let `k ≥ 2`. Call `C ⊆ {0, …, k-1}ⁿ` a perfect `k`-h
 set of `k` distinct codewords some coordinate takes `k` pairwise different values on them.
 Then `|C| ≤ (k - 1) (k / (k - 1))ⁿ`. The hypothesis `k ≥ 2` is used (for `k = 1` the bound
 would read `|C| ≤ 0`). For `k = 3`, perfect `3`-hash codes are exactly the trifferent codes
-(`isPerfectHashCode_three_iff`), and the bound is Körner's `2 (3/2)ⁿ`.
+(`isPerfectHashCode_three_iff`), and the bound is the elementary `2 (3/2)ⁿ`.
 
 The Fredman–Komlós bound is in `Targets/Coding/FredmanKomlos.lean`. Not covered: its later improvements; lower bounds for `k ≥ 4`.
 -/

@@ -13,7 +13,8 @@ values in some coordinate.
 * `IsTrifferent C`: the definition.
 * `IsTrifferent.exists_shorter`: from a trifferent code of length `n + 1` with more than three
   words one gets a trifferent code of length `n` with at least two thirds as many words.
-* `IsTrifferent.card_le`: **Körner's bound**, `|C| ≤ 2 (3/2)ⁿ`.
+* `IsTrifferent.card_le`: the **elementary bound** `|C| ≤ 2 (3/2)ⁿ`
+  (Körner 1973; see Körner–Marton 1988, Elias 1988; attribution varies).
 
 Determining the exponential growth rate of the largest trifferent code is open.
 -/
@@ -93,7 +94,8 @@ theorem IsTrifferent.exists_shorter {n : ℕ} {C : Finset (Fin (n + 1) → Fin 3
     · exact ⟨j, h1, h2, h3⟩
   · rw [Finset.card_image_of_injOn hinj]; omega
 
-/-- **Körner's bound.** A trifferent code of length `n` has at most `2 (3/2)ⁿ` words. -/
+/-- **The elementary bound** (Körner 1973; see Körner–Marton 1988, Elias 1988; attribution varies).
+A trifferent code of length `n` has at most `2 (3/2)ⁿ` words. -/
 theorem IsTrifferent.card_le : ∀ {n : ℕ} {C : Finset (Fin n → Fin 3)}, IsTrifferent C →
     (C.card : ℝ) ≤ 2 * (3 / 2 : ℝ) ^ n
   | 0, C, _ => by

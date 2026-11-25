@@ -10,7 +10,7 @@ Write `T(n)` for the largest size of a trifferent code in `{0,1,2}ⁿ`.
 * `IsTrifferent.padZero`, `exists_isTrifferent_succ`: `T(n) ≤ T(n + 1)`.
 * Exact values `T(1) = 3`, `T(2) = 4`, `T(3) = 6`, `T(4) = 9`: the upper bounds
   (`IsTrifferent.card_le_three`, `card_le_four`, `card_le_six`, `card_le_nine`) come from the
-  integer form of Körner's shortening step, and the matching codes
+  integer form of the shortening step behind the elementary bound `2 (3/2)ⁿ`, and the matching codes
   (`exists_isTrifferent_one`, …, `exists_isTrifferent_four`) are the tetracode
   `{(a, b, a + b, a + 2b)}` over `𝔽₃` and two shortenings of it.
 -/
