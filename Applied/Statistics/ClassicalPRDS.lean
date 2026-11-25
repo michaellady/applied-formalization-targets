@@ -95,4 +95,68 @@ theorem IsClassicalPRDSOn.isPRDSOn {P : Measure Ω} {p : ι → Ω → ℝ} {H�
     measure_union hdisj measurableSet_Ioc, mul_add, add_mul]
   exact add_le_add le_rfl hcheb
 
+/-- It is enough that the version of the conditional probability is non-decreasing on a set
+of values of full measure for the law of `p i`: it can be modified off that set to be
+non-decreasing everywhere. -/
+theorem isClassicalPRDSOn_of_monotoneOn (P : Measure Ω) (p : ι → Ω → ℝ) (H₀ : Finset ι)
+    (h : ∀ i ∈ H₀, ∀ D : Set (ι → ℝ), MeasurableSet D → IsUpperSet D →
+      ∃ (g : ℝ → ℝ≥0∞) (S : Set ℝ), P.map (p i) Sᶜ = 0 ∧ MonotoneOn g S ∧
+        ∀ A : Set ℝ, MeasurableSet A →
+          P ((fun ω j => p j ω) ⁻¹' D ∩ p i ⁻¹' A) = ∫⁻ x in A, g x ∂(P.map (p i))) :
+    IsClassicalPRDSOn P p H₀ := by
+  intro i hi D hD hup
+  obtain ⟨g, S, hS, hmono, hrep⟩ := h i hi D hD hup
+  refine ⟨fun x => ⨆ (y : ℝ) (_ : y ∈ S ∧ y ≤ x), g y, ?_, ?_⟩
+  · intro x x' hxx'
+    exact iSup₂_le fun y hy =>
+      le_iSup₂ (f := fun (y : ℝ) (_ : y ∈ S ∧ y ≤ x') => g y) y ⟨hy.1, hy.2.trans hxx'⟩
+  · intro A hA
+    rw [hrep A hA]
+    refine lintegral_congr_ae (ae_restrict_of_ae ?_)
+    have hae : ∀ᵐ x ∂(P.map (p i)), x ∈ S := by
+      have := measure_eq_zero_iff_ae_notMem.mp hS
+      filter_upwards [this] with x hx
+      exact Set.not_notMem.mp hx
+    filter_upwards [hae] with x hx
+    exact le_antisymm
+      (le_iSup₂ (f := fun (y : ℝ) (_ : y ∈ S ∧ y ≤ x) => g y) x ⟨hx, le_rfl⟩)
+      (iSup₂_le fun y hy => hmono hy.1 hx hy.2)
+
+/-- **Classical PRDS in terms of the regular conditional distribution.** For measurable
+p-values (countably many) on a finite measure, `IsClassicalPRDSOn` holds exactly when, for
+every `i ∈ H₀` and every increasing measurable `D`, the regular conditional probability
+`x ↦ condDistrib p (p i) P x D` of `p ∈ D` given `p i = x` is non-decreasing on a measurable
+set of values `x` that has full measure for the law of `p i`. -/
+theorem isClassicalPRDSOn_iff_condDistrib [Countable ι] (P : Measure Ω) [IsFiniteMeasure P]
+    (p : ι → Ω → ℝ) (hmeas : ∀ j, Measurable (p j)) (H₀ : Finset ι) :
+    IsClassicalPRDSOn P p H₀ ↔
+      ∀ i ∈ H₀, ∀ D : Set (ι → ℝ), MeasurableSet D → IsUpperSet D →
+        ∃ S : Set ℝ, MeasurableSet S ∧ P.map (p i) Sᶜ = 0 ∧
+          MonotoneOn (fun x => condDistrib (fun ω j => p j ω) (p i) P x D) S := by
+  have hpm : Measurable fun ω j => p j ω := measurable_pi_iff.mpr hmeas
+  have hkey : ∀ i, ∀ D : Set (ι → ℝ), MeasurableSet D → ∀ A : Set ℝ, MeasurableSet A →
+      P ((fun ω j => p j ω) ⁻¹' D ∩ p i ⁻¹' A)
+        = ∫⁻ x in A, condDistrib (fun ω j => p j ω) (p i) P x D ∂(P.map (p i)) := by
+    intro i D hD A hA
+    rw [setLIntegral_map hA (Kernel.measurable_coe _ hD) (hmeas i),
+      setLIntegral_preimage_condDistrib (hmeas i) hpm.aemeasurable hD hA, Set.inter_comm]
+  constructor
+  · intro h i hi D hD hup
+    obtain ⟨g, hg, hrep⟩ := h i hi D hD hup
+    have hae : g =ᵐ[P.map (p i)] fun x => condDistrib (fun ω j => p j ω) (p i) P x D :=
+      ae_eq_of_forall_setLIntegral_eq_of_sigmaFinite hg.measurable (Kernel.measurable_coe _ hD)
+        fun A hA _ => by rw [← hrep A hA, hkey i D hD A hA]
+    refine ⟨{x | g x = condDistrib (fun ω j => p j ω) (p i) P x D},
+      measurableSet_eq_fun hg.measurable (Kernel.measurable_coe _ hD), ?_, ?_⟩
+    · exact ae_iff.mp hae
+    · intro x hx y hy hxy
+      simp only [Set.mem_ofPred_eq] at hx hy
+      show condDistrib (fun ω j => p j ω) (p i) P x D ≤ condDistrib (fun ω j => p j ω) (p i) P y D
+      rw [← hx, ← hy]
+      exact hg hxy
+  · intro h
+    refine isClassicalPRDSOn_of_monotoneOn P p H₀ fun i hi D hD hup => ?_
+    obtain ⟨S, -, hS, hmono⟩ := h i hi D hD hup
+    exact ⟨_, S, hS, hmono, hkey i D hD⟩
+
 end Applied.MultipleTesting
