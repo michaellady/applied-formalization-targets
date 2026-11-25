@@ -73,10 +73,10 @@ almost surely.
 Not covered: three or more true nulls with arbitrary correlation (the open case); the
 Benjamini–Hochberg false discovery rate for two-sided tests (`BHTwoSidedGaussian`, reported
 disputed), even for `m = 2` with one false null; positive regression dependence (`IsPRDSOn`) of
-two-sided p-values, which is not proved here even for `m = 2`; multivariate `t` statistics;
-two-sided tests in a one-factor model with more than two statistics (the conditioning argument
-needs, for each upper set of the whole p-value vector, monotonicity of a product of stochastically
-ordered laws, which is not formalized).
+two-sided p-values, which is not proved in this file; multivariate `t` statistics. One-factor
+models with any number of statistics, and the Karlin–Rinott (MTP2) class, are covered in
+`Targets/Statistics/TwoSidedOneFactor.lean` and `Targets/Statistics/TwoSidedKarlinRinott.lean`,
+which also prove weak PRDS of the two-sided p-values in those models.
 -/
 
 open MeasureTheory ProbabilityTheory
