@@ -68,9 +68,20 @@ What is proved (in `Applied/Optimization/Simplex.lean`, `SimplexExample.lean`,
 * The encoding of rule inputs is injective (`RuleInput.encode_injective`) and
   `m + n ≤ bitSize P` (`add_le_bitSize`).
 
+Partial result in another file (it does not prove or refute any of the five statements).
+* `Targets/Optimization/KleeMintyDantzig.lean` (Klee–Minty 1972, in Chvátal's form): on the
+  Klee–Minty cube with `n` constraints and `2n` variables, which is nondegenerate and bounded,
+  every Dantzig (largest reduced cost) rule `R` started at the slack basis makes exactly
+  `2^n - 1` simplex pivots and visits all `2^n` feasible bases (`kleeMinty_dantzig`); hence no
+  Dantzig rule, with any tie-breaking, satisfies the polynomial bound in `PolynomialPivotRule`
+  or `UnrestrictedPolynomialPivotRule` (`dantzig_not_polynomial`). Here a "Dantzig rule" is any
+  `R` with `PivotRule.IsDantzigRule`: whenever a simplex pivot whose entering index has the
+  largest reduced cost exists, `R` returns one.
+
 Not proved: that any concrete rule (Dantzig, Bland, steepest edge, …) is polynomial-time
 computable in the sense of `IsPolyTime` (Mathlib has no tools for building Turing machines);
-any lower bound for a concrete rule (Klee–Minty and later constructions); that a polynomial
+any lower bound for a concrete rule other than Dantzig's (Bland, steepest edge, shadow vertex,
+and the later constructions for other rules); that a polynomial
 rule would give a strongly polynomial algorithm or the polynomial Hirsch conjecture; that the
 restricted and the general version are equivalent (perturbation arguments).
 
