@@ -27,13 +27,11 @@ lemma bhReject_nonempty_of_one_le_bhK (q : ι → ℝ) (h : 1 ≤ bhK α q) :
     (bhReject α q).Nonempty :=
   Finset.card_pos.mp (lt_of_lt_of_le h (bhK_le_card_bhReject q))
 
-/-- **Simes inequality.** If all hypotheses are true nulls with independent valid p-values,
-the Simes test rejects with probability at most `α`. The Simes test rejects when
-`1 ≤ bhK α q`, i.e. when at least `k` of the p-values are at most `α k / m` for some `k ≥ 1`. -/
-theorem measure_one_le_bhK_le (P : Measure Ω) [IsProbabilityMeasure P] (hα : 0 ≤ α)
-    (p : ι → Ω → ℝ) (hmeas : ∀ i, Measurable (p i)) (hindep : iIndepFun p P)
-    (hvalid : ∀ i, IsValidPValue P (p i)) :
-    P {ω | 1 ≤ bhK α fun j => p j ω} ≤ ENNReal.ofReal α := by
+/-- The Simes test rejects with probability at most the false discovery rate of
+Benjamini–Hochberg when every hypothesis is a true null. -/
+theorem measure_one_le_bhK_le_fdr (P : Measure Ω) (p : ι → Ω → ℝ)
+    (hmeas : ∀ i, Measurable (p i)) :
+    P {ω | 1 ≤ bhK α fun j => p j ω} ≤ fdr P univ (fun ω => bhReject α fun j => p j ω) := by
   have hpm : Measurable fun ω => (fun j => p j ω) := measurable_pi_iff.mpr hmeas
   have hS : MeasurableSet {ω | 1 ≤ bhK α fun j => p j ω} := by
     have h := (measurable_bhK (α := α)).comp hpm
@@ -55,8 +53,16 @@ theorem measure_one_le_bhK_le (P : Measure Ω) [IsProbabilityMeasure P] (hα : 0
       = ∫⁻ ω, {ω | 1 ≤ bhK α fun j => p j ω}.indicator (fun _ => (1 : ℝ≥0∞)) ω ∂P := by
         rw [lintegral_indicator_const hS, one_mul]
     _ ≤ fdr P univ (fun ω => bhReject α fun j => p j ω) := lintegral_mono hpt
-    _ ≤ ENNReal.ofReal α :=
-        fdr_bhReject_le_of_iIndepFun P hα p hmeas hindep univ fun i _ => hvalid i
+
+/-- **Simes inequality.** If all hypotheses are true nulls with independent valid p-values,
+the Simes test rejects with probability at most `α`. The Simes test rejects when
+`1 ≤ bhK α q`, i.e. when at least `k` of the p-values are at most `α k / m` for some `k ≥ 1`. -/
+theorem measure_one_le_bhK_le (P : Measure Ω) [IsProbabilityMeasure P] (hα : 0 ≤ α)
+    (p : ι → Ω → ℝ) (hmeas : ∀ i, Measurable (p i)) (hindep : iIndepFun p P)
+    (hvalid : ∀ i, IsValidPValue P (p i)) :
+    P {ω | 1 ≤ bhK α fun j => p j ω} ≤ ENNReal.ofReal α :=
+  (measure_one_le_bhK_le_fdr P p hmeas).trans
+    (fdr_bhReject_le_of_iIndepFun P hα p hmeas hindep univ fun i _ => hvalid i)
 
 /-- The Simes local test of the intersection hypothesis `I`. -/
 def simesLocal (α : ℝ) (p : ι → Ω → ℝ) (I : Finset ι) (ω : Ω) : Prop :=
