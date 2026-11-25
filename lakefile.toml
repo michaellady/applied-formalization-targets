@@ -1,5 +1,5 @@
 name = "AppliedFormalizationTargets"
-defaultTargets = ["Targets"]
+defaultTargets = ["Applied", "Targets"]
 
 [leanOptions]
 autoImplicit = false
@@ -13,3 +13,7 @@ rev = "fc4f59e577feb1a4956671bc04ac18aaaf8cd842"
 [[lean_lib]]
 name = "Targets"
 globs = ["Targets.+"]
+
+[[lean_lib]]
+name = "Applied"
+globs = ["Applied.+"]

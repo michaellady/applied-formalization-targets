@@ -11,12 +11,26 @@ Pure-mathematics conjectures belong in
 [Formal Conjectures](https://github.com/google-deepmind/formal-conjectures); this registry covers
 the applied results that project does not target.
 
+## Two layers
+
+- **`Applied/`: the library.** Reusable definitions and lemmas (p-values, error rates, smooth
+  convex functions, ...). Everything here is fully proved; `sorry` is not allowed. Later proofs
+  build on it, and general-purpose pieces should be offered upstream to Mathlib.
+- **`Targets/`: the registry.** One file per named result, with a metadata header. A target is
+  either a statement awaiting proof (`sorry`) or a short proof that calls the library.
+
+What goes into the library is decided by the targets: each frontier claim we want to check
+tells us which fundamentals to build next. See `ROADMAP.md`.
+
 ## Layout
 
-- `Targets/<Area>/<Name>.lean` — one target per file, with a metadata header.
+- `Applied/<Area>/...` — library.
+- `Targets/<Area>/<Name>.lean` — one target per file.
 - `TARGETS.md` — generated index of all targets.
+- `ROADMAP.md` — current focus and the order of work.
 - `BACKLOG.md` — results wanted but not yet stated in Lean.
-- `scripts/check_targets.py` — validates metadata and regenerates the index.
+- `scripts/check_targets.py` — validates metadata, regenerates the index, and rejects `sorry`
+  in the library.
 
 ## Status values
 
