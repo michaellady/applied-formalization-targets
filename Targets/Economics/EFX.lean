@@ -27,7 +27,11 @@ of the goods by all agents (`EFXCommonRanking.lean`, `efx_exists_common_ranking`
 (`EFXTwoExtraGoods.lean`, `efx_exists_two_extra_goods`), all agents but one sharing a
 valuation (`EFXAllButOne.lean`, `efx_exists_all_but_one_identical`), every agent having one of
 two valuations (`EFXTwoTypes.lean`, `efx_exists_two_types`), and valuations in `{0, 1}`
-(`EFXBinary.lean`, `efx_exists_binary`). This file itself contains only definitions. Conventions: valuations are real-valued and
+(`EFXBinary.lean`, `efx_exists_binary`). Relations with pairwise maximin share fairness are
+proved in `PMMSEFX.lean`: PMMS implies this strong form of EFX when all values are strictly
+positive (`isEFX_of_isPMMS`), and EFX implies `2/3`-PMMS for non-negative valuations
+(`isApproxPMMS_two_thirds_of_isEFX`); PMMS existence is itself open (`PMMS.lean`,
+`PMMSExists`). This file itself contains only definitions. Conventions: valuations are real-valued and
 additive, allocations are complete (`a : Fin m → Fin n` gives every good to exactly one
 agent), and `EFXExists` assumes `0 < n` (with no agents and `m > 0` goods no allocation
 exists).
