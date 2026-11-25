@@ -31,6 +31,7 @@ vector `u v` to every vertex so that distinct **non-adjacent** vertices get orth
 
 open Finset
 open scoped RealInnerProductSpace
+open Real
 
 namespace Applied.InformationTheory
 
@@ -165,5 +166,88 @@ theorem shannonCapacity_le_of_isOrthonormalRep [Fintype V] [Nonempty V]
       ≤ (M ^ (k + 1)) ^ (((k + 1 : ℕ) : ℝ)⁻¹) :=
         Real.rpow_le_rpow (Nat.cast_nonneg _) h (by positivity)
     _ = M := Real.pow_rpow_inv_natCast hM0 (Nat.succ_ne_zero k)
+
+/-! ### The pentagon: Lovász's umbrella -/
+
+/-- Azimuth `2πi/5` of the `i`-th rib of the umbrella. -/
+noncomputable def umbrellaAngle (i : Fin 5) : ℝ := 2 * π * (i : ℕ) / 5
+
+/-- Lovász's umbrella for `C₅`: unit vectors at azimuth `2πi/5` whose height
+`√(cos(π/5)/(1+cos(π/5)))` makes ribs `i` and `i ± 2` orthogonal. -/
+noncomputable def umbrella5 (i : Fin 5) : EuclideanSpace ℝ (Fin 3) :=
+  !₂[√(1 / (1 + cos (π / 5))) * cos (umbrellaAngle i),
+     √(1 / (1 + cos (π / 5))) * sin (umbrellaAngle i), √(cos (π / 5) / (1 + cos (π / 5)))]
+
+lemma cos_pi_div_five_pos : 0 < cos (π / 5) := by
+  rw [cos_pi_div_five]; positivity
+
+lemma inner_umbrella5 (i j : Fin 5) : ⟪umbrella5 i, umbrella5 j⟫ =
+    (cos (umbrellaAngle i - umbrellaAngle j) + cos (π / 5)) / (1 + cos (π / 5)) := by
+  have hk := cos_pi_div_five_pos
+  rw [inner_euclidean, Fin.sum_univ_three]
+  simp only [umbrella5]
+  simp only [Matrix.cons_val_zero, Matrix.cons_val_one]
+  have hA := Real.mul_self_sqrt (show 0 ≤ 1 / (1 + cos (π / 5)) by positivity)
+  have hB := Real.mul_self_sqrt (show 0 ≤ cos (π / 5) / (1 + cos (π / 5)) by positivity)
+  rw [cos_sub]
+  set A := √(1 / (1 + cos (π / 5)))
+  set B := √(cos (π / 5) / (1 + cos (π / 5)))
+  calc _ = A * A * (cos (umbrellaAngle i) * cos (umbrellaAngle j) +
+        sin (umbrellaAngle i) * sin (umbrellaAngle j)) + B * B := by simp; ring
+    _ = _ := by rw [hA, hB]; field_simp
+
+lemma umbrellaAngle_sub (i j : Fin 5) (hij : i ≠ j)
+    (hadj : ¬ (SimpleGraph.cycleGraph 5).Adj i j) :
+    cos (umbrellaAngle i - umbrellaAngle j) = - cos (π / 5) := by
+  have key : ((i : ℕ) : ℤ) - (j : ℕ) = 2 ∨ ((i : ℕ) : ℤ) - (j : ℕ) = -2 ∨
+      ((i : ℕ) : ℤ) - (j : ℕ) = 3 ∨ ((i : ℕ) : ℤ) - (j : ℕ) = -3 := by
+    rw [SimpleGraph.cycleGraph_adj] at hadj
+    revert i j; decide
+  have hsub : umbrellaAngle i - umbrellaAngle j = 2 * π * ((((i : ℕ) : ℤ) - (j : ℕ) : ℤ) : ℝ) / 5 := by
+    simp [umbrellaAngle]; ring
+  rw [hsub]
+  rcases key with h | h | h | h <;> rw [h] <;> push_cast
+  · rw [show 2 * π * 2 / 5 = π - π / 5 by ring, cos_pi_sub]
+  · rw [show 2 * π * (-2) / 5 = -(π - π / 5) by ring, cos_neg, cos_pi_sub]
+  · rw [show 2 * π * 3 / 5 = π / 5 + π by ring, cos_add_pi]
+  · rw [show 2 * π * (-3) / 5 = -(π / 5 + π) by ring, cos_neg, cos_add_pi]
+
+theorem isOrthonormalRep_umbrella5 :
+    IsOrthonormalRep (SimpleGraph.cycleGraph 5) umbrella5 := by
+  have hk := cos_pi_div_five_pos
+  refine ⟨fun i => norm_eq_one_of_inner_self ?_, fun i j hij hadj => ?_⟩
+  · rw [inner_umbrella5, sub_self, cos_zero]; field_simp
+  · rw [inner_umbrella5, umbrellaAngle_sub i j hij hadj]; simp
+
+/-- The handle of the umbrella. -/
+noncomputable def umbrellaHandle : EuclideanSpace ℝ (Fin 3) := !₂[0, 0, 1]
+
+theorem inner_umbrellaHandle (i : Fin 5) :
+    ⟪umbrellaHandle, umbrella5 i⟫ ^ 2 = cos (π / 5) / (1 + cos (π / 5)) := by
+  have hk := cos_pi_div_five_pos
+  rw [inner_euclidean, Fin.sum_univ_three]
+  simp [umbrellaHandle, umbrella5]
+  rw [Real.sq_sqrt (by positivity)]
+
+theorem norm_umbrellaHandle : ‖umbrellaHandle‖ = 1 := by
+  refine norm_eq_one_of_inner_self ?_
+  rw [inner_euclidean, Fin.sum_univ_three]
+  simp [umbrellaHandle]
+
+/-- `Θ(C₅) ≤ √5`, from the umbrella. -/
+theorem shannonCapacity_cycleGraph_five_le :
+    shannonCapacity (SimpleGraph.cycleGraph 5) ≤ √5 := by
+  refine shannonCapacity_le_of_isOrthonormalRep isOrthonormalRep_umbrella5 norm_umbrellaHandle
+    fun i => ?_
+  rw [inner_umbrellaHandle, cos_pi_div_five]
+  have h5 : √5 * √5 = 5 := Real.mul_self_sqrt (by norm_num)
+  have h0 : 0 < √5 := by positivity
+  rw [mul_div_assoc', le_div_iff₀ (by positivity)]
+  nlinarith
+
+/-- **Lovász (1979).** `Θ(C₅) = √5` (with Shannon's lower bound). -/
+theorem shannonCapacity_cycleGraph_five :
+    shannonCapacity (SimpleGraph.cycleGraph 5) = √5 :=
+  le_antisymm shannonCapacity_cycleGraph_five_le sqrt_five_le_shannonCapacity_cycleGraph_five
 
 end Applied.InformationTheory
