@@ -9,7 +9,35 @@ vertices are `vertex (v, r) k = v + 𝟙{i : k ≤ r i}` for `k = 0, …, m`.
 
 A labelling `l : (Fin m → ℕ) → Fin (m + 1)` is *admissible* if
 (A) `x i = 0 → l x ≠ castSucc i` and (B) `x i = N → l x ≠ last m`.
-`sperner_cube` : for `0 < N`, the number of fully labelled Kuhn simplices is odd.
+
+## Main definitions
+
+* `Simp m N`, `vertex σ k`: Kuhn simplices and their `m + 1` vertices.
+* `Admissible N l`: the boundary conditions (A), (B).
+* `full l σ`: the vertices of `σ` carry all `m + 1` labels.
+* `nb`: the facet-pairing involution on (simplex, dropped vertex) pairs (`down`, `up`, `swp`
+  are its three cases); `facet`, `door` (a facet carrying exactly the labels `1, …, m`).
+
+## Main results
+
+* `sperner_parity`: for `0 < N` and an admissible labelling, the number of fully labelled Kuhn
+  simplices is odd (as an identity in `ZMod 2`).
+* `exists_full`: hence some Kuhn simplex is fully labelled.
+
+## Proof outline
+
+Induction on the dimension by the usual "doors" double count modulo 2.
+`local_parity`: a simplex has an odd number of doors iff it is fully labelled.
+`facet_nb`, `nb_nb`: `nb` is an involution preserving the facet, so doors that are not fixed by
+`nb` cancel in pairs. `nb_eq_self_iff` and `door_iff_full_face`: the doors fixed by `nb` are
+exactly the fully labelled simplices of the face `x 0 = 0` for the induced labelling
+`faceLabel`, which is admissible in one dimension less (`faceLabel_admissible`).
+
+## Not in this file
+
+That the Kuhn simplices triangulate the cube (not needed for the count); Sperner's lemma for a
+triangulated simplex; the passage to Brouwer's theorem, which is `Applied.Topology.Brouwer`.
+The one-dimensional case is proved separately and more directly in `SpernerOneDim`.
 -/
 
 namespace Applied.Topology.Kuhn
@@ -19,7 +47,7 @@ open Finset
 /-- A Kuhn simplex of the grid `{0,…,N}^m`: base point and rank permutation. -/
 abbrev Simp (m N : ℕ) := (Fin m → Fin N) × Equiv.Perm (Fin m)
 
-/-- The `k`-th vertex of a Kuhn simplex: `vertex (v, r) k i = v i + [k ≤ r i]`. -/
+/-- The indicator `[k ≤ t]` as a natural number: `1` if `k ≤ t` and `0` otherwise. -/
 def ind {m : ℕ} (k : Fin (m + 1)) (t : Fin m) : ℕ := if k.val ≤ t.val then 1 else 0
 
 lemma ind_le_one {m : ℕ} (k : Fin (m + 1)) (t : Fin m) : ind k t ≤ 1 := by
@@ -46,6 +74,10 @@ lemma vertex_le_base {m N : ℕ} (σ : Simp m N) (k : Fin (m + 1)) (i : Fin m) :
 
 /-! ### The local parity lemma -/
 
+/-- **Local parity.** Let `g : α → α` be a map of a finite type (the labels of the vertices of
+a simplex) and `c : α` a fixed label. The number of `k` such that `g` maps `univ \ {k}` onto
+`univ \ {c}` (the "doors" of the simplex) is odd if `g` is onto and even otherwise. Stated in
+`ZMod 2`. -/
 theorem local_parity {α : Type*} [Fintype α] [DecidableEq α] (g : α → α) (c : α) :
     (∑ k, if (univ.erase k).image g = univ.erase c then (1 : ZMod 2) else 0) =
       if univ.image g = univ then 1 else 0 := by
@@ -405,7 +437,10 @@ lemma image_eq_erase_zero_iff {ι : Type*} [Fintype ι] (g : ι → Fin (n + 2))
 
 /-! ### The main parity theorem -/
 
-/-- Boundary conditions on a labelling of the grid `{0,…,N}^m` by `Fin (m + 1)`. -/
+/-- Boundary conditions on a labelling of the grid `{0,…,N}^m` by `Fin (m + 1)`:
+(A) a point with `x i = 0` is not labelled `i` (`i.castSucc`), and
+(B) a point with some coordinate `x i = N` is not labelled `m` (`Fin.last m`).
+The labelling is defined on all of `ℕ^m`; only grid points matter. -/
 def Admissible {m : ℕ} (N : ℕ) (l : (Fin m → ℕ) → Fin (m + 1)) : Prop :=
   (∀ x i, x i = 0 → l x ≠ i.castSucc) ∧ (∀ x i, x i = N → l x ≠ Fin.last m)
 
@@ -427,7 +462,9 @@ lemma door_iff_facet {m : ℕ} (l : (Fin m → ℕ) → Fin (m + 1)) (x : Simp m
     door l x ↔ (facet x).image l = univ.erase 0 := by
   simp only [door, facet, image_image]; rfl
 
-/-- The face labelling. -/
+/-- The labelling induced on the face `x 0 = 0`, a copy of the grid `{0,…,N}^n`: the point `y`
+is sent to `(0, y)` and its label, which is never `0` by condition (A), is shifted down by
+one. -/
 def faceLabel (l : (Fin (n + 1) → ℕ) → Fin (n + 2)) (hl : Admissible N l) :
     (Fin n → ℕ) → Fin (n + 1) :=
   fun w => (l (Fin.cons (0 : ℕ) w)).pred (by
@@ -503,6 +540,10 @@ lemma nb_eq_self_iff (l : (Fin (n + 1) → ℕ) → Fin (n + 2)) (hl : Admissibl
     apply nb_zero_neg
     rw [hi0, hv]; omega
 
+/-- **Sperner-type lemma for the Kuhn triangulation of the cube, parity form.** For `0 < N`
+and a labelling `l` of the grid `{0, …, N}^m` by `Fin (m + 1)` that is `Admissible N`, the
+number of fully labelled Kuhn simplices is odd: the sum over all Kuhn simplices of `1` (fully
+labelled) or `0` (not), computed in `ZMod 2`, equals `1`. -/
 theorem sperner_parity (hN : 0 < N) : ∀ (m : ℕ) (l : (Fin m → ℕ) → Fin (m + 1)),
     Admissible N l → (∑ σ : Simp m N, if full l σ then (1 : ZMod 2) else 0) = 1 := by
   intro m

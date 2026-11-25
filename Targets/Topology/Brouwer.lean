@@ -9,7 +9,7 @@ import Applied.Topology.Brouwer
 - source: L. E. J. Brouwer, "Über Abbildung von Mannigfaltigkeiten", Math. Ann. 71 (1912); proof via Sperner's lemma: B. Knaster, C. Kuratowski, S. Mazurkiewicz, Fund. Math. 14 (1929); cubical/Kuhn-triangulation route: H. W. Kuhn, "Some combinatorial lemmas in topology", IBM J. Res. Develop. 4 (1960) (details of the variant used here are our own; closest published form to be confirmed)
 - used-in: Nash's existence theorem (`Targets/Economics/NashExistence.lean`); general equilibrium; fixed-point arguments throughout analysis
 - prerequisites: `Applied.Topology.Kuhn.exists_full` (Sperner-type lemma for the Kuhn triangulation of the cube, `Targets/Topology/SpernerCube.lean`); Mathlib's Heine–Cantor theorem and compactness of products of intervals
-- formalized-elsewhere: atlas-lean `MathlibExt/Analysis/Convex/BrouwerFixedPoint.lean` :: `exists_fixedPoint` (nonempty compact convex sets of a finite-dimensional space; strictly more general than this entry); cslib-frontier `CslibFrontier/Foundations/Analysis/Brouwer.lean` :: `exists_isFixedPt_cube` (cube, with `ContinuousOn` and `MapsTo`), `CslibFrontier/Foundations/Analysis/Brouwer/Simplex.lean` :: `exists_isFixedPt_pi_simplex` (products of simplices, as `brouwer_pi_probSimplex`) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
+- formalized-elsewhere: atlas-lean `MathlibExt/Analysis/Convex/BrouwerFixedPoint.lean` :: `exists_fixedPoint` (nonempty compact convex sets of a finite-dimensional space; this contains the cube, simplex and product-of-simplices statements of this entry, but not, as stated, `IsCubeRetract.exists_fixedPoint`, which also covers non-convex retracts of cubes); cslib-frontier `CslibFrontier/Foundations/Analysis/Brouwer.lean` :: `exists_isFixedPt_cube` (cube, with `ContinuousOn` and `MapsTo`), `CslibFrontier/Foundations/Analysis/Brouwer/Simplex.lean` :: `exists_isFixedPt_pi_simplex` (products of simplices, as `brouwer_pi_probSimplex`) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement.
@@ -41,10 +41,20 @@ more than a self-map of the cube: `g` must be defined and continuous on all of `
 values in the cube everywhere; the self-map form (hypotheses only on the cube, as in
 cslib-frontier's `exists_isFixedPt_cube`) is `brouwer_cube_of_continuousOn`. The statement for
 the closed ball or for arbitrary compact convex sets is not formalized in this project; it is
-formalized in atlas-lean (`exists_fixedPoint`, see `formalized-elsewhere`), which is strictly
-more general than everything in this entry. The simplex must be non-empty
-(`Nonempty α`); for empty `α` the simplex is empty and there is nothing to prove, but the
-hypothesis is kept.
+formalized in atlas-lean (`exists_fixedPoint`, see `formalized-elsewhere`). That theorem is
+more general than the cube, simplex and product-of-simplices statements of this entry (these
+sets are nonempty, compact and convex in a finite-dimensional space). It is not, as stated,
+more general than `IsCubeRetract.exists_fixedPoint`: a retract of a cube need not be convex
+(a Y-shaped tree in the plane is one) and need not be a subset of a vector space. In the other
+direction, every nonempty compact convex subset of a finite-dimensional space is in fact a
+retract of a cube (nearest-point projection), but that is not formalized here, so the
+compact convex statement is not a corollary of this entry as it stands.
+
+The hypotheses `Nonempty α` (in `brouwer_probSimplex`) and `∀ i, Nonempty (S i)` (in
+`brouwer_pi_probSimplex`) are necessary: for empty `α` the sum `∑ i, p i` is `0 ≠ 1`, so
+`probSimplex α` is empty, its unique self-map is continuous, and it has no fixed point; the
+statement is false without the hypothesis. (For `brouwer_pi_probSimplex` the index type `ι`
+may be empty: the product is then a one-point space.)
 
 Not covered here: Brouwer's theorem for the closed ball and general compact convex sets, the
 no-retraction theorem, Kakutani's theorem, and Schauder's theorem.
