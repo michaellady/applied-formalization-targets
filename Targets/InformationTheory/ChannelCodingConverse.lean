@@ -9,7 +9,7 @@ import Applied.InformationTheory.MemorylessConverse
 - source: C. E. Shannon, "A Mathematical Theory of Communication", Bell Syst. Tech. J. 27 (1948); R. M. Fano, "Transmission of Information" (1961) (Fano's inequality; details to be confirmed); textbook form e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Sections 7.9 and 7.12 (converse via Fano and data processing; section numbers to be confirmed); I. Csiszár, J. Körner, "Information Theory: Coding Theorems for Discrete Memoryless Systems" (2nd ed., 2011) (to be confirmed)
 - used-in: upper bounds on operational capacity (binary symmetric and erasure channels; the erasure bound for the deletion channel, `Targets/InformationTheory/DeletionErasureBound.lean`)
 - prerequisites: Fano's inequality (`Applied/InformationTheory/Fano.lean`), data processing (`Applied/InformationTheory/DataProcessing.lean`), block codes and operational capacity (`Applied/InformationTheory/BlockCodes.lean`)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: yes for the memoryless converse: atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/InformationTheory/ChannelCodingWeakConverse.lean` :: `channelCoding_weak_converse` (bits, with the sharper Fano term `h(Pₑ)` in place of `log 2`); FujiHaruka/information-theory (github.com/FujiHaruka/information-theory), `InformationTheory/Shannon/ChannelCoding/Converse.lean`, `ConverseMemoryless.lean`, `ConverseGeneral.lean`; LeanInfoTheory (github.com/serhatemrecoban/LeanInfoTheory), `LeanInfoTheory/Shannon/ChannelCodingAsymptotic.lean` :: `limsup_codeRate_le_channelCapacity`. The bound `opCapacity F ≤ limsup capacity (F.kernel n) / n` for general families was not found elsewhere (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. All logarithms are natural (nats).
@@ -73,9 +73,14 @@ Differences from the textbook statements.
 Achievability, and hence the full coding theorem, is proved for the binary erasure and binary
 symmetric channels (`Targets/InformationTheory/BecCodingTheorem.lean`,
 `BscCodingTheorem.lean`). Not covered: achievability for general memoryless channels
-(`capacity W ≤ opCapacity (memoryless W)`); equality `opCapacity = lim C_n / n`
-for general families (Dobrushin); strong converses; channels with feedback; continuous
-alphabets.
+(`capacity W ≤ opCapacity (memoryless W)`; formalized elsewhere, in other channel models and
+without a bridge to ours: FujiHaruka/information-theory,
+`shannon_noisy_channel_coding_theorem_general`, and atlas-lean, `channelCoding_achievability`);
+the sharper Fano term `h(Pₑ)` in place of `log 2` in the per-code bound (as in atlas-lean,
+`channelCoding_weak_converse`); equality `opCapacity = lim C_n / n`
+for general families (Dobrushin); strong converses (formalized elsewhere: cslib-frontier for
+the binary symmetric channel, atlas-lean `ChannelCodingStrongConverse.lean`); channels with
+feedback; continuous alphabets.
 -/
 
 namespace Targets.InformationTheory

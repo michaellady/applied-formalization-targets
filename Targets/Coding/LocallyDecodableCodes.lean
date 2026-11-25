@@ -9,7 +9,7 @@ import Applied.Coding.LocallyDecodable
 - source: J. Katz, L. Trevisan, "On the efficiency of local decoding procedures for error-correcting codes", STOC 2000 (definition and the question); S. Yekhanin, "Locally decodable codes", Found. Trends Theor. Comput. Sci. 6 (2012) (survey; details to be confirmed); ProofAtlas Top 500 (Nov 2026), rank 226
 - used-in: private information retrieval, fault-tolerant storage, worst-case to average-case reductions, lower bounds for data structures and matrix rigidity
 - prerequisites: Hamming distance (Mathlib); finite probability spaces as weighted finite types
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: the open propositions were not found stated in any project checked on 2026-11-25. Related, in cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Computability/LocallyDecodable/`: `Basic.lean` :: `IsLocallyDecodable` (adaptive decoders, any finite alphabet; our `IsLDC` is a special case, bridge not formalized), `Hadamard.lean` :: `isLocalDecoder_hadamardDecoder` (the same parameters `(2, δ, 1/2 - 2δ)`), `OneQuery.lean` :: `IsLocalDecoder.four_mul_sq_mul_card_mul_sq_le` (one-query bound), `LowerBound.lean` :: `IsLocallyDecodable.rpow_le_card` (Katz–Trevisan lower bound); and tCSlib (github.com/Shilun-Allan-Li/tCSlib), `TCSlib/KikuchiLDC/LDC/MainTheorem.lean` :: `main_theorem_ldc_lower_bound` (a lower bound for normal-form 3-query codes) (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. A code `C : {0,1}ᵏ → {0,1}ⁿ` is a `(q, δ, ε)`-locally decodable code (LDC)
@@ -36,6 +36,22 @@ so `PolyLengthLDC 2` is false, and `PolyLengthLDC 1` is false (Katz–Trevisan; 
 trivial case `PolyLengthLDC 0` is formalized, see above); for `q = 3` the best constructions have subexponential length
 (Yekhanin, Efremenko) and the best lower bound is polynomial (about `k³`; to be confirmed).
 
+Formalized elsewhere (cslib-frontier, `CslibFrontier/Computability/LocallyDecodable/`, and
+tCSlib; statements read at source on 2026-11-25, proofs not re-checked). Their model
+`IsLocallyDecodable` allows adaptive decoders and any finite alphabet, so `IsLDC` here is a
+special case of it; the implication `IsLDC → IsLocallyDecodable` is not formalized.
+* `q = 1`: `OneQuery.lean` :: `IsLocalDecoder.four_mul_sq_mul_card_mul_sq_le` proves
+  `4 δ² k ε² ≤ |Γ| - 1` for one-query decoders (`k` the message length, `Γ` the code alphabet),
+  i.e. `4 δ² k ε² ≤ 1` for binary codes. With the implication above this bounds `k` for fixed
+  `δ, ε > 0` and so refutes `PolyLengthLDC 1`. It is not proved in this project.
+* Katz–Trevisan lower bound for any `q`: `LowerBound.lean` :: `IsLocallyDecodable.rpow_le_card`.
+* Hadamard code: `Hadamard.lean` :: `isLocalDecoder_hadamardDecoder`, with the same parameters
+  `(2, δ, 1/2 - 2δ)` as `isLDC_hadamardCode`.
+* `q = 3`: tCSlib `TCSlib/KikuchiLDC/LDC/MainTheorem.lean` :: `main_theorem_ldc_lower_bound`, a
+  polynomial lower bound (of the `k³` type, up to logarithmic factors) for normal-form 3-query
+  codes; it does not decide `PolyLengthLDC 3`.
+* `q = 2`: the exponential lower bound was not found proved in any project we checked.
+
 Review notes (modelling choices to check).
 
 * Decoders are *non-adaptive*: the `q` positions are chosen from the randomness and `i` before
@@ -56,7 +72,8 @@ Review notes (modelling choices to check).
   depend on `k`.
 * In `PolyLengthLDC q` the same `q` is used for all `k`.
 
-Not covered: lower bounds; locally correctable codes; larger alphabets; relaxed LDCs.
+Not covered: lower bounds (see "Formalized elsewhere" above); locally correctable codes; larger
+alphabets; relaxed LDCs.
 -/
 
 open Applied.Coding

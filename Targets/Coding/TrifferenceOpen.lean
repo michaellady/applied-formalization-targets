@@ -6,9 +6,10 @@ import Applied.Coding.TrifferenceLower
 - id: coding-trifference-rate-open
 - area: coding
 - status: open
-- source: J. Körner, "Coding of an information source having ambiguous alphabet and the entropy of graphs" (1973) for the upper bound `log₂ (3/2)`; J. Körner, K. Marton, "New bounds for perfect hashing via information theory" (1988) for the best known lower bound; that no improvement of the rate upper bound below `log₂ (3/2)` is known, and that the known improvements are by sub-exponential factors only (for example S. Bhandari, A. Khetan, "Improved upper bound for the size of a trifferent code", 2022), is to be confirmed
+- source: J. Körner, "Coding of an information source having ambiguous alphabet and the entropy of graphs" (1973) for the upper bound `log₂ (3/2)`; J. Körner, K. Marton, "New bounds for perfect hashing via information theory" (1988) for the best known lower bound; that no improvement of the rate upper bound below `log₂ (3/2)` is known, and that the known improvements are by sub-exponential factors only (for example S. Bhandari, A. Khetan, "Improved upper bound for the size of a trifferent code", 2022), while exponential improvements are known only for linear codes (C. Pohoata, D. Zakharov, "On the trifference problem for linear codes", IEEE Trans. Inform. Theory, 2022), is to be confirmed
 - used-in: perfect hashing, zero-error list decoding
 - prerequisites: finite combinatorics and real logarithms only
+- formalized-elsewhere: no Lean formalization found in the projects checked on 2026-11-25 (local clones and GitHub code search; see `PRIOR-ART-VERIFICATION-2.md`)
 - statement-review: unreviewed
 
 Informal statement. A code `C ⊆ {0,1,2}ⁿ` is *trifferent* if any three distinct codewords take
@@ -27,7 +28,8 @@ Proved here (as theorems, from the library):
   `Targets/Coding/TrifferenceKornerMarton.lean`.
 
 Open, stated as a `Prop` and not asserted: `RateLtKorner`, i.e. `R < log₂ (3/2)`: can Körner's
-upper bound on the rate be improved at all? (Believed open; to be confirmed.)
+upper bound on the rate be improved at all? (Believed open for general codes; for linear codes
+an exponential improvement is known, see the source line; to be confirmed.)
 
 Not covered: the exact value of `R`; whether `(log₂ T(n)) / n` converges; the generalization
 to perfect `k`-hashing for `k ≥ 4`.

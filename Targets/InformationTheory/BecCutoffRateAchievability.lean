@@ -9,7 +9,7 @@ import Applied.InformationTheory.ErasureAchievability
 - source: union–Bhattacharyya bound and random-coding (cutoff-rate) arguments, e.g. A. J. Viterbi, J. K. Omura, "Principles of Digital Communication and Coding" (1979), Ch. 2–3, and R. G. Gallager, "Information Theory and Reliable Communication" (1968), Section 5.6 (to be confirmed); the BEC coding theorem itself is due to P. Elias, "Coding for noisy channels" (1955) (to be confirmed)
 - used-in: partial progress towards the achievability half of Shannon's channel coding theorem (`Targets/InformationTheory/OperationalCapacity.lean`, `Targets/InformationTheory/BinaryErasureChannel.lean`)
 - prerequisites: block codes and operational capacity (`Applied/InformationTheory/BlockCodes.lean`); `bec` (`Applied/InformationTheory/Channel.lean`)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: no direct statement found in the projects checked on 2026-11-25; general random-coding achievability for memoryless channels is in FujiHaruka/information-theory (github.com/FujiHaruka/information-theory), `InformationTheory/Shannon/ChannelCoding/ShannonTheoremGeneral.lean` :: `shannon_noisy_channel_coding_theorem_general`, and atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/InformationTheory/RandomCodingBound.lean` :: `exists_code_avgError_le` (Gallager's random-coding bound), in different channel models (no bridge formalized)
 - statement-review: unreviewed
 
 Informal statement. Let `0 ≤ e ≤ 1` (Lean hypotheses `h0`, `h1`) and let `bec e` be the binary

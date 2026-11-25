@@ -9,7 +9,7 @@ import Applied.InformationTheory.BroadcastOuterBound
 - source: folklore (single-user converse applied to each receiver, and to the receivers cooperating); a special case of the cut-set bound, e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Section 15.10 (to be confirmed); A. El Gamal, Y.-H. Kim, "Network Information Theory" (2011), Chapter 5 (to be confirmed)
 - used-in: outer bound for the open problem `Targets/InformationTheory/BroadcastThreeReceivers.lean`
 - prerequisites: broadcast codes (`Applied/InformationTheory/MultiTerminal.lean`); single-user weak converse (`Applied/InformationTheory/{ChannelConverse,MemorylessConverse}.lean`)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: no three-receiver statement found in the projects checked on 2026-11-25. Two receivers: FujiHaruka/information-theory (github.com/FujiHaruka/information-theory), `InformationTheory/Shannon/BroadcastChannel/Operational.lean` :: `BCAchievable`, `bcCapacityRegion`, and `Converse.lean` :: `bc_degraded_converse` (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. All logarithms are natural (nats). Let `X` be a finite type, `Y₁, Y₂, Y₃`
@@ -47,7 +47,10 @@ can be loose.
 
 Not covered: the two-receiver degraded broadcast channel converse (superposition region),
 Marton's inner bound, the UV and Nair–El Gamal outer bounds, bounds for pairs of receivers,
-convexity of the region.
+convexity of the region. (For two receivers, the degraded converse, Marton's inner bound and
+the UV outer bound are formalized in FujiHaruka/information-theory,
+`InformationTheory/Shannon/BroadcastChannel/`, e.g. `Converse.lean` :: `bc_degraded_converse`;
+located on 2026-11-25, statements not compared in detail.)
 -/
 
 namespace Targets.InformationTheory

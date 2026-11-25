@@ -9,6 +9,7 @@ import Applied.Coding.GilbertVarshamovRate
 - source: E. N. Gilbert, "A comparison of signalling alphabets", Bell Syst. Tech. J. 31 (1952), 504–522; R. R. Varshamov (1957); textbook form e.g. F. J. MacWilliams, N. J. A. Sloane, "The Theory of Error-Correcting Codes" (1977), Ch. 17 (theorem number to be confirmed)
 - used-in: the benchmark rate `1 - H(δ)` that binary code families are compared with
 - prerequisites: the finite Gilbert–Varshamov bound; the entropy bound on the size of a Hamming ball
+- formalized-elsewhere: yes: atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/Combinatorics/Coding/GilbertVarshamov.lean` :: `exists_code_exp_le_card` (`q`-ary, natural logarithms; the same statement at `q = 2` up to units) (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. For natural numbers `k`, `n` with `2k ≤ n` there is a set `C` of binary

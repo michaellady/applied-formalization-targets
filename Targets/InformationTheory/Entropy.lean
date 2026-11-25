@@ -9,7 +9,7 @@ import Applied.InformationTheory.Entropy
 - source: standard; e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Chapter 2 (theorem numbers to be confirmed)
 - used-in: definition of channel capacity; converse of the channel coding theorem; statements of open capacity problems (deletion, relay, broadcast channels)
 - prerequisites: Gibbs' inequality (`Applied/InformationTheory/Gibbs.lean`); `Real.negMulLog` (Mathlib)
-- formalized-elsewhere: Mathlib has the Kullback–Leibler divergence of measures (`InformationTheory.klDiv`, with values in `ℝ≥0∞`) but no entropy or mutual information of finite distributions; other projects to be confirmed
+- formalized-elsewhere: Mathlib has the Kullback–Leibler divergence of measures (`InformationTheory.klDiv`, with values in `ℝ≥0∞`) but no entropy or mutual information of finite distributions; finite entropy and mutual information are formalized in other projects, e.g. LeanInfoTheory (github.com/serhatemrecoban/LeanInfoTheory), `LeanInfoTheory/Shannon/Entropy.lean`, `InfoMeasures.lean`; FujiHaruka/information-theory (github.com/FujiHaruka/information-theory), `InformationTheory/Shannon/Entropy.lean`, `MutualInfo.lean`; atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/InformationTheory/FiniteEntropy.lean` (clones of 2026-11-25; statements read at source, proofs not re-checked); the individual statements were not compared one by one
 - statement-review: unreviewed
 
 Informal statement. Let `X` and `Y` be finite sets and `P : X × Y → ℝ` a function with

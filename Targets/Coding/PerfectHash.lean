@@ -9,6 +9,7 @@ import Applied.Coding.PerfectHash
 - source: the shortening argument of J. Körner (1973) for `k = 3`, extended to general `k`; the setting is that of M. L. Fredman, J. Komlós, "On the size of separating systems and families of perfect hash functions" (1984), whose own (stronger) bound is not formalized here; attribution of the general-`k` elementary bound to be confirmed
 - used-in: perfect hashing, zero-error list decoding
 - prerequisites: finite combinatorics only
+- formalized-elsewhere: the size bound was not found in the projects checked on 2026-11-25. cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Foundations/Combinatorics/PerfectHashFamily/Defs.lean` :: `IsPerfectHashFamily` is the same notion up to transposition (bridge not formalized), with upper-bound constructions only (`Basic.lean` :: `card_perfectHashFamily_le`) (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. Let `k ≥ 2`. Call `C ⊆ {0, …, k-1}ⁿ` a perfect `k`-hash code if for every

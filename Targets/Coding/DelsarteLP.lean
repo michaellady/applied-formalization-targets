@@ -9,6 +9,7 @@ import Applied.Coding.DelsarteExamples
 - source: P. Delsarte, "An algebraic approach to the association schemes of coding theory", Philips Res. Rep. Suppl. 10 (1973); textbook form e.g. F. J. MacWilliams, N. J. A. Sloane, "The Theory of Error-Correcting Codes" (1977), Ch. 17, §4 (theorem numbers to be confirmed). That the LP bound gives `A(16, 6) ≤ 256` and `A(24, 8) ≤ 4096`, attained by the Nordstrom–Robinson and extended Golay codes, is classical (to be confirmed in the same chapter)
 - used-in: the McEliece–Rodemich–Rumsey–Welch asymptotic bound; exact values of `A(n, d)` for small `n`
 - prerequisites: characters of `𝔽₂ⁿ`; Krawtchouk polynomials; double counting
+- formalized-elsewhere: no proved formalization found in the projects checked on 2026-11-25. tCSlib (github.com/Shilun-Allan-Li/tCSlib), `TCSlib/ErrorCorrectingCodes/MRRW.lean` :: `delsarte_lp_bound` states the bound with real multipliers but its proof is `sorry` (Krawtchouk lemmas are proved there); item 3 here proves the case of integral (equivalently rational) multipliers. TauCeti (github.com/TauCetiProject/TauCeti), `TauCeti/InformationTheory/Coding/Krawtchouk.lean` has Krawtchouk polynomials and MacWilliams identities for linear codes (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. Write `K_k(i) = ∑_{a + b = k} (-1)ᵃ C(i, a) C(n - i, b)` for the binary
@@ -36,14 +37,17 @@ Krawtchouk number (`kraw i (n - i) k` in Lean; `n - i` is truncated subtraction,
 Differences from the textbook statement: the textbook states the LP bound as the optimum of a
 linear program over distance distributions; here only the weak-duality direction with an
 explicit dual certificate is proved, which is the form needed to obtain bounds. The certificate
-is required to be integral (after clearing denominators). For comparison, the bounds formalized
+is required to be integral (after clearing denominators); tCSlib's `delsarte_lp_bound`
+(`TCSlib/ErrorCorrectingCodes/MRRW.lean`) states the bound for real multipliers, but its proof
+there is `sorry`. For comparison, the bounds formalized
 in this project give (Hamming, Elias–Bassalygo finite form, by direct computation outside Lean,
 not proved here) about 28 and 27 for `(8, 4)`, 478 and 501 for `(16, 6)`, 7216 and 7772 for
 `(24, 8)`.
 
 Not covered: the primal linear program and strong duality; the McEliece–Rodemich–Rumsey–Welch
 asymptotic bound `R ≤ H(1/2 - √(δ(1 - δ)))`, which is derived from this bound with a specific
-family of certificates and is the best known asymptotic upper bound for most `δ`;
+family of certificates and is the best known asymptotic upper bound for most `δ` (stated with
+`sorry` in tCSlib, `mrrw_bound`; not found proved in any project we checked);
 the Schrijver semidefinite bound; non-binary alphabets.
 -/
 
