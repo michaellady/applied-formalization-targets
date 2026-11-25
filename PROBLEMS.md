@@ -34,7 +34,7 @@ States: **done** (all three points), **partial** (statement plus some proved con
 | 260 | Sample compression conjecture | stated | Definition is satisfiable |
 | 343 | Matroid secretary conjecture | partial | Stated; `1/n`-competitive for every matroid; `1/4`-competitive for rank one (classical secretary) |
 | 136 | Polynomial pivot rule for simplex | todo | Needs a usable formal model of polynomial-time computation first |
-| 342 | Li–Li network coding conjecture | todo | |
+| 342 | Li–Li network coding conjecture | partial | Routing side only (fractional multicommodity flow, convexity). The conjecture itself is NOT stated: no network-coding rate region is defined |
 | 94 | Strongly polynomial linear programming | todo | Needs a usable formal model of polynomial-time computation first |
 | 223 | Semidefinite feasibility in polynomial time | todo | Needs a usable formal model of polynomial-time computation first |
 | 207 | Capacity of the binary deletion channel | partial | Stated as a defined quantity; `0 ≤ C(d) ≤ log 2`, `C(0) = log 2`, `C(1) = 0` |
@@ -114,7 +114,11 @@ channels are still missing.
 | Neyman–Pearson for randomized tests | done | Existence of a test of given size; converse |
 | Lehmann–Scheffé | partial | Stated with a sub-σ-algebra and a consequence of sufficiency, not sufficiency itself |
 | Glivenko–Cantelli | done | Rates (DKW inequality) |
-| Remaining backlog entries (about 7) | todo | Not yet stated |
+| Fundamental theorem of asset pricing (one period, finite states) | done | Multi-period; risk-neutral probabilities |
+| Gibbard–Satterthwaite | done | Versions with indifference |
+| Posted price is optimal for a single buyer | done | Virtual values; multiple bidders |
+| Shapley value: axioms and uniqueness | done | Subset-formula form |
+| Remaining backlog entries (about 5) | todo | Not yet stated |
 
 ## After the tracker is worked through
 
