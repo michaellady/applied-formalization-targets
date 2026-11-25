@@ -16,8 +16,10 @@ import Mathlib.Data.Fintype.Basic
 Informal statement. `n` agents with additive non-negative valuations divide `m` indivisible
 goods. An allocation is EFX if no agent envies another after removing any single good from the
 other's bundle. Existence is proved in the separate entry `EFXTwoAgents.lean` (not in this file) for `n = 2`,
-and for every `n` under identical valuations (which covers `n = 1`); it is reported on paper for `n = 3`
-(not checked against this strong form), and open for `n ≥ 4`.
+and for every `n` under identical valuations (which covers `n = 1`); for `n = 3` it is proved
+for this strong form in the separate entry `EFXThreeAgents.lean` (theorem `efx_exists_three`,
+a proof of the proposition `EFXExistsThree` below, following Chaudhury–Garg–Mehlhorn 2020 and
+the simpler proof of Akrami et al. 2022); it is open for `n ≥ 4`.
 
 The two-agent case and the identical-valuations case are proved for this strong form in
 `Targets/Economics/EFXTwoAgents.lean` (theorems `efx_exists_two` and `efx_exists_identical`).
@@ -54,9 +56,9 @@ def EFXExists : Prop :=
   ∀ (n m : ℕ), 0 < n → ∀ v : Fin n → Fin m → ℝ, (∀ i g, 0 ≤ v i g) →
     ∃ a : Fin m → Fin n, IsEFX v a
 
-/-- The three-agent case, reported proved on paper (Chaudhury–Garg–Mehlhorn 2020). Stated as a
-proposition because it is not proved here and the form of EFX in that paper has not been
-checked against `IsEFX`. -/
+/-- The three-agent case (Chaudhury–Garg–Mehlhorn 2020). Kept as a proposition in this file;
+it is proved for the strong form `IsEFX` in `Targets/Economics/EFXThreeAgents.lean`
+(`efx_exists_three : EFXExistsThree`). -/
 def EFXExistsThree : Prop :=
   ∀ (m : ℕ) (v : Fin 3 → Fin m → ℝ), (∀ i g, 0 ≤ v i g) → ∃ a : Fin m → Fin 3, IsEFX v a
 
