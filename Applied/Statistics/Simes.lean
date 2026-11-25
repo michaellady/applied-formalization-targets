@@ -8,7 +8,10 @@ import Applied.Statistics.ClosedTesting
   that `p₍ₖ₎ ≤ α k / m` for some `k` is at most `α`. It is the Benjamini–Hochberg theorem with
   every hypothesis a true null.
 * `hommel`: the closed test built from Simes local tests; `fwer_hommel_le`.
-* `hochberg`: Hochberg's step-up procedure; `hochberg_subset_hommel`, `fwer_hochberg_le`.
+* `hochberg`: Hochberg's step-up procedure, with the textbook treatment of tied p-values (a
+  block of ties uses the divisor of its last position); `hochberg_subset_hommel`,
+  `fwer_hochberg_le`. `hochberg_firstPosition_subset`: it rejects at least what the more
+  conservative first-position rule rejects.
 -/
 
 open MeasureTheory ProbabilityTheory Finset
@@ -90,9 +93,86 @@ theorem fwer_hommel_le (P : Measure Ω) [IsProbabilityMeasure P] (hα : 0 ≤ α
 
 open Classical in
 /-- Hochberg's step-up procedure: reject `i` when some `j` with `p i ≤ p j` satisfies
-`p j ≤ α / #{l | p j ≤ p l}`. Without ties, `#{l | p j ≤ p l} = m - rank j + 1`. -/
+`p j ≤ α / (#{l | p j < p l} + 1)`.
+
+This is the textbook rule (sort `p₍₁₎ ≤ … ≤ p₍ₘ₎`, take the largest `k` with
+`p₍ₖ₎ ≤ α / (m - k + 1)`, reject the hypotheses at positions `1, …, k`), written without
+sorting. Without ties `#{l | p j < p l} + 1 = m - rank j + 1`. With ties, the p-values equal
+to `p j` occupy a block of consecutive positions and `#{l | p j < p l} + 1` is the divisor
+`m - k + 1` of the *last* position `k` of that block, the most favourable one in the block
+when `α ≥ 0`. Hence for `α ≥ 0` every way of ordering tied p-values gives this same rejection
+set: if the textbook rule stops at position `k`, the last position of the block of `p₍ₖ₎`
+also passes, and everything at or below that block is rejected. (The equivalence with the
+sorted formulation is an argument on paper and is not formalized; for `α < 0` the sorted rule
+can depend on the order of ties and no claim is made.)
+
+`hochberg_firstPosition_subset` compares this with the more conservative rule that divides by
+`#{l | p j ≤ p l}` (the first position of the tie block), and `hochberg_eq_univ_of_forall_eq`
+shows that equal p-values `x ≤ α` are all rejected. -/
 noncomputable def hochberg (α : ℝ) (p : ι → Ω → ℝ) (ω : Ω) : Finset ι :=
-  {i | ∃ j, p i ω ≤ p j ω ∧ p j ω ≤ α / (univ.filter fun l => p j ω ≤ p l ω).card}
+  {i | ∃ j, p i ω ≤ p j ω ∧
+    p j ω ≤ α / (((univ.filter fun l => p j ω < p l ω).card : ℝ) + 1)}
+
+omit [MeasurableSpace Ω] [DecidableEq ι] in
+lemma mem_hochberg {p : ι → Ω → ℝ} {ω : Ω} {i : ι} :
+    i ∈ hochberg α p ω ↔ ∃ j, p i ω ≤ p j ω ∧
+      p j ω ≤ α / (((univ.filter fun l => p j ω < p l ω).card : ℝ) + 1) := by
+  classical
+  simp [hochberg]
+
+omit [MeasurableSpace Ω] [DecidableEq ι] in
+open Classical in
+/-- The corrected rule rejects everything rejected by the more conservative rule that divides
+by `#{l | p j ≤ p l}`, the divisor of the *first* position of a block of tied p-values. -/
+theorem hochberg_firstPosition_subset (hα : 0 ≤ α) (p : ι → Ω → ℝ) (ω : Ω) :
+    (univ.filter fun i => ∃ j, p i ω ≤ p j ω ∧
+        p j ω ≤ α / (univ.filter fun l => p j ω ≤ p l ω).card) ⊆ hochberg α p ω := by
+  intro i hi
+  obtain ⟨j, hij, hj⟩ := (mem_filter.mp hi).2
+  refine mem_hochberg.mpr ⟨j, hij, hj.trans ?_⟩
+  have hlt : (univ.filter fun l => p j ω < p l ω).card
+      < (univ.filter fun l => p j ω ≤ p l ω).card := by
+    refine Finset.card_lt_card ⟨fun l hl => ?_, fun hsub => ?_⟩
+    · simp only [mem_filter, mem_univ, true_and] at hl ⊢
+      exact hl.le
+    · have : j ∈ univ.filter fun l : ι => p j ω < p l ω := hsub (by simp)
+      simp at this
+  have hle : ((univ.filter fun l => p j ω < p l ω).card : ℝ) + 1
+      ≤ (univ.filter fun l => p j ω ≤ p l ω).card := by
+    exact_mod_cast hlt
+  exact div_le_div_of_nonneg_left hα (by positivity) hle
+
+omit [MeasurableSpace Ω] [DecidableEq ι] in
+/-- If all p-values are equal to `x ≤ α`, Hochberg's procedure rejects every hypothesis. -/
+theorem hochberg_eq_univ_of_forall_eq {p : ι → Ω → ℝ} {ω : Ω} {x : ℝ}
+    (hp : ∀ i, p i ω = x) (hx : x ≤ α) : hochberg α p ω = univ := by
+  refine Finset.eq_univ_iff_forall.mpr fun i => mem_hochberg.mpr ⟨i, le_rfl, ?_⟩
+  have h0 : (univ.filter fun l => p i ω < p l ω) = ∅ :=
+    Finset.filter_eq_empty_iff.mpr fun l _ => by simp [hp]
+  rw [h0, hp i]
+  simpa using hx
+
+omit [MeasurableSpace Ω] [DecidableEq ι] in
+open Classical in
+/-- If all p-values are equal to `x > α / m`, the more conservative rule that divides by
+`#{l | p j ≤ p l}` rejects nothing. With `hochberg_eq_univ_of_forall_eq`: for `m = 2` and
+`p₁ = p₂ = x` with `α / 2 < x ≤ α`, Hochberg's procedure rejects both hypotheses and the
+conservative rule rejects none. -/
+theorem firstPosition_eq_empty_of_forall_eq {p : ι → Ω → ℝ} {ω : Ω} {x : ℝ}
+    (hp : ∀ i, p i ω = x) (hx : α / Fintype.card ι < x) :
+    (univ.filter fun i => ∃ j, p i ω ≤ p j ω ∧
+        p j ω ≤ α / (univ.filter fun l => p j ω ≤ p l ω).card) = ∅ := by
+  refine Finset.filter_eq_empty_iff.mpr fun i _ => ?_
+  rintro ⟨j, -, hj⟩
+  have h1 : (univ.filter fun l => p j ω ≤ p l ω) = univ :=
+    Finset.filter_eq_self.mpr fun l _ => by simp [hp]
+  rw [h1, Finset.card_univ, hp j] at hj
+  exact not_lt.mpr hj hx
+
+/-- Two tied p-values `α / 2 < x ≤ α`: Hochberg's procedure rejects both. -/
+example (p : Fin 2 → Ω → ℝ) (ω : Ω) (x : ℝ) (hp : ∀ i, p i ω = x) (hx : x ≤ α) :
+    hochberg α p ω = univ :=
+  hochberg_eq_univ_of_forall_eq hp hx
 
 omit [MeasurableSpace Ω] in
 /-- Everything Hochberg rejects, Hommel rejects. -/
@@ -100,8 +180,7 @@ theorem hochberg_subset_hommel (hα : 0 ≤ α) (p : ι → Ω → ℝ) (ω : Ω
     hochberg α p ω ⊆ hommel α p ω := by
   classical
   intro i hi
-  simp only [hochberg, mem_filter, mem_univ, true_and] at hi
-  obtain ⟨j, hij, hj⟩ := hi
+  obtain ⟨j, hij, hj⟩ := mem_hochberg.mp hi
   simp only [hommel, closedTest, mem_filter, mem_univ, true_and]
   intro I hiI
   -- `a` counts the members of `I` whose p-value is at most `p j`
@@ -110,7 +189,7 @@ theorem hochberg_subset_hommel (hα : 0 ≤ α) (p : ι → Ω → ℝ) (ω : Ω
   have ha1 : 1 ≤ a := Finset.card_pos.mpr ⟨⟨i, hiI⟩, by simp [hF, hij]⟩
   have han : a ≤ Fintype.card I := by
     rw [ha, ← Finset.card_univ]; exact Finset.card_le_card (Finset.filter_subset _ _)
-  set N := (univ.filter fun l => p j ω ≤ p l ω).card with hN
+  set N := (univ.filter fun l => p j ω < p l ω).card + 1 with hN
   -- members of `I` with a strictly larger p-value inject into `{l | p j < p l}`
   have hrest : Fintype.card I - a + 1 ≤ N := by
     have h1 : (univ.filter fun l : I => ¬ p l ω ≤ p j ω).card = Fintype.card I - a := by
@@ -125,14 +204,9 @@ theorem hochberg_subset_hommel (hα : 0 ≤ α) (p : ι → Ω → ℝ) (ω : Ω
         have := (mem_filter.mp (mem_coe.mp hl)).2
         exact mem_coe.mpr (mem_filter.mpr ⟨mem_univ _, not_le.mp this⟩)
       · exact fun x _ y _ hxy => Subtype.ext hxy
-    have h3 : (univ.filter fun l : ι => p j ω < p l ω).card < N := by
-      refine Finset.card_lt_card ⟨fun l hl => ?_, fun hsub => ?_⟩
-      · simp only [mem_filter, mem_univ, true_and] at hl ⊢
-        exact hl.le
-      · have : j ∈ univ.filter fun l : ι => p j ω < p l ω :=
-          hsub (by simp)
-        simp at this
     omega
+  have hj' : p j ω ≤ α / (N : ℝ) := by
+    rw [hN]; push_cast; exact hj
   -- hence `p j ≤ α a / |I|`
   have hnpos : (0 : ℝ) < Fintype.card I := by
     exact_mod_cast lt_of_lt_of_le ha1 han
@@ -140,7 +214,7 @@ theorem hochberg_subset_hommel (hα : 0 ≤ α) (p : ι → Ω → ℝ) (ω : Ω
     have : 0 < N := by omega
     exact_mod_cast this
   have hthr : p j ω ≤ α * a / Fintype.card I := by
-    refine hj.trans ?_
+    refine hj'.trans ?_
     rw [div_le_div_iff₀ hNpos hnpos]
     have hreal : (Fintype.card I : ℝ) - a + 1 ≤ N := by
       have : ((Fintype.card I - a + 1 : ℕ) : ℝ) ≤ N := by exact_mod_cast hrest
