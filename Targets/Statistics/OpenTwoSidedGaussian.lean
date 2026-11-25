@@ -1,4 +1,5 @@
 import Applied.Statistics.PRDS
+import Applied.Statistics.PValues
 import Mathlib.Probability.Distributions.Gaussian.Basic
 import Mathlib.Probability.CDF
 
@@ -24,13 +25,12 @@ correlation matrix, and let `p i = 2 (1 - Φ(|Z i|))` be the two-sided p-values.
 
 Both are written as propositions, not theorems, so nothing here asserts them.
 
-What is proved: `simesTwoSidedGaussian_of_prds`. If the two-sided p-values are valid and
-positively regression dependent, the Simes bound holds. The open content is exactly the gap
+What is proved: two-sided p-values of a standard normal statistic are valid
+(`isValidPValue_twoSidedP`); the Simes bound holds for independent statistics
+(`simesTwoSidedGaussian_of_indep`) and whenever the two-sided p-values are positively
+regression dependent (`simesTwoSidedGaussian_of_prds`). The open content is exactly the gap
 between "jointly normal with arbitrary correlation" and that dependence condition. Two-sided
 p-values of positively correlated normals need not satisfy it.
-
-Still to do: prove that `twoSidedP` is a valid p-value for a standard normal statistic, so
-the validity hypothesis below can be dropped.
 -/
 
 open MeasureTheory ProbabilityTheory Finset
@@ -64,14 +64,34 @@ def BHTwoSidedGaussian : Prop :=
     ∀ α : ℝ, 0 ≤ α → α ≤ 1 →
       fdr P H₀ (fun ω => bhReject α fun i => twoSidedP (Z i ω)) ≤ ENNReal.ofReal α
 
-/-- Partial result: the Simes bound holds whenever the two-sided p-values are valid and
-positively regression dependent. -/
+/-- Two-sided p-values of a standard normal statistic are valid. -/
+theorem isValidPValue_twoSidedP {Ω : Type} [MeasurableSpace Ω] (P : Measure Ω) (Z : Ω → ℝ)
+    (hZ : Measurable Z) (hlaw : P.map Z = gaussianReal 0 1) :
+    IsValidPValue P fun ω => twoSidedP (Z ω) :=
+  isValidPValue_zTest_twoSided P Z hZ hlaw
+
+lemma measurable_twoSidedP : Measurable twoSidedP :=
+  measurable_const.mul (measurable_const.sub
+    ((monotone_cdf (gaussianReal 0 1)).measurable.comp measurable_norm))
+
+/-- Partial result: for standard normal statistics, the Simes bound holds whenever the
+two-sided p-values are positively regression dependent. -/
 theorem simesTwoSidedGaussian_of_prds {n : ℕ} {Ω : Type} [MeasurableSpace Ω] (P : Measure Ω)
-    [IsProbabilityMeasure P] (Z : Fin n → Ω → ℝ)
-    (hmeas : ∀ i, Measurable fun ω => twoSidedP (Z i ω))
-    (hvalid : ∀ i, IsValidPValue P fun ω => twoSidedP (Z i ω))
+    [IsProbabilityMeasure P] (Z : Fin n → Ω → ℝ) (hZ : ∀ i, Measurable (Z i))
+    (hlaw : ∀ i, P.map (Z i) = gaussianReal 0 1)
     (hprds : IsPRDSOn P (fun i ω => twoSidedP (Z i ω)) univ) (α : ℝ) (hα : 0 ≤ α) :
     P {ω | 1 ≤ bhK α fun i => twoSidedP (Z i ω)} ≤ ENNReal.ofReal α :=
-  measure_one_le_bhK_le_of_prds P hα _ hmeas hvalid hprds
+  measure_one_le_bhK_le_of_prds P hα _ (fun i => measurable_twoSidedP.comp (hZ i))
+    (fun i => isValidPValue_twoSidedP P (Z i) (hZ i) (hlaw i)) hprds
+
+/-- Partial result: the conjecture holds for independent statistics. -/
+theorem simesTwoSidedGaussian_of_indep {n : ℕ} {Ω : Type} [MeasurableSpace Ω] (P : Measure Ω)
+    [IsProbabilityMeasure P] (Z : Fin n → Ω → ℝ) (hZ : ∀ i, Measurable (Z i))
+    (hlaw : ∀ i, P.map (Z i) = gaussianReal 0 1) (hindep : iIndepFun Z P)
+    (α : ℝ) (hα : 0 ≤ α) :
+    P {ω | 1 ≤ bhK α fun i => twoSidedP (Z i ω)} ≤ ENNReal.ofReal α :=
+  measure_one_le_bhK_le P hα _ (fun i => measurable_twoSidedP.comp (hZ i))
+    (hindep.comp (fun _ => twoSidedP) fun _ => measurable_twoSidedP)
+    fun i => isValidPValue_twoSidedP P (Z i) (hZ i) (hlaw i)
 
 end Targets.Statistics
