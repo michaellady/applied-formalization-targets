@@ -1,0 +1,61 @@
+# Statement review log
+
+Lean checks proofs. It does not check that a statement says what the cited theorem says, or
+that the prose around it is honest. This file records the reviews done for that.
+
+## Fresh-eyes audit, 25 November 2026
+
+**Method.** Each registry file, together with every library file it depends on, was given to a
+reviewer with no other context and seven rules: the Lean statement matches the prose; it is
+not vacuous through a Lean convention; it agrees with the named theorem as generally known;
+every restriction is disclosed; the citation is plausible; open problems are not asserted;
+definitions mean what they claim. The tool was the `converge audit` command from
+`michaellady/mike-skills`.
+
+**Limits.** Only one reviewer model (Claude) was available where this ran. The tool is designed
+for up to eight independent models; this run does not have that diversity. The reviewer had
+no access to the cited papers, so "agrees with the literature" means "agrees with what the
+model recalls". A pass is evidence, not proof, of fidelity. No human has reviewed these
+statements; every entry remains `statement-review: unreviewed`.
+
+**Coverage.** All 97 registry entries.
+
+| Pass | Entries | Passed | Flagged |
+|---|---|---|---|
+| First (81 entries) | 81 | 65 | 16 |
+| Second (16 re-audits after fixes, 16 new entries) | 32 | 23 | 9 |
+
+After the second pass 88 of 97 entries had passed their latest audit. The nine flagged in the
+second pass were corrected afterwards and have not been audited a third time.
+
+### Findings and what was done
+
+| Entry | Finding | Kind | Outcome |
+|---|---|---|---|
+| `Statistics/Simes`, `PositiveDependence`, `StepUpAdjusted` | `hochberg` used the first position of a tie block, so it rejected less than textbook Hochberg | Real defect | Redefined to the textbook rule; all theorems re-proved; the counterexample is now a lemma |
+| `Economics/EFX` | The open statement was a theorem closed with `sorry` | Rule violation | Now `def … : Prop`; three-agent case likewise |
+| `Coding/Trifference` | Open quantity not defined in Lean | Gap | `trifferenceMax`, `trifferenceRate` defined; bound stated for `T(n)` |
+| `Coding/TrifferenceSmall` | Claimed a 9-word code for all longer lengths without a theorem | Gap | Theorem added |
+| `Economics/Myerson` | "Iff" in prose, one direction proved | Gap | Converse proved |
+| `Statistics/BenjaminiYekutieli` | Rescaled-level claim without a theorem | Gap | Corollary proved |
+| `Statistics/GraphicalApproach` | Idempotence claim without a theorem | Gap | Theorem added; hypotheses disclosed |
+| `Statistics/PRDS*`, `PositiveDependence`, `OpenTwoSidedGaussian` | `IsPRDSOn` is the conditioning-on-`p ≤ t` form, not the original definition | Disclosure | Stated plainly everywhere; the implication from the classical definition is not formalized |
+| `Statistics/PositiveDependence` | Hommel and Hochberg need the condition on the true-null subfamily, not on the full vector | Disclosure | Stated |
+| `Economics/GibbardSatterthwaite` | For infinite sets of alternatives the hypotheses cannot hold | Vacuity | Disclosed: content only for finite sets |
+| `InformationTheory/BscReliabilityFunction` | Open range of rates overstated | Fidelity | Hedged; exact range to be confirmed |
+| `Economics/LiLiRoutingSide` | A parenthetical claim about the rate region was false | Error in prose | Corrected |
+| `Economics/PutCallParity`, `Statistics/DeltaMethod`, `PValues`, `ClosedTesting`, `ConcentrationIntervals`, `InformationTheory/OperationalCapacity`, `Coding/HammingBound` | Hypotheses or scope not mentioned in prose | Disclosure | Disclosed |
+| `Statistics/OpenTwoSidedGaussian` | Two unsourced claims | Citation | One removed; one given a "to be confirmed" citation |
+
+### Reviewer errors
+
+- Claimed `Mathlib.Basic.Real.Basic` is not a real module. It is in the pinned Mathlib; the file
+  compiles.
+- Twice flagged a cross-reference to another registry file as "not backed" because that file
+  was not part of the prompt.
+
+### Not yet done
+
+- A third audit of the nine entries corrected after the second pass.
+- An audit with more than one reviewer model.
+- Human review of any statement against its source.

@@ -29,8 +29,9 @@ Both are written as propositions, not theorems, so nothing here asserts them.
 
 What is proved: two-sided p-values of a standard normal statistic are valid
 (`isValidPValue_twoSidedP`); the Simes bound holds for independent statistics
-(`simesTwoSidedGaussian_of_indep`) and whenever the two-sided p-values are positively
-regression dependent (`simesTwoSidedGaussian_of_prds`). The open content is exactly the gap
+(`simesTwoSidedGaussian_of_indep`) and whenever the two-sided p-values satisfy the
+conditioning-on-`p ≤ t` form of positive regression dependence used in this library
+(`IsPRDSOn`, sometimes called weak PRDS; `simesTwoSidedGaussian_of_prds`). The open content is exactly the gap
 between "jointly normal with arbitrary correlation" and that dependence condition. Whether
 two-sided p-values of correlated normals satisfy it in general is not established here; the
 literature treats the two-sided case as not covered by the positive-dependence results.
