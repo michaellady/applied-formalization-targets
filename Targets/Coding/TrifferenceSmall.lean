@@ -1,4 +1,4 @@
-import Applied.Coding.TrifferenceSmall
+import Applied.Coding.TrifferenceLower
 
 /-!
 # Trifferent codes of length at most 4: exact maximum sizes
@@ -21,9 +21,16 @@ Also recorded: a code with at most two words is trifferent; for every `n ≥ 1` 
 constant words form a trifferent code; prepending a fixed symbol preserves trifference, so
 `T(n) ≤ T(n + 1)`.
 
-Not covered: any lower bound on `T(n)` that grows with `n` (the best formalized lower bound for
-`n ≥ 5` is `T(n) ≥ 9`, by padding); the values for `n = 5, 6` reported from computer search
-in the literature (`T(5) = 10`, `T(6) = 13`; reference and values to be confirmed).
+Exact values are also stated for the maximum itself, `trifferenceMax n = 3, 4, 6, 9` for
+`n = 1, …, 4` (`Applied/Coding/TrifferenceRate.lean`), together with `T(n) ≥ 3` for `n ≥ 1`
+and `T(n) ≥ 9` for `n ≥ 4`. Lower bounds for lengths 5 and 6 are proved by explicit codes
+checked by `decide` (`Applied/Coding/TrifferenceLower.lean`): `T(5) ≥ 10` and `T(6) ≥ 13`, so
+`T(n) ≥ 13` for `n ≥ 6`.
+
+Not covered: the matching upper bounds `T(5) ≤ 10` and `T(6) ≤ 13` (the values `T(5) = 10`,
+`T(6) = 13` are reported from computer search in the literature; reference and values to be
+confirmed). The recursion only gives `T(5) ≤ 13` and `T(6) ≤ 19`. A lower bound growing
+exponentially with `n` is in `Targets/Coding/Trifference.lean`.
 -/
 
 namespace Targets.Coding
@@ -49,6 +56,18 @@ alias exists_trifferent_length_two := Applied.Coding.exists_isTrifferent_two
 alias exists_trifferent_length_three := Applied.Coding.exists_isTrifferent_three
 
 alias exists_trifferent_length_four := Applied.Coding.exists_isTrifferent_four
+
+alias exists_trifferent_length_five := Applied.Coding.exists_isTrifferent_five
+
+alias exists_trifferent_length_six := Applied.Coding.exists_isTrifferent_six
+
+alias trifferenceMax_one := Applied.Coding.trifferenceMax_one
+
+alias trifferenceMax_two := Applied.Coding.trifferenceMax_two
+
+alias trifferenceMax_three := Applied.Coding.trifferenceMax_three
+
+alias trifferenceMax_four := Applied.Coding.trifferenceMax_four
 
 /-- For every length `n ≥ 4` there is a trifferent code with 9 words (pad the tetracode). -/
 theorem exists_isTrifferent_card_nine (n : ℕ) (hn : 4 ≤ n) :
