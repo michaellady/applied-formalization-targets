@@ -71,10 +71,11 @@ folded-normal monotone likelihood ratio; for `|ρ| = 1` the statistics agree in 
 almost surely.
 
 Not covered: three or more true nulls with arbitrary correlation (the open case); the
-Benjamini–Hochberg false discovery rate for two-sided tests (`BHTwoSidedGaussian`, reported
-disputed), even for `m = 2` with one false null; positive regression dependence of two-sided
-p-values, which is not proved in this file, neither in the library's weak (conditioning on `p i ≤ t`;
-Ramdas et al. 2019, Def. 1) form `IsPRDSOn` nor in Benjamini–Yekutieli's classical form;
+Benjamini–Hochberg false discovery rate for two-sided tests (`BHTwoSidedGaussian`, refuted in
+`Targets/Statistics/BHTwoSidedCounterexample.lean`), even for `m = 2` with one false null;
+positive regression dependence of two-sided p-values, which is not proved in this file, neither
+in the library's weak (conditioning on `p i ≤ t`; Ramdas et al. 2019, Def. 1) form `IsPRDSOn`
+nor in Benjamini–Yekutieli's classical form;
 multivariate `t` statistics. One-factor models with any number of statistics, and the
 Karlin–Rinott (MTP2) class, are covered in `Targets/Statistics/TwoSidedOneFactor.lean` and
 `Targets/Statistics/TwoSidedKarlinRinott.lean`, which also prove weak PRDS of the two-sided
