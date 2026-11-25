@@ -1,5 +1,6 @@
 import Applied.Economics.MatroidSecretaryUniform
 import Mathlib.Combinatorics.Hall.Basic
+import Mathlib.Combinatorics.SimpleGraph.Finite
 
 /-!
 # The matroid secretary problem for graphic matroids
@@ -257,5 +258,101 @@ lemma integral_orderMeasure (F : VertexOrder V → ℝ) :
     smul_eq_mul, ENNReal.toReal_inv, ENNReal.toReal_natCast, inv_mul_eq_div]
 
 end Graphic
+
+/-! ### The reduction and the main theorem -/
+
+/-- **Reduction to partition matroids (Korula–Pál).** Let the multigraph have no loops, and
+suppose that for every map `f : E → V` there is a feasible deterministic `c`-competitive online
+algorithm `A f` for the partition matroid `partitionOne f`. Then the graphic matroid has a
+`c/2`-competitive randomized online algorithm: draw a uniformly random vertex order `ω` and run
+`A (head ω)`, where `head ω e` is the later endpoint of `e`. -/
+theorem hasCompetitiveRandomized_graphic_of_partition {V : Type} [Fintype V] {src tgt : E → V}
+    (hl : ∀ e, src e ≠ tgt e) {c : ℝ} (A : (E → V) → OnlineAlg E)
+    (hA : ∀ f, IsFeasible (partitionOne f) (A f))
+    (hAc : ∀ f, IsCompetitive (partitionOne f) (A f) c) :
+    HasCompetitiveRandomized (graphic src tgt) (c / 2) := by
+  refine ⟨VertexOrder V, inferInstance, orderMeasure V, inferInstance,
+    fun ω => A (head src tgt ω), fun ω σ w hw => ?_, fun w hw I hI => ?_⟩
+  · exact graphic_indep_of_injOn_head hl ω _ (partitionOne_indep_iff.1 (hA _ σ w hw))
+  · obtain ⟨g, hg, hgI⟩ := exists_endpoint_injOn hI
+    have hne : Nonempty (VertexOrder V) := ⟨Fintype.equivFin V⟩
+    set N := Fintype.card (VertexOrder V) with hNdef
+    have hN : (0 : ℝ) < N := by exact_mod_cast Fintype.card_pos (α := VertexOrder V)
+    rw [integral_orderMeasure, le_div_iff₀ hN]
+    set S : VertexOrder V → Finset E := fun ω => I.filter fun e => head src tgt ω e = g e with hS
+    have hstep : ∀ ω, c * ∑ e ∈ S ω, w e ≤ expWeight (A (head src tgt ω)) w := by
+      intro ω
+      refine hAc _ w hw _ (partitionOne_indep_iff.2 ?_)
+      intro x hx y hy hxy
+      simp only [hS, coe_filter, Set.mem_ofPred_eq] at hx hy
+      exact hg hx.1 hy.1 (by rw [← hx.2, ← hy.2, hxy])
+    have hswap : ∑ ω, ∑ e ∈ S ω, w e =
+        ∑ e ∈ I, (#{ω : VertexOrder V | head src tgt ω e = g e} : ℝ) * w e := by
+      simp only [hS, Finset.sum_filter]
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl fun e _ => ?_
+      rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
+    have hcount : ∀ e ∈ I, (#{ω : VertexOrder V | head src tgt ω e = g e} : ℝ) = N / 2 := by
+      intro e he
+      have h := two_mul_card_head_eq (hl e) (hgI e he)
+      have h' : (2 : ℝ) * (#{ω : VertexOrder V | head src tgt ω e = g e} : ℝ) = N := by
+        exact_mod_cast h
+      linarith
+    calc (c / 2 * ∑ e ∈ I, w e) * N = c * ∑ e ∈ I, (N / 2 : ℝ) * w e := by
+          rw [← Finset.mul_sum]; ring
+      _ = c * ∑ ω, ∑ e ∈ S ω, w e := by
+          rw [hswap, Finset.sum_congr rfl fun e he => by rw [← hcount e he]]
+      _ = ∑ ω, c * ∑ e ∈ S ω, w e := Finset.mul_sum _ _ _
+      _ ≤ ∑ ω, expWeight (A (head src tgt ω)) w := Finset.sum_le_sum fun ω _ => hstep ω
+
+section PartitionSecretary
+
+variable {ι : Type*} [Fintype ι]
+
+/-- The `⌊nᵢ/e⌋` rule (ties broken by a fixed order) run independently inside each block of
+`f`. -/
+def partitionSecretaryRule (f : E → ι) : OnlineAlg E :=
+  MatroidSecretary.blockSum f fun i => secretaryRuleLex (Block f i)
+
+omit [Fintype ι] in
+theorem partitionSecretaryRule_isFeasible (f : E → ι) :
+    IsFeasible (partitionOne f) (partitionSecretaryRule f) :=
+  blockSum_isFeasible (partitionOne_isBlockSum f) fun _ => secretaryRuleLex_isFeasible
+
+/-- **Partition matroids with capacities one, constant `1/e`.** -/
+theorem partitionSecretaryRule_isCompetitive (f : E → ι) :
+    IsCompetitive (partitionOne f) (partitionSecretaryRule f) (1 / Real.exp 1) :=
+  blockSum_isCompetitive (partitionOne_isBlockSum f) fun _ => secretaryRuleLex_isCompetitive
+
+end PartitionSecretary
+
+/-- **Graphic matroids of loopless multigraphs: constant `1/(2e)`.** For every finite loopless
+multigraph (vertex type `V`, edge type `E`, edge `e` joining `src e ≠ tgt e`), the graphic
+matroid has a feasible randomized online algorithm that is `1/(2e)`-competitive: draw a
+uniformly random vertex order, orient every edge towards its later endpoint and run the
+`⌊nᵥ/e⌋` rule independently among the edges entering each vertex `v`. -/
+theorem hasCompetitiveRandomized_graphic {V : Type} [Fintype V] {src tgt : E → V}
+    (hl : ∀ e, src e ≠ tgt e) :
+    HasCompetitiveRandomized (graphic src tgt) (1 / (2 * Real.exp 1)) := by
+  have := hasCompetitiveRandomized_graphic_of_partition hl (fun f => partitionSecretaryRule f)
+    (fun f => partitionSecretaryRule_isFeasible f) (fun f => partitionSecretaryRule_isCompetitive f)
+  convert this using 1
+  ring
+
+/-- The graphic matroid of a finite simple graph `G`: ground set the edge set of `G`, each edge
+`e` joining the two components of a fixed representative pair of `e`. -/
+def simpleGraphic {V : Type*} [Fintype V] (G : SimpleGraph V) [Fintype G.edgeSet] :
+    Matroid G.edgeSet :=
+  graphic (fun e : G.edgeSet => (Quot.out e.1).1) (fun e : G.edgeSet => (Quot.out e.1).2)
+
+/-- **Graphic matroids of simple graphs: constant `1/(2e)`.** -/
+theorem hasCompetitiveRandomized_simpleGraphic {V : Type} [Fintype V] (G : SimpleGraph V)
+    [Fintype G.edgeSet] :
+    HasCompetitiveRandomized (simpleGraphic G) (1 / (2 * Real.exp 1)) := by
+  refine hasCompetitiveRandomized_graphic fun e h => ?_
+  have he := e.2
+  rw [← Quot.out_eq e.1] at he
+  have hadj : G.Adj (Quot.out e.1).1 (Quot.out e.1).2 := (SimpleGraph.mem_edgeSet G).1 he
+  exact G.ne_of_adj hadj h
 
 end Applied.Economics.MatroidSecretary
