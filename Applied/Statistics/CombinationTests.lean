@@ -295,4 +295,217 @@ theorem measure_le_antitone_le (hm : m1 ≤ mΩ) [IsProbabilityMeasure P]
 
 end RandomThreshold
 
+section LowerSet
+
+variable {P : Measure Ω} {p1 p2 : Ω → ℝ}
+
+/-- **Lower-set lemma.** `p1` is `m1`-measurable and valid, `p2` is conditionally valid given
+`m1`, and `R` is a measurable lower set of the plane (closed under decreasing either
+coordinate). Then `P ((p1, p2) ∈ R)` is at most the Lebesgue measure of `R ∩ [0,1]²`. -/
+theorem measure_mem_lowerSet_prod_le (hm : m1 ≤ mΩ) [IsProbabilityMeasure P]
+    (h1 : IsValidPValue P p1) (hp1 : Measurable[m1] p1) (h2 : IsCondValidPValue P m1 p2)
+    {R : Set (ℝ × ℝ)} (hR : MeasurableSet R)
+    (hlow : ∀ x y x' y', (x, y) ∈ R → x' ≤ x → y' ≤ y → (x', y') ∈ R) :
+    P {ω | (p1 ω, p2 ω) ∈ R} ≤ volume (R ∩ Icc (0 : ℝ) 1 ×ˢ Icc (0 : ℝ) 1) := by
+  set T : ℝ → Set ℝ := fun x => {y | (x, y) ∈ R} ∩ Icc 0 1 with hT
+  have hTne : ∀ x, volume (T x) ≠ ∞ := fun x =>
+    ((measure_mono inter_subset_right).trans_lt (by simp)).ne
+  set g : ℝ → ℝ := fun x => (volume (T x)).toReal with hg
+  have hganti : Antitone g := fun x x' hxx' =>
+    ENNReal.toReal_mono (hTne x)
+      (measure_mono fun y hy => ⟨hlow x' y x y hy.1 hxx' le_rfl, hy.2⟩)
+  have hg0 : ∀ x, 0 ≤ g x := fun x => ENNReal.toReal_nonneg
+  have hgof : ∀ x, ENNReal.ofReal (g x) = volume (T x) := fun x => ENNReal.ofReal_toReal (hTne x)
+  have hsub : {ω | (p1 ω, p2 ω) ∈ R} ⊆ {ω | p2 ω ≤ 0} ∪ {ω | min (p2 ω) 1 ≤ g (p1 ω)} := by
+    intro ω hω
+    rcases le_or_gt (p2 ω) 0 with h0 | h0
+    · exact Or.inl h0
+    right
+    have hmem : (p1 ω, min (p2 ω) 1) ∈ R := hlow _ _ _ _ hω le_rfl (min_le_left _ _)
+    have hIoc : Ioc 0 (min (p2 ω) 1) ⊆ T (p1 ω) := fun y hy =>
+      ⟨hlow _ _ _ _ hmem le_rfl hy.2, hy.1.le, hy.2.trans (min_le_right _ _)⟩
+    have hvol := measure_mono (μ := volume) hIoc
+    rw [Real.volume_Ioc, sub_zero] at hvol
+    exact (ENNReal.ofReal_le_iff_le_toReal (hTne _)).mp hvol
+  have harea : ∫⁻ x in Icc (0 : ℝ) 1, ENNReal.ofReal (g x)
+      = volume (R ∩ Icc (0 : ℝ) 1 ×ˢ Icc (0 : ℝ) 1) := by
+    rw [Measure.volume_eq_prod,
+      Measure.prod_apply (hR.inter (measurableSet_Icc.prod measurableSet_Icc)),
+      ← lintegral_indicator measurableSet_Icc]
+    refine lintegral_congr fun x => ?_
+    by_cases hx : x ∈ Icc (0 : ℝ) 1
+    · rw [indicator_of_mem hx, hgof]
+      congr 1
+      ext y
+      constructor
+      · rintro ⟨hy, hy01⟩
+        exact ⟨hy, hx, hy01⟩
+      · rintro ⟨hy, -, hy01⟩
+        exact ⟨hy, hy01⟩
+    · rw [indicator_of_notMem hx]
+      have : Prod.mk x ⁻¹' (R ∩ Icc (0 : ℝ) 1 ×ˢ Icc (0 : ℝ) 1) = ∅ := by
+        ext y
+        simp only [mem_preimage, mem_inter_iff, mem_prod, mem_empty_iff_false, iff_false]
+        exact fun h => hx h.2.1
+      rw [this, measure_empty]
+  calc P {ω | (p1 ω, p2 ω) ∈ R}
+      ≤ P {ω | p2 ω ≤ 0} + P {ω | min (p2 ω) 1 ≤ g (p1 ω)} :=
+        (measure_mono hsub).trans (measure_union_le _ _)
+    _ ≤ 0 + ∫⁻ x in Icc (0 : ℝ) 1, ENNReal.ofReal (g x) :=
+        add_le_add h2.measure_nonpos.le
+          (measure_le_antitone_le_lintegral hm h1 hp1 h2.min_one hganti hg0)
+    _ = volume (R ∩ Icc (0 : ℝ) 1 ×ˢ Icc (0 : ℝ) 1) := by rw [zero_add, harea]
+
+end LowerSet
+
+section Fisher
+
+/-- The conditional error function of Fisher's product test with early rejection at `α₁` and
+binding futility stop at `α₀`: `1` for `x ≤ α₁`, `c / x` for `α₁ < x ≤ α₀`, `0` for `x > α₀`. -/
+noncomputable def fisherBoundary (c α₁ α₀ : ℝ) (x : ℝ) : ℝ :=
+  if x ≤ α₁ then 1 else if x ≤ α₀ then c / x else 0
+
+variable {c α₁ α₀ : ℝ}
+
+lemma fisherBoundary_nonneg (hc : 0 ≤ c) (hα : 0 ≤ α₁) (x : ℝ) :
+    0 ≤ fisherBoundary c α₁ α₀ x := by
+  unfold fisherBoundary
+  split_ifs with h1 h2
+  · exact zero_le_one
+  · exact div_nonneg hc (hα.trans (not_le.mp h1).le)
+  · exact le_rfl
+
+lemma fisherBoundary_antitone (hc : 0 < c) (hcα : c ≤ α₁) :
+    Antitone (fisherBoundary c α₁ α₀) := by
+  intro x y hxy
+  unfold fisherBoundary
+  by_cases hy1 : y ≤ α₁
+  · rw [ite_eq_left hy1, ite_eq_left (hxy.trans hy1)]
+  rw [ite_eq_right hy1]
+  have hypos : 0 < y := (hc.trans_le hcα).trans (not_le.mp hy1)
+  by_cases hx1 : x ≤ α₁
+  · rw [ite_eq_left hx1]
+    split_ifs
+    · rw [div_le_one hypos]
+      linarith [not_le.mp hy1]
+    · exact zero_le_one
+  rw [ite_eq_right hx1]
+  have hxpos : 0 < x := (hc.trans_le hcα).trans (not_le.mp hx1)
+  by_cases hy0 : y ≤ α₀
+  · rw [ite_eq_left hy0, ite_eq_left (hxy.trans hy0)]
+    exact div_le_div_of_nonneg_left hc.le hxpos hxy
+  · rw [ite_eq_right hy0]
+    split_ifs
+    · exact (div_pos hc hxpos).le
+    · exact le_rfl
+
+/-- `∫₀¹ fisherBoundary = α₁ + c log (α₀ / α₁)` for `0 < c ≤ α₁ ≤ α₀ ≤ 1`. -/
+lemma integral_fisherBoundary (hc : 0 < c) (hcα : c ≤ α₁) (h10 : α₁ ≤ α₀) (h01 : α₀ ≤ 1) :
+    ∫ x in (0 : ℝ)..1, fisherBoundary c α₁ α₀ x = α₁ + c * Real.log (α₀ / α₁) := by
+  have hα₁ : 0 < α₁ := hc.trans_le hcα
+  have hint : ∀ a b : ℝ, IntervalIntegrable (fisherBoundary c α₁ α₀) volume a b := fun a b =>
+    (fisherBoundary_antitone hc hcα).intervalIntegrable
+  have e1 : ∫ x in (0 : ℝ)..α₁, fisherBoundary c α₁ α₀ x = α₁ := by
+    rw [intervalIntegral.integral_of_le hα₁.le,
+      setIntegral_congr_fun measurableSet_Ioc (g := fun _ => (1 : ℝ))
+        (fun x hx => by simp [fisherBoundary, hx.2]),
+      ← intervalIntegral.integral_of_le hα₁.le, intervalIntegral.integral_const]
+    simp
+  have e2 : ∫ x in α₁..α₀, fisherBoundary c α₁ α₀ x = c * Real.log (α₀ / α₁) := by
+    rw [intervalIntegral.integral_of_le h10,
+      setIntegral_congr_fun measurableSet_Ioc (g := fun x => c * x⁻¹)
+        (fun x hx => by simp [fisherBoundary, not_le.mpr hx.1, hx.2, div_eq_mul_inv]),
+      ← intervalIntegral.integral_of_le h10, intervalIntegral.integral_const_mul,
+      integral_inv_of_pos hα₁ (hα₁.trans_le h10)]
+  have e3 : ∫ x in α₀..1, fisherBoundary c α₁ α₀ x = 0 := by
+    rw [intervalIntegral.integral_of_le h01,
+      setIntegral_congr_fun measurableSet_Ioc (g := fun _ => (0 : ℝ))
+        (fun x hx => by
+          simp [fisherBoundary, not_le.mpr (h10.trans_lt hx.1), not_le.mpr hx.1])]
+    simp
+  rw [← intervalIntegral.integral_add_adjacent_intervals (hint 0 α₁) (hint α₁ 1),
+    ← intervalIntegral.integral_add_adjacent_intervals (hint α₁ α₀) (hint α₀ 1), e1, e2, e3,
+    add_zero]
+
+variable {P : Measure Ω} {p1 p2 : Ω → ℝ}
+
+/-- **Bauer–Köhne design with early stopping.** For `0 < c ≤ α₁ ≤ α₀ ≤ 1`, the two-stage test
+that rejects at the interim when `p1 ≤ α₁`, stops for futility when `p1 > α₀` (binding), and
+otherwise rejects at the end when `p1 * p2 ≤ c`, has level `α₁ + c log (α₀ / α₁)`. -/
+theorem measure_fisher_earlyStopping_le (hm : m1 ≤ mΩ) [IsProbabilityMeasure P]
+    (h1 : IsValidPValue P p1) (hp1 : Measurable[m1] p1) (h2 : IsCondValidPValue P m1 p2)
+    (hc : 0 < c) (hcα : c ≤ α₁) (h10 : α₁ ≤ α₀) (h01 : α₀ ≤ 1) :
+    P {ω | p1 ω ≤ α₁ ∨ (p1 ω ≤ α₀ ∧ p1 ω * p2 ω ≤ c)}
+      ≤ ENNReal.ofReal (α₁ + c * Real.log (α₀ / α₁)) := by
+  have hsub : {ω | p1 ω ≤ α₁ ∨ (p1 ω ≤ α₀ ∧ p1 ω * p2 ω ≤ c)}
+      ⊆ {ω | p1 ω ≤ 0} ∪ {ω | min (p2 ω) 1 ≤ fisherBoundary c α₁ α₀ (p1 ω)} := by
+    intro ω hω
+    rcases le_or_gt (p1 ω) 0 with h0 | h0
+    · exact Or.inl h0
+    right
+    show min (p2 ω) 1 ≤ fisherBoundary c α₁ α₀ (p1 ω)
+    unfold fisherBoundary
+    by_cases ha : p1 ω ≤ α₁
+    · rw [ite_eq_left ha]
+      exact min_le_right _ _
+    · rcases hω with h | ⟨hb, hprod⟩
+      · exact absurd h ha
+      · rw [ite_eq_right ha, ite_eq_left hb]
+        refine (min_le_left _ _).trans ?_
+        rw [le_div_iff₀ h0, mul_comm]
+        exact hprod
+  calc P {ω | p1 ω ≤ α₁ ∨ (p1 ω ≤ α₀ ∧ p1 ω * p2 ω ≤ c)}
+      ≤ P {ω | p1 ω ≤ 0} + P {ω | min (p2 ω) 1 ≤ fisherBoundary c α₁ α₀ (p1 ω)} :=
+        (measure_mono hsub).trans (measure_union_le _ _)
+    _ ≤ 0 + ENNReal.ofReal (∫ x in (0 : ℝ)..1, fisherBoundary c α₁ α₀ x) :=
+        add_le_add ((h1 0 le_rfl).trans (by simp))
+          (measure_le_antitone_le hm h1 hp1 h2.min_one (fisherBoundary_antitone hc hcα)
+            (fisherBoundary_nonneg hc.le (hc.le.trans hcα)))
+    _ = ENNReal.ofReal (α₁ + c * Real.log (α₀ / α₁)) := by
+        rw [zero_add, integral_fisherBoundary hc hcα h10 h01]
+
+/-- **Bauer–Köhne design without a futility stop** (equivalently, with a non-binding one). For
+`0 < c ≤ α₁ ≤ 1`, rejecting when `p1 ≤ α₁` or `p1 * p2 ≤ c` has level `α₁ - c log α₁`. -/
+theorem measure_fisher_noFutility_le (hm : m1 ≤ mΩ) [IsProbabilityMeasure P]
+    (h1 : IsValidPValue P p1) (hp1 : Measurable[m1] p1) (h2 : IsCondValidPValue P m1 p2)
+    (hc : 0 < c) (hcα : c ≤ α₁) (hα1 : α₁ ≤ 1) :
+    P {ω | p1 ω ≤ α₁ ∨ p1 ω * p2 ω ≤ c} ≤ ENNReal.ofReal (α₁ - c * Real.log α₁) := by
+  have houter : Measurable fun x : ℝ => min x 1 := measurable_id.min measurable_const
+  have hp1' : Measurable[m1] fun ω => min (p1 ω) 1 := houter.comp hp1
+  have key := measure_fisher_earlyStopping_le hm (isValidPValue_min_one h1) hp1' h2 hc hcα hα1
+    le_rfl
+  have hsub : {ω | p1 ω ≤ α₁ ∨ p1 ω * p2 ω ≤ c} ⊆ {ω | p2 ω ≤ 0} ∪
+      {ω | min (p1 ω) 1 ≤ α₁ ∨ (min (p1 ω) 1 ≤ 1 ∧ min (p1 ω) 1 * p2 ω ≤ c)} := by
+    intro ω hω
+    rcases le_or_gt (p2 ω) 0 with h0 | h0
+    · exact Or.inl h0
+    right
+    rcases hω with h | h
+    · exact Or.inl ((min_le_left _ _).trans h)
+    · exact Or.inr ⟨min_le_right _ _,
+        (mul_le_mul_of_nonneg_right (min_le_left _ _) h0.le).trans h⟩
+  calc P {ω | p1 ω ≤ α₁ ∨ p1 ω * p2 ω ≤ c}
+      ≤ P {ω | p2 ω ≤ 0}
+        + P {ω | min (p1 ω) 1 ≤ α₁ ∨ (min (p1 ω) 1 ≤ 1 ∧ min (p1 ω) 1 * p2 ω ≤ c)} :=
+        (measure_mono hsub).trans (measure_union_le _ _)
+    _ ≤ 0 + ENNReal.ofReal (α₁ + c * Real.log (1 / α₁)) :=
+        add_le_add h2.measure_nonpos.le key
+    _ = ENNReal.ofReal (α₁ - c * Real.log α₁) := by
+        rw [zero_add, one_div, Real.log_inv]
+        congr 1
+        ring
+
+/-- **Fisher's product test (Bauer–Köhne 1994).** For `0 < c ≤ 1`, rejecting when
+`p1 * p2 ≤ c` has level `c (1 - log c)`. -/
+theorem measure_fisher_product_le (hm : m1 ≤ mΩ) [IsProbabilityMeasure P]
+    (h1 : IsValidPValue P p1) (hp1 : Measurable[m1] p1) (h2 : IsCondValidPValue P m1 p2)
+    (hc : 0 < c) (hc1 : c ≤ 1) :
+    P {ω | p1 ω * p2 ω ≤ c} ≤ ENNReal.ofReal (c * (1 - Real.log c)) := by
+  refine (measure_mono (t := {ω | p1 ω ≤ c ∨ p1 ω * p2 ω ≤ c}) fun ω hω => Or.inr hω).trans
+    ((measure_fisher_noFutility_le hm h1 hp1 h2 hc le_rfl hc1).trans_eq ?_)
+  congr 1
+  ring
+
+end Fisher
+
 end Applied.CombinationTests
