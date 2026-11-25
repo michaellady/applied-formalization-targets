@@ -9,6 +9,7 @@ import Applied.Optimization.OnlineGradient
 - source: Yu. Nesterov, "Introductory Lectures on Convex Optimization" (2004), Section 3.2 (subgradient method; theorem number to be confirmed); S. Bubeck, "Convex optimization: algorithms and complexity" (2015), Section 3.1 (theorem number to be confirmed)
 - used-in: analyses of (sub)gradient and stochastic gradient methods
 - prerequisites: Mathlib `gradient`, `ConvexOn`, Jensen's inequality
+- formalized-elsewhere: optlib `Optlib/Algorithm/SubgradientMethod.lean` :: `subgradient_method_fix_step_size` (the same best-iterate bound, for subgradients of Lipschitz functions); atlas-lean `MathlibExt/Analysis/Convex/SubgradientMethod.lean` :: `subgradient_method_rate` (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `f` be convex and differentiable on a real Hilbert space, `η > 0`,

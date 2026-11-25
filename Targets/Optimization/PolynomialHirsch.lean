@@ -9,7 +9,7 @@ import Applied.Optimization.PolytopeGraph
 - source: the Hirsch conjecture (W. M. Hirsch, 1957, reported in G. B. Dantzig, "Linear Programming and Extensions", 1963) was refuted by F. Santos, "A counterexample to the Hirsch conjecture", Ann. of Math. 176 (2012); the polynomial version is the subject of the Polymath3 project (G. Kalai, 2010) and is stated in Santos's paper (exact wording to be confirmed); best known upper bounds are quasi-polynomial (G. Kalai, D. J. Kleitman, 1992; details to be confirmed)
 - used-in: complexity of the simplex method (a polynomial pivot rule would imply it), combinatorics of polytopes
 - prerequisites: `Set.extremePoints`, `IsExtreme`, `segment` (Mathlib)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)
 - statement-review: unreviewed
 
 Informal statement. The graph of a polytope has the vertices of the polytope as vertices and

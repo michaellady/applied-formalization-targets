@@ -9,7 +9,7 @@ import Applied.Optimization.ConnectedLayerFamily
 - source: F. Eisenbrand, N. Hähnle, A. Razborov, T. Rothvoß, "Diameter of polyhedra: limits of abstraction", Math. Oper. Res. 35(4) (2010) 786–794 (the abstraction and the bound `f(d, n) ≤ n ^ (1 + log₂ d)`; theorem numbers to be confirmed); the recursion is the argument of G. Kalai, D. J. Kleitman, "A quasi-polynomial bound for the diameter of graphs of polyhedra", Bull. Amer. Math. Soc. 26 (1992) 315–316, transferred to the abstract setting
 - used-in: the polynomial Hirsch conjecture (`Targets/Optimization/PolynomialHirsch.lean`): the diameter of a simple polytope is bounded in terms of this abstract quantity (EHRR; NOT formalized here)
 - prerequisites: `Finset`, `Nat.findGreatest`, `Nat.log`, `Real.logb`, `Real.rpow` (Mathlib)
-- formalized-elsewhere: not checked
+- formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)
 - statement-review: unreviewed
 
 Informal statement. Let `α` be a type with decidable equality, `U` a finite subset of `α`,

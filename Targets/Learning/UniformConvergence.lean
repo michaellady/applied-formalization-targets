@@ -9,6 +9,7 @@ import Applied.Learning.UniformConvergence
 - source: W. Hoeffding, "Probability inequalities for sums of bounded random variables", J. Amer. Statist. Assoc. 58 (1963) for the tail bound; the finite-class corollary is textbook material, e.g. S. Shalev-Shwartz, S. Ben-David, "Understanding Machine Learning" (2014), chapter 4 (theorem number to be confirmed)
 - used-in: agnostic PAC learning of finite classes; model selection and validation bounds
 - prerequisites: Hoeffding's inequality for independent sub-Gaussian variables (in Mathlib), finite union bound
+- formalized-elsewhere: cslib-frontier `CslibFrontier/MachineLearning/PACLearning/AgnosticFiniteClass.lean` :: `IsERM.measure_pi_lt_error_le` (our `erm_excess_risk` with `ε/2` in place of `ε`) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. On a probability space, `Z 1, …, Z n` (`n ≥ 1`) are independent

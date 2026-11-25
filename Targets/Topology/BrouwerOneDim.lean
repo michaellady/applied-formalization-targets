@@ -9,6 +9,7 @@ import Applied.Topology.BrouwerOneDim
 - source: classical consequence of the intermediate value theorem (B. Bolzano, 1817); the general theorem is L. E. J. Brouwer, "Über Abbildung von Mannigfaltigkeiten", Math. Ann. 71 (1912). Textbook form of the one-dimensional case: e.g. any real analysis text, as an exercise on the intermediate value theorem (exact reference to be confirmed)
 - used-in: elementary special case of Brouwer's theorem (`Targets/Topology/Brouwer.lean`)
 - prerequisites: Mathlib's intermediate value theorem `intermediate_value_Icc'`
+- formalized-elsewhere: subsumed by the general theorem: atlas-lean `MathlibExt/Analysis/Convex/BrouwerFixedPoint.lean` :: `exists_fixedPoint`; see `Targets/Topology/Brouwer.lean` (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement.

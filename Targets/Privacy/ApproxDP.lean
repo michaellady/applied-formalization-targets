@@ -9,6 +9,7 @@ import Applied.Privacy.ApproxDP
 - source: C. Dwork, K. Kenthapadi, F. McSherry, I. Mironov, M. Naor, "Our data, ourselves: privacy via distributed noise generation", EUROCRYPT 2006 (definition and composition); C. Dwork, A. Roth, "The Algorithmic Foundations of Differential Privacy" (2014), Definition 2.4, Proposition 2.1 and Theorem 3.16 (numbers to be confirmed; the adaptive form is Theorem B.1 there, to be confirmed)
 - used-in: privacy accounting for the Gaussian mechanism and for every mechanism with a small failure probability
 - prerequisites: probability mass functions, sums in the extended non-negative reals
+- formalized-elsewhere: cslib-frontier `CslibFrontier/Privacy/DifferentialPrivacy/Basic.lean` :: `DifferentiallyPrivate.iff_hockeyStick_le`, `Composition.lean` :: `bind_pair`, `prod`, `DifferentiallyPrivate.adaptiveComposition` (the same definition; also randomized postprocessing and `k`-fold composition, not covered here); atlas-lean `CSLibExt/Privacy/ApproximateDifferentialPrivacy.lean` :: `isApproxDP_comp_bind_pair`; sampcert `SampCert/DifferentialPrivacy/Approximate/DP.lean` (definition) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. A mechanism with countable output is `(ε, δ)`-differentially private if

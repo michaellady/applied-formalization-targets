@@ -9,6 +9,7 @@ import Applied.Privacy.GeometricMechanism
 - source: A. Ghosh, T. Roughgarden, M. Sundararajan, "Universally utility-maximizing privacy mechanisms", STOC 2009 / SIAM J. Comput. 41 (2012) (definition of the geometric mechanism and its privacy; statement number to be confirmed); continuous analogue: C. Dwork, F. McSherry, K. Nissim, A. Smith (2006)
 - used-in: private counting queries and histograms; discrete replacement for the Laplace mechanism in deployed systems
 - prerequisites: geometric series, sums over the integers
+- formalized-elsewhere: cslib-frontier `CslibFrontier/Privacy/DifferentialPrivacy/DiscreteLaplace.lean` :: `differentiallyPrivate_addNoise_twoSidedGeometric`; atlas-lean `CSLibExt/Privacy/DiscreteMechanisms.lean`; sampcert (discrete Laplace samplers) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `ε > 0` and `α = e^{-ε}`. The two-sided geometric distribution puts mass

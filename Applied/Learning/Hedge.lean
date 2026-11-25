@@ -37,8 +37,10 @@ lemma exp_neg_mul_le (η x : ℝ) (hx0 : 0 ≤ x) (hx1 : x ≤ 1) :
   rw [e] at h
   linarith
 
-/-- **Hedge regret bound.** -/
-theorem hedge_regret_bound [Nonempty ι] (η : ℝ) (_hη : 0 < η) (ℓ : ℕ → ι → ℝ)
+/-- **Hedge regret bound, without a sign condition on `η`.** The inequality of
+`hedge_regret_bound` holds for every real learning rate `η`; the hypothesis `0 < η` there is
+not used. (For `η ≤ 0` the statement is true but not informative: `1 - e^{-η} ≤ 0`.) -/
+theorem hedge_regret_bound_of_real [Nonempty ι] (η : ℝ) (ℓ : ℕ → ι → ℝ)
     (h0 : ∀ t i, 0 ≤ ℓ t i) (h1 : ∀ t i, ℓ t i ≤ 1) (T : ℕ) (i : ι) :
     (1 - Real.exp (-η)) * ∑ t ∈ range T, hedgeLoss η ℓ t
       ≤ η * ∑ t ∈ range T, ℓ t i + Real.log (Fintype.card ι) := by
@@ -98,5 +100,13 @@ theorem hedge_regret_bound [Nonempty ι] (η : ℝ) (_hη : 0 < η) (ℓ : ℕ �
   have hlog := Real.log_le_log (Real.exp_pos _) hchain
   rw [Real.log_exp, Real.log_mul hN.ne' (Real.exp_pos _).ne', Real.log_exp] at hlog
   linarith
+
+/-- **Hedge regret bound.** The hypothesis `0 < η` is not needed; see
+`hedge_regret_bound_of_real`. -/
+theorem hedge_regret_bound [Nonempty ι] (η : ℝ) (_hη : 0 < η) (ℓ : ℕ → ι → ℝ)
+    (h0 : ∀ t i, 0 ≤ ℓ t i) (h1 : ∀ t i, ℓ t i ≤ 1) (T : ℕ) (i : ι) :
+    (1 - Real.exp (-η)) * ∑ t ∈ range T, hedgeLoss η ℓ t
+      ≤ η * ∑ t ∈ range T, ℓ t i + Real.log (Fintype.card ι) :=
+  hedge_regret_bound_of_real η ℓ h0 h1 T i
 
 end Applied.Learning

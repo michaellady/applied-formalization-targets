@@ -9,6 +9,7 @@ import Applied.SignalProcessing.JohnsonLindenstrauss
 - source: S. Dasgupta, A. Gupta, "An elementary proof of a theorem of Johnson and Lindenstrauss", Random Structures & Algorithms 22 (2003)
 - used-in: dimensionality reduction, sketching, nearest-neighbour search, compressed sensing
 - prerequisites: standard Gaussian measure on Euclidean space and Chernoff bounds (in Mathlib); chi-squared tail bounds (proved in `Applied/SignalProcessing/JohnsonLindenstrauss.lean`)
+- formalized-elsewhere: cslib-frontier `CslibFrontier/Probability/JohnsonLindenstrauss.lean` :: `exists_linearMap_forall_norm_sq_mem_Icc` (the same `24 log n / ε²`, squared distances, linear map; also allows `ε = 1`); tcslib `TCSlib/LearningTheory/JohnsonLindenstrauss/Main.lean` (constant `32`); atlas-lean `MathlibExt/Geometry/Euclidean/JohnsonLindenstrauss.lean` (existential constant) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Any `N` points in Euclidean space embed linearly into dimension

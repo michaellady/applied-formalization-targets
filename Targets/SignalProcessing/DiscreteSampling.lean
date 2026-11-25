@@ -9,7 +9,7 @@ import Applied.SignalProcessing.DiscreteSampling
 - source: finite analogue of the Nyquist–Shannon sampling theorem (C. Shannon, "Communication in the presence of noise", Proc. IRE 37 (1949)); a reference stating exactly this finite form is to be confirmed
 - used-in: decimation and interpolation of band-limited discrete signals, multirate signal processing, OFDM
 - prerequisites: Mathlib's discrete Fourier transform `ZMod.dft` and its inverse; a polynomial of degree `< K` with `K` distinct roots is zero
-- formalized-elsewhere: not checked
+- formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)
 - statement-review: unreviewed
 
 Informal statement. Let `N = K · M` with `N ≥ 1`, and let `a` be any residue mod `N`. Let

@@ -9,6 +9,7 @@ import Applied.Learning.PACFinite
 - source: L. G. Valiant, "A theory of the learnable", Comm. ACM 27 (1984) for the model; the bound for finite classes is textbook material, e.g. S. Shalev-Shwartz, S. Ben-David, "Understanding Machine Learning" (2014), chapter 2 (theorem number to be confirmed)
 - used-in: sample complexity of consistent learners; Occam's razor bounds
 - prerequisites: independence of random variables, finite union bound
+- formalized-elsewhere: cslib-frontier `CslibFrontier/MachineLearning/PACLearning/FiniteClass.lean` :: `measure_pi_exists_consistent_lt_error_le_card_mul_pow` (product-measure form) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. On a probability space, `Z 1, …, Z n` are independent measurable random

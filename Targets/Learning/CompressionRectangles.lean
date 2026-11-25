@@ -9,6 +9,7 @@ import Applied.Learning.SampleCompressionBoxes
 - source: folklore; axis-parallel rectangles are a standard example of a class with a compression scheme of size `4` (keep the extreme positive examples), e.g. N. Littlestone, M. Warmuth, "Relating data compression and learnability" (1986) and S. Floyd, M. Warmuth, Machine Learning 21 (1995) (location to be confirmed)
 - used-in: a special case of the sample compression conjecture (scheme size equal to the VC dimension `4`, which is attained when both orders have at least three points; that equality is standard and not proved here)
 - prerequisites: the definitions of `Applied.Learning.SampleCompression`
+- formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)
 - statement-review: unreviewed
 
 Informal statement. Let `A` and `B` be finite linearly ordered types with decidable equality.
@@ -34,6 +35,12 @@ kept).
 Not covered: the VC dimension being exactly `4` (only `≤ 4` is proved), boxes in more than two
 dimensions (the same argument gives size `2n` in dimension `n`, not formalized), and infinite
 domains.
+
+Scheme model. `CompressionScheme` keeps an unordered **set** of labelled examples and
+reconstructs from that set alone (no order, no side information); cslib-frontier's
+`SampleCompressionScheme` keeps an ordered list. The existence result here is therefore the
+stronger form: it gives an ordered-list scheme of the same size (on paper), not conversely.
+See "Scheme model" in `Targets/Learning/SampleCompression.lean`.
 -/
 
 namespace Targets.Learning
