@@ -17,6 +17,9 @@ Informal statement. `n` agents with additive non-negative valuations divide `m` 
 goods. An allocation is EFX if no agent envies another after removing any single good from the
 other's bundle. Existence is known for `n ≤ 3` and open for `n ≥ 4`.
 
+The two-agent case and the identical-valuations case are proved for this strong form in
+`Targets/Economics/EFXTwoAgents.lean`.
+
 Review note: this uses the strong form (removing *any* good, including ones the envious agent
 values at zero). Which form each cited paper proves must be checked before relying on
 `efx_exists_three`.

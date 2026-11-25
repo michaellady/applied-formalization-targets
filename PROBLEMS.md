@@ -64,7 +64,7 @@ foundations are the real next piece of work for this group.
 | Delta method | done | Multivariate form |
 | Johnson–Lindenstrauss lemma | stated | Proof (Gaussian concentration for projections) |
 | Marcus–Spielman–Srivastava (Kadison–Singer) | stated | Proof (interlacing polynomials; large) |
-| EFX existence | stated | Three-agent case on paper; general case open |
+| EFX existence | partial | Two agents and identical valuations proved; three-agent case on paper; general case open |
 
 ## D. Backlog of results proved on paper (`BACKLOG.md`)
 
@@ -85,6 +85,8 @@ foundations are the real next piece of work for this group.
 | Lower-tail and combined (min, max) p-values | done | — |
 | Benjamini–Hochberg: rejection count and monotonicity | done | — |
 | Hamming, Singleton, Plotkin bounds; entropy bound on Hamming balls | done | Sharper Plotkin form |
+| Vickrey auction truthfulness | done | Reserve prices; uniqueness |
+| Stable matching existence | done | The algorithm itself; proposer-optimality |
 | Remaining backlog entries (about 25) | todo | Not yet stated |
 
 ## After the tracker is worked through
