@@ -436,4 +436,251 @@ end RelayCode
 
 end BroadcastCut
 
+/-! ### The multiple-access cut for one code -/
+
+section MACCut
+
+variable {X X₁ Y Y₁ : Type*} [Fintype X] [Fintype X₁] [Fintype Y] [Fintype Y₁]
+  [DecidableEq X] [DecidableEq X₁] [DecidableEq Y]
+
+namespace RelayCode
+
+variable {n M : ℕ}
+
+/-- The probability that the receiver observes `y : Fin n → Y` when the message `m` is sent. -/
+noncomputable def recvProb (W : X × X₁ → Y × Y₁ → ℝ) (c : RelayCode X X₁ Y Y₁ n M) (m : Fin M)
+    (y : Fin n → Y) : ℝ :=
+  ∑ z, if (fun t => (z t).1) = y then c.outProb W m z else 0
+
+/-- The joint mass function of the uniformly distributed message and the receiver's output
+sequence `Yⁿ`. -/
+noncomputable def recvJoint (W : X × X₁ → Y × Y₁ → ℝ) (c : RelayCode X X₁ Y Y₁ n M) (m : Fin M)
+    (y : Fin n → Y) : ℝ :=
+  c.recvProb W m y / M
+
+omit [Fintype X] [Fintype X₁] [DecidableEq X] [DecidableEq X₁] in
+lemma recvProb_nonneg {W : X × X₁ → Y × Y₁ → ℝ} (hW : IsChannel W)
+    (c : RelayCode X X₁ Y Y₁ n M) (m : Fin M) (y : Fin n → Y) : 0 ≤ c.recvProb W m y :=
+  Finset.sum_nonneg fun z _ => by
+    split_ifs
+    · exact c.outProb_nonneg hW m z
+    · exact le_rfl
+
+omit [Fintype X] [Fintype X₁] [DecidableEq X] [DecidableEq X₁] in
+lemma recvJoint_nonneg {W : X × X₁ → Y × Y₁ → ℝ} (hW : IsChannel W)
+    (c : RelayCode X X₁ Y Y₁ n M) (m : Fin M) (y : Fin n → Y) : 0 ≤ c.recvJoint W m y :=
+  div_nonneg (c.recvProb_nonneg hW m y) (Nat.cast_nonneg _)
+
+omit [Fintype X] [Fintype X₁] [DecidableEq X] [DecidableEq X₁] in
+/-- Expectations of functions of `Yⁿ` can be computed from the full output law. -/
+lemma sum_recvProb_mul (W : X × X₁ → Y × Y₁ → ℝ) (c : RelayCode X X₁ Y Y₁ n M) (m : Fin M)
+    (g : (Fin n → Y) → ℝ) :
+    ∑ y, c.recvProb W m y * g y = ∑ z, c.outProb W m z * g (fun t => (z t).1) := by
+  unfold recvProb
+  simp only [Finset.sum_mul, ite_mul, zero_mul]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun z _ => ?_
+  rw [Finset.sum_ite_eq]
+  simp
+
+omit [Fintype X] [Fintype X₁] [DecidableEq X] [DecidableEq X₁] in
+lemma sum_recvProb [Nonempty Y] [Nonempty Y₁] {W : X × X₁ → Y × Y₁ → ℝ} (hW : IsChannel W)
+    (c : RelayCode X X₁ Y Y₁ n M) (m : Fin M) : ∑ y, c.recvProb W m y = 1 := by
+  have h := c.sum_recvProb_mul W m (fun _ => 1)
+  simp only [mul_one] at h
+  rw [h, c.sum_outProb hW]
+
+omit [Fintype X] [Fintype X₁] [DecidableEq X] [DecidableEq X₁] in
+/-- **Conditioning on the past can only lower the entropy of the receiver's output.** For a
+fixed message, `E[-log P(Yⁿ | m)] ≥ ∑ₜ E[-log V(Yₜ | Xₜ, X₁ₜ)]`, written with the signs
+reversed. -/
+lemma sum_outProb_mul_log_recvProb_le [Nonempty Y] [Nonempty Y₁] {W : X × X₁ → Y × Y₁ → ℝ}
+    (hW : IsChannel W) (c : RelayCode X X₁ Y Y₁ n M) (m : Fin M) :
+    ∑ z, c.outProb W m z * log (c.recvProb W m (fun t => (z t).1))
+      ≤ ∑ z, c.outProb W m z * ∑ t, log (relayRecv W (c.inputAt m z t) (z t).1) := by
+  set Q : (Fin n → Y × Y₁) → ℝ := c.outProb W m with hQdef
+  set U : (Fin n → Y × Y₁) → Fin n → ℝ := fun z t =>
+    condKernel (fun y b => W (c.inputAt m z t) (y, b)) (z t).1 (z t).2 with hUdef
+  set V' : (Fin n → Y × Y₁) → Fin n → ℝ := fun z t => relayRecv W (c.inputAt m z t) (z t).1
+    with hVdef
+  have hWVU : ∀ z t, W (c.inputAt m z t) (z t) = V' z t * U z t := fun z t =>
+    (mul_condKernel (J := fun y b => W (c.inputAt m z t) (y, b)) (fun _ _ => hW.nonneg _ _)
+      (z t).1 (z t).2).symm
+  have hU0 : ∀ z t, 0 ≤ U z t := fun z t => condKernel_nonneg (fun _ _ => hW.nonneg _ _) _ _
+  have hne : ∀ z, Q z ≠ 0 → ∀ t, V' z t ≠ 0 ∧ U z t ≠ 0 := by
+    intro z hz t
+    have hW0 : W (c.inputAt m z t) (z t) ≠ 0 := fun h =>
+      hz (Finset.prod_eq_zero (mem_univ t) h)
+    rw [hWVU] at hW0
+    exact mul_ne_zero_iff.mp hW0
+  set ρ : (Fin n → Y × Y₁) → ℝ := fun z => c.recvProb W m (fun t => (z t).1) with hρdef
+  have hρ : ∀ z, Q z ≤ ρ z := fun z => by
+    have := Finset.single_le_sum
+      (f := fun z' => if (fun t => (z' t).1) = (fun t => (z t).1) then c.outProb W m z' else 0)
+      (fun z' _ => by split_ifs <;> [exact c.outProb_nonneg hW m z'; exact le_rfl]) (mem_univ z)
+    rw [ite_eq_left rfl] at this
+    exact this
+  set S : (Fin n → Y × Y₁) → ℝ := fun z => ρ z * ∏ t, U z t with hSdef
+  have hS0 : ∀ z, 0 ≤ S z := fun z =>
+    mul_nonneg (c.recvProb_nonneg hW m _) (Finset.prod_nonneg fun t _ => hU0 z t)
+  have hSsum : ∑ z, S z = 1 := by
+    rw [← (Equiv.arrowProdEquivProdArrow (Fin n) (fun _ => Y) (fun _ => Y₁)).symm.sum_comp,
+      Fintype.sum_prod_type]
+    have hin : ∀ y : Fin n → Y, ∑ y₁ : Fin n → Y₁,
+        ∏ t, condKernel (fun y' b => W (c.inputAt m (fun i => (y i, y₁ i)) t) (y', b)) (y t)
+          (y₁ t) = 1 := fun y =>
+      sum_prod_causal_eq_one n
+        (fun t y₁ => condKernel (fun y' b => W (c.inputAt m (fun i => (y i, y₁ i)) t) (y', b))
+          (y t))
+        (fun t y₁ => sum_condKernel _ _)
+        (fun t y₁ y₁' h => by
+          rw [c.inputAt_causal m t (fun i => (y i, y₁ i)) (fun i => (y i, y₁' i))
+            (fun j hj => by rw [h j hj])])
+    have h2 : ∀ y : Fin n → Y, ∑ y₁ : Fin n → Y₁,
+        S ((Equiv.arrowProdEquivProdArrow (Fin n) (fun _ => Y) (fun _ => Y₁)).symm (y, y₁))
+          = c.recvProb W m y := fun y => by
+      rw [← mul_one (c.recvProb W m y), ← hin y, Finset.mul_sum]
+      rfl
+    simp only [h2]
+    exact c.sum_recvProb hW m
+  have hac : ∀ z, S z = 0 → Q z = 0 := by
+    intro z hz
+    by_contra h
+    have hρ0 : 0 < ρ z := lt_of_lt_of_le
+      (lt_of_le_of_ne (c.outProb_nonneg hW m z) (Ne.symm h)) (hρ z)
+    have hU : ∏ t, U z t ≠ 0 := Finset.prod_ne_zero_iff.mpr fun t _ => (hne z h t).2
+    exact mul_ne_zero hρ0.ne' hU hz
+  have hQsum : ∑ z, Q z = 1 := c.sum_outProb hW m
+  have hgibbs := sum_negMulLog_le_neg_sum_mul_log univ Q S
+    (fun z _ => c.outProb_nonneg hW m z) (fun z _ => hS0 z) (fun z _ => hac z)
+    (by rw [hSsum, hQsum])
+  have hi : ∀ z, Q z * log (S z) = Q z * log (ρ z) + Q z * ∑ t, log (U z t) := by
+    intro z
+    by_cases h0 : Q z = 0
+    · simp [h0]
+    · have hρ0 : ρ z ≠ 0 := (lt_of_lt_of_le
+        (lt_of_le_of_ne (c.outProb_nonneg hW m z) (Ne.symm h0)) (hρ z)).ne'
+      have hU : ∏ t, U z t ≠ 0 := Finset.prod_ne_zero_iff.mpr fun t _ => (hne z h0 t).2
+      rw [hSdef, log_mul hρ0 hU, log_prod fun t _ => (hne z h0 t).2]
+      ring
+  have hii : ∀ z, negMulLog (Q z) = -(Q z * ∑ t, log (V' z t)) - Q z * ∑ t, log (U z t) := by
+    intro z
+    by_cases h0 : Q z = 0
+    · simp [h0]
+    · have hlog : log (Q z) = ∑ t, (log (V' z t) + log (U z t)) := by
+        rw [hQdef, outProb_eq_prod, log_prod fun t _ => by
+          rw [hWVU]; exact mul_ne_zero (hne z h0 t).1 (hne z h0 t).2]
+        refine Finset.sum_congr rfl fun t _ => ?_
+        rw [hWVU, log_mul (hne z h0 t).1 (hne z h0 t).2]
+      rw [negMulLog, hlog, Finset.sum_add_distrib]
+      ring
+  simp only [hi, hii, Finset.sum_add_distrib, Finset.sum_sub_distrib, Finset.sum_neg_distrib]
+    at hgibbs
+  change ∑ z, Q z * log (ρ z) ≤ ∑ z, Q z * ∑ t, log (V' z t)
+  linarith
+
+/-- **Multiple-access cut for one relay code** (multi-letter to single-letter). With the
+message uniform on `Fin M`, `I(message; Yⁿ) ≤ ∑ₜ I(Xₜ, X₁ₜ; Yₜ)`, the `t`-th term computed for
+the time-`t` input law `timeInput W c t`. -/
+theorem mutualInfo_recvJoint_le [Nonempty Y] [Nonempty Y₁] {W : X × X₁ → Y × Y₁ → ℝ}
+    (hW : IsChannel W) (c : RelayCode X X₁ Y Y₁ n M) (hM : 0 < M) :
+    mutualInfo (c.recvJoint W) ≤ ∑ t, cutMAC W (c.timeInput W t) := by
+  have hM' : (M : ℝ) ≠ 0 := by exact_mod_cast hM.ne'
+  have hV := isChannel_relayRecv (Y₁ := Y₁) hW
+  set Qy : (Fin n → Y) → ℝ := fun y => ∑ m, c.recvJoint W m y with hQdef
+  have hQ0 : ∀ y, 0 ≤ Qy y := fun y => Finset.sum_nonneg fun m _ => c.recvJoint_nonneg hW m y
+  have hQsum : ∑ y, Qy y = 1 := by
+    rw [hQdef, Finset.sum_comm]
+    simp only [recvJoint, ← Finset.sum_div, c.sum_recvProb hW, Finset.sum_const,
+      Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+    field_simp
+  -- the time-`t` marginal of `Yⁿ`
+  have hmarg : ∀ t, wordMarginal Qy t = outputDist (c.timeInput W t) (relayRecv W) := by
+    intro t
+    funext b
+    have h1 : wordMarginal Qy t b
+        = ∑ m, ∑ z, c.outProb W m z / M * (if (z t).1 = b then 1 else 0) := by
+      unfold wordMarginal
+      have : ∀ y : Fin n → Y, (if y t = b then Qy y else 0)
+          = ∑ m, c.recvProb W m y * ((M : ℝ)⁻¹ * if y t = b then 1 else 0) := by
+        intro y
+        rw [hQdef, ← Finset.sum_mul]
+        simp only [recvJoint, ← Finset.sum_div]
+        split_ifs <;> ring
+      simp only [this]
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      rw [c.sum_recvProb_mul W m (fun y => (M : ℝ)⁻¹ * if y t = b then 1 else 0)]
+      refine Finset.sum_congr rfl fun z _ => ?_
+      ring
+    rw [h1, sum_outProb_mul_at hW c t (fun _ w => if w.1 = b then 1 else 0)]
+    unfold outputDist relayRecv
+    refine Finset.sum_congr rfl fun a _ => ?_
+    congr 1
+    rw [Fintype.sum_prod_type]
+    simp [mul_ite, Finset.sum_ite_eq']
+  have ha : entropy Qy ≤ ∑ t, entropy (outputDist (c.timeInput W t) (relayRecv W)) := by
+    have := entropy_le_sum_entropy_wordMarginal Qy hQ0 hQsum
+    simpa only [hmarg] using this
+  -- the conditional entropy of `Yⁿ` given the message
+  have hb : ∑ t, ∑ a, c.timeInput W t a * entropy (relayRecv W a)
+      ≤ condEntropy (fun y m => c.recvJoint W m y) := by
+    have hrow : ∀ m, ∑ y, c.recvJoint W m y = (M : ℝ)⁻¹ := fun m => by
+      simp [recvJoint, ← Finset.sum_div, c.sum_recvProb hW]
+    have hce : condEntropy (fun y m => c.recvJoint W m y)
+        = ∑ m, ∑ z, c.outProb W m z / M * -log (c.recvProb W m (fun t => (z t).1)) := by
+      unfold condEntropy
+      refine Finset.sum_congr rfl fun m _ => ?_
+      simp only [hrow]
+      have : ∀ y, c.recvJoint W m y * log ((M : ℝ)⁻¹ / c.recvJoint W m y)
+          = c.recvProb W m y * ((M : ℝ)⁻¹ * -log (c.recvProb W m y)) := by
+        intro y
+        unfold recvJoint
+        by_cases h0 : c.recvProb W m y = 0
+        · simp [h0]
+        · have : (M : ℝ)⁻¹ / (c.recvProb W m y / M) = (c.recvProb W m y)⁻¹ := by field_simp
+          rw [this, log_inv]
+          ring
+      simp only [this]
+      rw [c.sum_recvProb_mul W m (fun y => (M : ℝ)⁻¹ * -log (c.recvProb W m y))]
+      refine Finset.sum_congr rfl fun z _ => ?_
+      ring
+    have hent : ∀ t, ∑ a, c.timeInput W t a * entropy (relayRecv W a)
+        = ∑ m, ∑ z, c.outProb W m z / M * -log (relayRecv W (c.inputAt m z t) (z t).1) := by
+      intro t
+      rw [sum_outProb_mul_at hW c t (fun a w => -log (relayRecv W a w.1))]
+      refine Finset.sum_congr rfl fun a _ => ?_
+      congr 1
+      unfold entropy
+      rw [Fintype.sum_prod_type]
+      refine Finset.sum_congr rfl fun y _ => ?_
+      show negMulLog (relayRecv W a y) = ∑ y₁, W a (y, y₁) * -log (relayRecv W a y)
+      rw [← Finset.sum_mul, negMulLog]
+      unfold relayRecv
+      ring
+    rw [hce, Finset.sum_congr rfl fun t _ => hent t, Finset.sum_comm]
+    refine Finset.sum_le_sum fun m _ => ?_
+    rw [Finset.sum_comm]
+    have key := c.sum_outProb_mul_log_recvProb_le hW m
+    have e1 : ∀ z, ∑ t, c.outProb W m z / M * -log (relayRecv W (c.inputAt m z t) (z t).1)
+        = -((M : ℝ)⁻¹ * (c.outProb W m z * ∑ t, log (relayRecv W (c.inputAt m z t) (z t).1))) :=
+      fun z => by rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_neg_distrib]
+                  exact Finset.sum_congr rfl fun t _ => by ring
+    have e2 : ∀ z, c.outProb W m z / M * -log (c.recvProb W m (fun t => (z t).1))
+        = -((M : ℝ)⁻¹ * (c.outProb W m z * log (c.recvProb W m (fun t => (z t).1)))) :=
+      fun z => by ring
+    simp only [e1, e2, Finset.sum_neg_distrib, ← Finset.mul_sum]
+    have hMi : (0 : ℝ) ≤ (M : ℝ)⁻¹ := inv_nonneg.mpr (Nat.cast_nonneg _)
+    exact neg_le_neg (mul_le_mul_of_nonneg_left key hMi)
+  rw [← mutualInfo_swap, mutualInfo_eq_entropy_sub_condEntropy _
+    (fun y m => c.recvJoint_nonneg hW m y)]
+  change entropy Qy - _ ≤ _
+  unfold cutMAC
+  simp only [mutualInfo_joint_eq _ _ (c.timeInput_nonneg hW _) hV, Finset.sum_sub_distrib]
+  linarith
+
+end RelayCode
+
+end MACCut
+
 end Applied.InformationTheory
