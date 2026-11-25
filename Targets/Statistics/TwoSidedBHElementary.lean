@@ -44,8 +44,8 @@ law is a degenerate Gaussian; the statement itself does not mention joint normal
 proved). (2) does not contradict `BHTwoSidedGaussian`: the false discovery rate stays below
 `α` by (1).
 
-Not covered: any violation of the level `α` itself (see `OpenTwoSidedGaussian.lean` and the
-files it points to); non-degenerate correlation in (2); the exact false discovery rate of the
+Not covered: any violation of the level `α` itself (for that see
+`Targets/Statistics/BHTwoSidedCounterexample.lean`); non-degenerate correlation in (2); the exact false discovery rate of the
 example.
 -/
 

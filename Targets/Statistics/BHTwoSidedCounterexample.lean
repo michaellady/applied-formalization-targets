@@ -31,15 +31,18 @@ type); for a replication number `N` there are `100 N` statistics: `96 N` true nu
 every `N ≥ N₀` the Benjamini–Hochberg procedure at level `1/100` on the two-sided p-values has
 false discovery rate strictly greater than `1/100`. `N₀` is not explicit (it comes from the
 Archimedean property), and from the proof it is astronomically large: the slack of the Chebyshev
-step is `η = 10⁻²⁴`, so the argument needs `N` of order at least `10⁴⁶`.
+step is `η = 10⁻²⁴` and a bin has up to 489 cut-offs, so the argument needs `N` of order
+`10⁵⁰` (our estimate from the proof, not a theorem; thresholds as small as `10⁻¹⁷` have to be
+resolved by counts).
 
 (3) `exists_gaussian_bh_fdr_gt`: (2) repackaged with indices `Fin n`, together with joint
 normality, unit variances and mean zero of the true nulls; this is what (1) uses.
 
 Differences from the textbook statement. Theorem 1 of the preprint states `FDR_N > 0.0104` for
-all sufficiently large `N`; here only `FDR_N > 0.01` is proved (the certificate sum is
-`1.0575…`, i.e. the proof gives a bound slightly above `0.0105`, but the Lean statement records
-only the strict inequality with the level). The preprint proves an asymptotic statement through
+all sufficiently large `N`; here only `FDR_N > 0.01` is proved. (The certificate sum evaluates
+to `1.0575…` with `#eval`, which would give a limiting bound near `0.0105`; Lean only proves
+that the sum exceeds one, and the statement records only the strict inequality with the
+level.) The preprint proves an asymptotic statement through
 almost sure convergence of empirical distribution functions and Fatou's lemma; the Lean proof
 bounds, for each value of the factor, the probability that finitely many counts deviate from
 their conditional means (Chebyshev), which gives the same conclusion for all large `N` without
