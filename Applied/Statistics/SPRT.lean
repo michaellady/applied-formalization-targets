@@ -32,6 +32,13 @@ bounds the type-I error of the sequential probability ratio test with upper thre
 * `supermartingale_likelihoodRatioProcess`, `martingale_likelihoodRatioProcess`.
 * `sprt_typeI_error_le`: `P₀ (∃ n, A ≤ Λ n) ≤ 1 / A`.
 * `sprt_typeI_error_randomTime_le`: `P₀ (A ≤ Λ τ) ≤ 1 / A` for any random time `τ`.
+
+## Relation to other files and scope
+
+`Ville.lean` supplies the maximal inequality. The sharper Wald bounds `α ≤ (1 - β) / A` and
+`β ≤ B (1 - α)` are in `SPRTWald.lean` (abstract change of measure) and `SPRTWaldIID.lean`
+(i.i.d. observations). Not here: almost sure termination, expected sample size (Wald's
+identity), Wald–Wolfowitz optimality, and composite hypotheses.
 -/
 
 open MeasureTheory ProbabilityTheory Filter
@@ -57,16 +64,20 @@ def partialProd (Y : ℕ → Ω → ℝ) (n : ℕ) (ω : Ω) : ℝ := ∏ i ∈ 
 @[simp] lemma partialProd_zero (Y : ℕ → Ω → ℝ) (ω : Ω) : partialProd Y 0 ω = 1 := by
   simp [partialProd]
 
+/-- Recursion for partial products: `Λ (n + 1) = Λ n * Y n`. -/
 lemma partialProd_succ (Y : ℕ → Ω → ℝ) (n : ℕ) :
     partialProd Y (n + 1) = partialProd Y n * Y n := by
   ext ω; simp [partialProd, Finset.prod_range_succ]
 
+/-- Partial products of non-negative factors are non-negative. -/
 lemma partialProd_nonneg {Y : ℕ → Ω → ℝ} (hnn : ∀ i ω, 0 ≤ Y i ω) (n : ℕ) (ω : Ω) :
     0 ≤ partialProd Y n ω :=
   Finset.prod_nonneg fun i _ => hnn i ω
 
 variable {Y : ℕ → Ω → ℝ}
 
+/-- The partial products are adapted to the filtration of the strict past: `Λ n` depends only on
+`Y 0, …, Y (n - 1)`. -/
 lemma stronglyAdapted_partialProd (hY : ∀ i, Measurable (Y i)) :
     StronglyAdapted (pastFiltration (m0 := m0) Y hY) (partialProd Y) := by
   intro n
@@ -85,12 +96,14 @@ lemma indep_pastFiltration (hY : ∀ i, Measurable (Y i)) (hindep : iIndepFun Y 
     (fun j => (hY j).comap_le) hindep (S := Set.Iio n) (T := {n}) (by simp)
   simpa [pastFiltration] using h
 
+/-- For independent factors, `Λ n = ∏ i < n, Y i` is independent of the next factor `Y n`. -/
 lemma indepFun_partialProd (hY : ∀ i, Measurable (Y i)) (hindep : iIndepFun Y μ) (n : ℕ) :
     partialProd Y n ⟂ᵢ[μ] Y n := by
   rw [IndepFun_iff_Indep]
   refine indep_of_indep_of_le_left (indep_pastFiltration hY hindep n) ?_
   exact ((stronglyAdapted_partialProd (m0 := m0) hY n).measurable).comap_le
 
+/-- Partial products of independent integrable factors are integrable. -/
 lemma integrable_partialProd [IsProbabilityMeasure μ] (hY : ∀ i, Measurable (Y i))
     (hindep : iIndepFun Y μ) (hint : ∀ i, Integrable (Y i) μ) (n : ℕ) :
     Integrable (partialProd Y n) μ := by
@@ -180,13 +193,16 @@ noncomputable def likelihoodRatioProcess (p₀ p₁ : E → ℝ) (X : ℕ → Ω
   partialProd fun i ω => likelihoodRatio p₀ p₁ (X i ω)
 
 omit [MeasurableSpace E] in
+/-- Unfolding lemma: `Λ n = ∏ i < n, p₁ (X i) / p₀ (X i)`. -/
 lemma likelihoodRatioProcess_apply (p₀ p₁ : E → ℝ) (X : ℕ → Ω → E) (n : ℕ) (ω : Ω) :
     likelihoodRatioProcess p₀ p₁ X n ω = ∏ i ∈ Finset.range n, p₁ (X i ω) / p₀ (X i ω) := rfl
 
 omit [MeasurableSpace E] in
+/-- The likelihood ratio of non-negative densities is non-negative. -/
 lemma likelihoodRatio_nonneg (hp₀ : ∀ x, 0 ≤ p₀ x) (hp₁ : ∀ x, 0 ≤ p₁ x) (x : E) :
     0 ≤ likelihoodRatio p₀ p₁ x := div_nonneg (hp₁ x) (hp₀ x)
 
+/-- The likelihood ratio of measurable densities is measurable. -/
 lemma measurable_likelihoodRatio (hm₀ : Measurable p₀) (hm₁ : Measurable p₁) :
     Measurable (likelihoodRatio p₀ p₁) := hm₁.div hm₀
 

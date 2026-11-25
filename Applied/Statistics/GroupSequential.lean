@@ -17,6 +17,18 @@ crossed at look `k`. The trial makes a type-I error when any boundary is crossed
 Nothing is assumed about the joint distribution of the test statistics. Computing boundaries
 that achieve a given spending function for jointly normal statistics is a separate numerical
 problem and is not covered here.
+
+## Relation to other files
+
+This is the root of the group-sequential files. Reading order:
+`GroupSequential` (this file: spending principle as an inequality) →
+`GroupSequentialBoundaries` (first-crossing events are disjoint, so the inequality is an
+equality; existence of exact spending boundaries and of a Pocock-type common boundary for
+statistics without atoms) → `GroupSequentialCanonical` (independent normal increments:
+`cov (Z a, Z b) = √(a / b)`) → `GroupSequentialJointLaw` (joint normality; boundaries that
+depend only on the look times) → `GroupSequentialGraphical` (several hypotheses, repeated
+p-values and confidence sets). `Ville.lean` gives the martingale analogue
+(`measure_firstCrossing_le`).
 -/
 
 open MeasureTheory Finset
@@ -30,6 +42,9 @@ variable {Ω : Type*} [MeasurableSpace Ω]
 def firstCrossing (A : ℕ → Set Ω) (k : ℕ) : Set Ω := A k \ ⋃ j ∈ range k, A j
 
 omit [MeasurableSpace Ω] in
+/-- If some boundary is crossed during the first `K` looks, there is a first look at which this
+happens: the union of the crossing events is contained in the union of the first-crossing
+events. (The reverse inclusion is `biUnion_firstCrossing_eq` in `GroupSequentialBoundaries`.) -/
 lemma biUnion_subset_biUnion_firstCrossing (A : ℕ → Set Ω) (K : ℕ) :
     ⋃ k ∈ range K, A k ⊆ ⋃ k ∈ range K, firstCrossing A k := by
   classical

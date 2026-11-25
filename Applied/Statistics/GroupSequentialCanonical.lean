@@ -212,6 +212,7 @@ theorem map_partialSum (hξ : ∀ i, Measurable (ξ i))
   rw [Finset.card_range] at h
   exact h
 
+/-- The increment `S b - S a` is the sum of the observations with index in `[a, b)`. -/
 lemma partialSum_sub (ξ : ℕ → Ω → ℝ) {a b : ℕ} (hab : a ≤ b) (ω : Ω) :
     partialSum ξ b ω - partialSum ξ a ω = ∑ i ∈ Ico a b, ξ i ω :=
   (Finset.sum_Ico_eq_sub (fun i => ξ i ω) hab).symm
@@ -224,6 +225,7 @@ theorem map_partialSum_sub (hξ : ∀ i, Measurable (ξ i))
   simp_rw [partialSum_sub ξ hab]
   simpa using map_blockSum hξ hlaw hindep (Ico a b)
 
+/-- Partial sums of measurable observations are measurable. -/
 lemma measurable_partialSum (hξ : ∀ i, Measurable (ξ i)) (n : ℕ) :
     Measurable (partialSum ξ n) :=
   Finset.measurable_fun_sum _ fun i _ => hξ i

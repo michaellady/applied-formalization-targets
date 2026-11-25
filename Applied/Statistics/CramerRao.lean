@@ -13,6 +13,15 @@ In a regular parametric model `S` is the score `∂/∂θ log p_θ`, `E[S²]` is
 information `I(θ)`, and `E[T S] = ∂/∂θ E_θ[T]`. So `Var(T) ≥ (∂/∂θ E_θ[T])² / I(θ)`, and for an
 unbiased estimator `Var(T) ≥ 1 / I(θ)`. The regularity conditions that justify differentiating
 under the integral are what connect the model to this inequality; they are not treated here.
+
+## Relation to other files and scope
+
+`sq_integral_mul_le` (Cauchy–Schwarz for integrals of products of square-integrable real
+functions) is a general analysis fact with no statistical content. Other estimation-theory
+files: `RaoBlackwell.lean`, `LehmannScheffe.lean` (minimum-variance unbiased estimation) and
+`FisherNeyman.lean` (sufficiency). Not here: Fisher information as a definition, the identity
+`E[T S] = ∂/∂θ E_θ[T]`, the multivariate (matrix) inequality, attainment in exponential
+families, and the Bayesian (van Trees) version.
 -/
 
 open MeasureTheory ProbabilityTheory

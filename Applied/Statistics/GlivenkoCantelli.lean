@@ -18,6 +18,12 @@ frequency of `(-∞, t]`.
 The proof of the uniform statement uses the quantiles `u_q = inf {s | q ≤ F s}` for
 `q = j / K`: the empirical cdf and its left limits converge at these countably many points,
 and monotonicity controls every other point up to `1 / K`.
+
+## Scope
+
+Stand-alone (Mathlib only). `lowerQuantile` is an auxiliary definition for the proof, not a
+general quantile API. Not here: rates (Dvoretzky–Kiefer–Wolfowitz), Glivenko–Cantelli classes,
+multivariate distribution functions, Donsker's theorem.
 -/
 
 open MeasureTheory ProbabilityTheory Filter Finset Set
@@ -43,9 +49,12 @@ private theorem quantileSet_bddBelow (hq0 : 0 < q) : BddBelow {s | q ≤ cdf μ 
   by_contra hlt
   exact absurd (hs.trans (monotone_cdf μ (not_le.mp hlt).le)) (not_le.mpr hs₀)
 
+/-- The lower quantile is a lower bound of `{t | q ≤ F t}`: if `q ≤ F t` then the `q`-quantile is
+at most `t`. -/
 theorem lowerQuantile_le (hq0 : 0 < q) {t : ℝ} (ht : q ≤ cdf μ t) : lowerQuantile μ q ≤ t :=
   csInf_le (quantileSet_bddBelow hq0) ht
 
+/-- Strictly below the `q`-quantile the distribution function is strictly below `q`. -/
 theorem cdf_lt_of_lt_lowerQuantile (hq0 : 0 < q) {t : ℝ} (ht : t < lowerQuantile μ q) :
     cdf μ t < q := by
   by_contra h
@@ -62,6 +71,7 @@ theorem le_cdf_lowerQuantile (hq0 : 0 < q) (hq1 : q < 1) : q ≤ cdf μ (lowerQu
   have : cdf μ s < q := hsub ⟨lowerQuantile_le hq0 hs', hsb⟩
   exact absurd hs' (not_le.mpr this)
 
+/-- If `F t < q` then `t` is strictly below the `q`-quantile (`0 < q < 1`). -/
 theorem lt_lowerQuantile_of_cdf_lt (hq0 : 0 < q) (hq1 : q < 1) {t : ℝ} (ht : cdf μ t < q) :
     t < lowerQuantile μ q := by
   by_contra h
@@ -92,11 +102,13 @@ noncomputable def empiricalFreq (X : ℕ → Ω → ℝ) (n : ℕ) (ω : Ω) (s 
 noncomputable def empiricalCDF (X : ℕ → Ω → ℝ) (n : ℕ) (ω : Ω) (t : ℝ) : ℝ :=
   empiricalFreq X n ω (Iic t)
 
+/-- Empirical frequencies are non-negative. -/
 theorem empiricalFreq_nonneg (X : ℕ → Ω → ℝ) (n : ℕ) (ω : Ω) (s : Set ℝ) :
     0 ≤ empiricalFreq X n ω s :=
   div_nonneg (sum_nonneg fun _ _ => indicator_nonneg (fun _ _ => zero_le_one) _)
     (Nat.cast_nonneg n)
 
+/-- Empirical frequencies are at most one. -/
 theorem empiricalFreq_le_one (X : ℕ → Ω → ℝ) (n : ℕ) (ω : Ω) (s : Set ℝ) :
     empiricalFreq X n ω s ≤ 1 := by
   refine div_le_one_of_le₀ ?_ (Nat.cast_nonneg n)
@@ -104,6 +116,7 @@ theorem empiricalFreq_le_one (X : ℕ → Ω → ℝ) (n : ℕ) (ω : Ω) (s : S
         sum_le_sum fun i _ => indicator_le_self' (fun _ _ => zero_le_one) _
     _ = n := by simp
 
+/-- Empirical frequencies are monotone in the set. -/
 theorem empiricalFreq_mono (X : ℕ → Ω → ℝ) (n : ℕ) (ω : Ω) {s s' : Set ℝ} (h : s ⊆ s') :
     empiricalFreq X n ω s ≤ empiricalFreq X n ω s' := by
   unfold empiricalFreq

@@ -77,18 +77,23 @@ maximum of `k` comparison statistics `(X j - X₀) / √2` with a shared control
 noncomputable def dunnettCDF (k : ℕ) (d : ℝ) : ℝ :=
   ∫ x, cdf (gaussianReal 0 1) (√2 * d + x) ^ k ∂(gaussianReal 0 1)
 
+/-- The integrand `x ↦ Φ(√2 d + x) ^ k` of Dunnett's integral is measurable. -/
 lemma measurable_dunnett_integrand (k : ℕ) (d : ℝ) :
     Measurable fun x : ℝ => cdf (gaussianReal 0 1) (√2 * d + x) ^ k :=
   ((monotone_cdf _).measurable.comp (measurable_const.add measurable_id)).pow_const k
 
+/-- The integrand of Dunnett's integral is non-negative. -/
 lemma dunnett_integrand_nonneg (k : ℕ) (d x : ℝ) :
     0 ≤ cdf (gaussianReal 0 1) (√2 * d + x) ^ k :=
   pow_nonneg (cdf_nonneg _ _) _
 
+/-- The integrand of Dunnett's integral is at most one. -/
 lemma dunnett_integrand_le_one (k : ℕ) (d x : ℝ) :
     cdf (gaussianReal 0 1) (√2 * d + x) ^ k ≤ 1 :=
   pow_le_one₀ (cdf_nonneg _ _) (cdf_le_one _ _)
 
+/-- The integrand of Dunnett's integral is integrable against the standard normal law (it is
+bounded by one). -/
 lemma integrable_dunnett_integrand (k : ℕ) (d : ℝ) :
     Integrable (fun x : ℝ => cdf (gaussianReal 0 1) (√2 * d + x) ^ k) (gaussianReal 0 1) :=
   Integrable.of_bound (measurable_dunnett_integrand k d).aestronglyMeasurable 1
@@ -96,9 +101,11 @@ lemma integrable_dunnett_integrand (k : ℕ) (d : ℝ) :
       rw [Real.norm_eq_abs, abs_of_nonneg (dunnett_integrand_nonneg k d x)]
       exact dunnett_integrand_le_one k d x)
 
+/-- Dunnett's integral is non-negative. -/
 lemma dunnettCDF_nonneg (k : ℕ) (d : ℝ) : 0 ≤ dunnettCDF k d :=
   integral_nonneg fun x => dunnett_integrand_nonneg k d x
 
+/-- Dunnett's integral is at most one. -/
 lemma dunnettCDF_le_one (k : ℕ) (d : ℝ) : dunnettCDF k d ≤ 1 := by
   have h := integral_mono (integrable_dunnett_integrand k d)
     (integrable_const (μ := gaussianReal 0 1) (1 : ℝ)) fun x => dunnett_integrand_le_one k d x

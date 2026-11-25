@@ -41,6 +41,16 @@ the first stage):
 * `measure_weighted_adaptive_eq`: the test with the pre-planned weights (Cui–Hung–Wang 1999,
   Lehmacher–Wassmer 1999) has type I error exactly `N(0,1) [c, ∞)` for every first-stage
   measurable second-stage size.
+
+## Relation to other files and scope
+
+Uses the partial sums and z-statistics of `GroupSequentialCanonical.lean`. The p-value based
+route to adaptive designs is in `CombinationTests.lean` (Fisher's product, general conditional
+error functions of the first-stage p-value) and `InverseNormalCombination.lean` (weighted
+z-statistic); `measure_weighted_adaptive_eq` here is the model-based counterpart of the latter.
+Not here: unknown variance, early stopping at the interim, sample-size decreases, non-null
+drift (power), and the Müller–Schäfer principle phrased with conditional expectations of test
+functions.
 -/
 
 open MeasureTheory ProbabilityTheory Finset Set
@@ -307,9 +317,11 @@ def firstStage (ξ : ℕ → Ω → ℝ) (n : ℕ) : MeasurableSpace Ω :=
 def laterStages (ξ : ℕ → Ω → ℝ) (n : ℕ) : MeasurableSpace Ω :=
   ⨆ i ∈ {i : ℕ | n ≤ i}, MeasurableSpace.comap (ξ i) inferInstance
 
+/-- The interim information is a sub-σ-algebra of the ambient one. -/
 lemma firstStage_le (hξ : ∀ i, Measurable (ξ i)) (n : ℕ) : firstStage ξ n ≤ mΩ :=
   iSup₂_le fun i _ => (hξ i).comap_le
 
+/-- The first-stage sum `S n` is known at the interim: it is `firstStage ξ n`-measurable. -/
 lemma measurable_firstStage_partialSum (ξ : ℕ → Ω → ℝ) (n : ℕ) :
     Measurable[firstStage ξ n] (partialSum ξ n) :=
   Finset.measurable_fun_sum _ fun i hi =>
@@ -317,6 +329,7 @@ lemma measurable_firstStage_partialSum (ξ : ℕ → Ω → ℝ) (n : ℕ) :
       (le_biSup (fun j => MeasurableSpace.comap (ξ j) inferInstance)
         (show i ∈ {i : ℕ | i < n} from Finset.mem_range.mp hi)) le_rfl
 
+/-- The first-stage z-statistic `Z n = S n / √n` is known at the interim. -/
 lemma measurable_firstStage_zStat (ξ : ℕ → Ω → ℝ) (n : ℕ) :
     Measurable[firstStage ξ n] (zStat ξ n) :=
   (measurable_firstStage_partialSum ξ n).div_const _
@@ -325,10 +338,12 @@ lemma measurable_firstStage_zStat (ξ : ℕ → Ω → ℝ) (n : ℕ) :
 def stageTwoSum (ξ : ℕ → Ω → ℝ) (n1 d : ℕ) (ω : Ω) : ℝ :=
   partialSum ξ (n1 + d) ω - partialSum ξ n1 ω
 
+/-- The second-stage sum is measurable. -/
 lemma measurable_stageTwoSum (hξ : ∀ i, Measurable (ξ i)) (n1 d : ℕ) :
     Measurable (stageTwoSum ξ n1 d) :=
   (measurable_partialSum hξ _).sub (measurable_partialSum hξ _)
 
+/-- The second-stage sum depends only on the observations after the first stage. -/
 lemma measurable_laterStages_stageTwoSum (ξ : ℕ → Ω → ℝ) (n1 d : ℕ) :
     Measurable[laterStages ξ n1] (stageTwoSum ξ n1 d) := by
   have h : stageTwoSum ξ n1 d = fun ω => ∑ i ∈ Finset.Ico n1 (n1 + d), ξ i ω := by

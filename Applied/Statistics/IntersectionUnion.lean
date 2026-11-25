@@ -40,6 +40,13 @@ Normal mean with known standard error `s` (the estimate has law `N(θ, s²)` on 
 
 The p-value form of `iut_level` is `Applied.MultipleTesting.isValidPValue_iSup_of_isValidPValue`
 (the maximum p-value).
+
+## Relation to other files and scope
+
+`CombinedPValues.lean` has the maximum p-value; `ClosedTesting.lean` the fixed-sequence test;
+`StandardNormal.lean` the facts about `Φ` (re-exported here under their old names). Not here:
+the t-test (unknown variance) TOST, ratio-scale bioequivalence limits (80–125%), asymmetric
+margins, and more powerful equivalence tests (Berger–Hsu).
 -/
 
 open MeasureTheory ProbabilityTheory Set Filter
@@ -288,6 +295,8 @@ standard error `s` and critical value `c`: the z-test of `θ ≤ -δ` and the z-
 both reject. -/
 def tostRegion (δ s c : ℝ) : Set ℝ := {x | c < (x - -δ) / s ∧ (x - δ) / s < -c}
 
+/-- For standard error `s > 0` the TOST rejection region is the open interval
+`(-δ + c s, δ - c s)` of estimates (empty when `c s ≥ δ`). -/
 lemma tostRegion_eq_Ioo {δ s c : ℝ} (hs : 0 < s) :
     tostRegion δ s c = Ioo (-δ + c * s) (δ - c * s) := by
   ext x

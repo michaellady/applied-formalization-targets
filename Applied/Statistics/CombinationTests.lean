@@ -46,6 +46,14 @@ is a valid p-value *conditionally on the interim information*.
 
 `p2` need not be measurable (outer measure is used); `p1` must be `m1`-measurable. P-values
 are real-valued and are not assumed to lie in `[0, 1]`.
+
+## Relation to other files and scope
+
+`PValues.lean` supplies `IsValidPValue`; `InverseNormalCombination.lean` applies
+`measure_mem_lowerSet_prod_le` to the inverse-normal region; `ConditionalError.lean` is the
+model-based (Gaussian) treatment of the same designs. Not here: more than two stages, the
+numerical constant `c` of Bauer–Köhne (the solution of `c (1 - ln c) = α`), exactness of the
+Fisher levels (only the reduction to an area computation), and estimation after adaptation.
 -/
 
 open MeasureTheory ProbabilityTheory Set Function
@@ -414,6 +422,7 @@ noncomputable def fisherBoundary (c α₁ α₀ : ℝ) (x : ℝ) : ℝ :=
 
 variable {c α₁ α₀ : ℝ}
 
+/-- The Bauer–Köhne conditional error function is non-negative (for `c ≥ 0`, `α₁ ≥ 0`). -/
 lemma fisherBoundary_nonneg (hc : 0 ≤ c) (hα : 0 ≤ α₁) (x : ℝ) :
     0 ≤ fisherBoundary c α₁ α₀ x := by
   unfold fisherBoundary
@@ -422,6 +431,8 @@ lemma fisherBoundary_nonneg (hc : 0 ≤ c) (hα : 0 ≤ α₁) (x : ℝ) :
   · exact div_nonneg hc (hα.trans (not_le.mp h1).le)
   · exact le_rfl
 
+/-- The Bauer–Köhne conditional error function is non-increasing in the first-stage p-value
+when `0 < c ≤ α₁` (so that `c / x ≤ 1` on the continuation region `x > α₁`). -/
 lemma fisherBoundary_antitone (hc : 0 < c) (hcα : c ≤ α₁) :
     Antitone (fisherBoundary c α₁ α₀) := by
   intro x y hxy

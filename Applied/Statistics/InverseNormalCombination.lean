@@ -29,6 +29,14 @@ the rejection region is written without the quantile function:
 * `measure_inverseNormal_eq`: for independent, exactly uniform p-values the rejection
   probability is exactly `1 - Φ z`.
 * `map_normalTail`: `1 - Φ(Z)` is uniform on `[0, 1]` for standard normal `Z`.
+
+## Relation to other files and scope
+
+Built on `CombinationTests.lean` (lower sets of the plane) and `StandardNormal.lean` (strict
+monotonicity of `Φ`). The same test in an explicit Gaussian two-stage model is
+`measure_weighted_adaptive_eq` in `ConditionalError.lean`. Not here: early stopping
+(group-sequential inverse-normal designs), more than two stages, data-dependent weights, and
+the quantile function `Φ⁻¹` itself.
 -/
 
 open MeasureTheory ProbabilityTheory Set Function
@@ -41,6 +49,7 @@ open Applied.MultipleTesting
 /-- Upper tail of the standard normal distribution: `1 - Φ z`. -/
 noncomputable def normalTail (z : ℝ) : ℝ := 1 - cdf (gaussianReal 0 1) z
 
+/-- The standard normal upper tail `1 - Φ` is non-increasing. -/
 lemma normalTail_antitone : Antitone normalTail := fun _ _ h =>
   sub_le_sub_left (monotone_cdf _ h) 1
 
@@ -48,16 +57,21 @@ lemma normalTail_antitone : Antitone normalTail := fun _ _ h =>
 `Applied.StdNormal.strictMono_cdf`. -/
 alias cdf_gaussianReal_strictMono := StdNormal.strictMono_cdf
 
+/-- The standard normal upper tail `1 - Φ` is strictly decreasing. -/
 lemma normalTail_strictAnti : StrictAnti normalTail := fun _ _ h =>
   sub_lt_sub_left (cdf_gaussianReal_strictMono h) 1
 
+/-- The standard normal upper tail is measurable. -/
 lemma measurable_normalTail : Measurable normalTail :=
   normalTail_antitone.measurable
 
+/-- `N(0,1)(z, ∞) = 1 - Φ z`. (The general `N(θ, s²)` version is
+`Applied.StdNormal.gaussianReal_Ioi`.) -/
 lemma gaussianReal_Ioi (z : ℝ) : gaussianReal 0 1 (Ioi z) = ENNReal.ofReal (normalTail z) := by
   rw [← compl_Iic, prob_compl_eq_one_sub measurableSet_Iic, ← ofReal_cdf, normalTail,
     ENNReal.ofReal_sub _ (cdf_nonneg _ _), ENNReal.ofReal_one]
 
+/-- `N(0,1)[z, ∞) = 1 - Φ z`. -/
 lemma gaussianReal_Ici (z : ℝ) : gaussianReal 0 1 (Ici z) = ENNReal.ofReal (normalTail z) := by
   rw [← gaussianReal_Ioi]
   exact (measure_congr (Ioi_ae_eq_Ici' (gaussianReal_singleton z))).symm
@@ -131,6 +145,8 @@ lemma map_weightedSum (hw : w₁ ^ 2 + w₂ ^ 2 = 1) :
     simp only [mul_one, NNReal.coe_add, NNReal.coe_one, NNReal.coe_mk]
     exact hw
 
+/-- For `w₁² + w₂² = 1` and independent standard normal coordinates, the closed half-plane
+`{z ≤ w₁ x + w₂ y}` has probability `1 - Φ z`. -/
 lemma measure_halfPlane_le (hw : w₁ ^ 2 + w₂ ^ 2 = 1) (z : ℝ) :
     ((gaussianReal 0 1).prod (gaussianReal 0 1)) {q : ℝ × ℝ | z ≤ w₁ * q.1 + w₂ * q.2}
       = ENNReal.ofReal (normalTail z) := by
@@ -141,6 +157,8 @@ lemma measure_halfPlane_le (hw : w₁ ^ 2 + w₂ ^ 2 = 1) (z : ℝ) :
         (Measure.map_apply hf measurableSet_Ici).symm
     _ = ENNReal.ofReal (normalTail z) := by rw [map_weightedSum hw, gaussianReal_Ici]
 
+/-- For `w₁² + w₂² = 1` and independent standard normal coordinates, the open half-plane
+`{z < w₁ x + w₂ y}` has probability `1 - Φ z`. -/
 lemma measure_halfPlane_lt (hw : w₁ ^ 2 + w₂ ^ 2 = 1) (z : ℝ) :
     ((gaussianReal 0 1).prod (gaussianReal 0 1)) {q : ℝ × ℝ | z < w₁ * q.1 + w₂ * q.2}
       = ENNReal.ofReal (normalTail z) := by
@@ -173,10 +191,13 @@ def invNormalOuter (w₁ w₂ z : ℝ) : Set (ℝ × ℝ) :=
 def invNormalInner (w₁ w₂ z : ℝ) : Set (ℝ × ℝ) :=
   {q | ∃ a b, q.1 < normalTail a ∧ q.2 < normalTail b ∧ z ≤ w₁ * a + w₂ * b}
 
+/-- The inner (open) approximation is contained in the rejection region. -/
 lemma invNormalInner_subset : invNormalInner w₁ w₂ z ⊆ invNormalRegion w₁ w₂ z := by
   rintro q ⟨a, b, ha, hb, hab⟩
   exact ⟨a, b, ha.le, hb.le, hab⟩
 
+/-- The rejection region is contained in its outer (closed) approximation, for non-negative
+weights that are not both zero. -/
 lemma invNormalRegion_subset_outer (hw1 : 0 ≤ w₁) (hw2 : 0 ≤ w₂) (hpos : 0 < w₁ + w₂) :
     invNormalRegion w₁ w₂ z ⊆ invNormalOuter w₁ w₂ z := by
   rintro q ⟨z₁, z₂, h1, h2, hz⟩ a b ha hb
@@ -195,10 +216,12 @@ lemma invNormalRegion_subset_outer (hw1 : 0 ≤ w₁) (hw2 : 0 ≤ w₂) (hpos :
   · have e3 : w₁ * z₁ < w₁ * a := mul_lt_mul_of_pos_left ha' h0
     linarith
 
+/-- The outer approximation is a lower set of the plane: smaller p-values stay inside. -/
 lemma invNormalOuter_lower {x y x' y' : ℝ} (h : (x, y) ∈ invNormalOuter w₁ w₂ z)
     (hx : x' ≤ x) (hy : y' ≤ y) : (x', y') ∈ invNormalOuter w₁ w₂ z :=
   fun a b ha hb => h a b (ha.trans_le hx) (hb.trans_le hy)
 
+/-- The outer approximation is measurable (its complement is open, a union of open quadrants). -/
 lemma measurableSet_invNormalOuter : MeasurableSet (invNormalOuter w₁ w₂ z) := by
   have hset : (invNormalOuter w₁ w₂ z)ᶜ = ⋃ a : ℝ, ⋃ b : ℝ, ⋃ _ : w₁ * a + w₂ * b ≤ z,
       Ioi (normalTail a) ×ˢ Ioi (normalTail b) := by
@@ -220,6 +243,7 @@ lemma measurableSet_invNormalOuter : MeasurableSet (invNormalOuter w₁ w₂ z) 
       isOpen_Ioi.prod isOpen_Ioi
   exact hopen.measurableSet.of_compl
 
+/-- The inner approximation is measurable (it is open, a union of open quadrants). -/
 lemma measurableSet_invNormalInner : MeasurableSet (invNormalInner w₁ w₂ z) := by
   have hset : invNormalInner w₁ w₂ z = ⋃ a : ℝ, ⋃ b : ℝ, ⋃ _ : z ≤ w₁ * a + w₂ * b,
       Iio (normalTail a) ×ˢ Iio (normalTail b) := by
@@ -236,6 +260,8 @@ lemma measurableSet_invNormalInner : MeasurableSet (invNormalInner w₁ w₂ z) 
   exact (isOpen_iUnion fun a => isOpen_iUnion fun b => isOpen_iUnion fun _ =>
     isOpen_Iio.prod isOpen_Iio).measurableSet
 
+/-- On the z-scale the outer approximation is contained in the closed half-plane
+`{z ≤ w₁ Z₁ + w₂ Z₂}`. -/
 lemma preimage_invNormalOuter_subset (hpos : 0 ≤ w₁ + w₂) :
     Prod.map normalTail normalTail ⁻¹' invNormalOuter w₁ w₂ z
       ⊆ {q : ℝ × ℝ | z ≤ w₁ * q.1 + w₂ * q.2} := by
@@ -251,6 +277,7 @@ lemma preimage_invNormalOuter_subset (hpos : 0 ≤ w₁ + w₂) :
     h (u + ε) (v + ε) (normalTail_strictAnti (by linarith)) (normalTail_strictAnti (by linarith))
   nlinarith
 
+/-- On the z-scale the inner approximation contains the open half-plane `{z < w₁ Z₁ + w₂ Z₂}`. -/
 lemma subset_preimage_invNormalInner (hpos : 0 ≤ w₁ + w₂) :
     {q : ℝ × ℝ | z < w₁ * q.1 + w₂ * q.2}
       ⊆ Prod.map normalTail normalTail ⁻¹' invNormalInner w₁ w₂ z := by
@@ -264,12 +291,14 @@ lemma subset_preimage_invNormalInner (hpos : 0 ≤ w₁ + w₂) :
     ?_⟩
   nlinarith
 
+/-- The part of the outer approximation inside the unit square has area at most `1 - Φ z`. -/
 lemma volume_invNormalOuter_le (hpos : 0 ≤ w₁ + w₂) (hw : w₁ ^ 2 + w₂ ^ 2 = 1) :
     volume (invNormalOuter w₁ w₂ z ∩ Icc (0 : ℝ) 1 ×ˢ Icc (0 : ℝ) 1)
       ≤ ENNReal.ofReal (normalTail z) := by
   rw [volume_inter_unitSquare_eq measurableSet_invNormalOuter, ← measure_halfPlane_le hw z]
   exact measure_mono (preimage_invNormalOuter_subset hpos)
 
+/-- The part of the inner approximation inside the unit square has area at least `1 - Φ z`. -/
 lemma le_volume_invNormalInner (hpos : 0 ≤ w₁ + w₂) (hw : w₁ ^ 2 + w₂ ^ 2 = 1) :
     ENNReal.ofReal (normalTail z)
       ≤ volume (invNormalInner w₁ w₂ z ∩ Icc (0 : ℝ) 1 ×ˢ Icc (0 : ℝ) 1) := by

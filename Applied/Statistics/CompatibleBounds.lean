@@ -31,6 +31,15 @@ probability at most `γ`, and it is non-decreasing in `γ`). `H i` is rejected a
 
 The bounds take values in any linear order `β` (for instance `ℝ`, or `EReal` so that the bound
 at level zero can be `⊥`). Nothing is assumed measurable: statements are about outer measure.
+
+## Relation to other files and scope
+
+The testing procedures themselves are in `SequentiallyRejective.lean`, `ClosedTesting.lean`,
+`GraphicalApproach.lean` and `GraphicalInstances.lean`; this file adds confidence bounds whose
+conclusions never contradict those tests. Simple Bonferroni sets are in
+`SimultaneousIntervals.lean`. Not here: two-sided intervals, the "informative" bounds that
+improve on the margin for rejected hypotheses, non-Bonferroni procedures (Hommel, Hochberg,
+step-down Dunnett), and a concrete model in which the bounds `L` exist.
 -/
 
 open MeasureTheory Finset
@@ -418,9 +427,12 @@ variable [LinearOrder ι]
 /-- Weights of fixed-sequence testing: the whole level goes to the first hypothesis of `I`. -/
 def firstWeights (I : Finset ι) (i : ι) : ℝ := if ∀ j ∈ I, i ≤ j then 1 else 0
 
+/-- The fixed-sequence weights are non-negative. -/
 lemma firstWeights_nonneg (I : Finset ι) (i : ι) : 0 ≤ firstWeights I i := by
   unfold firstWeights; split_ifs <;> norm_num
 
+/-- The fixed-sequence weights are monotone: removing hypotheses never lowers the weight of a
+remaining one. -/
 lemma monotoneWeights_firstWeights : MonotoneWeights (firstWeights (ι := ι)) := by
   intro I J hJI i _
   unfold firstWeights
@@ -428,6 +440,7 @@ lemma monotoneWeights_firstWeights : MonotoneWeights (firstWeights (ι := ι)) :
   · rw [ite_eq_left h, ite_eq_left fun j hj => h j (hJI hj)]
   · rw [ite_eq_right h]; split_ifs <;> norm_num
 
+/-- The fixed-sequence weights of any set sum to at most one (at most one hypothesis is first). -/
 lemma sum_firstWeights_le_one (I : Finset ι) : ∑ i ∈ I, firstWeights I i ≤ 1 := by
   unfold firstWeights
   rw [Finset.sum_boole]

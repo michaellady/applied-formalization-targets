@@ -12,6 +12,21 @@ A likelihood-ratio test with threshold `k` is a test `φ'` equal to `1` where `p
 `0` where `p₁ < k p₀` (and arbitrary, possibly randomized, where `p₁ = k p₀`). The
 Neyman–Pearson lemma says that such a test is most powerful among all tests whose size does not
 exceed its own.
+
+## Main results
+
+* `neymanPearson_pointwise`: the pointwise inequality `(φ' - φ)(p₁ - k p₀) ≥ 0`.
+* `neymanPearson_randomized`: the lemma in terms of densities with respect to `μ`.
+* `neymanPearson_randomized_withDensity`: the same for the measures `μ.withDensity pᵢ`.
+
+## Scope
+
+Test functions take values in `ℝ≥0∞` with `φ ≤ 1` as a hypothesis; `p₀`, `p₁` need not
+integrate to one. The non-randomized lemma (rejection regions) is the registry entry
+`Targets/Statistics/NeymanPearson.lean`. Not here: existence of a likelihood-ratio test of a
+prescribed size `α` (which is what randomization is for), the converse (uniqueness of most
+powerful tests), the threshold `k = ∞`, and monotone-likelihood-ratio families
+(Karlin–Rubin).
 -/
 
 open MeasureTheory

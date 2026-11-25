@@ -198,6 +198,7 @@ theorem measure_biUnion_eq_of_alphaSpending (P : Measure Ω) {A : ℕ → Set Ω
 that look `k` never rejects, `⊥` that it always rejects). -/
 def crossing (c : ℕ → EReal) (X : ℕ → Ω → ℝ) (k : ℕ) : Set Ω := {ω | c k ≤ (X k ω : EReal)}
 
+/-- Crossing events of measurable statistics are measurable. -/
 lemma measurableSet_crossing (c : ℕ → EReal) {X : ℕ → Ω → ℝ} (hX : ∀ k, Measurable (X k))
     (k : ℕ) : MeasurableSet (crossing c X k) :=
   measurableSet_le measurable_const (measurable_coe_real_ereal.comp (hX k))

@@ -30,6 +30,13 @@ non-negative e-values are covered through `ENNReal.ofReal`.
   `∑ i ∈ H₀, α (q i) / m`.
 * `fdr_ebhReject_le`: e-BH has false discovery rate at most `α m₀ / m` under arbitrary
   dependence between the e-values.
+
+## Relation to other files and scope
+
+`BenjaminiHochberg.lean` supplies the false discovery proportion and rate; `Ville.lean` shows
+that stopped test supermartingales are e-values, which is the main source of e-values in
+sequential trials. Not here: boosted e-BH, calibrators from p-values to e-values, products and
+averages of e-values, and optimality (growth-rate) questions.
 -/
 
 open MeasureTheory Finset
@@ -112,11 +119,14 @@ noncomputable def ebhReject (q : ι → ℝ≥0∞) : Finset ι :=
 
 variable {α}
 
+/-- The e-BH cut-off index is at most the number `m` of hypotheses. -/
 lemma ebhK_le (q : ι → ℝ≥0∞) : ebhK α q ≤ Fintype.card ι := by
   refine Finset.sup_le fun k hk => ?_
   have : k ≤ Fintype.card ι := Nat.lt_succ_iff.mp (mem_range.mp hk)
   split_ifs <;> omega
 
+/-- At the cut-off index `k*` the defining condition holds: at least `k*` e-values are at least
+`m / (α k*)`. -/
 lemma ebhK_le_ebhCount (q : ι → ℝ≥0∞) : ebhK α q ≤ ebhCount α q (ebhK α q) := by
   obtain ⟨k, -, hk⟩ := Finset.exists_mem_eq_sup (range (Fintype.card ι + 1)) nonempty_range_add_one
     (fun k => if k ≤ ebhCount α q k then k else 0)
@@ -127,6 +137,8 @@ lemma ebhK_le_ebhCount (q : ι → ℝ≥0∞) : ebhK α q ≤ ebhCount α q (eb
   · simp only [h, ↓reduceIte] at hk'
     rw [hk']; exact Nat.zero_le _
 
+/-- Maximality of the cut-off index: any `k ≤ m` for which at least `k` e-values are at least
+`m / (α k)` is at most `k*`. -/
 lemma le_ebhK (q : ι → ℝ≥0∞) {k : ℕ} (hk : k ≤ Fintype.card ι) (h : k ≤ ebhCount α q k) :
     k ≤ ebhK α q := by
   have h1 : k = (fun k => if k ≤ ebhCount α q k then k else 0) k := by simp [h]
@@ -142,6 +154,8 @@ lemma ebhCount_mono (q : ι → ℝ≥0∞) {k l : ℕ} (hkl : k ≤ l) :
   have : (k : ℝ≥0∞) ≤ l := by exact_mod_cast hkl
   gcongr
 
+/-- The number of e-BH rejections is the number of e-values at least `m / (α k*)` (by
+definition). -/
 lemma card_ebhReject_eq_ebhCount (q : ι → ℝ≥0∞) :
     (ebhReject α q).card = ebhCount α q (ebhK α q) := rfl
 

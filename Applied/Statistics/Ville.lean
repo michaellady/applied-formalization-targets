@@ -34,6 +34,12 @@ Mathlib has Doob's maximal inequality for non-negative *sub*martingales
 (`MeasureTheory.maximal_ineq`); the supermartingale inequality here is derived from the
 optional stopping theorem `MeasureTheory.Submartingale.expected_stoppedValue_mono` applied to
 `-M`.
+
+## Relation to other files and scope
+
+`EValues.lean` supplies `IsEValue`; `SPRT.lean` applies `ville` to the likelihood-ratio
+supermartingale. Not here: continuous time, e-processes that are not supermartingales,
+confidence sequences, and stopping times that may be infinite (for the e-value statements).
 -/
 
 open MeasureTheory Filter

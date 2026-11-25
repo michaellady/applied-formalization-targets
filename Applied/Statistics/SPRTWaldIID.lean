@@ -16,6 +16,13 @@ to `P₀` on `F n` (`wald_density_iid`), so the abstract hypotheses `WaldSetup` 
 The assumption `p₀ > 0` everywhere is relaxed at the end of the file to
 `∀ᵐ x ∂ν, 0 < p₁ x → 0 < p₀ x` (`wald_density_iid_of_ac`, `waldSetup_iid_of_ac`,
 `sprt_alpha_le_iid_of_ac`, `sprt_beta_le_iid_of_ac`).
+
+## Relation to other files and scope
+
+Combines `SPRTWald.lean` (the abstract bounds) with the likelihood-ratio process of
+`SPRT.lean`. Not here: that the SPRT exit time "first `n` with `Λ n ∉ (B, A)`" is a stopping
+time of `obsFiltration` and is almost surely finite (the theorems take an arbitrary stopping
+time and keep `τ < ∞` inside the events), Wald's approximations, and expected sample sizes.
 -/
 
 open MeasureTheory ProbabilityTheory
@@ -32,10 +39,12 @@ def obsVec (X : ℕ → Ω → E) (n : ℕ) (ω : Ω) : Fin n → E := fun i => 
 def obsFiltration (X : ℕ → Ω → E) (n : ℕ) : MeasurableSpace Ω :=
   MeasurableSpace.comap (obsVec X n) inferInstance
 
+/-- The vector of the first `n` observations is measurable. -/
 lemma measurable_obsVec {X : ℕ → Ω → E} (hX : ∀ i, Measurable (X i)) (n : ℕ) :
     Measurable (obsVec X n) :=
   measurable_pi_iff.mpr fun i => hX i
 
+/-- The information in the first `n` observations is a sub-σ-algebra of the ambient one. -/
 lemma obsFiltration_le {X : ℕ → Ω → E} (hX : ∀ i, Measurable (X i)) (n : ℕ) :
     obsFiltration X n ≤ m0 :=
   (measurable_obsVec hX n).comap_le
@@ -43,6 +52,7 @@ lemma obsFiltration_le {X : ℕ → Ω → E} (hX : ∀ i, Measurable (X i)) (n 
 variable {p₀ p₁ : E → ℝ} {ν : Measure E} {P₀ P₁ : Measure Ω} {X : ℕ → Ω → E}
 
 omit [MeasurableSpace E] in
+/-- The likelihood-ratio process at time `n` is a function of the first `n` observations. -/
 lemma likelihoodRatioProcess_eq_comp (n : ℕ) :
     likelihoodRatioProcess p₀ p₁ X n =
       (fun v : Fin n → E => ∏ i : Fin n, p₁ (v i) / p₀ (v i)) ∘ obsVec X n := by
@@ -50,6 +60,8 @@ lemma likelihoodRatioProcess_eq_comp (n : ℕ) :
   rw [likelihoodRatioProcess_apply, Function.comp_apply]
   exact (Fin.prod_univ_eq_prod_range (fun i => p₁ (X i ω) / p₀ (X i ω)) n).symm
 
+/-- The likelihood-ratio process at time `n` is measurable with respect to the first `n`
+observations. -/
 lemma measurable_obsFiltration_likelihoodRatioProcess (hm₀ : Measurable p₀)
     (hm₁ : Measurable p₁) (n : ℕ) :
     Measurable[obsFiltration X n] (likelihoodRatioProcess p₀ p₁ X n) := by

@@ -19,6 +19,13 @@ under every `P θ`. Estimators are square integrable under every `P θ`.
 
 The proof: `U - E[V | m]` is `m`-measurable with mean zero under every `θ`, hence zero almost
 surely by completeness, and `Var(E[V | m]) ≤ Var(V)` by Rao–Blackwell.
+
+## Relation to other files and scope
+
+Builds on `RaoBlackwell.lean`. Sufficiency is not a hypothesis on `m`: only its consequence
+`HasCommonCondExp` for the competitor is assumed (`FisherNeyman.lean` treats sufficiency on a
+finite sample space, without a formal link to this file). Not here: completeness of concrete
+families (e.g. exponential families), bounded completeness, Basu's theorem.
 -/
 
 open MeasureTheory ProbabilityTheory
