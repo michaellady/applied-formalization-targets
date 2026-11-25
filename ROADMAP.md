@@ -18,7 +18,7 @@ assumptions hold in practice, so every target states its assumptions in plain la
 | 2 | Bonferroni, Holm (arbitrary dependence) | 1 | done |
 | 3 | Closed testing principle; Holm is the closed Bonferroni test | 1 | done |
 | 4 | Weighted Bonferroni; fixed-sequence testing | 1 | done |
-| 5 | False discovery rate (FDR); Benjamini–Hochberg under independence | 1, independence | in progress |
+| 5 | False discovery rate (FDR); Benjamini–Hochberg under independence | 1, independence | done |
 | 6 | Benjamini–Yekutieli (arbitrary dependence) | 5 | todo |
 | 7 | Šidák correction (independent p-values) | 1, independence | todo |
 | 8 | Fallback and graphical procedures (Bretz et al. 2009) | 3, 4 | todo |
