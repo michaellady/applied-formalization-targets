@@ -683,4 +683,114 @@ end RelayCode
 
 end MACCut
 
+/-! ### Concavity of the two cuts in the input law -/
+
+section Concavity
+
+variable {ι : Type*} [Fintype ι]
+
+/-- **Concavity of entropy.** For weights `w ≥ 0` summing to `1` and nonnegative `q i`,
+`∑ᵢ wᵢ H(qᵢ) ≤ H(∑ᵢ wᵢ qᵢ)`. -/
+theorem entropy_concave {Z : Type*} [Fintype Z] (w : ι → ℝ) (hw0 : ∀ i, 0 ≤ w i)
+    (hw1 : ∑ i, w i = 1) (q : ι → Z → ℝ) (hq : ∀ i z, 0 ≤ q i z) :
+    ∑ i, w i * entropy (q i) ≤ entropy (fun z => ∑ i, w i * q i z) := by
+  unfold entropy
+  simp only [Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_le_sum fun z _ => ?_
+  have := concaveOn_negMulLog.le_map_sum (t := univ) (w := w) (p := fun i => q i z)
+    (fun i _ => hw0 i) hw1 (fun i _ => Set.mem_Ici.mpr (hq i z))
+  simpa only [smul_eq_mul] using this
+
+/-- **Concavity of conditional entropy** in the joint mass function (`condEntropy P` is
+`H(A | B)` for `P : A → B → ℝ`). For nonnegative weights and nonnegative `P i`,
+`∑ᵢ wᵢ H_{Pᵢ}(A | B) ≤ H_{∑ wᵢ Pᵢ}(A | B)`. -/
+theorem condEntropy_concave {A B : Type*} [Fintype A] [Fintype B] (w : ι → ℝ)
+    (hw0 : ∀ i, 0 ≤ w i) (P : ι → A → B → ℝ) (hP : ∀ i a b, 0 ≤ P i a b) :
+    ∑ i, w i * condEntropy (P i) ≤ condEntropy (fun a b => ∑ i, w i * P i a b) := by
+  unfold condEntropy
+  simp only [Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_le_sum fun b _ => ?_
+  rw [Finset.sum_comm]
+  refine Finset.sum_le_sum fun a _ => ?_
+  set s : ι → ℝ := fun i => ∑ a', P i a' b with hs
+  have hsum_s : ∑ a', ∑ i, w i * P i a' b = ∑ i, w i * s i := by
+    rw [Finset.sum_comm]
+    simp only [hs, Finset.mul_sum]
+  rw [hsum_s]
+  have hle : ∀ i, P i a b ≤ s i := fun i =>
+    Finset.single_le_sum (f := fun a' => P i a' b) (fun a' _ => hP i a' b) (mem_univ a)
+  have h := log_sum_inequality univ (fun i => w i * P i a b) (fun i => w i * s i)
+    (fun i _ => mul_nonneg (hw0 i) (hP i a b))
+    (fun i _ => mul_nonneg (hw0 i) ((hP i a b).trans (hle i)))
+    (fun i _ h0 => by
+      rcases mul_eq_zero.mp h0 with h | h
+      · rw [h, zero_mul]
+      · rw [le_antisymm (h ▸ hle i) (hP i a b), mul_zero])
+  have hflip : ∀ x y : ℝ, x * log (y / x) = -(x * log (x / y)) := fun x y => by
+    rw [← inv_div, log_inv]; ring
+  rw [hflip]
+  simp only [hflip, mul_neg, Finset.sum_neg_distrib]
+  refine neg_le_neg (h.trans (le_of_eq (Finset.sum_congr rfl fun i _ => ?_)))
+  by_cases hw : w i = 0
+  · simp [hw]
+  · rw [mul_div_mul_left _ _ hw]
+    simp only [hs]
+    ring
+
+variable {X X₁ Y Y₁ : Type*} [Fintype X] [Fintype X₁] [Fintype Y] [Fintype Y₁]
+
+/-- **Concavity of the multiple-access cut** `I(X, X₁; Y)` in the input law. -/
+theorem cutMAC_concave {W : X × X₁ → Y × Y₁ → ℝ} (hW : IsChannel W) (w : ι → ℝ)
+    (hw0 : ∀ i, 0 ≤ w i) (hw1 : ∑ i, w i = 1) (p : ι → X × X₁ → ℝ) (hp : ∀ i a, 0 ≤ p i a) :
+    ∑ i, w i * cutMAC W (p i) ≤ cutMAC W (fun a => ∑ i, w i * p i a) := by
+  have hV := isChannel_relayRecv (Y₁ := Y₁) hW
+  have hp' : ∀ a, 0 ≤ ∑ i, w i * p i a := fun a =>
+    Finset.sum_nonneg fun i _ => mul_nonneg (hw0 i) (hp i a)
+  unfold cutMAC
+  rw [mutualInfo_joint_eq _ _ hp' hV]
+  simp only [mutualInfo_joint_eq _ _ (hp _) hV, mul_sub, Finset.sum_sub_distrib]
+  have hout : outputDist (fun a => ∑ i, w i * p i a) (relayRecv W)
+      = fun y => ∑ i, w i * outputDist (p i) (relayRecv W) y := by
+    funext y
+    unfold outputDist
+    simp only [Finset.sum_mul, Finset.mul_sum]
+    rw [Finset.sum_comm]
+    exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun a _ => by ring
+  have hlin : ∑ a, (∑ i, w i * p i a) * entropy (relayRecv W a)
+      = ∑ i, w i * ∑ a, p i a * entropy (relayRecv W a) := by
+    simp only [Finset.sum_mul, Finset.mul_sum]
+    rw [Finset.sum_comm]
+    exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun a _ => by ring
+  rw [hout, hlin]
+  have := entropy_concave w hw0 hw1 (fun i => outputDist (p i) (relayRecv W))
+    (fun i y => outputDist_nonneg (hp i) hV y)
+  linarith
+
+/-- **Concavity of the broadcast cut** `I(X; Y, Y₁ | X₁)` in the input law. -/
+theorem cutBC_concave {W : X × X₁ → Y × Y₁ → ℝ} (hW : IsChannel W) (w : ι → ℝ)
+    (hw0 : ∀ i, 0 ≤ w i) (p : ι → X × X₁ → ℝ) (hp : ∀ i a, 0 ≤ p i a) :
+    ∑ i, w i * cutBC W (p i) ≤ cutBC W (fun a => ∑ i, w i * p i a) := by
+  unfold cutBC
+  simp only [mul_sub, Finset.sum_sub_distrib]
+  have hJ : (fun w' x₁ => relayJointX1 W (fun a => ∑ i, w i * p i a) x₁ w')
+      = fun w' x₁ => ∑ i, w i * relayJointX1 W (p i) x₁ w' := by
+    funext w' x₁
+    unfold relayJointX1
+    simp only [Finset.sum_mul, Finset.mul_sum]
+    rw [Finset.sum_comm]
+    exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun x _ => by ring
+  have hlin : ∑ a, (∑ i, w i * p i a) * entropy (W a)
+      = ∑ i, w i * ∑ a, p i a * entropy (W a) := by
+    simp only [Finset.sum_mul, Finset.mul_sum]
+    rw [Finset.sum_comm]
+    exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun a _ => by ring
+  rw [hJ, hlin]
+  have := condEntropy_concave w hw0 (fun i w' x₁ => relayJointX1 W (p i) x₁ w')
+    (fun i w' x₁ => relayJointX1_nonneg hW (hp i) x₁ w')
+  linarith
+
+end Concavity
+
 end Applied.InformationTheory
