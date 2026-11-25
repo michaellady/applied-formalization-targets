@@ -24,8 +24,12 @@ bounded quantities are not trivially zero.
 * **The graphical bound is attained.** In the coin model with the fixed-sequence graph on two
   hypotheses at level `1/2`, the graphical procedure has family-wise error rate exactly `1/2`
   (`fwer_graphical_coin_eq`).
-* **Worked example (Bretz, Maurer, Brannath, Posch 2009).** Two primary and two secondary
-  hypotheses, weights `(1/2, 1/2, 0, 0)`, `p = (0.01, 0.005, 0.1, 0.5)`, `α = 0.025`:
+* **Worked example.** The graph is the two-primary, two-secondary graph of Bretz, Maurer,
+  Brannath and Posch (2009); the p-values are those of the example in Bretz, Posch, Glimm,
+  Klinglmueller, Maurer and Rohmeyer, Biometrical J. 53 (2011), Example 1 and Figure 3, which
+  states that `H₁` and `H₂` are rejected and nothing else. Weights `(1/2, 1/2, 0, 0)`,
+  `p = (0.01, 0.005, 0.1, 0.5)`, `α = 0.025` (the level is our choice; `0.05` gives the same
+  decisions):
   Algorithm 1 rejects `H₂`, then `H₁`, and stops; the updated weights and transition matrices
   are computed (`bretz_update_one`, `bretz_update_two`), and the closed test rejects exactly
   `{H₁, H₂}` (`bretz_closedTest`).
@@ -235,7 +239,7 @@ theorem fwer_graphical_coin_eq :
     exact (hstep.subset_closedTest (by norm_num) (monotoneWeights_graphWeights _) coinp ω)
       (mem_insert_self _ _)
 
-/-! ### The worked example of Bretz, Maurer, Brannath and Posch (2009) -/
+/-! ### A worked example (graph of Bretz et al. 2009, p-values of Bretz et al. 2011) -/
 
 /-- Initial weights: the level is split between the two primary hypotheses. -/
 noncomputable def bretzW : Fin 4 → ℝ := ![1 / 2, 1 / 2, 0, 0]
