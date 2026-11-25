@@ -7,12 +7,13 @@ import Applied.InformationTheory.RunCap
 A run-length code. Fix `L` and `C ≥ 2`. An information bit `v` is sent as a block of two runs:
 `0^(L+1) 1^(C(L+1))` if `v = 0` and `0^(C(L+1)) 1^(L+1)` if `v = 1`. The codeword of
 `u ∈ {0,1}^t` is the concatenation of its `t` blocks, padded with zeros to the block length
-`n`. The receiver applies `runCap L` to the received word (every run becomes one letter, or
-two if the run has at least `L + 2` letters). On the codeword this gives the "virtual word"
-`virtEnc` of length `3t (+ ≤ 2)`, block `0 11` or `00 1`; by monotonicity of `runCap` the
-capped received word is a subsequence of the virtual word of the codeword, and by a Chernoff
-bound over the independent blocks it has, with high probability, at least `3t - t/8` letters.
-The supersequence count then bounds the number of candidates compatible with it.
+`n`. The decoder is the subsequence decoder of `exists_deletion_code`. The analysis applies
+`runCap L` to the received word (every run becomes one letter, or two if the run has at least
+`L + 2` letters). On a codeword this gives the "virtual word" `virtEnc` of length
+`3t (+ ≤ 2)`, block `0 11` or `00 1`; by monotonicity of `runCap` the capped received word is a
+subsequence of the virtual word of every codeword that can produce it, and by a Chernoff bound
+over the independent blocks it has, with high probability, at least `3t - t/8` letters. The
+supersequence count then bounds the number of candidates compatible with it.
 
 * `delExp_runBlock_bad`: the probability that a block is damaged is at most
   `blockBad d L C lam = d^(L+1) + lam^(-(L+1)) (d + (1-d) lam)^(C(L+1))`, for `0 < lam ≤ 1`.
@@ -20,6 +21,7 @@ The supersequence count then bounds the number of candidates compatible with it.
   `log 2 / (8 (C+1) (L+1))` is achievable over the deletion channel.
 * `exists_blockBad_le`: for every `0 ≤ d < 1` such `L`, `C`, `lam` exist.
 * `deletionCapacity_pos`: `0 < deletionCapacity d` for every `0 ≤ d < 1`.
+* `deletionCapacity_half_ge`: `log 2 / 528 ≤ deletionCapacity (1/2)`.
 -/
 
 open Finset Real
@@ -558,5 +560,17 @@ theorem le_deletionCapacity_runLength {d : ℝ} (h0 : 0 ≤ d) (h1 : d ≤ 1) {L
     log 2 / (8 * (((C : ℝ) + 1) * ((L : ℝ) + 1))) ≤ deletionCapacity d :=
   le_opCapacity (isStochastic_deletionChannel h0 h1)
     (achievable_deletionChannel_runLength h0 h1 hC hl0 hl1 hbad)
+
+/-- A numerical instance: at deletion probability `1/2`, where the classical bound
+`log 2 - h(d)` vanishes, the capacity is at least `log 2 / 528` nats per input bit
+(`L = 10`, `C = 5`, `lam = 1/2`). -/
+theorem deletionCapacity_half_ge : log 2 / 528 ≤ deletionCapacity (1 / 2) := by
+  have hbad : blockBad (1 / 2) 10 5 (1 / 2) ≤ 1 / 1000 := by
+    unfold blockBad; norm_num
+  have h := le_deletionCapacity_runLength (d := 1 / 2) (by norm_num) (by norm_num)
+    (L := 10) (C := 5) (by norm_num) (lam := 1 / 2) (by norm_num) (by norm_num) hbad
+  have e : log 2 / (8 * ((((5 : ℕ) : ℝ) + 1) * (((10 : ℕ) : ℝ) + 1))) = log 2 / 528 := by
+    norm_num
+  rwa [e] at h
 
 end Applied.InformationTheory
