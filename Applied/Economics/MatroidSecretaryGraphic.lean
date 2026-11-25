@@ -5,7 +5,44 @@ import Mathlib.Combinatorics.SimpleGraph.Finite
 /-!
 # The matroid secretary problem for graphic matroids
 
-Test file (being developed).
+Everything uses the model of `Applied/Economics/MatroidSecretary.lean` unchanged.
+
+## Graphic matroids
+
+* `linearMatroid K v`: the matroid on a finite type `E` represented by vectors `v : E → W` over
+  a field `K` (a set is independent iff its vectors are linearly independent, `LinearIndepOn`).
+  The augmentation axiom is proved from `exists_finite_card_le_of_finite_of_linearIndependent_of_span`.
+* A finite multigraph is given by a vertex type `V` and maps `src tgt : E → V` (edge `e` joins
+  `src e` and `tgt e`; parallel edges and loops are allowed; the orientation is irrelevant).
+  `incVec src tgt e = 𝟙_{tgt e} - 𝟙_{src e} ∈ ℚ^V` is the signed incidence vector, and
+  `graphic src tgt := linearMatroid ℚ (incVec src tgt)` is the column matroid of the signed
+  incidence matrix over `ℚ`, which is the standard representation of the cycle matroid (a set
+  of edges is independent iff it contains no cycle; this equivalence is textbook, e.g. Oxley,
+  *Matroid Theory*, Prop. 5.1.2, and is NOT proved here). Sanity checks proved here: loops are
+  never independent (`src_ne_tgt_of_indep`), two parallel edges are dependent
+  (`graphic_not_indep_pair`), a directed triangle is dependent (`graphic_not_indep_triangle`).
+* `simpleGraphic G`: the graphic matroid of a finite simple graph `G : SimpleGraph V`, ground
+  type `G.edgeSet`.
+
+## The Korula–Pál reduction
+
+* `VertexOrder V = V ≃ Fin |V|`; `head ω e`, `tail ω e`: the later and earlier endpoint of `e`.
+* `graphic_indep_of_injOn_head` (**triangularity**): a set of non-loop edges whose later
+  endpoints are pairwise distinct is independent.
+* `exists_endpoint_injOn` (**Hall**): in an independent set every edge can be assigned one of
+  its endpoints injectively (Hall's theorem, using `|S| ≤ |V(S)|` from linear algebra).
+* `two_mul_card_head_eq`: a given endpoint of a non-loop edge is its later endpoint in exactly
+  half of the vertex orders.
+* `orderMeasure V`: the uniform probability measure on vertex orders.
+* `hasCompetitiveRandomized_graphic_of_partition`: if every partition matroid with capacities
+  one `partitionOne f` (`f : E → V`) has a feasible deterministic `c`-competitive algorithm,
+  then every graphic matroid has a `c/2`-competitive randomized algorithm (random vertex order,
+  partition the non-loop edges by their later endpoint, loops ignored).
+* `partitionSecretaryRule_isCompetitive`: the `⌊nᵢ/e⌋` rule in each block is
+  `1/e`-competitive for `partitionOne f`.
+* `hasCompetitiveRandomized_graphic`, `hasCompetitiveRandomized_simpleGraphic`: every graphic
+  matroid of a finite multigraph (resp. simple graph) has a `1/(2e)`-competitive randomized
+  online algorithm.
 -/
 
 open Finset Function
