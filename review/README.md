@@ -134,3 +134,16 @@ found in those repositories. In short:
   perceptron bound, Shapley uniqueness, Bondareva–Shapley, both welfare theorems, the regular
   posted-price case, Fisher–Neyman (discrete) and Lehmann–Scheffé. Some of these contradict
   `NOVELTY.md`, which is out of date on those points.
+
+
+## Updates since these packets were written
+
+The packets were written against commit `fbba0ff`. Later batches changed some of the mismatch notes above:
+
+- **Hochberg ties / sorted formulas (note 3):** now proved in Lean. `hochbergSorted_eq_hochberg`, `holmSorted_eq_holm` and `bhSorted_eq_bhReject` in `Applied/Statistics/SortedProcedures.lean` show the definitions equal the sorted textbook rules, independent of tie order. The adjusted-p-value sorted formulas are still unproved.
+- **Simes (packet A):** the Simes identity `P(reject) = α` under independence is now proved for every m (`measure_one_le_bhK_eq`, `Applied/Statistics/SimesExact.lean`), along with exact BH FDR `= α·m₀/m` and exact Šidák FWER `= α` under the global null.
+- **Graphical instances (packet B):** Holm and fallback are proved to be exact instances of the graphical approach; fixed-sequence equals its graph when all p-values are positive (`Applied/Statistics/GraphicalInstances.lean`). The stale header in `SequentiallyRejective.lean` (note 15) is fixed.
+- **Positive dependence (packet D):** extended to unequal loadings, independent group factors and many-to-one comparisons (`Applied/Statistics/PRDSFactorModels.lean`).
+- **Trifference (note 11):** boundedness of the rate sequence is now proved; log₂√(9/7) ≤ rate ≤ log₂(3/2) (`TrifferenceRate.lean`, `TrifferenceLower.lean`).
+- **Secretary (packet F):** exact success probability and the 1/e bound for every n (`SecretaryOneOverE.lean`; the classical 1/e result has Lean precedents); partition matroids at 1/4 and closure under direct sums and restriction (`MatroidSecretaryDirectSum.lean`).
+- These new results are `statement-review: unreviewed` and are not yet covered by any packet.
