@@ -39,7 +39,8 @@ when `X` is nonempty, so the theorem is vacuous there. The case of exactly two a
 (where majority rule is a non-dictatorial example) is excluded by hypothesis.
 
 Not covered: weak-order preferences, infinitely many voters (where non-principal ultrafilters
-give non-dictatorial rules), the Gibbard–Satterthwaite is in `Targets/Economics/GibbardSatterthwaite.lean`.
+give non-dictatorial rules). The Gibbard–Satterthwaite theorem, derived from this one, is in
+`Targets/Economics/GibbardSatterthwaite.lean`.
 -/
 
 namespace Targets.Economics
