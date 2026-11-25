@@ -21,7 +21,7 @@ States: **done** (all three points), **partial** (statement plus some proved con
 |---|---|---|
 | Rungs 1–7, 9, 12 | done | — |
 | 8. Graphical procedures | done | Weighted Simes and parametric variants |
-| 10. Positive dependence | partial | Independent, comonotone and one-factor normal cases proved; general non-negatively correlated normals missing |
+| 10. Positive dependence | partial | Independent, comonotone and one-factor normal cases proved, with an end-to-end Benjamini–Hochberg theorem for equicorrelated z-tests; general non-negatively correlated normals missing |
 | 11. Group-sequential designs | partial | Covariances and independent increments proved; joint normal law and boundary computation missing |
 | 13. Simes and Benjamini–Hochberg for two-sided normal tests | partial | The conjectures themselves |
 
@@ -33,27 +33,29 @@ States: **done** (all three points), **partial** (statement plus some proved con
 | 138 | Binary Gilbert–Varshamov tightness | partial | Gilbert–Varshamov bound in finite and rate form; Hamming, Singleton, Plotkin bounds |
 | 260 | Sample compression conjecture | stated | Definition is satisfiable |
 | 343 | Matroid secretary conjecture | partial | Stated; `1/n`-competitive for every matroid; `1/4`-competitive for rank one (classical secretary) |
-| 136 | Polynomial pivot rule for simplex | todo | Needs a usable formal model of polynomial-time computation first |
+| 136 | Polynomial pivot rule for simplex | partial | Stated (with a polynomial-time requirement on the rule, and variants); finite termination on nondegenerate programs proved; polynomial Hirsch conjecture also stated |
 | 342 | Li–Li network coding conjecture | partial | Routing side only (fractional multicommodity flow, convexity). The conjecture itself is NOT stated: no network-coding rate region is defined |
-| 94 | Strongly polynomial linear programming | todo | Needs a usable formal model of polynomial-time computation first |
-| 223 | Semidefinite feasibility in polynomial time | todo | Needs a usable formal model of polynomial-time computation first |
+| 94 | Strongly polynomial linear programming | todo | Not stated: needs an arithmetic machine model (real RAM or BSS); see `Applied/Complexity/NotYetStated.lean` |
+| 223 | Semidefinite feasibility in polynomial time | stated | Stated on Mathlib's Turing-machine model with an explicit encoding; nothing proved about it beyond trivial cases |
 | 207 | Capacity of the binary deletion channel | partial | Stated as a defined quantity; `0 ≤ C(d) ≤ log 2`, `C(0) = log 2`, `C(1) = 0` |
 | 155 | Capacity of the relay channel | stated | Defined with causal relay codes; `0 ≤ C ≤ log |X|` |
 | 390 | Capacity region of 3-receiver broadcast channels | stated | Region defined (private messages only); unclear whether the ranked problem means this general setting |
 | 229 | Reliability function of the binary symmetric channel | partial | Defined; shown non-negative and bounded; the exact open range of rates needs checking |
 | 325 | Computability of Shannon capacity of graphs | partial | Shannon capacity defined; `Θ(C₅) ≥ √5`, `3 ≤ Θ(C₇) ≤ 7`; the value of `Θ(C₇)` stated as open. Computability itself not stated |
 | 226 | Constant-query locally decodable codes | partial | Stated; the Hadamard code is proved to be a 2-query locally decodable code |
-| 204 | PAC learning of DNF in polynomial time | todo | Needs a usable formal model of polynomial-time computation first |
-| 131 | Planted clique conjecture | todo | Needs a usable formal model of polynomial-time computation first |
-| 232 | Classical worst-case reduction for LWE | todo | Needs a usable formal model of polynomial-time computation first |
-| 286 | Worst-case to average-case reduction for LPN | todo | Needs a usable formal model of polynomial-time computation first |
+| 204 | PAC learning of DNF in polynomial time | todo | Not stated: needs machine-readable hypotheses and a pinned access model; see `NotYetStated.lean` |
+| 131 | Planted clique conjecture | stated | Detection form with vanishing advantage; which form the ranking intends is unconfirmed |
+| 232 | Classical worst-case reduction for LWE | todo | Not stated: needs lattice promise problems, discrete Gaussians and oracle reductions; see `NotYetStated.lean` |
+| 286 | Worst-case to average-case reduction for LPN | todo | Not stated: needs oracle reductions and a canonical worst-case problem; see `NotYetStated.lean` |
 | 422 | Witsenhausen counterexample | todo | |
 | 406 | Uniform ε-equilibrium in stochastic games | stated | Definitions and a sanity lemma only; fidelity of the definition needs review |
 | 233 | Quantum capacity of the depolarizing channel | todo | Needs channel capacity definitions first |
 | 315 | Good quantum locally testable codes | todo | |
 
-Seven of these are questions about polynomial-time algorithms; they cannot be stated
-faithfully until a usable model of polynomial-time computation exists in Lean.
+Seven of these are questions about polynomial-time algorithms. Mathlib has a Turing-machine
+notion of polynomial time, on which three are now stated. It has no machine constructions
+beyond the identity, so no non-trivial language is provably in P here. The other four need
+models Mathlib lacks; `Applied/Complexity/NotYetStated.lean` lists exactly what.
 
 The channel-capacity foundations now exist for single-user channels with finite alphabets
 (entropy, mutual information, information capacity, capacity of the binary symmetric and
