@@ -23,8 +23,8 @@ assumptions hold in practice, so every target states its assumptions in plain la
 | 7 | Šidák correction (independent p-values) | proved | — |
 | 8 | Closed weighted Bonferroni tests; sequentially rejective shortcut; the graphical approach, with order independence | proved | Weighted Simes and parametric local tests; adjusted p-values of graphical procedures |
 | 9 | Simes inequality, Hommel, Hochberg (independence) | proved | — |
-| 10 | Benjamini–Hochberg, Simes, Hommel, Hochberg under positive dependence; independence and comonotone families satisfy the condition | proved | Positively correlated normals with correlation strictly between 0 and 1 |
-| 11 | Group-sequential designs: alpha-spending principle | proved | Joint normal law of interim statistics; boundaries achieving a spending function |
+| 10 | Benjamini–Hochberg, Simes, Hommel, Hochberg under positive dependence; independence and comonotone families satisfy the condition | proved | A general non-negatively correlated normal vector that is not of one-factor form (the one-factor model is proved) |
+| 11 | Group-sequential designs: alpha-spending principle | proved | Joint multivariate normality as a law; boundaries achieving a spending function (marginals, covariances and independent increments are proved) |
 | 12 | Split conformal prediction: finite-sample coverage | proved | Upper bound on coverage without ties; full and cross-conformal methods |
 | 13 | Open problems stated in Lean, with partial results | stated | Any progress on the conjectures themselves (validity of the p-values and the independent case are proved) |
 
@@ -45,7 +45,6 @@ rung 10. The open content is the gap between arbitrary correlation and that cond
 
 ## Next steps, in order
 
-1. One-sided tests of positively correlated normals satisfy the rung-10 condition.
 3. First applied open problems from the ProofAtlas list (see `BACKLOG.md`): sample
    compression, trifference, matroid secretary.
 4. Statement review of every target against its source.

@@ -35,10 +35,9 @@ implication is not formalized here. Every theorem named "under PRDS" or "of_prds
 project is proved under this form. In particular the facts above are about this form and are
 not claimed for the classical definition.
 
-Not covered: jointly normal test statistics with correlations strictly between zero and one
-(for example the equicorrelated model `Zᵢ = √ρ W + √(1-ρ) εᵢ`), which is the main case of
-interest in the cited paper. Only the two extremes (independence, and one common statistic)
-and their combination over independent blocks are proved.
+The one-factor (equicorrelated) normal model with any correlation in `[0, 1]` is covered in
+`Targets/Statistics/PRDSCommonFactor.lean`. Not covered: a general jointly normal vector with
+non-negative correlations that is not of one-factor form.
 -/
 
 namespace Targets.Statistics

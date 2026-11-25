@@ -21,8 +21,8 @@ States: **done** (all three points), **partial** (statement plus some proved con
 |---|---|---|
 | Rungs 1–7, 9, 12 | done | — |
 | 8. Graphical procedures | done | Weighted Simes and parametric variants |
-| 10. Positive dependence | partial | Independent and comonotone cases proved; positively correlated normals (correlation strictly between 0 and 1) still missing |
-| 11. Group-sequential designs | partial | Joint normal law of interim statistics; boundary computation |
+| 10. Positive dependence | partial | Independent, comonotone and one-factor normal cases proved; general non-negatively correlated normals missing |
+| 11. Group-sequential designs | partial | Covariances and independent increments proved; joint normal law and boundary computation missing |
 | 13. Simes and Benjamini–Hochberg for two-sided normal tests | partial | The conjectures themselves |
 
 ## B. Applied open problems (ProofAtlas Top 500, edition 12 Nov 2026)
@@ -124,6 +124,7 @@ channels are still missing.
 | Bondareva–Shapley | done | — |
 | Compressed sensing: null space property and restricted isometry | done | Optimal constants |
 | Proximal gradient (ISTA) rate; tuned Hedge bound; Massart's lemma; discrete sampling theorem | done | Rademacher generalization bound; reconstruction formula |
+| Ville's inequality and anytime-valid tests; sequential probability ratio test error bound | done | Type-II bound; expected sample size |
 | Remaining backlog entries (about 3) | todo | Not yet stated |
 
 ## Prior art
