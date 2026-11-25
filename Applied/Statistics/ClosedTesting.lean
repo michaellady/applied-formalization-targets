@@ -3,13 +3,46 @@ import Applied.Statistics.MultipleTesting
 /-!
 # Closed testing, weighted Bonferroni and fixed-sequence testing
 
-* `closedTest φ`: the closed testing procedure built from local tests `φ I` of the intersection
-  hypotheses. `fwer_closedTest_le`: it controls FWER as soon as the local test of the true
-  intersection hypothesis has level `α` (Marcus, Peritz and Gabriel 1976).
-* `holm_eq_closedTest`: Holm's procedure is exactly the closed test built from Bonferroni
-  local tests.
-* `fwer_weightedBonferroni_le`: weighted Bonferroni.
-* `fwer_fixedSequence_le`: testing in a pre-specified order at full level `α`.
+Notation as in `Applied.Statistics.MultipleTesting`: `p i` are the p-values, `H₀` the set of
+true nulls, `fwer P H₀ R` the family-wise error rate of the rejection rule `R`.
+
+For a set `I` of hypotheses, the *intersection hypothesis* `H_I` says that all hypotheses in `I`
+are true. A *local test* `φ I : Ω → Prop` is a test of `H_I` (`φ I ω` means: rejected on the
+data `ω`).
+
+## Main definitions
+
+* `closedTest φ`: the closed testing procedure. Hypothesis `i` is rejected when every
+  intersection hypothesis `I ∋ i` is rejected by its local test.
+* `bonferroniLocal α p I`: the Bonferroni local test, `min_{i ∈ I} p i ≤ α / |I|`.
+* `weightedBonferroni α w p`: reject `i` when `p i ≤ w i * α`.
+* `fixedSequence α p`: for hypotheses in a fixed order, reject `i` when `p j ≤ α` for all
+  `j ≤ i`.
+
+## Main results
+
+* `fwer_closedTest_le`: the **closed testing principle** (Marcus, Peritz and Gabriel 1976). The
+  closed test has FWER at most `α` as soon as the local test of the *true* intersection
+  hypothesis `H₀` has level `α`. Nothing is required of the other local tests.
+* `holm_eq_closedTest`: **Holm's procedure is the closed test built from Bonferroni local
+  tests** (for `α ≥ 0`).
+* `fwer_weightedBonferroni_le`: weighted Bonferroni controls FWER when the weights are
+  non-negative with sum at most one.
+* `fwer_fixedSequence_le`: fixed-sequence testing controls FWER at the full level `α`.
+
+## Where to go next
+
+* `Simes`: Simes local tests give Hommel's procedure, and Hochberg's step-up procedure is
+  contained in it.
+* `SequentiallyRejective`, `Shortcuts`, `GraphicalApproach`: closed tests with *weighted*
+  Bonferroni local tests and their shortcuts (fallback, graphical approach).
+* `HommelAdjusted`: adjusted p-values of a closed test.
+
+## Not in this file
+
+Consonance and general shortcut theory; closed tests are evaluated over all `2^m - 1`
+intersection hypotheses by definition, and efficient shortcuts are proved case by case in the
+files above.
 -/
 
 open MeasureTheory
@@ -55,18 +88,7 @@ theorem holm_eq_closedTest (α : ℝ) (hα : 0 ≤ α) (p : ι → Ω → ℝ) (
     intro h I hiI
     obtain ⟨j, hj, hjmin⟩ := Finset.exists_min_image I (fun j => p j ω) ⟨i, hiI⟩
     refine ⟨j, hj, (h j (hjmin i hiI)).trans ?_⟩
-    set B := Finset.univ.filter fun l => p l ω < p j ω
-    have hdisj : Disjoint B I := by
-      rw [Finset.disjoint_left]
-      intro l hl hlI
-      exact absurd (hjmin l hlI) (not_le.mpr (Finset.mem_filter.mp hl).2)
-    have hcard : B.card + I.card ≤ Fintype.card ι := by
-      rw [← Finset.card_union_of_disjoint hdisj]
-      exact Finset.card_le_univ _
-    have hcardR : (I.card : ℝ) ≤ (Fintype.card ι : ℝ) - B.card := by
-      have : ((B.card + I.card : ℕ) : ℝ) ≤ Fintype.card ι := by exact_mod_cast hcard
-      push_cast at this
-      linarith
+    have hcardR := card_le_card_sub_card_lt (fun l => p l ω) I j hjmin
     have hpos : (0 : ℝ) < I.card := by exact_mod_cast Finset.card_pos.mpr ⟨i, hiI⟩
     exact div_le_div_of_nonneg_left hα hpos hcardR
   · -- the closed test rejects `i`; apply it to `I = {l | p j ≤ p l}`
@@ -90,18 +112,6 @@ theorem holm_eq_closedTest (α : ℝ) (hα : 0 ≤ α) (p : ι → Ω → ℝ) (
 end Closed
 
 section Weighted
-
-/-- Union bound with a separate threshold for each p-value. -/
-theorem measure_exists_le_le' (P : Measure Ω) (p : ι → Ω → ℝ) (H₀ : Finset ι)
-    (hp : ∀ i ∈ H₀, IsValidPValue P (p i)) (c : ι → ℝ) (hc : ∀ i ∈ H₀, 0 ≤ c i) :
-    P {ω | ∃ i ∈ H₀, p i ω ≤ c i} ≤ ENNReal.ofReal (∑ i ∈ H₀, c i) := by
-  have hset : {ω | ∃ i ∈ H₀, p i ω ≤ c i} = ⋃ i ∈ H₀, {ω | p i ω ≤ c i} := by
-    ext ω; simp
-  rw [hset]
-  calc P (⋃ i ∈ H₀, {ω | p i ω ≤ c i}) ≤ ∑ i ∈ H₀, P {ω | p i ω ≤ c i} :=
-        measure_biUnion_finset_le _ _
-    _ ≤ ∑ i ∈ H₀, ENNReal.ofReal (c i) := Finset.sum_le_sum fun i hi => hp i hi (c i) (hc i hi)
-    _ = ENNReal.ofReal (∑ i ∈ H₀, c i) := (ENNReal.ofReal_sum_of_nonneg hc).symm
 
 variable [Fintype ι]
 

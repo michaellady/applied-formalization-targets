@@ -6,7 +6,7 @@ import Applied.Statistics.Simes
 - id: stat-simes-hommel-hochberg
 - area: statistics
 - status: formalized
-- source: R. J. Simes, Biometrika 73 (1986); G. Hommel, Biometrika 75 (1988); Y. Hochberg, Biometrika 75 (1988)
+- source: R. J. Simes, Biometrika 73 (1986); G. Hommel, Biometrika 75 (1988); Y. Hochberg, Biometrika 75 (1988) 800–803
 - used-in: confirmatory clinical trials (Hochberg is a standard multiplicity adjustment for multiple endpoints)
 - prerequisites: Benjamini–Hochberg theorem, closed testing
 - statement-review: unreviewed
@@ -15,6 +15,11 @@ Informal statement. For independent valid p-values under the global null, the ch
 `p₍ₖ₎ ≤ α k / m` for some `k` is at most `α` (Simes). The closed test built from Simes tests
 (Hommel) therefore controls the family-wise error rate, and so does Hochberg's step-up
 procedure, because everything Hochberg rejects Hommel also rejects.
+
+Hommel's procedure is formalized as the closed Simes test (`Applied.MultipleTesting.hommel`:
+`i` is rejected when the Simes test rejects every intersection hypothesis containing `i`),
+which is its standard description. The equivalence with Hommel's 1988 stagewise rule is not
+formalized.
 
 Hochberg's procedure as formalized: reject `i` when some `j` with `pᵢ ≤ pⱼ` satisfies
 `pⱼ ≤ α / (#{l : pⱼ < p_l} + 1)`. This is the textbook rule (largest `k` with
@@ -31,8 +36,8 @@ conservative rule rejects none of them when `x > α / m`.
 
 The Simes inequality is an equality for independent, exactly uniform p-values
 (`Targets/Statistics/SimesIdentity.lean`). All three are proved here under mutual
-independence only. Their validity under positive
-dependence is a later rung of the ladder.
+independence only; their validity under positive dependence is in
+`Targets/Statistics/PositiveDependence.lean`.
 
 Independence hypotheses. `hommel_controls_fwer` and `hochberg_controls_fwer` assume that
 **all** `m` p-values are mutually independent (`iIndepFun p P`). This is more than the
@@ -42,7 +47,11 @@ p-values may depend on anything. That stronger form is
 (hypothesis `iIndepFun (fun j : H₀ => p j) P`), with the Simes local test of the true
 intersection hypothesis in `simes_local_test_level_of_null_independent`. In `simes_inequality`
 every hypothesis is a true null (validity is assumed for all `i`), so there the hypothesis is
-already independence of the true nulls. What remains stronger than necessary: mutual
+already independence of the true nulls. The aliases still assume every p-value measurable;
+the library versions `fwer_hommel_le_of_null_measurable`, `fwer_hochberg_le_of_null_measurable`
+and `measure_simesLocal_le_of_null_measurable` ask for measurability of the true-null p-values
+only, so that nothing at all is assumed about the false nulls. What remains stronger than
+necessary: mutual
 independence of the null p-values is itself only a sufficient condition (weak PRDS among the
 nulls suffices, `Targets/Statistics/PositiveDependence.lean`).
 -/

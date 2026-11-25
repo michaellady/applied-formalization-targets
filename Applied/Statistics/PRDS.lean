@@ -1,23 +1,49 @@
-import Applied.Statistics.BenjaminiHochberg
+import Applied.Statistics.BHMonotone
 import Applied.Statistics.Simes
 
 /-!
 # Benjamini–Hochberg under positive dependence (PRDS)
 
 `IsPRDSOn P p H₀` says that the p-values are positively regression dependent on the true nulls
-`H₀`, in the form used by Blanchard and Roquain (2008): for a true null `i` and an increasing
-set `D` of p-value vectors, the conditional probability of `D` given `p i ≤ t` does not
-decrease in `t`. It is written without division, so no conditioning on null events is needed.
+`H₀`, in the following form: for a true null `i` and an increasing set `D` of p-value vectors,
+the conditional probability of `D` given `p i ≤ t` does not decrease in `t`. It is written
+without division, so no conditioning on null events is needed.
 
-This conditioning-on-`p i ≤ t` form (sometimes called weak PRDS) is not the definition of
-Benjamini and Yekutieli (2001), whose PRDS conditions on `p i = t`. The classical condition
+This is the conditioning-on-`p i ≤ t` consequence of PRDS used in the proofs of Benjamini–Yekutieli and
+Blanchard–Roquain (their condition (7), proof of Prop. 3.6); it is the definition of PRDS in
+Ramdas et al. 2019, Def. 1, sometimes called weak PRDS.
+It is not the definition of Benjamini and Yekutieli (2001) (nor Definition 3.5 of Blanchard and
+Roquain 2008), whose PRDS conditions on `p i = t`. The classical condition
 implies the form used here; that is proved in `Applied/Statistics/ClassicalPRDS.lean`
-(`IsClassicalPRDSOn.isPRDSOn`), which imports this file. All theorems below named "under positive dependence" or
-`_of_prds` are proved under `IsPRDSOn`, i.e. under this form.
+(`IsClassicalPRDSOn.isPRDSOn`), which imports this file. All theorems below named "under
+positive dependence" or `_of_prds` are proved under `IsPRDSOn`, i.e. under this form.
 
-`fdr_bhReject_le_of_prds`: under this condition the Benjamini–Hochberg procedure at level `α`
-has false discovery rate at most `α m₀ / m` (the conclusion of Benjamini and Yekutieli 2001,
-Theorem 1.2, with their dependence hypothesis replaced by `IsPRDSOn`).
+## Main results
+
+* `fdr_bhReject_le_of_prds`: under this condition the Benjamini–Hochberg procedure at level `α`
+  has false discovery rate at most `α m₀ / m` (the conclusion of Benjamini and Yekutieli 2001,
+  Theorem 1.2, with their dependence hypothesis replaced by `IsPRDSOn`).
+* `measure_one_le_bhK_le_of_prds`: the Simes inequality under positive dependence (all
+  hypotheses true nulls).
+* `fwer_hommel_le_of_prds`, `fwer_hochberg_le_of_prds`: Hommel's and Hochberg's procedures
+  control the family-wise error rate when the p-values of the true nulls, as a family on their
+  own, are valid and `IsPRDSOn`.
+
+The proof of the first is the self-consistency argument of Blanchard and Roquain; its algebraic
+core is `prds_core`, and `fdp_bhReject_le_self` is the pointwise bound it starts from.
+
+## Where `IsPRDSOn` comes from
+
+* independence: `PRDSIndependent`; comonotone p-values and independent blocks: `PRDSExamples`;
+* the classical definition: `ClassicalPRDS`; MTP2 densities: `PRDSMTP2`;
+* normal statistics with non-negative covariances (one-sided tests): `PRDSGaussian`;
+* factor models: `PRDSCommonFactor`, `PRDSFactorModels`, `PRDSRankedFactor`;
+* two-sided tests: `TwoSidedOneFactor`, `TwoSidedMTP2`.
+
+## Not in this file
+
+Any criterion for `IsPRDSOn` (see the list above); the weighted Simes test under positive
+dependence (`WeightedSimes`); negative dependence.
 -/
 
 open MeasureTheory Finset
@@ -78,12 +104,9 @@ lemma prds_core (m : ℕ) (c : ℝ) (hc : 0 ≤ c) (a G H : ℕ → ℝ)
 
 variable {ι : Type*} [Fintype ι] {α : ℝ}
 
-/-- Raising p-values can only lower the Benjamini–Hochberg cut-off. -/
-lemma bhK_antitone {q q' : ι → ℝ} (h : q ≤ q') : bhK α q' ≤ bhK α q := by
-  refine le_bhK q (bhK_le q') ((bhK_le_bhCount q').trans ?_)
-  refine Finset.card_le_card fun j hj => ?_
-  rw [mem_filter] at hj ⊢
-  exact ⟨mem_univ _, (h j).trans hj.2⟩
+/-- Raising p-values can only lower the Benjamini–Hochberg cut-off. This is `bhK_anti` of
+`Applied.Statistics.BHMonotone` in unbundled form. -/
+lemma bhK_antitone {q q' : ι → ℝ} (h : q ≤ q') : bhK α q' ≤ bhK α q := bhK_anti α h
 
 variable [DecidableEq ι]
 
@@ -122,7 +145,9 @@ conditioning-on-`p i ≤ t` form and cleared of denominators: for `i ∈ H₀`, 
 measurable set `D` of p-value vectors and `s ≤ t`,
 `P (D, p i ≤ s) * P (p i ≤ t) ≤ P (D, p i ≤ t) * P (p i ≤ s)`.
 
-This is the form of Blanchard and Roquain (2008), sometimes called weak PRDS. It is not
+This is the conditioning-on-`p i ≤ t` consequence of PRDS used in the proofs of Benjamini–Yekutieli and
+Blanchard–Roquain (their condition (7), proof of Prop. 3.6); it is the definition of PRDS in
+Ramdas et al. 2019, Def. 1, sometimes called weak PRDS. It is not
 Benjamini and Yekutieli's PRDS, which conditions on `p i = t`; the classical condition
 implies this one (`IsClassicalPRDSOn.isPRDSOn` in `Applied/Statistics/ClassicalPRDS.lean`). -/
 def IsPRDSOn (P : Measure Ω) (p : ι → Ω → ℝ) (H₀ : Finset ι) : Prop :=

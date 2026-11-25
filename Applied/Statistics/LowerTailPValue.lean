@@ -9,6 +9,10 @@ import Applied.Statistics.PValues
   p-value. Unlike the upper-tail transform `1 - F_μ(X)` of `isValidPValue_upperTail`, this needs
   no continuity assumption, because `F` is right-continuous.
 * `isValidPValue_zTest_lower`: the lower-tailed z-test.
+
+Related: `PValues` (upper-tail and two-sided p-values).
+Not in this file: the matching statement for the upper tail of a discrete statistic (which
+needs `μ [x, ∞)` in place of `1 - F x`), and exact uniformity for continuous `F`.
 -/
 
 open MeasureTheory ProbabilityTheory Set Filter

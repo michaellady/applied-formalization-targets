@@ -21,6 +21,12 @@ procedure rejects `i`. With sorted p-values `p₍₁₎ ≤ … ≤ p₍ₘ₎` 
 The definitions follow the tie convention of `holm` in
 `Applied/Statistics/MultipleTesting.lean`: tied p-values share the multiplier of the first
 position in the tie.
+
+Related: `HolmAdjustedSorted` (the sorted textbook formula), `StepUpAdjusted` (Hochberg and
+Benjamini–Hochberg), `HommelAdjusted` (Hommel).
+Not in this file: any probabilistic statement about adjusted p-values (for instance that an
+adjusted p-value is a valid p-value for an intersection hypothesis); the family-wise error rate
+of `holm` itself is `fwer_holm_le` in `Applied.Statistics.MultipleTesting`.
 -/
 
 open Finset
@@ -34,6 +40,7 @@ strictly below `p j`. -/
 noncomputable def holmFactor (p : ι → Ω → ℝ) (ω : Ω) (j : ι) : ℝ :=
   (Fintype.card ι : ℝ) - (univ.filter fun l => p l ω < p j ω).card
 
+/-- The Holm multiplier is at least one (hypothesis `j` itself is never counted out). -/
 lemma one_le_holmFactor (p : ι → Ω → ℝ) (ω : Ω) (j : ι) : 1 ≤ holmFactor p ω j := by
   classical
   have hsub : (univ.filter fun l => p l ω < p j ω) ⊆ univ.erase j := by
@@ -53,6 +60,7 @@ lemma one_le_holmFactor (p : ι → Ω → ℝ) (ω : Ω) (j : ι) : 1 ≤ holmF
   unfold holmFactor
   linarith
 
+/-- The Holm multiplier is positive. -/
 lemma holmFactor_pos (p : ι → Ω → ℝ) (ω : Ω) (j : ι) : 0 < holmFactor p ω j :=
   zero_lt_one.trans_le (one_le_holmFactor p ω j)
 
@@ -64,6 +72,7 @@ noncomputable def holmAdjusted (p : ι → Ω → ℝ) (ω : Ω) (i : ι) : ℝ 
       ⟨i, mem_filter.mpr ⟨mem_univ i, le_rfl⟩⟩)
     fun j => holmFactor p ω j * p j ω
 
+/-- The adjusted p-value is at most `a` iff every term of the maximum is. -/
 lemma holmAdjusted_le_iff (p : ι → Ω → ℝ) (ω : Ω) (i : ι) (a : ℝ) :
     holmAdjusted p ω i ≤ a ↔ ∀ j, p j ω ≤ p i ω → holmFactor p ω j * p j ω ≤ a := by
   unfold holmAdjusted

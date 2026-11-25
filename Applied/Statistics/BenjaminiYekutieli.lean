@@ -6,8 +6,19 @@ import Applied.Statistics.BenjaminiHochberg
 With no assumption on the dependence between p-values, the Benjamini–Hochberg procedure at
 level `α` has false discovery rate at most `α (m₀ / m) (1 + 1/2 + ⋯ + 1/m)`.
 
+* `byConst m`: the harmonic number `1 + 1/2 + ⋯ + 1/m` (`byConst_eq_harmonic`).
+* `fdr_bhReject_le_of_arbitrary_dependence`: the **Benjamini–Yekutieli theorem** (2001,
+  Theorem 1.3). The only hypotheses are `α ≥ 0`, measurability, and validity of the true-null
+  p-values. Equivalently, running Benjamini–Hochberg at level `α / byConst m` controls the
+  false discovery rate at `α m₀ / m` under any dependence.
+
 The proof bounds each true null's contribution `1 / |R|` by a function of its own p-value
-alone, using `1 / k = ∑_{k ≤ j < m} 1 / (j (j + 1)) + 1 / m`.
+alone (`fdp_bhReject_le_bands`), using `1 / k = ∑_{k ≤ j < m} 1 / (j (j + 1)) + 1 / m`
+(`sum_Ico_inv_mul_succ`, `one_div_le_sum_bands`).
+
+Related: `BenjaminiHochberg` (independence, no harmonic factor), `PRDS` (positive dependence, no
+harmonic factor), `SimesSharp` (the harmonic factor is attained for the Simes test).
+Not here: sharpness of the bound for the false discovery rate when some nulls are false.
 -/
 
 open MeasureTheory Finset
@@ -56,6 +67,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι] {α : ℝ}
 the harmonic number `1 + 1/2 + ⋯ + 1/m` for `m ≥ 1`. -/
 noncomputable def byConst (m : ℕ) : ℝ := ∑ j ∈ Ico 1 m, (1 : ℝ) / (j + 1) + 1
 
+/-- For `m ≥ 1`, `byConst m` is the harmonic number `H_m = 1 + 1/2 + ⋯ + 1/m`. -/
 lemma byConst_eq_harmonic {m : ℕ} (hm : 1 ≤ m) :
     byConst m = ∑ j ∈ range m, (1 : ℝ) / (j + 1) := by
   induction m, hm using Nat.le_induction with

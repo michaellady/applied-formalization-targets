@@ -23,8 +23,10 @@ most its adjustment.
 
 Conventions. Without ties the multiplier of the `l`-th smallest p-value is `m - l + 1`, the
 textbook value. Tied p-values share the multiplier of the first position in the tie, which is
-the tie convention of `Applied.MultipleTesting.holm`; software that breaks ties by position
-reports adjusted p-values that are at most these.
+the tie convention of `Applied.MultipleTesting.holm`. For non-negative p-values this agrees
+exactly with software that sorts the p-values and breaks ties by position: the sorted formula
+gives the same adjusted p-values for every ordering of the ties
+(`Targets/Statistics/HolmAdjustedSorted.lean`).
 
 The textbook sorted formula `max_{j ≤ k} min(1, (m - j + 1) p_(j))` (for non-negative p-values
 and every sorting permutation) is proved in `Targets/Statistics/HolmAdjustedSorted.lean`.

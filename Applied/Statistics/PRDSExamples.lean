@@ -4,8 +4,8 @@ import Applied.Statistics.PRDSIndependent
 # Further families of p-values that are positively regression dependent
 
 `IsPRDSOn P p H₀` is defined in `Applied/Statistics/PRDS.lean`. It is the
-conditioning-on-`p i ≤ t` form of positive regression dependence (Blanchard and Roquain;
-sometimes called weak PRDS), not the definition of Benjamini and Yekutieli, which conditions
+conditioning-on-`p i ≤ t` form of positive regression dependence (the definition of Ramdas et
+al. 2019; sometimes called weak PRDS), not the definition of Benjamini and Yekutieli, which conditions
 on `p i = t`. The classical condition implies this form
 (`Applied/Statistics/ClassicalPRDS.lean`); "positively regression dependent"
 below always means `IsPRDSOn`.

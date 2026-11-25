@@ -18,17 +18,19 @@ version* of the conditional probability is non-decreasing.
   same as: Mathlib's regular conditional distribution `condDistrib p (p i) P x D` is
   non-decreasing in `x` on a measurable set of values `x` of full measure for the law of `p i`.
 * `IsClassicalPRDSOn.isPRDSOn`: the classical condition implies `IsPRDSOn`, the
-  conditioning-on-`p i ≤ t` form (Blanchard and Roquain 2008; sometimes called weak PRDS) used
-  by every "under positive dependence" theorem of this library. This is the standard remark
-  that conditioning on `X i = x` being monotone implies conditioning on `X i ≤ t` being monotone
-  (Lehmann 1966; Blanchard and Roquain 2008). The only hypothesis besides the classical
+  conditioning-on-`p i ≤ t` form (the definition of PRDS in Ramdas, Barber, Wainwright and
+  Jordan 2019, Definition 1; sometimes called weak PRDS) used by every "under positive
+  dependence" theorem of this library. This is the standard remark that conditioning on
+  `X i = x` being monotone implies conditioning on `X i ≤ t` being monotone (Lehmann 1966; it
+  is the step used in the proofs of Benjamini–Yekutieli and of Blanchard and Roquain 2008,
+  condition (7) and the proof of Proposition 3.6). The only hypothesis besides the classical
   condition is that the p-values of `H₀` are almost everywhere measurable; `P` is an arbitrary
   measure.
 
 The key inequality is `setLIntegral_mul_measure_le`: if `g x ≤ g y` whenever `x ∈ A` and `y ∈ B`
 then `(∫_A g) μ(B) ≤ (∫_B g) μ(A)`.
 
-The converse implication is false in general and is not claimed.
+The converse implication is not claimed, and nothing is asserted here about whether it holds.
 -/
 
 open MeasureTheory ProbabilityTheory
@@ -65,6 +67,8 @@ def IsClassicalPRDSOn (P : Measure Ω) (p : ι → Ω → ℝ) (H₀ : Finset ι
     ∃ g : ℝ → ℝ≥0∞, Monotone g ∧ ∀ A : Set ℝ, MeasurableSet A →
       P ((fun ω j => p j ω) ⁻¹' D ∩ p i ⁻¹' A) = ∫⁻ x in A, g x ∂(P.map (p i))
 
+/-- Classical PRDS on `H₀` is classical PRDS on `{i}` for each `i ∈ H₀` (the condition is
+stated hypothesis by hypothesis). -/
 lemma isClassicalPRDSOn_iff_forall_singleton (P : Measure Ω) (p : ι → Ω → ℝ) (H₀ : Finset ι) :
     IsClassicalPRDSOn P p H₀ ↔ ∀ i ∈ H₀, IsClassicalPRDSOn P p {i} := by
   constructor

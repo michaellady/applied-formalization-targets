@@ -25,6 +25,7 @@ variable {Ω ι : Type*} [MeasurableSpace Ω] [Fintype ι] [DecidableEq ι]
 noncomputable def holmWeights (I : Finset ι) (_i : ι) : ℝ := 1 / I.card
 
 omit [Fintype ι] [DecidableEq ι] in
+/-- The equal weights `1 / |I|` are monotone: a smaller intersection gives larger weights. -/
 lemma monotoneWeights_holmWeights : MonotoneWeights (holmWeights (ι := ι)) := by
   intro I J hJI i hi
   have hJ : (0 : ℝ) < J.card := by exact_mod_cast Finset.card_pos.mpr ⟨i, hi⟩
@@ -50,6 +51,8 @@ variable [LinearOrder ι]
 noncomputable def fallbackWeights (a : ι → ℝ) (I : Finset ι) (i : ι) : ℝ :=
   ∑ l ∈ univ.filter (fun l => l ≤ i ∧ ∀ j, l ≤ j → j < i → j ∉ I), a l
 
+/-- Fallback weights built from non-negative initial weights are monotone: removing hypotheses
+from `I` can only pass more level forward. -/
 lemma monotoneWeights_fallbackWeights (a : ι → ℝ) (ha : ∀ l, 0 ≤ a l) :
     MonotoneWeights (fallbackWeights a) := by
   intro I J hJI i _
@@ -57,6 +60,7 @@ lemma monotoneWeights_fallbackWeights (a : ι → ℝ) (ha : ∀ l, 0 ≤ a l) :
   rw [mem_filter] at hl ⊢
   exact ⟨mem_univ _, hl.2.1, fun j h1 h2 hj => hl.2.2 j h1 h2 (hJI hj)⟩
 
+/-- Fallback weights built from non-negative initial weights are non-negative. -/
 lemma fallbackWeights_nonneg (a : ι → ℝ) (ha : ∀ l, 0 ≤ a l) (I : Finset ι) (i : ι) :
     0 ≤ fallbackWeights a I i :=
   Finset.sum_nonneg fun l _ => ha l

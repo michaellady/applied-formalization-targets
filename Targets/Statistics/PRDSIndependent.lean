@@ -27,7 +27,9 @@ As a consequence the Benjamini–Hochberg bound `α m₀ / m` and the Simes ineq
 independent p-values follow from their positive-dependence versions.
 
 The dependence condition. `Applied.MultipleTesting.IsPRDSOn` is the
-conditioning-on-`pᵢ ≤ t` form used by Blanchard and Roquain (sometimes called weak PRDS),
+conditioning-on-`pᵢ ≤ t` consequence of PRDS used in the proofs of Benjamini–Yekutieli and
+Blanchard–Roquain (their condition (7), proof of Prop. 3.6); it is the definition of PRDS in
+Ramdas et al. 2019, Def. 1, sometimes called weak PRDS. Here it is
 cleared of denominators: `P(D, pᵢ ≤ s) · P(pᵢ ≤ t) ≤ P(D, pᵢ ≤ t) · P(pᵢ ≤ s)` for `s ≤ t`.
 It is not the definition of Benjamini and Yekutieli, whose PRDS conditions on `pᵢ = t`. The
 classical condition implies this form: `Applied.MultipleTesting.IsClassicalPRDSOn.isPRDSOn`

@@ -28,7 +28,26 @@ Main results.
   `graphical_eq_closedTest`: once it stops it has rejected exactly what the closed weighted
   Bonferroni test rejects.
 
+## Reading the Lean statements
+
+A graph is `s : GraphState ι` (weights `s.weights`, transition matrix `s.trans`, bundled with a
+proof of `IsGraph`). The procedure is not a function but a reachability relation: `R` is a
+possible set of rejections on the p-values `q` when
+`SeqRejectable α (graphWeights s) q R` (`Applied.Statistics.SequentiallyRejective`), i.e. `R`
+was built by rejecting one hypothesis at a time, each with p-value at most `α` times its
+current weight. `fwer_graphical_le` holds for every such `R`, whether or not the algorithm was
+run to the end; `graphical_eq_closedTest` identifies the final set.
+
+## Related files
+
 Holm, fallback and fixed-sequence testing as graphs: `Applied.Statistics.GraphicalInstances`.
+Simes-based closed tests with graphical weights: `Applied.Statistics.WeightedSimes`.
+Group-sequential graphical procedures: `Applied.Statistics.GroupSequentialGraphical`.
+
+## Not in this file
+
+Graphs with infinitesimal `ε`-edges; parametric (Dunnett-type) local tests; consonance;
+adjusted p-values of the graphical procedure.
 -/
 
 open MeasureTheory Finset
@@ -50,25 +69,31 @@ def weightUpdate (w : ι → ℝ) (G : ι → ι → ℝ) (j : ι) : ι → ℝ 
   if l = j then 0 else w l + w j * G j l
 
 omit [DecidableEq ι] in
+/-- The updated edge `l → m` for `l`, `m`, `j` pairwise distinct. -/
 lemma graphUpdate_apply_of_ne (G : ι → ι → ℝ) [DecidableEq ι] {j l m : ι} (hl : l ≠ j)
     (hm : m ≠ j) (hlm : l ≠ m) :
     graphUpdate G j l m
       = if G l j * G j l < 1 then (G l m + G l j * G j m) / (1 - G l j * G j l) else 0 := by
   simp [graphUpdate, hl, hm, hlm]
 
+/-- After removing `j`, it has no outgoing edges. -/
 @[simp] lemma graphUpdate_left (G : ι → ι → ℝ) (j m : ι) : graphUpdate G j j m = 0 := by
   simp [graphUpdate]
 
+/-- After removing `j`, it has no incoming edges. -/
 @[simp] lemma graphUpdate_right (G : ι → ι → ℝ) (j l : ι) : graphUpdate G j l j = 0 := by
   simp [graphUpdate]
 
+/-- The updated transition matrix has no loops. -/
 @[simp] lemma graphUpdate_diag (G : ι → ι → ℝ) (j l : ι) : graphUpdate G j l l = 0 := by
   simp [graphUpdate]
 
+/-- The removed hypothesis keeps no weight. -/
 @[simp] lemma weightUpdate_self (w : ι → ℝ) (G : ι → ι → ℝ) (j : ι) :
     weightUpdate w G j j = 0 := by
   simp [weightUpdate]
 
+/-- A remaining hypothesis `l` receives the share `w j * G j l` of the weight of `j`. -/
 lemma weightUpdate_apply_of_ne (w : ι → ℝ) (G : ι → ι → ℝ) {j l : ι} (hl : l ≠ j) :
     weightUpdate w G j l = w l + w j * G j l := by
   simp [weightUpdate, hl]
@@ -90,9 +115,11 @@ structure IsGraph (w : ι → ℝ) (G : ι → ι → ℝ) : Prop where
   trans : IsTransition G
 
 omit [DecidableEq ι] in
+/-- Every edge of a transition matrix is at most one. -/
 lemma IsTransition.le_one {G : ι → ι → ℝ} (hG : IsTransition G) (l m : ι) : G l m ≤ 1 :=
   (Finset.single_le_sum (fun x _ => hG.nonneg l x) (mem_univ m)).trans (hG.sum_le l)
 
+/-- Two distinct outgoing edges of the same hypothesis sum to at most one. -/
 lemma IsTransition.add_le_one {G : ι → ι → ℝ} (hG : IsTransition G) (l : ι) {m k : ι}
     (hmk : m ≠ k) : G l m + G l k ≤ 1 := by
   have := Finset.sum_le_univ_sum_of_nonneg (s := {m, k}) (fun x => hG.nonneg l x)
@@ -364,9 +391,11 @@ def weights (s : GraphState ι) : ι → ℝ := s.1.1
 def trans (s : GraphState ι) : ι → ι → ℝ := s.1.2
 
 omit [DecidableEq ι] in
+/-- The weights and transition matrix of a `GraphState` satisfy `IsGraph`. -/
 lemma isGraph (s : GraphState ι) : IsGraph s.weights s.trans := s.2
 
 omit [DecidableEq ι] in
+/-- Two graphs with the same weights and the same transition matrix are equal. -/
 @[ext] lemma ext {s t : GraphState ι} (hw : s.weights = t.weights) (hG : s.trans = t.trans) :
     s = t :=
   Subtype.ext (Prod.ext hw hG)
@@ -375,10 +404,12 @@ omit [DecidableEq ι] in
 def ofGraph {w : ι → ℝ} {G : ι → ι → ℝ} (h : IsGraph w G) : GraphState ι := ⟨(w, G), h⟩
 
 omit [DecidableEq ι] in
+/-- The weights of `ofGraph h`. -/
 @[simp] lemma weights_ofGraph {w : ι → ℝ} {G : ι → ι → ℝ} (h : IsGraph w G) :
     (ofGraph h).weights = w := rfl
 
 omit [DecidableEq ι] in
+/-- The transition matrix of `ofGraph h`. -/
 @[simp] lemma trans_ofGraph {w : ι → ℝ} {G : ι → ι → ℝ} (h : IsGraph w G) :
     (ofGraph h).trans = G := rfl
 
@@ -386,9 +417,11 @@ omit [DecidableEq ι] in
 noncomputable def remove (j : ι) (s : GraphState ι) : GraphState ι :=
   ⟨(weightUpdate s.weights s.trans j, graphUpdate s.trans j), s.isGraph.update j⟩
 
+/-- Removing `j` updates the weights by `weightUpdate`. -/
 @[simp] lemma weights_remove (j : ι) (s : GraphState ι) :
     (remove j s).weights = weightUpdate s.weights s.trans j := rfl
 
+/-- Removing `j` updates the transition matrix by `graphUpdate`. -/
 @[simp] lemma trans_remove (j : ι) (s : GraphState ι) :
     (remove j s).trans = graphUpdate s.trans j := rfl
 
@@ -421,8 +454,10 @@ chosen. -/
 noncomputable def removeAll (s : GraphState ι) (R : Finset ι) : GraphState ι :=
   R.val.foldr remove s
 
+/-- Removing no hypothesis leaves the graph unchanged. -/
 @[simp] lemma removeAll_empty (s : GraphState ι) : s.removeAll ∅ = s := rfl
 
+/-- Removing `insert i R` is removing `R` and then `i`. -/
 lemma removeAll_insert (s : GraphState ι) {R : Finset ι} {i : ι} (hi : i ∉ R) :
     s.removeAll (insert i R) = remove i (s.removeAll R) := by
   unfold removeAll
@@ -472,16 +507,21 @@ weights of the graph after removing all hypotheses outside `I`. -/
 noncomputable def graphWeights (s : GraphState ι) (I : Finset ι) : ι → ℝ :=
   (s.removeAll (univ \ I)).weights
 
+/-- The weights of the global intersection hypothesis are the initial weights of the graph. -/
 lemma graphWeights_univ (s : GraphState ι) : graphWeights s univ = s.weights := by
   simp [graphWeights]
 
+/-- Graphical weights are non-negative. -/
 lemma graphWeights_nonneg (s : GraphState ι) (I : Finset ι) (i : ι) : 0 ≤ graphWeights s I i :=
   (s.removeAll (univ \ I)).isGraph.w_nonneg i
 
+/-- Hypotheses outside `I` get weight zero in the intersection hypothesis `I`. -/
 lemma graphWeights_of_notMem (s : GraphState ι) {I : Finset ι} {i : ι} (hi : i ∉ I) :
     graphWeights s I i = 0 :=
   s.weights_removeAll_of_mem (mem_sdiff.mpr ⟨mem_univ i, hi⟩)
 
+/-- The graphical weights of every intersection hypothesis sum to at most one, so each weighted
+Bonferroni local test has level `α`. -/
 lemma sum_graphWeights_le_one (s : GraphState ι) (I : Finset ι) :
     ∑ i ∈ I, graphWeights s I i ≤ 1 :=
   (Finset.sum_le_univ_sum_of_nonneg fun i => graphWeights_nonneg s I i).trans

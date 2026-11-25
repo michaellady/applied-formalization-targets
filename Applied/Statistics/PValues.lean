@@ -5,13 +5,42 @@ import Mathlib.Probability.Distributions.Gaussian.Real
 /-!
 # Valid p-values from test statistics
 
-* `measure_one_sub_cdf_le`: for a distribution on `ℝ` giving no mass to single points, the upper-tail
-  transform `1 - F` is super-uniform (the probability integral transform, one direction).
+`IsValidPValue P p` (`Applied.Statistics.MultipleTesting`) is the only property of p-values that
+the error-rate theorems use. This file shows that the p-values of the usual upper-tailed and
+two-sided tests have it. `F_μ` is the distribution function of the null law `μ` of the
+statistic and `Φ` the standard normal distribution function (`cdf (gaussianReal 0 1)`).
+
+## Main results
+
+* `measure_one_sub_cdf_le`: for a distribution on `ℝ` giving no mass to single points, the
+  upper-tail transform `1 - F` is super-uniform (the probability integral transform, one
+  direction).
 * `isValidPValue_upperTail`: if the statistic `X` has null law `μ` without atoms, then
   `1 - F_μ(X)` is a valid p-value.
 * `isValidPValue_twoSided`: if moreover `μ` is symmetric about zero, `2 (1 - F_μ(|X|))` is a
   valid p-value.
-* `isValidPValue_zTest_upper`, `isValidPValue_zTest_twoSided`: the one- and two-sided z-tests.
+* `isValidPValue_zTest_upper`, `isValidPValue_zTest_twoSided`: the one- and two-sided z-tests
+  for a standard normal statistic.
+* `isValidPValue_zTest_upper_of_mean_nonpos`: the one-sided z-test with the composite null
+  "mean `≤ 0`" (unit variance).
+
+## Auxiliary facts about the normal tail
+
+`strictMono_cdf_gaussianReal`, `strictAnti_one_sub_cdf_gaussianReal`,
+`antitone_one_sub_cdf_gaussianReal`, `antitone_one_sub_cdf_gaussian_add`,
+`measurable_one_sub_cdf_gaussian`, `measurable_zTest`, `antitone_twoSided`,
+`measurable_twoSided`, `measurable_twoSided_abs`.
+
+## Related files
+
+* `LowerTailPValue`: `F_μ(X)` is valid for every null law, atoms allowed.
+* `CombinedPValues`: Bonferroni minimum and maximum of several p-values.
+
+## Not in this file
+
+Exact uniformity of `1 - F_μ(X)` (see `IsUniformPValue` in `SidakExact`); t-tests and other
+studentized statistics; discrete tests through the upper tail (the no-atom hypothesis excludes
+them; use `LowerTailPValue`, or a conservative p-value proved valid directly).
 -/
 
 open MeasureTheory ProbabilityTheory Set Filter
@@ -124,5 +153,87 @@ theorem isValidPValue_zTest_twoSided (P : Measure Ω) (Z : Ω → ℝ) (hZ : Mea
     (hlaw : P.map Z = gaussianReal 0 1) :
     IsValidPValue P fun ω => 2 * (1 - cdf (gaussianReal 0 1) |Z ω|) :=
   isValidPValue_twoSided P Z hZ _ gaussianReal_singleton hlaw (by rw [gaussianReal_map_neg, neg_zero])
+
+/-! ### The standard normal tail as a function
+
+Monotonicity and measurability of `z ↦ 1 - Φ z` and `x ↦ 2 (1 - Φ x)`. These are used wherever
+z-test p-values are shown to be positively dependent (`PRDSGaussian`, `PRDSFactorModels`,
+`TwoSidedOneFactor`, `TwoSidedMTP2`). -/
+
+section StandardNormalTail
+
+/-- The standard normal distribution function is strictly increasing. -/
+lemma strictMono_cdf_gaussianReal : StrictMono (cdf (gaussianReal 0 1)) := by
+  intro x y hxy
+  by_contra hcon
+  have hle : cdf (gaussianReal 0 1) y - cdf (gaussianReal 0 1) x ≤ 0 := by linarith
+  have h0 : gaussianReal 0 1 (Set.Ioc x y) = 0 := by
+    rw [← measure_cdf (gaussianReal 0 1), StieltjesFunction.measure_Ioc]
+    exact ENNReal.ofReal_eq_zero.mpr hle
+  have hvol := gaussianReal_absolutelyContinuous' 0 one_ne_zero h0
+  rw [Real.volume_Ioc, ENNReal.ofReal_eq_zero] at hvol
+  linarith
+
+/-- The standard normal upper tail `z ↦ 1 - Φ z` is strictly decreasing. -/
+lemma strictAnti_one_sub_cdf_gaussianReal :
+    StrictAnti fun z : ℝ => 1 - cdf (gaussianReal 0 1) z := fun x y hxy => by
+  have := strictMono_cdf_gaussianReal hxy
+  show 1 - _ < 1 - _
+  linarith
+
+/-- The standard normal upper tail `z ↦ 1 - Φ z` is non-increasing. -/
+lemma antitone_one_sub_cdf_gaussianReal :
+    Antitone fun z : ℝ => 1 - cdf (gaussianReal 0 1) z :=
+  strictAnti_one_sub_cdf_gaussianReal.antitone
+
+/-- The standard normal upper tail `z ↦ 1 - Φ z` is measurable. -/
+lemma measurable_one_sub_cdf_gaussian :
+    Measurable fun z : ℝ => 1 - cdf (gaussianReal 0 1) z :=
+  antitone_one_sub_cdf_gaussianReal.measurable
+
+/-- The shifted standard normal upper tail `z ↦ 1 - Φ (z + m)` is non-increasing. -/
+lemma antitone_one_sub_cdf_gaussian_add (m : ℝ) :
+    Antitone fun z : ℝ => 1 - cdf (gaussianReal 0 1) (z + m) := fun _ _ hxy =>
+  antitone_one_sub_cdf_gaussianReal (by linarith)
+
+/-- The one-sided z-test p-value `1 - Φ (Z)` of a measurable statistic is measurable. -/
+lemma measurable_zTest {Z : Ω → ℝ} (hZ : Measurable Z) :
+    Measurable fun ω => 1 - cdf (gaussianReal 0 1) (Z ω) :=
+  antitone_one_sub_cdf_gaussianReal.measurable.comp hZ
+
+/-- The two-sided transform `x ↦ 2 (1 - Φ x)` is non-increasing. -/
+lemma antitone_twoSided : Antitone fun x : ℝ => 2 * (1 - cdf (gaussianReal 0 1) x) :=
+  fun _ _ hxy => mul_le_mul_of_nonneg_left (antitone_one_sub_cdf_gaussianReal hxy) zero_le_two
+
+/-- The two-sided transform `x ↦ 2 (1 - Φ x)` is measurable. -/
+lemma measurable_twoSided : Measurable fun x : ℝ => 2 * (1 - cdf (gaussianReal 0 1) x) :=
+  antitone_twoSided.measurable
+
+/-- The two-sided z-test p-value `2 (1 - Φ(|Z|))` of a measurable statistic is measurable. -/
+lemma measurable_twoSided_abs {Z : Ω → ℝ} (hZ : Measurable Z) :
+    Measurable fun ω => 2 * (1 - cdf (gaussianReal 0 1) |Z ω|) :=
+  measurable_twoSided.comp (measurable_norm.comp hZ)
+
+end StandardNormalTail
+
+/-! ### One-sided z-test with a composite null -/
+
+/-- **One-sided z-test with a composite null.** If `Z` is normal with unit variance and mean
+`m ≤ 0`, then `1 - Φ (Z)` is a valid p-value. -/
+theorem isValidPValue_zTest_upper_of_mean_nonpos (P : Measure Ω) (Z : Ω → ℝ) (hZ : Measurable Z)
+    {m : ℝ} (hm : m ≤ 0) (hlaw : P.map Z = gaussianReal m 1) :
+    IsValidPValue P fun ω => 1 - cdf (gaussianReal 0 1) (Z ω) := by
+  have hlaw' : P.map (fun ω => Z ω - m) = gaussianReal 0 1 := by
+    have : (fun ω => Z ω - m) = (fun z => z - m) ∘ Z := rfl
+    rw [this, ← Measure.map_map (measurable_sub_const m) hZ, hlaw,
+      gaussianReal_map_sub_const, sub_self]
+  intro t ht
+  refine (measure_mono ?_).trans
+    (isValidPValue_zTest_upper P _ (hZ.sub_const m) hlaw' t ht)
+  intro ω hω
+  have : cdf (gaussianReal 0 1) (Z ω) ≤ cdf (gaussianReal 0 1) (Z ω - m) :=
+    monotone_cdf _ (by linarith)
+  simp only [Set.mem_ofPred_eq] at hω ⊢
+  linarith
 
 end Applied.MultipleTesting

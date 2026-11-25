@@ -33,6 +33,7 @@ variable {Ω : Type*} [MeasurableSpace Ω] {ι : Type*}
 noncomputable def dunnettZ (Y : Option ι → Ω → ℝ) (v : Option ι → ℝ≥0) (j : ι) (ω : Ω) : ℝ :=
   (√((v (some j) : ℝ) + v none))⁻¹ * (Y (some j) ω - Y none ω)
 
+/-- The comparison statistic is measurable when the group means are. -/
 lemma measurable_dunnettZ {Y : Option ι → Ω → ℝ} (hmeas : ∀ o, Measurable (Y o))
     (v : Option ι → ℝ≥0) (j : ι) : Measurable (dunnettZ Y v j) :=
   ((hmeas (some j)).sub (hmeas none)).const_mul _
