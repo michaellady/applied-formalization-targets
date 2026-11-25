@@ -412,4 +412,182 @@ lemma card_col_eq_mul_le {e f : E} (hef : e ≠ f) :
 
 end Colouring
 
+/-! ### Uniformly random seeds -/
+
+/-- A family of feasible online algorithms indexed by a finite nonempty type `Ω : Type` gives a
+randomized algorithm (uniform seed) as soon as the sum over the seeds of the expected weights is
+at least `c · |Ω|` times the weight of every independent set. -/
+theorem hasCompetitiveRandomized_of_sum {M : Matroid E} {Ω : Type} [Fintype Ω] [Nonempty Ω]
+    (A : Ω → OnlineAlg E) (hA : ∀ ω, IsFeasible M (A ω)) {c : ℝ}
+    (hc : ∀ w : E → ℝ, (∀ e, 0 ≤ w e) → ∀ I : Finset E, M.Indep (I : Set E) →
+      c * (∑ e ∈ I, w e) * Fintype.card Ω ≤ ∑ ω, expWeight (A ω) w) :
+    HasCompetitiveRandomized M c := by
+  let _ : MeasurableSpace Ω := ⊤
+  have _ : DiscreteMeasurableSpace Ω := ⟨fun _ => trivial⟩
+  have hpos : (Fintype.card Ω : ENNReal) ≠ 0 := by exact_mod_cast (Fintype.card_pos (α := Ω)).ne'
+  set P : MeasureTheory.Measure Ω := ((Fintype.card Ω : ENNReal)⁻¹) • MeasureTheory.Measure.count
+  have : MeasureTheory.IsProbabilityMeasure P := by
+    constructor
+    rw [_root_.smul_apply, MeasureTheory.Measure.count_univ, smul_eq_mul,
+      ENat.card_eq_coe_fintype_card]
+    simp only [ENat.toENNReal_coe]
+    exact ENNReal.inv_mul_cancel hpos (ENNReal.natCast_ne_top _)
+  refine ⟨Ω, ⊤, P, inferInstance, A, hA, fun w hw I hI => ?_⟩
+  have hN : (0 : ℝ) < Fintype.card Ω := by exact_mod_cast Fintype.card_pos (α := Ω)
+  rw [MeasureTheory.integral_smul_measure, MeasureTheory.integral_count, smul_eq_mul,
+    ENNReal.toReal_inv, ENNReal.toReal_natCast, inv_mul_eq_div, le_div_iff₀ hN]
+  exact hc w hw I hI
+
+/-! ### Counting kept elements -/
+
+lemma half_pow_le_two_div {x k : ℕ} (hx : 1 ≤ x) (h : x < 2 ^ (k + 1)) :
+    (1 / 2 : ℝ) ^ k ≤ 2 / x := by
+  have hx' : (0 : ℝ) < x := by exact_mod_cast hx
+  rw [le_div_iff₀ hx']
+  have h' : (x : ℝ) ≤ 2 ^ (k + 1) := by exact_mod_cast h.le
+  calc (1 / 2 : ℝ) ^ k * x ≤ (1 / 2) ^ k * 2 ^ (k + 1) := by gcongr
+    _ = 2 := by rw [pow_succ, ← mul_assoc, ← mul_pow]; norm_num
+
+/-- The values `0` in `Fin m`. -/
+def zeroSet (m : ℕ) : Finset (Fin m) := univ.filter fun x => (x : ℕ) = 0
+
+lemma card_zeroSet {m : ℕ} (hm : 1 ≤ m) : #(zeroSet m) = 1 := by
+  rw [Finset.card_eq_one]
+  refine ⟨⟨0, hm⟩, ?_⟩
+  ext x
+  simp [zeroSet, Fin.ext_iff]
+
+omit [Fintype E] in
+lemma prod_ite_mul_prod_ite {ι : Type*} (s : Finset ι) (p : ι → Prop) [DecidablePred p] (m : ℕ) :
+    (∏ x ∈ s, if p x then 1 else m) * (∏ x ∈ s, if p x then m else 1) = m ^ #s := by
+  rw [← Finset.prod_mul_distrib, ← Finset.prod_const]
+  refine Finset.prod_congr rfl fun x _ => ?_
+  split_ifs <;> simp
+
+/-- A uniformly random `k : E → Fin m` has `k e = 0` with probability `1/m`. -/
+lemma card_keep_one {m : ℕ} (hm : 1 ≤ m) (e : E) :
+    #(univ.filter fun k : E → Fin m => (k e : ℕ) = 0) * m = Fintype.card (E → Fin m) := by
+  have hfil : (univ.filter fun k : E → Fin m => (k e : ℕ) = 0) =
+      Fintype.piFinset fun x => if x = e then zeroSet m else univ := by
+    ext k
+    simp only [mem_filter, mem_univ, true_and, Fintype.mem_piFinset]
+    constructor
+    · intro h x
+      split_ifs with hx
+      · subst hx; simp [zeroSet, h]
+      · exact mem_univ _
+    · intro h
+      have := h e
+      simpa [zeroSet] using this
+  rw [hfil, Fintype.card_piFinset, Fintype.card_fun, Fintype.card_fin]
+  have h1 : ∏ x : E, #(if x = e then zeroSet m else (univ : Finset (Fin m))) =
+      ∏ x : E, (if x = e then 1 else m) :=
+    Finset.prod_congr rfl fun x _ => by split_ifs <;> simp [card_zeroSet hm]
+  have h2 : ∏ x : E, (if x = e then m else 1) = m := by simp
+  have h3 := prod_ite_mul_prod_ite (univ : Finset E) (fun x => x = e) m
+  rw [h2, Finset.card_univ] at h3
+  rw [h1, h3]
+
+/-- A uniformly random `k : E → Fin m` has `k e = 0` and `k f = 0` (`e ≠ f`) with
+probability `1/m²`. -/
+lemma card_keep_two {m : ℕ} (hm : 1 ≤ m) {e f : E} (hef : e ≠ f) :
+    #(univ.filter fun k : E → Fin m => (k e : ℕ) = 0 ∧ (k f : ℕ) = 0) * (m * m) =
+      Fintype.card (E → Fin m) := by
+  have hfil : (univ.filter fun k : E → Fin m => (k e : ℕ) = 0 ∧ (k f : ℕ) = 0) =
+      Fintype.piFinset fun x => if x = e ∨ x = f then zeroSet m else univ := by
+    ext k
+    simp only [mem_filter, mem_univ, true_and, Fintype.mem_piFinset]
+    constructor
+    · intro h x
+      split_ifs with hx
+      · rcases hx with rfl | rfl
+        · simp [zeroSet, h.1]
+        · simp [zeroSet, h.2]
+      · exact mem_univ _
+    · intro h
+      have h1 := h e
+      have h2 := h f
+      simp only [true_or, or_true, ite_true, zeroSet, mem_filter, mem_univ, true_and] at h1 h2
+      exact ⟨h1, h2⟩
+  rw [hfil, Fintype.card_piFinset, Fintype.card_fun, Fintype.card_fin]
+  have h1 : ∏ x : E, #(if x = e ∨ x = f then zeroSet m else (univ : Finset (Fin m))) =
+      ∏ x : E, (if x = e ∨ x = f then 1 else m) :=
+    Finset.prod_congr rfl fun x _ => by split_ifs <;> simp [card_zeroSet hm]
+  have h2 : ∏ x : E, (if x = e ∨ x = f then m else 1) = m * m := by
+    have : ∀ x : E, (if x = e ∨ x = f then m else 1) =
+        (if x = e then m else 1) * (if x = f then m else 1) := by
+      intro x
+      by_cases hxe : x = e
+      · subst hxe; simp [hef]
+      · by_cases hxf : x = f
+        · subst hxf; simp [hxe]
+        · simp [hxe, hxf]
+    rw [Finset.prod_congr rfl fun x _ => this x, Finset.prod_mul_distrib]
+    simp
+  have h3 := prod_ite_mul_prod_ite (univ : Finset E) (fun x => x = e ∨ x = f) m
+  rw [h2, Finset.card_univ] at h3
+  rw [h1, h3]
+
+/-! ### The collision sum -/
+
+section CollisionSum
+
+variable {F : Finset (Finset E)} {c : Finset E → ℕ}
+
+/-- For `e` in an independent set `I`, the sum over the other elements `f` of `I` of the
+collision bounds `2 ^ (-κ(e, f))` is at most `2 (h + 1)`, where `h` bounds the number of members
+of `F` containing `e`. -/
+lemma sum_half_pow_mexp_le {I : Finset E} (hI : ∀ A ∈ F, #(I ∩ A) ≤ c A) {e : E} (he : e ∈ I)
+    {h : ℕ} (hh : #(F.filter (e ∈ ·)) ≤ h) :
+    ∑ f ∈ I.erase e, (1 / 2 : ℝ) ^ mexp F c (fun A => e ∈ A ∧ f ∈ A) ≤ 2 * (h + 1) := by
+  have hn : 1 ≤ Fintype.card E := Fintype.card_pos_iff.2 ⟨e⟩
+  have hcA : ∀ A ∈ F, e ∈ A → 1 ≤ c A := fun A hA heA =>
+    le_trans (Finset.card_pos.2 ⟨e, mem_inter.2 ⟨he, heA⟩⟩) (hI A hA)
+  have hterm : ∀ f, (1 / 2 : ℝ) ^ mexp F c (fun A => e ∈ A ∧ f ∈ A) ≤
+      2 / Fintype.card E + ∑ A ∈ F.filter (e ∈ ·), if f ∈ A then 2 / (c A : ℝ) else 0 := by
+    intro f
+    have hnn : ∀ A ∈ F.filter (e ∈ ·), (0 : ℝ) ≤ if f ∈ A then 2 / (c A : ℝ) else 0 :=
+      fun A _ => by split_ifs <;> positivity
+    rcases mexp_cases F c (fun A => e ∈ A ∧ f ∈ A) with h0 | ⟨A, hA, ⟨heA, hfA⟩, h0⟩
+    · rw [h0]
+      refine (half_pow_le_two_div hn (Nat.lt_pow_succ_log_self (by norm_num) _)).trans ?_
+      exact le_add_of_nonneg_right (Finset.sum_nonneg hnn)
+    · rw [h0]
+      refine (half_pow_le_two_div (hcA A hA heA)
+        (Nat.lt_pow_succ_log_self (by norm_num) _)).trans ?_
+      refine le_add_of_nonneg_of_le (by positivity) ?_
+      have := Finset.single_le_sum hnn (mem_filter.2 ⟨hA, heA⟩)
+      simpa [hfA] using this
+  refine (Finset.sum_le_sum fun f _ => hterm f).trans ?_
+  rw [Finset.sum_add_distrib, Finset.sum_comm]
+  have h1 : ∑ _f ∈ I.erase e, (2 / Fintype.card E : ℝ) ≤ 2 := by
+    rw [Finset.sum_const, nsmul_eq_mul]
+    have hc : (#(I.erase e) : ℝ) ≤ Fintype.card E := by
+      exact_mod_cast (Finset.card_le_univ _)
+    have hn' : (0 : ℝ) < Fintype.card E := by exact_mod_cast hn
+    calc (#(I.erase e) : ℝ) * (2 / Fintype.card E) ≤ Fintype.card E * (2 / Fintype.card E) := by
+          gcongr
+      _ = 2 := by field_simp
+  have h2 : ∑ A ∈ F.filter (e ∈ ·), ∑ f ∈ I.erase e, (if f ∈ A then 2 / (c A : ℝ) else 0) ≤
+      ∑ _A ∈ F.filter (e ∈ ·), (2 : ℝ) := by
+    refine Finset.sum_le_sum fun A hA => ?_
+    rw [mem_filter] at hA
+    rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
+    have hcpos : (0 : ℝ) < c A := by exact_mod_cast hcA A hA.1 hA.2
+    have hcard : (#((I.erase e).filter (· ∈ A)) : ℝ) ≤ c A := by
+      have : (I.erase e).filter (· ∈ A) ⊆ I ∩ A := by
+        intro x hx
+        simp only [mem_filter, mem_erase] at hx
+        exact mem_inter.2 ⟨hx.1.2, hx.2⟩
+      exact_mod_cast (Finset.card_le_card this).trans (hI A hA.1)
+    calc (#((I.erase e).filter (· ∈ A)) : ℝ) * (2 / c A) ≤ c A * (2 / c A) := by gcongr
+      _ = 2 := by field_simp
+  have h3 : ∑ _A ∈ F.filter (e ∈ ·), (2 : ℝ) ≤ 2 * h := by
+    rw [Finset.sum_const, nsmul_eq_mul, mul_comm]
+    have : (#(F.filter (e ∈ ·)) : ℝ) ≤ h := by exact_mod_cast hh
+    linarith
+  linarith
+
+end CollisionSum
+
 end Applied.Economics.MatroidSecretary
