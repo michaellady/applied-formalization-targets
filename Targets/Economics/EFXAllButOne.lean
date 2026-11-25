@@ -32,9 +32,9 @@ hypothesis `hu` (`v i = u` for `i ≠ α`) does not exclude `v α = u`, in which
 is the identical-valuations entry. For `n = 2` this re-proves `efx_exists_two` by the same
 cut-and-choose idea.
 
-Not covered: the full two-types theorem of Mahara (both types with at least two agents);
-three or more types; non-additive valuations; chores; the general case
-(`Targets.Economics.EFXExists`, open).
+Not covered here: the full two-types theorem of Mahara, which is proved separately in
+`EFXTwoTypes.lean` (`efx_exists_two_types`) and implies this entry; three or more types; non-additive valuations; chores; the general
+case (`Targets.Economics.EFXExists`, open).
 -/
 
 namespace Targets.Economics
