@@ -40,9 +40,9 @@ Conventions that recur:
 | Fully sequential | `Ville.lean` | `Applied.Sequential` | Ville's inequality; stopped test supermartingales are e-values |
 | Fully sequential | `SPRT.lean` | `Applied.Sequential` | Likelihood-ratio (super)martingale; SPRT type-I error `≤ 1/A` |
 | Fully sequential | `SPRTWald.lean`, `SPRTWaldIID.lean` | `Applied.Sequential` | Wald's bounds `A α ≤ 1 - β`, `β ≤ B (1 - α)` by change of measure; the i.i.d. instance |
-| Adaptive | `CombinationTests.lean` | `Applied.CombinationTests` | Conditionally valid p-values; lower-set rejection regions; Fisher's product test (Bauer–Köhne) |
+| Adaptive | `CombinationTests.lean` | `Applied.CombinationTests` | Conditionally valid p-values; lower-set rejection regions; level bounds for Fisher's product test (Bauer–Köhne) |
 | Adaptive | `InverseNormalCombination.lean` | `Applied.CombinationTests` | Inverse-normal / weighted z combination test |
-| Adaptive | `ConditionalError.lean` | `Applied.ConditionalError` | Conditional error principle; sample-size increase in the promising zone |
+| Adaptive | `ConditionalError.lean` | `Applied.ConditionalError` | Conditional error principle; Chen–DeMets–Lan sample-size increase (conditional power ≥ 50%) |
 | Equivalence, NI | `IntersectionUnion.lean` | `Applied.IntersectionUnion` | Intersection-union tests, TOST and its exact size, co-primary power, non-inferiority then superiority |
 | Many-to-one | `MaxStatisticClosedTest.lean` | `Applied.MultipleTesting` | Closed max-statistic test and its step-down shortcut (no probability) |
 | Many-to-one | `Dunnett.lean` | `Applied.MultipleTesting` | Dunnett's integral, critical values, single-step and step-down procedures, simultaneous bounds |
@@ -137,7 +137,10 @@ Names are relative to the namespace in the table above.
 * `GSFamily`, `GSFamily.repeatedP`, `isValidPValue_repeatedP_stopped` — the repeated p-value
   of a family of nested group-sequential tests is a valid p-value at any data-dependent look.
 * `fwer_gsGraphical_any_look_le` — the Maurer–Bretz graphical group-sequential procedure
-  controls the family-wise error rate simultaneously over all looks.
+  controls the family-wise error rate simultaneously over all looks. This is for abstract
+  families monotone and right-continuous in the level; the only family with a proven level is
+  the Bonferroni split over looks, and level-monotone normal spending boundaries are assumed,
+  not constructed.
   `le_measure_forall_mem_repeatedCI` — repeated confidence sets cover at all looks at once.
 
 ### 3. Fully sequential and anytime-valid tests
@@ -164,7 +167,8 @@ Names are relative to the namespace in the table above.
 * `measure_le_antitone_le` — **conditional error function**: for non-increasing `g ≥ 0`,
   `P (p2 ≤ g(p1)) ≤ ∫₀¹ g`. `measure_mem_lowerSet_prod_le` — any measurable lower-set
   rejection region of the `(p1, p2)` plane has level at most its area in the unit square.
-* `measure_fisher_earlyStopping_le` — level of the Bauer–Köhne design (Fisher's product with
+* `measure_fisher_earlyStopping_le` — level bound (`≤`; attainment is not proved) for the
+  Bauer–Köhne design (Fisher's product with
   early rejection at `α₁` and binding futility stop at `α₀`).
 * `measure_inverseNormal_le` — the inverse-normal test with pre-fixed weights
   `w₁² + w₂² = 1` has level `1 - Φ z`; `measure_adaptive_weightedZ_le` allows the second-stage
@@ -172,7 +176,8 @@ Names are relative to the namespace in the table above.
 * `measure_iUnion_selected_le` — **conditional error principle** in set form: replacing the
   planned test, design by design, by tests with no larger conditional rejection probability
   does not increase the type-I error.
-* `measure_conventional_adaptive_le` — **promising zone** (Chen–DeMets–Lan): increasing the
+* `measure_conventional_adaptive_le` — **Chen–DeMets–Lan (2004)**, the part of the
+  Mehta–Pocock promising zone with conditional power under the current trend ≥ 50%: increasing the
   second-stage sample size when `z₁ ≥ c √(n₁/(n₁+n₂))` and then using the conventional
   z-test keeps the level `1 - Φ c`. `measure_weighted_adaptive_eq` — the pre-planned weighted
   statistic has level exactly `1 - Φ c` for every interim sample-size rule.
@@ -188,6 +193,7 @@ Names are relative to the namespace in the table above.
 * `tost_level`, `tost_size` — TOST for a normal mean with known standard error has level
   `1 - Φ c` on `|θ| ≥ δ`, and for `c ≥ 0` its size is exactly
   `max 0 ((1 - Φ c) - Φ (c - 2δ/s))`, strictly below the nominal level (`tost_size_lt`).
+  (`c ≥ 0` is a convenience of the proof; for `δ ≥ 0` it is not needed mathematically.)
 * `ni_then_superiority_fwer_le` — non-inferiority and then superiority can both be tested at
   full level from one lower confidence bound.
 
@@ -199,7 +205,8 @@ Names are relative to the namespace in the table above.
   `measure_forall_manyToOne_le` — it is the distribution function of the maximum of `k`
   comparison statistics sharing a control. `dunnettCrit k α` — its `(1-α)`-quantile.
 * `fwer_dunnettSingleStep_le`, `fwer_dunnettStepDown_le` — single-step and step-down Dunnett
-  control the family-wise error rate for one-sided composite nulls (known variance, balanced).
+  control the family-wise error rate for one-sided composite nulls (known variance, i.e. the
+  ∞-df case; balanced; no numerical critical value is proved).
   `dunnettCrit_le_of_bonferroni` — Dunnett's critical value is at most Bonferroni's.
   `measure_dunnett_lowerBounds` — simultaneous lower bounds with coverage exactly `1 - α`.
 * `measure_notMem_partitionConfidenceSet_le` — the partitioning principle.
@@ -254,7 +261,8 @@ continuous time; confidence sequences; boosted e-BH and calibrators.
 Adaptive: more than two stages; early stopping combined with the inverse-normal test;
 data-dependent weights; attainment of the Fisher-product levels (reduced to an area
 computation, not carried out); unknown variance; sample-size decreases; that the conventional
-test can be anti-conservative outside the promising zone; the Müller–Schäfer principle with
+test can be anti-conservative outside the region `z₁ ≥ c √(n₁/(n₁+n₂))`; the Mehta–Pocock
+promising zone below 50% conditional power; the Müller–Schäfer principle with
 conditional expectations of test functions; estimation after adaptation.
 
 Equivalence and non-inferiority: ratio-scale limits (80–125%); asymmetric margins; uniformly

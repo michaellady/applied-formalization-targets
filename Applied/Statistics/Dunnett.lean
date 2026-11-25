@@ -37,7 +37,8 @@ mutually independent, `X₀` is standard normal, and the comparison statistics a
 
 ## Scope and neighbours
 
-Known variance, balanced design, one-sided comparisons only. Not here: estimated variance
+Known variance (the infinite-degrees-of-freedom, ∞-df, case), balanced design, one-sided
+comparisons only. No numerical critical value is proved. Not here: estimated variance
 (the multivariate `t` critical values of Dunnett 1955), unbalanced allocation, two-sided
 comparisons, step-up (Dunnett–Tamhane 1992) procedures, and numerical values of the critical
 points.

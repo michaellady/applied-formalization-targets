@@ -12,6 +12,10 @@ import Applied.Statistics.Dunnett
 - formalized-elsewhere: not found in the Lean repositories searched (NEXT-TARGETS.md, 25 Nov 2026)
 - statement-review: unreviewed
 
+Scope in one sentence: known variance, that is the infinite-degrees-of-freedom (∞-df) case of
+Dunnett's procedure (normal, not multivariate-`t`, critical values), balanced, one-sided; the
+critical value is characterized by an equation and NO numerical critical value is proved.
+
 Informal statement. `Φ` is the standard normal distribution function (`cdf (gaussianReal 0 1)`)
 and `N` the standard normal law.
 

@@ -32,7 +32,8 @@ is a valid p-value *conditionally on the interim information*.
 * `measure_mem_lowerSet_prod_le`: for a measurable lower set `R` of the plane,
   `P ((p1, p2) ∈ R) ≤ Lebesgue (R ∩ [0,1]²)`.
 * `measure_fisher_earlyStopping_le`, `measure_fisher_noFutility_le`, `measure_fisher_product_le`:
-  levels of Fisher's product test with and without early stopping.
+  level bounds (`≤`) for Fisher's product test with and without early stopping; attainment
+  is not proved.
 * `IsCondValidPValue.select`: choosing the second-stage p-value from a countable family by an
   `m1`-measurable rule keeps conditional validity.
 * `IsCondValidPValue.of_indep`, `IsCondValidPValue.of_indep_comp`: a valid p-value independent

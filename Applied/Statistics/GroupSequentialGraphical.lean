@@ -34,6 +34,10 @@ No measurability is assumed anywhere (outer measure of the events).
 
 ## Relation to other files and scope
 
+The theorems are for abstract families (`GSFamily`) that are monotone and right-continuous in
+the level and are assumed to have level; the only family with a proven level is the Bonferroni
+split over looks; level-monotone normal spending boundaries are assumed, not constructed.
+
 `GraphicalApproach.lean` supplies the weights and the sequentially rejective procedure for a
 single analysis; `GroupSequentialBoundaries.lean` the crossing events. Monotonicity and
 right-continuity in the level of actual alpha-spending boundaries are hypotheses of

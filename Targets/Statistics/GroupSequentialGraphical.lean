@@ -9,8 +9,21 @@ import Applied.Statistics.GroupSequentialGraphical
 - source: W. Maurer, F. Bretz, "Multiple testing in group sequential trials using graphical approaches", Stat. Biopharm. Res. 5 (2013) 311-320 (the main result of the paper; section and page numbers to be confirmed); C. Jennison, B. W. Turnbull, "Interim analyses: the repeated confidence interval approach", J. Roy. Statist. Soc. B 51 (1989) 305-361 (to be confirmed); repeated p-values: C. Jennison, B. W. Turnbull, "Group Sequential Methods with Applications to Clinical Trials" (2000), Chapter 9 (to be confirmed); related: D.-I. Tang, N. L. Geller, Biometrics 55 (1999); E. Glimm, W. Maurer, F. Bretz, Stat. Med. 29 (2010)
 - used-in: confirmatory trials with interim analyses and several endpoints or doses (graph plus spending function designs); monitoring by repeated confidence intervals
 - prerequisites: the project's graphical approach (`fwer_graphical_le`, `graphical_eq_closedTest`), closed weighted Bonferroni tests, alpha-spending principle
-- formalized-elsewhere: not found in the Lean repositories searched (NEXT-TARGETS.md, 25 Nov 2026)
+- formalized-elsewhere: the general result was not found in the Lean repositories searched (NEXT-TARGETS.md, 25 Nov 2026); a special case exists: atlas-lean's `measure_exists_look_endpoint_bonferroni_le` (fixed-weight Bonferroni over looks and endpoints with a spending function) corresponds to the `ofPValues` family with fixed weights and no graph update
 - statement-review: unreviewed
+
+What is and is not proved, in one paragraph. The theorems are for ABSTRACT families of nested
+rejection events that are monotone and right-continuous in the level (`GSFamily`), each
+assumed to have level (`HasLevel`). The only family for which the level is PROVED
+unconditionally is the Bonferroni split of the level over the looks (`ofPValues`, (4c)).
+Level-monotone normal spending boundaries (O'Brien–Fleming, Pocock, Lan–DeMets for the
+canonical joint normal law) are ASSUMED, not constructed: `ofBoundaries` takes monotonicity
+and right-continuity in the level, and the spending bound, as hypotheses, and nothing in the
+library shows that the boundaries of `exists_alphaSpending_boundaries_gaussian` can be chosen
+monotone in the level. So the Maurer–Bretz theorem cannot at present be instantiated inside
+Lean with normal-theory spending boundaries. The fixed-weight special case (Bonferroni over
+looks and endpoints, no graph update) is formalized elsewhere: atlas-lean,
+`measure_exists_look_endpoint_bonferroni_le`.
 
 Informal statement. These are known results (Maurer-Bretz 2013; Jennison-Turnbull); nothing
 here is new. Looks are indexed `0, 1, …, K`, so `K` is the index of the last look.

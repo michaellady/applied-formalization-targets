@@ -380,7 +380,9 @@ theorem tost_level (hs : s ≠ 0) (hθ : δ ≤ |θ|) :
     exact (measure_mono hsub).trans (zTest_upper_level hs (by linarith))
 
 /-- For `c ≥ 0` the TOST rejection probability on the null `|θ| ≥ δ` is largest at the
-margin. -/
+margin. The hypothesis `c ≥ 0` is a convenience of the proof (the rejection interval then lies
+to the left of `δ`); for `δ ≥ 0` the statement is true for every real `c`, because the
+interval is symmetric about `0`, but that version is not proved here. -/
 theorem tost_prob_le_margin (hs : s ≠ 0) (hc : 0 ≤ c) (hθ : δ ≤ |θ|) :
     gaussianReal θ (s ^ 2) (tostRegion δ s c)
       ≤ ENNReal.ofReal ((1 - Φ c) - Φ (c - 2 * δ / s)) := by
@@ -402,7 +404,8 @@ theorem tost_prob_le_margin (hs : s ≠ 0) (hc : 0 ≤ c) (hθ : δ ≤ |θ|) :
     exact key (-θ) h
 
 /-- **Size of TOST.** For `s ≠ 0` and `c ≥ 0`, the supremum of the rejection probability over
-the null `|θ| ≥ δ` equals `(1 - Φ c) - Φ (c - 2 δ / s)` (zero when this is negative). -/
+the null `|θ| ≥ δ` equals `(1 - Φ c) - Φ (c - 2 δ / s)` (zero when this is negative). As in
+`tost_prob_le_margin`, `c ≥ 0` is assumed for convenience and could be replaced by `δ ≥ 0`. -/
 theorem tost_size (hs : s ≠ 0) (hc : 0 ≤ c) (δ : ℝ) :
     ⨆ θ : ℝ, ⨆ _ : δ ≤ |θ|, gaussianReal θ (s ^ 2) (tostRegion δ s c)
       = ENNReal.ofReal ((1 - Φ c) - Φ (c - 2 * δ / s)) := by

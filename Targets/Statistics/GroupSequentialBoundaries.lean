@@ -9,6 +9,7 @@ import Applied.Statistics.GroupSequentialJointLaw
 - source: K. K. G. Lan, D. L. DeMets, "Discrete sequential boundaries for clinical trials", Biometrika 70 (1983) (spending-function boundaries); S. J. Pocock, "Group sequential methods in the design and analysis of clinical trials", Biometrika 64 (1977) (common boundary); C. Jennison, B. W. Turnbull, "Group Sequential Methods with Applications to Clinical Trials" (2000), Chapters 2 and 7 (chapter numbers to be confirmed)
 - used-in: design of interim analyses in clinical trials
 - prerequisites: continuity of `c ↦ P(A ∩ {X ≥ c})` for statistics without atoms (dominated convergence), intermediate value theorem, disjointness of first-crossing events, joint law of the interim statistics (`Targets/Statistics/GroupSequentialJointLaw.lean`)
+- formalized-elsewhere: none found in the Lean repositories searched; atlas-lean (`Adaptive/AlphaSpending.lean`) explicitly disclaims joint-law boundaries ("no joint-law boundary, first-crossing spending constraint … is formalized here")
 - statement-review: unreviewed
 
 Informal statement. Looks are numbered `0, 1, …, K-1`. At look `k` the test rejects when the
