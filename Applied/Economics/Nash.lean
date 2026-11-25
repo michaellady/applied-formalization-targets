@@ -3,10 +3,11 @@ import Applied.Economics.Minimax
 /-!
 # Nash equilibria: zero-sum games and potential games
 
-Mathlib (at the pinned revision) has no Brouwer or Kakutani fixed-point theorem, so Nash's
-existence theorem for general finite games is not proved here. This file proves the two
-classical special cases that do not need a fixed-point theorem, and sets up the definitions for
-the general statement.
+Mathlib (at the pinned revision) has no Brouwer or Kakutani fixed-point theorem. This file
+proves the two classical special cases that do not need a fixed-point theorem, and sets up the
+definitions for the general statement; Nash's existence theorem for general finite games is
+proved in `Applied/Economics/NashExistence.lean` via this project's Brouwer theorem
+(`Applied/Topology/Brouwer.lean`).
 
 ## Two-player games
 

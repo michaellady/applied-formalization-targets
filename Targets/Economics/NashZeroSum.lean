@@ -33,8 +33,9 @@ The game is zero-sum when `B = -A`.
   the row player the same payoff, and if `(p, q)`, `(p', q')` are equilibria then so is
   `(p, q')`.
 
-Not covered: existence of Nash equilibria in general (non-zero-sum) bimatrix games, which
-needs a fixed-point theorem not available in Mathlib (see `Targets/Economics/NashExistence.lean`);
+Not covered here: existence of Nash equilibria in general (non-zero-sum) bimatrix games in
+this file's `IsBimatrixNash` form (general existence for the `n`-player notion `IsMixedNash`
+is proved in `Targets/Economics/NashExistence.lean` via Brouwer's theorem);
 the relation between `IsBimatrixNash` and the `n`-player definition `IsMixedNash` of that file
 is not formalized.
 -/
