@@ -60,8 +60,12 @@ Review notes (modelling choices to check).
   achievability since `exp (n R) > 0`.
 * `Out n` lives in `Type` (universe 0).
 
-Not covered: the channel coding theorem `opCapacity (memoryless W) = capacity W`; the
-equivalence of maximal and average error criteria; strong converses.
+Not covered here: the channel coding theorem `opCapacity (memoryless W) = capacity W`. Its
+converse half `opCapacity (memoryless W) ≤ capacity W`, together with the weak converse
+`(1 - Pₑ) log M ≤ capacity (F.kernel n) + log 2` for a single code and
+`opCapacity F ≤ limsup capacity (F.kernel n) / n` for a general family, is proved in
+`Targets/InformationTheory/ChannelCodingConverse.lean`; achievability is not formalized. Also
+not covered: the equivalence of maximal and average error criteria; strong converses.
 -/
 
 namespace Targets.InformationTheory
