@@ -303,4 +303,68 @@ theorem IsLinearTwoQueryLDC.two_rpow_le {k m : ℕ} {a : Fin m → Fin k → ZMo
   have := h.four_rpow_le hm
   rwa [show (4 : ℝ) = 2 ^ (2 : ℝ) by norm_num, ← rpow_mul (by norm_num), ← mul_assoc] at this
 
+/-! ### Tightness: the Hadamard code -/
+
+/-- The positions of the Hadamard code of length `2 ^ k`: all vectors of `𝔽₂ᵏ`, listed in some
+order. -/
+noncomputable def hadamardVectors (k : ℕ) : Fin (2 ^ k) → Fin k → ZMod 2 :=
+  (Fintype.equivFinOfCardEq (by simp [ZMod.card])).symm
+
+private lemma card_filter_coord_eq_zero {k : ℕ} (i : Fin k) :
+    2 * (univ.filter fun p : Fin k → ZMod 2 => p i = 0).card = 2 ^ k := by
+  classical
+  have hc : (univ.filter fun p : Fin k → ZMod 2 => ¬ p i = 0).card =
+      (univ.filter fun p : Fin k → ZMod 2 => p i = 0).card := by
+    refine card_bij (fun p _ => p + Pi.single i 1) (fun p hp => ?_) (fun p _ q _ h => ?_)
+      (fun q hq => ⟨q + Pi.single i 1, ?_, ?_⟩)
+    · simp only [mem_filter, mem_univ, true_and] at hp ⊢
+      have : ∀ x : ZMod 2, ¬ x = 0 → x + 1 = 0 := by decide
+      simpa using this _ hp
+    · simpa using h
+    · simp only [mem_filter, mem_univ, true_and] at hq ⊢
+      have : ∀ x : ZMod 2, x = 0 → ¬ x + 1 = 0 := by decide
+      simpa using this _ hq
+    · rw [add_assoc, add_self_zmod_two, add_zero]
+  have := card_filter_add_card_filter_not (s := (univ : Finset (Fin k → ZMod 2)))
+    (fun p => p i = 0)
+  rw [hc, card_univ, Fintype.card_fun, ZMod.card, Fintype.card_fin] at this
+  omega
+
+/-- **The bound `m ≥ 4 ^ (δ k)` is attained at `δ = 1/2`**: the Hadamard code (all `2 ^ k`
+vectors of `𝔽₂ᵏ`) is a linear two-query LDC in matching form with `δ = 1/2`, and its length is
+`2 ^ k = 4 ^ (k / 2)`. (A matching on `m` positions has at most `m / 2` pairs, so `δ ≤ 1/2` is
+forced whenever `k ≥ 1`.) -/
+theorem isLinearTwoQueryLDC_hadamardVectors (k : ℕ) :
+    IsLinearTwoQueryLDC (hadamardVectors k) (1 / 2) := by
+  classical
+  intro i
+  set e := (Fintype.equivFinOfCardEq (by simp [ZMod.card]) :
+    (Fin k → ZMod 2) ≃ Fin (2 ^ k)) with he
+  have ha : ∀ j, hadamardVectors k j = e.symm j := fun j => rfl
+  set A := univ.filter fun p : Fin k → ZMod 2 => p i = 0
+  have hsi : (Pi.single i 1 : Fin k → ZMod 2) i = 1 := by simp
+  have hcoord : ∀ p : Fin k → ZMod 2, p i = 0 → (p + (Pi.single i 1 : Fin k → ZMod 2)) i ≠ 0 := by
+    intro p hp; rw [Pi.add_apply, hp, hsi]; decide
+  refine ⟨A.image fun p => (e p, e (p + Pi.single i 1)), ?_, ?_, ?_⟩
+  · intro x hx y hy hxy
+    simp only [A, mem_image, mem_filter, mem_univ, true_and] at hx hy
+    obtain ⟨p, hp, rfl⟩ := hx
+    obtain ⟨q, hq, rfl⟩ := hy
+    have hpq : p ≠ q := by rintro rfl; exact hxy rfl
+    simp only [ne_eq, EmbeddingLike.apply_eq_iff_eq]
+    refine ⟨hpq, ?_, ?_, ?_⟩
+    · rintro rfl; exact hcoord q hq hp
+    · rintro h; exact hcoord p hp (h ▸ hq)
+    · intro h; exact hpq (by simpa using h)
+  · intro x hx
+    simp only [A, mem_image, mem_filter, mem_univ, true_and] at hx
+    obtain ⟨p, hp, rfl⟩ := hx
+    simp only [ha, Equiv.symm_apply_apply]
+    rw [← add_assoc, add_self_zmod_two, zero_add]
+  · rw [card_image_of_injective _ (fun p q h => e.injective (Prod.ext_iff.mp h).1)]
+    have := card_filter_coord_eq_zero i
+    have h2 : ((2 : ℕ) : ℝ) * (A.card : ℝ) = ((2 ^ k : ℕ) : ℝ) := by exact_mod_cast this
+    push_cast at h2 ⊢
+    linarith
+
 end Applied.Coding
