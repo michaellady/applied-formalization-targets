@@ -340,6 +340,40 @@ lemma measurable_gaussianReal_abs_affine (a b : ℝ) {U : Set ℝ} (hU : Measura
     (measurable_norm.comp ((measurable_fst.const_mul a).add (measurable_snd.const_mul b))) hU
   exact measurable_measure_prodMk_left hT
 
+/-- The probability that `|c w + d Y| ∈ D`, `Y` standard normal, `d ≠ 0`, is non-decreasing in
+`|w|` when `D` is upward closed on `[0, ∞)` (stochastic monotonicity of the folded normal
+family in its location). -/
+lemma gaussianReal_abs_affine_mono (c : ℝ) {d : ℝ} (hd : d ≠ 0) {D : Set ℝ}
+    (hD : MeasurableSet D) (hDup : ∀ x y, 0 ≤ x → x ≤ y → x ∈ D → y ∈ D) {w v : ℝ}
+    (hvw : |v| ≤ |w|) :
+    gaussianReal 0 1 {y | |c * v + d * y| ∈ D} ≤ gaussianReal 0 1 {y | |c * w + d * y| ∈ D} := by
+  rw [gaussianReal_abs_affine_mem _ hd hD, gaussianReal_abs_affine_mem _ hd hD]
+  have htot : ∀ t : ℝ, foldedMeasure t (sqNN d) (D ∩ Set.Ioi 0) +
+      foldedMeasure t (sqNN d) (Set.Ioi 0 \ D) = 1 := by
+    intro t
+    have h1 := gaussianReal_abs_affine_mem t hd MeasurableSet.univ
+    simp only [Set.mem_univ, Set.ofPred_true, measure_univ, Set.univ_inter] at h1
+    rw [h1, ← foldedMeasure_union _ _ _ (measurableSet_Ioi.diff hD)]
+    · congr 1; ext x; simp only [Set.mem_union, Set.mem_inter_iff, Set.mem_sdiff]; tauto
+    · rw [Set.disjoint_left]; intro x hx hx'; exact hx'.2 hx.1
+  have hm : |c * v| ≤ |c * w| := by
+    rw [abs_mul, abs_mul]; exact mul_le_mul_of_nonneg_left hvw (abs_nonneg c)
+  have hmlr := foldedMeasure_mul_le hm (sqNN_ne_zero hd) (hD.inter measurableSet_Ioi)
+    (measurableSet_Ioi.diff hD) (A := D ∩ Set.Ioi 0) (B := Set.Ioi 0 \ D)
+    (fun x hx y hy => ⟨le_of_lt hy.1, le_of_not_gt fun hxy =>
+      hy.2 (hDup x y (le_of_lt hx.2) hxy.le hx.1)⟩)
+  set A' := foldedMeasure (c * v) (sqNN d) (D ∩ Set.Ioi 0)
+  set A := foldedMeasure (c * w) (sqNN d) (D ∩ Set.Ioi 0)
+  set B' := foldedMeasure (c * v) (sqNN d) (Set.Ioi 0 \ D)
+  set B := foldedMeasure (c * w) (sqNN d) (Set.Ioi 0 \ D)
+  have h1 : A + B = 1 := htot (c * w)
+  have h2 : A' + B' = 1 := htot (c * v)
+  calc A' = A' * (A + B) := by rw [h1, mul_one]
+    _ = A' * A + B * A' := by ring
+    _ ≤ A' * A + A * B' := by gcongr
+    _ = A * (A' + B') := by ring
+    _ = A := by rw [h2, mul_one]
+
 /-- **Key inequality for two-sided tests in a one-factor model.** Let `W` be independent of
 `(X, Y)`, `X` independent of `Y`, both standard normal, `b, d ≠ 0`, and let `U₁ ⊆ U₀` and `D`
 be measurable sets that are upward closed on `[0, ∞)`. With `E U = {|a W + b X| ∈ U}` and
@@ -369,34 +403,7 @@ theorem twoSided_key_ineq (P : Measure Ω) [IsProbabilityMeasure P] {W X Y : Ω 
   refine lintegral_mixture_mul_le _ (measurable_gaussianReal_abs_affine a b hU₀)
     (measurable_gaussianReal_abs_affine a b hU₁) (measurable_gaussianReal_abs_affine c d hD)
     ?_ ?_
-  · -- the conditional probability of `F` increases with `|w|`
-    intro w v hvw
-    rw [gaussianReal_abs_affine_mem _ hd hD, gaussianReal_abs_affine_mem _ hd hD]
-    have htot : ∀ t : ℝ, foldedMeasure t (sqNN d) (D ∩ Set.Ioi 0) +
-        foldedMeasure t (sqNN d) (Set.Ioi 0 \ D) = 1 := by
-      intro t
-      have h1 := gaussianReal_abs_affine_mem t hd MeasurableSet.univ
-      simp only [Set.mem_univ, Set.ofPred_true, measure_univ, Set.univ_inter] at h1
-      rw [h1, ← foldedMeasure_union _ _ _ (measurableSet_Ioi.diff hD)]
-      · congr 1; ext x; simp only [Set.mem_union, Set.mem_inter_iff, Set.mem_sdiff]; tauto
-      · rw [Set.disjoint_left]; intro x hx hx'; exact hx'.2 hx.1
-    have hm : |c * v| ≤ |c * w| := by
-      rw [abs_mul, abs_mul]; exact mul_le_mul_of_nonneg_left hvw (abs_nonneg c)
-    have hmlr := foldedMeasure_mul_le hm (sqNN_ne_zero hd) (hD.inter measurableSet_Ioi)
-      (measurableSet_Ioi.diff hD) (A := D ∩ Set.Ioi 0) (B := Set.Ioi 0 \ D)
-      (fun x hx y hy => ⟨le_of_lt hy.1, le_of_not_gt fun hxy =>
-        hy.2 (hDup x y (le_of_lt hx.2) hxy.le hx.1)⟩)
-    set A' := foldedMeasure (c * v) (sqNN d) (D ∩ Set.Ioi 0)
-    set A := foldedMeasure (c * w) (sqNN d) (D ∩ Set.Ioi 0)
-    set B' := foldedMeasure (c * v) (sqNN d) (Set.Ioi 0 \ D)
-    set B := foldedMeasure (c * w) (sqNN d) (Set.Ioi 0 \ D)
-    have h1 : A + B = 1 := htot (c * w)
-    have h2 : A' + B' = 1 := htot (c * v)
-    calc A' = A' * (A + B) := by rw [h1, mul_one]
-      _ = A' * A + B * A' := by ring
-      _ ≤ A' * A + A * B' := by gcongr
-      _ = A * (A' + B') := by ring
-      _ = A := by rw [h2, mul_one]
+  · exact fun w v hvw => gaussianReal_abs_affine_mono c hd hD hDup hvw
   · -- monotone likelihood ratio of `g₁ / g₀` in `|w|`
     intro w v hvw
     rw [gaussianReal_abs_affine_mem _ hb hU₀, gaussianReal_abs_affine_mem _ hb hU₀,
@@ -427,6 +434,75 @@ theorem twoSided_key_ineq (P : Measure Ω) [IsProbabilityMeasure P] {W X Y : Ω 
     calc A' * (A + B) = A' * A + B * A' := by ring
       _ ≤ A' * A + A * B' := by gcongr
       _ = A * (A' + B') := by ring
+
+/-- Conditioning on the first statistic itself: for `W` independent of a standard normal `Y`, the
+joint probability of `|W| ∈ U` and `|c W + d Y| ∈ D` is a mixture over the law of `W`. -/
+lemma measure_abs_inter_eq_lintegral_direct (P : Measure Ω) [IsProbabilityMeasure P]
+    {W Y : Ω → ℝ} (hW : Measurable W) (hY : Measurable Y) (hWY : IndepFun W Y P)
+    (hlawY : P.map Y = gaussianReal 0 1) (c d : ℝ) {U D : Set ℝ} (hU : MeasurableSet U)
+    (hD : MeasurableSet D) :
+    P ({ω | |W ω| ∈ U} ∩ {ω | |c * W ω + d * Y ω| ∈ D}) =
+      ∫⁻ w, {x : ℝ | |x| ∈ U}.indicator 1 w *
+        gaussianReal 0 1 {y | |c * w + d * y| ∈ D} ∂(P.map W) := by
+  have hjoint : P.map (fun ω => (W ω, Y ω)) = (P.map W).prod (P.map Y) :=
+    hWY.map_prod_eq_prod_map_map hW.aemeasurable hY.aemeasurable
+  set S : Set (ℝ × ℝ) := {z | |z.1| ∈ U} ∩ {z | |c * z.1 + d * z.2| ∈ D} with hSdef
+  have hS : MeasurableSet S := by
+    refine MeasurableSet.inter ?_ ?_
+    · exact (measurable_norm.comp measurable_fst) hU
+    · exact (measurable_norm.comp ((measurable_fst.const_mul c).add
+        (measurable_snd.const_mul d))) hD
+  have hset : {ω | |W ω| ∈ U} ∩ {ω | |c * W ω + d * Y ω| ∈ D} =
+      (fun ω => (W ω, Y ω)) ⁻¹' S := rfl
+  rw [hset, ← Measure.map_apply (hW.prodMk hY) hS, hjoint, hlawY, Measure.prod_apply hS]
+  refine lintegral_congr fun w => ?_
+  by_cases hw : |w| ∈ U
+  · have hsec : Prod.mk w ⁻¹' S = {y | |c * w + d * y| ∈ D} := by
+      ext y; simp [S, hw]
+    rw [hsec, Set.indicator_of_mem (show w ∈ {x : ℝ | |x| ∈ U} from hw), Pi.one_apply, one_mul]
+  · have hsec : Prod.mk w ⁻¹' S = ∅ := by
+      ext y; simp [S, hw]
+    rw [hsec, measure_empty, Set.indicator_of_notMem (show w ∉ {x : ℝ | |x| ∈ U} from hw),
+      zero_mul]
+
+/-- **Key inequality, conditioning statistic without noise.** Let `W` be independent of a
+standard normal `Y`, `d ≠ 0`, and let `U₁ ⊆ U₀` and `D` be measurable and upward closed on
+`[0, ∞)`. With `E U = {|W| ∈ U}` and `F = {|c W + d Y| ∈ D}`,
+`P (E U₀ ∩ F) P (E U₁) ≤ P (E U₁ ∩ F) P (E U₀)`. The law of `W` is arbitrary. -/
+theorem twoSided_key_ineq_direct (P : Measure Ω) [IsProbabilityMeasure P] {W Y : Ω → ℝ}
+    (hW : Measurable W) (hY : Measurable Y) (hWY : IndepFun W Y P)
+    (hlawY : P.map Y = gaussianReal 0 1) (c : ℝ) {d : ℝ} (hd : d ≠ 0) {U₀ U₁ D : Set ℝ}
+    (hU₀ : MeasurableSet U₀) (hU₁ : MeasurableSet U₁) (hD : MeasurableSet D) (hsub : U₁ ⊆ U₀)
+    (hU₁up : ∀ x y, 0 ≤ x → x ≤ y → x ∈ U₁ → y ∈ U₁)
+    (hDup : ∀ x y, 0 ≤ x → x ≤ y → x ∈ D → y ∈ D) :
+    P ({ω | |W ω| ∈ U₀} ∩ {ω | |c * W ω + d * Y ω| ∈ D}) * P {ω | |W ω| ∈ U₁}
+      ≤ P ({ω | |W ω| ∈ U₁} ∩ {ω | |c * W ω + d * Y ω| ∈ D}) * P {ω | |W ω| ∈ U₀} := by
+  have huniv : ∀ U : Set ℝ, P {ω | |W ω| ∈ U} =
+      P ({ω | |W ω| ∈ U} ∩ {ω | |c * W ω + d * Y ω| ∈ (Set.univ : Set ℝ)}) := by
+    intro U; congr 1; ext ω; simp
+  rw [huniv U₀, huniv U₁]
+  rw [measure_abs_inter_eq_lintegral_direct P hW hY hWY hlawY c d hU₀ hD,
+    measure_abs_inter_eq_lintegral_direct P hW hY hWY hlawY c d hU₁ hD,
+    measure_abs_inter_eq_lintegral_direct P hW hY hWY hlawY c d hU₀ MeasurableSet.univ,
+    measure_abs_inter_eq_lintegral_direct P hW hY hWY hlawY c d hU₁ MeasurableSet.univ]
+  simp only [Set.mem_univ, Set.ofPred_true, measure_univ, mul_one]
+  have hind : ∀ {U : Set ℝ}, MeasurableSet U →
+      Measurable ({x : ℝ | |x| ∈ U}.indicator (1 : ℝ → ℝ≥0∞)) := fun hU =>
+    measurable_const.indicator (measurable_norm hU)
+  refine lintegral_mixture_mul_le _ (hind hU₀) (hind hU₁)
+    (measurable_gaussianReal_abs_affine c d hD)
+    (fun w v hvw => gaussianReal_abs_affine_mono c hd hD hDup hvw) ?_
+  intro w v hvw
+  by_cases h1 : |v| ∈ U₁
+  · have h1w : |w| ∈ U₁ := hU₁up _ _ (abs_nonneg v) hvw h1
+    have h0v : |v| ∈ U₀ := hsub h1
+    rw [Set.indicator_of_mem (show v ∈ {x : ℝ | |x| ∈ U₁} from h1),
+      Set.indicator_of_mem (show w ∈ {x : ℝ | |x| ∈ U₁} from h1w),
+      Set.indicator_of_mem (show v ∈ {x : ℝ | |x| ∈ U₀} from h0v)]
+    simp only [Pi.one_apply, one_mul]
+    exact Set.indicator_le_self' (fun _ _ => zero_le) w |>.trans le_rfl
+  · rw [Set.indicator_of_notMem (show v ∉ {x : ℝ | |x| ∈ U₁} from h1), zero_mul]
+    exact zero_le
 
 end KeyInequality
 
