@@ -1,0 +1,74 @@
+import Applied.Economics.MatroidSecretaryDirectSum
+import Targets.Economics.MatroidSecretary
+
+/-!
+# Matroid secretary problem: partition matroids with capacities one
+
+- id: econ-matroid-secretary-partition
+- area: economics
+- status: formalized
+- source: folklore special case of the matroid secretary problem of M. Babaioff, N. Immorlica, R. Kleinberg, "Matroids, secretary problems, and online mechanisms", SODA 2007 (whether and where that paper states the partition-matroid case, and with which constant, to be confirmed); the per-block rule is the classical secretary rule (Lindley 1961, Dynkin 1963)
+- used-in: online selection with one slot per category; building block for reductions in the matroid secretary literature
+- prerequisites: `Applied/Economics/MatroidSecretary.lean` (model, half rule); Mathlib's `IndepMatroid.ofFinite`; `Measure.pi` is not needed here (deterministic algorithm)
+- statement-review: unreviewed
+
+Informal statement. Let `E` be a finite set and `f : E → ι` any map (`ι` an arbitrary type;
+the blocks are the fibres of `f`). The *partition matroid with capacities one*
+`partitionOne f` has as independent sets the sets containing at most one element of each
+block (Lean: `f` is injective on the set); its ground set is all of `E`. In the random-order
+model of `Targets/Economics/MatroidSecretary.lean` (weights non-negative and adversarial,
+fixed before a uniformly random arrival order, the algorithm knowing `E` and `f`), the
+following deterministic online algorithm is feasible (always accepts an independent set, for
+all non-negative weights) and `1/4`-competitive (expected accepted weight at least `1/4` of the
+weight of every independent set, hence of the optimum): inside each block, independently, skip
+the first `⌊nᵢ/2⌋` arrivals of that block (`nᵢ` = size of the block), then accept the first
+arrival of that block that beats all earlier arrivals of that block in the order "weight, then
+a fixed enumeration of the block" (`halfRuleLex`). Consequently the conclusion of the matroid
+secretary conjecture holds for this class with `c = 1/4`.
+
+Lean hypotheses and conventions disclosed.
+* `E : Type` with `[Fintype E]`; `ι : Type*` arbitrary (internally reduced to the finite type
+  `Set.range f`); no decidability assumption is visible (classical).
+* The algorithm (`partitionHalfRule`, via `blockSum`) may depend on `f` and on the block sizes:
+  the matroid is known in advance, as in the base model.
+* Competitiveness is the base model's `IsCompetitive` (average over all `n!` arrival orders of
+  `E`); the proof uses that the order induced on each block is uniform
+  (`card_blockOrder_fiber`) and that the expected weight splits over blocks
+  (`expWeight_blockSum`).
+* Blocks may be empty or singletons; ties among weights are allowed (broken by a fixed order).
+
+What is proved.
+* `exists_isCompetitive_partitionOne`: a feasible deterministic `1/4`-competitive algorithm
+  exists for every `partitionOne f`.
+* `hasCompetitiveRandomized_partitionOne`: hence `HasCompetitiveRandomized (partitionOne f) (1/4)`.
+* `partitionOne_isBlockSum`: `partitionOne f` is the direct sum of the rank-one uniform
+  matroids on its blocks.
+* `partitionOne_conclusion`: the conclusion of `MatroidSecretaryConjecture`, restricted to
+  partition matroids with capacities one, with `c = 1/4`.
+
+Not covered: partition matroids with capacities larger than one (each block a uniform matroid
+of rank `kᵢ ≥ 2`; this would follow from `HasCompetitiveRandomized.blockSum` once uniform
+matroids of rank `k` are done, which they are not here); the optimal constant `1/e`; the
+model where the algorithm does not know the blocks in advance.
+-/
+
+namespace Targets.Economics
+
+open Applied.Economics.MatroidSecretary
+
+alias partitionOne_isBlockSum := Applied.Economics.MatroidSecretary.partitionOne_isBlockSum
+
+alias exists_isCompetitive_partitionOne :=
+  Applied.Economics.MatroidSecretary.exists_isCompetitive_partitionOne
+
+alias hasCompetitiveRandomized_partitionOne :=
+  Applied.Economics.MatroidSecretary.hasCompetitiveRandomized_partitionOne
+
+/-- The conclusion of the matroid secretary conjecture holds with `c = 1/4` for partition
+matroids with capacities one (ground set `E`, blocks the fibres of any map `f`). -/
+theorem partitionOne_conclusion :
+    ∃ c : ℝ, 0 < c ∧ ∀ (E : Type) [Fintype E] (ι : Type) (f : E → ι),
+      (partitionOne f).E = Set.univ ∧ HasCompetitiveRandomized (partitionOne f) c :=
+  ⟨1 / 4, by norm_num, fun _ _ _ f => ⟨rfl, hasCompetitiveRandomized_partitionOne f⟩⟩
+
+end Targets.Economics
