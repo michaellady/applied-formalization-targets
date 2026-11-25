@@ -9,7 +9,7 @@ import Mathlib.Probability.CDF
 - id: stat-open-two-sided-gaussian
 - area: statistics
 - status: open
-- source: S. K. Sarkar, "On the Simes inequality and its generalization" (2008); S. K. Sarkar, arXiv:2304.05261 (2023); Y. Benjamini, "Discovering the false discovery rate", J. R. Statist. Soc. B 72 (2010)
+- source: S. K. Sarkar, "On the Simes inequality and its generalization" (2008); S. K. Sarkar, arXiv:2304.05261 (2023); Y. Benjamini, "Discovering the false discovery rate", J. R. Statist. Soc. B 72 (2010); A. Reiner-Benaim, Biometrical J. 49 (2007) 107–126. For the Benjamini–Hochberg half, two 2026 preprints claim a refutation: E. Dobriban, "The Benjamini–Hochberg Procedure Can Fail to Control the FDR for Correlated Two-Sided Gaussian Tests", arXiv:2607.12208v1 (13 Jul 2026), Theorem 1; L. Lei, "How Much Can Gaussian Dependence Inflate the Benjamini-Hochberg Procedure's FDR?", arXiv:2607.14812v4 (9 Oct 2026), Theorem 2.1 with Proposition 2.3
 - used-in: any study applying Hochberg, Hommel or Benjamini–Hochberg to two-sided z- or t-tests with correlated statistics, which is the usual situation in practice
 - prerequisites: multivariate normal distribution; rungs 5, 9 and 10 of the roadmap
 - statement-review: unreviewed
@@ -20,10 +20,24 @@ correlation matrix, and let `p i = 2 (1 - Φ(|Z i|))` be the two-sided p-values.
 * `SimesTwoSidedGaussian`: under the global null, the Simes test rejects with probability at
   most `α`. Reported as a long-standing conjecture; no counterexample found in our search.
 * `BHTwoSidedGaussian`: Benjamini–Hochberg controls the false discovery rate at `α` when the
-  true nulls have mean zero. Long conjectured; a web search in November 2026 surfaced a
-  preprint attributed to E. Dobriban, titled "The Benjamini–Hochberg procedure can fail to
-  control the FDR for correlated two-sided Gaussian tests" (citation to be confirmed; we have
-  not read or verified it). Treat the truth value as unknown.
+  true nulls have mean zero. Conjectured for about twenty years (Reiner-Benaim 2007, Benjamini
+  2010, Sarkar 2023). Two preprints of July 2026, both read for this project on 25 Nov 2026,
+  claim it is false:
+  - Dobriban (arXiv:2607.12208v1, Theorem 1): in a one-factor model with `m = 100 N`
+    hypotheses (`96 N` true nulls `0.3 Z + √0.91 εᵢ`, `N` non-nulls `2.4 - 0.3 Z + √0.91 ηⱼ`,
+    `3 N` non-nulls `4.4 - 0.72 Z + (√301 / 25) ξₖ`, positive definite correlation matrix), at
+    `α = 0.01` the false discovery rate exceeds `0.0104` for all sufficiently large `N`. The
+    proof is asymptotic (conditioning on `Z`, Glivenko–Cantelli, Fatou) and ends with an
+    interval-arithmetic certificate over 1000 bins of `Z` and a grid of 7425 thresholds, run
+    with the Arb library; the preprint states the proof was produced by a language model and
+    checked by the author.
+  - Lei (arXiv:2607.14812v4, Theorem 2.1 and Proposition 2.3): for every `q ∈ (0, 1)` there
+    are finite Gaussian models with positive definite correlation matrix whose false discovery
+    rate is arbitrarily close to an explicit `ℓ₌(q) > q`, with
+    `ℓ₌(q) = q √(log(1/q)) / (2 √π) + 0.6492828… q + o(q)`; so no bound of the form `C q` holds.
+  Neither preprint has been machine-checked, and we do not know of a peer-reviewed version.
+  Nothing in this file asserts or refutes the statement: it stays a `def`. Partial results
+  towards a machine-checked refutation, if any, are listed at the end of this header.
 
 Both are written as propositions, not theorems, so nothing here asserts them.
 
