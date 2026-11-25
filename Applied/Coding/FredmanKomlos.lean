@@ -281,4 +281,178 @@ theorem card_filter_injective_comp {β : Type*} [Fintype β] [DecidableEq β] (�
 
 end InjSum
 
+section FK
+
+variable {β : Type*} [Fintype β] [DecidableEq β] {n : ℕ}
+
+/-- For a tuple `c` of codewords and a coordinate `i`: the codewords `x` such that the symbols
+`c₁(i), …, c_m(i), x(i)` are pairwise distinct. -/
+noncomputable def fkFree {m k : ℕ} (w : β → Fin n → Fin k) (c : Fin m → β) (i : Fin n) :
+    Finset β :=
+  univ.filter fun x => Function.Injective (fun t => w (c t) i) ∧
+    w x i ∉ univ.image (fun t => w (c t) i)
+
+/-- **Hansel's lemma applied to one tuple** (the reduction of Fredman and Komlós). Fix `m`
+distinct codewords `c₁, …, c_m` of a perfect `(m+2)`-hash family. For every coordinate where
+their symbols are distinct, two symbols remain; the codewords taking these two symbols form a
+complete bipartite graph on the other codewords, and these graphs cover all pairs. -/
+theorem hansel_fkFree {m : ℕ} (w : β → Fin n → Fin (m + 2))
+    (H : ∀ S : Finset β, S.card = m + 2 → ∃ i, Set.InjOn (fun b => w b i) S)
+    (c : Fin m → β) (hc : Function.Injective c) :
+    ((Fintype.card β - m : ℕ) : ℝ) * Real.logb 2 ((Fintype.card β - m : ℕ) : ℝ) ≤
+      ∑ i, ((fkFree w c i).card : ℝ) := by
+  classical
+  set V : Finset β := univ \ univ.image c with hVdef
+  have hV : V.card = Fintype.card β - m := by
+    rw [hVdef, card_sdiff_of_subset (subset_univ _), card_univ, card_image_of_injective _ hc,
+      card_univ, Fintype.card_fin]
+  set A : Fin n → Finset (Fin (m + 2)) := fun i => univ.image (fun t => w (c t) i) with hA
+  set X : Fin n → Finset β := fun i => V.filter fun x => Function.Injective (fun t => w (c t) i) ∧
+    w x i ∉ A i ∧ ∀ y, y ∉ A i → w x i ≤ y with hX
+  set Y : Fin n → Finset β := fun i => V.filter fun x => Function.Injective (fun t => w (c t) i) ∧
+    w x i ∉ A i ∧ ∃ y, y ∉ A i ∧ y < w x i with hY
+  have hdisj : ∀ i ∈ (univ : Finset (Fin n)), Disjoint (X i) (Y i) := by
+    intro i _
+    rw [disjoint_left]
+    intro x hx hy
+    obtain ⟨-, -, -, hle⟩ := mem_filter.mp hx
+    obtain ⟨-, -, -, y, hy, hlt⟩ := mem_filter.mp hy
+    exact absurd (hle y hy) (not_le.mpr hlt)
+  have hcov : BicliqueCover V univ X Y := by
+    intro u hu v hv huv
+    have hu' : u ∉ univ.image c := (mem_sdiff.mp hu).2
+    have hv' : v ∉ univ.image c := (mem_sdiff.mp hv).2
+    set S := insert u (insert v (univ.image c)) with hS
+    have hScard : S.card = m + 2 := by
+      rw [hS, card_insert_of_notMem, card_insert_of_notMem hv', card_image_of_injective _ hc,
+        card_univ, Fintype.card_fin]
+      simp only [mem_insert, not_or]
+      exact ⟨huv, hu'⟩
+    obtain ⟨i, hi⟩ := H S hScard
+    have hcS : ∀ t, c t ∈ S := fun t => by
+      rw [hS]; exact mem_insert_of_mem (mem_insert_of_mem (mem_image_of_mem _ (mem_univ t)))
+    have huS : u ∈ S := mem_insert_self _ _
+    have hvS : v ∈ S := mem_insert_of_mem (mem_insert_self _ _)
+    have hinj : Function.Injective (fun t => w (c t) i) :=
+      fun t t' e => hc (hi (mem_coe.mpr (hcS t)) (mem_coe.mpr (hcS t')) e)
+    have hnot : ∀ x ∈ S, x ∉ univ.image c → w x i ∉ A i := by
+      intro x hx hx' hmem
+      obtain ⟨t, -, e⟩ := mem_image.mp hmem
+      exact hx' (mem_image.mpr ⟨t, mem_univ _, hi (mem_coe.mpr (hcS t)) (mem_coe.mpr hx) e⟩)
+    have hua := hnot u huS hu'
+    have hva := hnot v hvS hv'
+    have huv' : w u i ≠ w v i := fun e => huv (hi (mem_coe.mpr huS) (mem_coe.mpr hvS) e)
+    have hAcard : (A i).card = m := by
+      rw [hA]; simp only
+      rw [card_image_of_injective _ hinj, card_univ, Fintype.card_fin]
+    have hcompl : ({w u i, w v i} : Finset (Fin (m + 2))) = univ \ A i := by
+      apply eq_of_subset_of_card_le
+      · intro y hy
+        simp only [mem_insert, mem_singleton] at hy
+        rcases hy with rfl | rfl
+        · exact mem_sdiff.mpr ⟨mem_univ _, hua⟩
+        · exact mem_sdiff.mpr ⟨mem_univ _, hva⟩
+      · rw [card_sdiff_of_subset (subset_univ _), card_univ, Fintype.card_fin, hAcard,
+          card_pair huv']
+        omega
+    have hrest : ∀ y, y ∉ A i → y = w u i ∨ y = w v i := by
+      intro y hy
+      have : y ∈ ({w u i, w v i} : Finset (Fin (m + 2))) := by
+        rw [hcompl]; exact mem_sdiff.mpr ⟨mem_univ _, hy⟩
+      simpa using this
+    refine ⟨i, mem_univ _, ?_⟩
+    rcases lt_or_gt_of_ne huv' with h | h
+    · left
+      refine ⟨mem_filter.mpr ⟨hu, hinj, hua, fun y hy => ?_⟩,
+        mem_filter.mpr ⟨hv, hinj, hva, w u i, hua, h⟩⟩
+      rcases hrest y hy with rfl | rfl
+      · exact le_rfl
+      · exact h.le
+    · right
+      refine ⟨mem_filter.mpr ⟨hv, hinj, hva, fun y hy => ?_⟩,
+        mem_filter.mpr ⟨hu, hinj, hua, w v i, hva, h⟩⟩
+      rcases hrest y hy with rfl | rfl
+      · exact h.le
+      · exact le_rfl
+  have hh := hansel V univ X Y hdisj hcov
+  rw [hV] at hh
+  refine hh.trans (sum_le_sum fun i _ => ?_)
+  have hsub : (V.filter fun v => v ∈ X i ∨ v ∈ Y i) ⊆ fkFree w c i := by
+    intro x hx
+    rw [mem_filter] at hx
+    rw [fkFree, mem_filter]
+    rcases hx.2 with h | h
+    · obtain ⟨-, h1, h2, -⟩ := mem_filter.mp h
+      exact ⟨mem_univ _, h1, h2⟩
+    · obtain ⟨-, h1, h2, -⟩ := mem_filter.mp h
+      exact ⟨mem_univ _, h1, h2⟩
+  exact_mod_cast card_le_card hsub
+
+omit [DecidableEq β] in
+/-- Summing the free counts over all tuples `c` gives the number of `(m+1)`-tuples of
+codewords with pairwise distinct symbols in coordinate `i`. -/
+theorem sum_card_fkFree {m k : ℕ} (w : β → Fin n → Fin k) (i : Fin n) :
+    ∑ c : Fin m → β, (fkFree w c i).card =
+      ((univ : Finset (Fin (m + 1) → β)).filter
+        fun f => Function.Injective ((fun b => w b i) ∘ f)).card := by
+  classical
+  rw [card_filter, ← (Fin.consEquiv fun _ => β).sum_comp, Fintype.sum_prod_type, sum_comm]
+  refine sum_congr rfl fun c _ => ?_
+  rw [fkFree, card_filter]
+  refine sum_congr rfl fun x _ => ?_
+  have hc : (Fin.consEquiv fun _ => β) (x, c) = Fin.cons x c := rfl
+  rw [hc]
+  refine if_congr ?_ rfl rfl
+  rw [Fin.comp_cons, Fin.cons_injective_iff]
+  simp only [Set.mem_range, mem_image, mem_univ, true_and, Function.comp_def]
+  tauto
+
+/-- **Fredman–Komlós bound, core form.** Let `β` be a finite set of `N` codewords, each a word
+`w b` of length `n` over `{0, …, m+1}`, such that any `m + 2` codewords take pairwise distinct
+values in some coordinate. Then
+`N (N-1) ⋯ (N-m) · log₂ (N - m) ≤ n · (m+2)! · (N / (m+2))^{m+1}`. -/
+theorem fredmanKomlos_core {m : ℕ} (w : β → Fin n → Fin (m + 2))
+    (H : ∀ S : Finset β, S.card = m + 2 → ∃ i, Set.InjOn (fun b => w b i) S) :
+    ((Fintype.card β).descFactorial (m + 1) : ℝ) * Real.logb 2 ((Fintype.card β - m : ℕ) : ℝ) ≤
+      n * (m + 2).factorial * ((Fintype.card β : ℝ) / (m + 2 : ℕ)) ^ (m + 1) := by
+  classical
+  set N := Fintype.card β
+  set D : Finset (Fin m → β) := univ.filter Function.Injective with hD
+  have hDcard : D.card = N.descFactorial m := by
+    rw [hD, ← Fintype.card_subtype, Fintype.card_congr (Equiv.subtypeInjectiveEquivEmbedding _ _),
+      Fintype.card_embedding_eq, Fintype.card_fin]
+  set L := ((N - m : ℕ) : ℝ) * Real.logb 2 ((N - m : ℕ) : ℝ)
+  have hL0 : ∀ c ∈ D, L ≤ ∑ i, ((fkFree w c i).card : ℝ) := fun c hc =>
+    hansel_fkFree w H c (mem_filter.mp hc).2
+  have hmass : ∀ i : Fin n,
+      ∑ s, ((univ.filter fun b : β => w b i = s).card : ℝ) = N := by
+    intro i
+    rw [← Nat.cast_sum, ← card_eq_sum_card_fiberwise (fun _ _ => mem_coe.mpr (mem_univ _)),
+      card_univ]
+  calc ((N.descFactorial (m + 1) : ℕ) : ℝ) * Real.logb 2 ((N - m : ℕ) : ℝ)
+      = ∑ _c ∈ D, L := by
+        rw [sum_const, hDcard, nsmul_eq_mul, Nat.descFactorial_succ]
+        push_cast
+        ring
+    _ ≤ ∑ c ∈ D, ∑ i, ((fkFree w c i).card : ℝ) := sum_le_sum hL0
+    _ ≤ ∑ c : Fin m → β, ∑ i, ((fkFree w c i).card : ℝ) :=
+        sum_le_sum_of_subset_of_nonneg (subset_univ _)
+          (fun _ _ _ => sum_nonneg fun _ _ => Nat.cast_nonneg _)
+    _ = ∑ i, ∑ c : Fin m → β, ((fkFree w c i).card : ℝ) := sum_comm
+    _ = ∑ i, injSum (fun s => ((univ.filter fun b : β => w b i = s).card : ℝ)) univ (m + 1) := by
+        refine sum_congr rfl fun i _ => ?_
+        rw [← Nat.cast_sum, sum_card_fkFree]
+        exact card_filter_injective_comp (fun b => w b i) (m + 1)
+    _ ≤ ∑ _i : Fin n, ((m + 2).factorial * ((N : ℝ) / (m + 2 : ℕ)) ^ (m + 1) : ℝ) := by
+        refine sum_le_sum fun i _ => ?_
+        have h := injSum_univ_le (fun s => ((univ.filter fun b : β => w b i = s).card : ℝ))
+          (fun _ => Nat.cast_nonneg _) (k := m + 1) (by rw [Fintype.card_fin])
+        rw [hmass i] at h
+        exact h
+    _ = n * (m + 2).factorial * ((N : ℝ) / (m + 2 : ℕ)) ^ (m + 1) := by
+        rw [sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul]
+        ring
+
+end FK
+
 end Applied.Coding
