@@ -46,9 +46,10 @@ by another two-element type must be transported by hand.
 For the `2 × 2` results the pure strategy sets are literally `Fin 2`; games whose two-element
 strategy sets are other types must be transported by hand.
 
-Not covered: general-sum two-player games beyond `2 × 2` (e.g. `2 × n`, `3 × 3`), games with
-three or more players, and Nash's theorem itself, which remains open in this project (`sorry` in
-`Targets/Economics/NashExistence.lean`).
+Not covered here by direct arguments: general-sum two-player games beyond `2 × 2` and games
+with three or more players. These are all covered by Nash's general existence theorem, proved
+via Brouwer's theorem in `Targets/Economics/NashExistence.lean`; the results in this file give
+independent proofs that avoid fixed-point theorems.
 -/
 
 namespace Targets.Economics

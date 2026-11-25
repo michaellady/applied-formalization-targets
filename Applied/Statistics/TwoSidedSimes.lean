@@ -1,0 +1,1017 @@
+import Applied.Statistics.PRDSFactorModels
+import Applied.Statistics.Simes
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Probability.Distributions.Gaussian.HasGaussianLaw.Independence
+
+/-!
+# The Simes test for two-sided z-tests: two statistics, and boundary cases
+
+Two-sided p-values `p j = 2 (1 - Φ(|Z j|))` of correlated normal statistics are not covered by
+the positive-dependence results of `Applied/Statistics/PRDS.lean`: `p j` is not a monotone
+function of `Z j`. This file proves the Simes inequality in the following situations.
+
+* `measure_simes_twoSided_bivariateGaussian`: **two statistics, any correlation.** `Z 0`, `Z 1`
+  jointly Gaussian (`IsGaussian` law on `Fin 2 → ℝ`), each standard normal, correlation
+  `ρ ∈ [-1, 1]` arbitrary.
+* `measure_simes_twoSided_oneFactor_two`: the same in an explicit one-factor form
+  `Z j = a j W + b j ε j` (`j = 0, 1`) with `W`, `ε 0`, `ε 1` independent standard normal,
+  `a j ^ 2 + b j ^ 2 = 1` and `b j ≠ 0`; loadings of either sign, correlation `a 0 a 1 ∈ (-1, 1)`.
+* `measure_simes_twoSided_abs_eq`: **perfectly correlated statistics.** If `|Z j| = |Z₀|` for
+  every `j` (for example `Z j = ± Z₀`, correlation `±1`) with `Z₀` standard normal.
+* `fwer_hommel_twoSided_le_of_card_le_two`, `fwer_hochberg_twoSided_le_of_card_le_two`:
+  Hommel's and Hochberg's procedures on two-sided p-values control the family-wise error rate
+  when at most two hypotheses are true nulls and their statistics are jointly Gaussian and
+  standard normal.
+
+## Proof for two statistics
+
+For `m = 2` the Simes test rejects when `p₍₁₎ ≤ α / 2` or `p₍₂₎ ≤ α`. With
+`A j = {p j ≤ α / 2}` and `B j = {p j ≤ α}`, the rejection probability is at most
+`P (B 0 ∩ B 1) + P (A 0) - P (A 0 ∩ B 1) + P (A 1) - P (A 1 ∩ B 0)`, and the bound `α` follows
+from validity (`P (A j) ≤ α / 2`, `P (B j) ≤ α`) and the two inequalities
+`P (A i ∩ B k) P (B i) ≥ P (B i ∩ B k) P (A i)` (`measure_simes_two_of_key`). For the latter
+(`twoSided_key_ineq`, `twoSided_key_ineq_direct`; for a bivariate normal pair with `|ρ| < 1`,
+`twoSided_key_ineq_gaussianPair` writes `Z k = ρ Z i + √(1 - ρ²) Y` with `Y` independent of
+`Z i`), condition on the common factor `W = w`: `|Z 0|` and `|Z 1|` become independent folded
+normal variables whose location is `|a j w|`. The folded normal family has a monotone likelihood ratio in the location
+(`foldedPDF_mul_le`, from `cosh (a x) cosh (b y) ≥ cosh (a y) cosh (b x)` for `a ≥ b ≥ 0`,
+`x ≥ y ≥ 0`), so both conditional probabilities increase with `|w|` in the right sense, and a
+symmetrisation over two independent copies of `W` (`lintegral_mixture_mul_le`) concludes.
+-/
+
+open MeasureTheory ProbabilityTheory Real Finset
+open scoped ENNReal NNReal
+
+namespace Applied.MultipleTesting
+
+section FoldedNormal
+
+/-- `cosh (a y) cosh (b x) ≤ cosh (a x) cosh (b y)` for `0 ≤ b ≤ a` and `0 ≤ y ≤ x`. -/
+lemma cosh_mul_cosh_le {a b x y : ℝ} (hb : 0 ≤ b) (hab : b ≤ a) (hy : 0 ≤ y) (hxy : y ≤ x) :
+    cosh (a * y) * cosh (b * x) ≤ cosh (a * x) * cosh (b * y) := by
+  have ha : 0 ≤ a := hb.trans hab
+  have hx : 0 ≤ x := hy.trans hxy
+  have e : ∀ u w : ℝ, cosh u * cosh w = (cosh (u + w) + cosh (u - w)) / 2 := by
+    intro u w; rw [cosh_add, cosh_sub]; ring
+  rw [e, e]
+  have h1 : cosh (a * y + b * x) ≤ cosh (a * x + b * y) := by
+    rw [cosh_le_cosh, abs_of_nonneg (add_nonneg (mul_nonneg ha hy) (mul_nonneg hb hx)),
+      abs_of_nonneg (add_nonneg (mul_nonneg ha hx) (mul_nonneg hb hy))]
+    nlinarith [mul_nonneg (sub_nonneg.2 hab) (sub_nonneg.2 hxy)]
+  have h2 : cosh (a * y - b * x) ≤ cosh (a * x - b * y) := by
+    rw [cosh_le_cosh, ← sq_le_sq]
+    have hA : 0 ≤ a ^ 2 - b ^ 2 := by nlinarith
+    have hX : 0 ≤ x ^ 2 - y ^ 2 := by nlinarith
+    nlinarith [mul_nonneg hA hX]
+  linarith
+
+/-- Density of `|X|` on `(0, ∞)` for `X ∼ N(m, v)`. -/
+noncomputable def foldedPDF (m : ℝ) (v : ℝ≥0) (x : ℝ) : ℝ :=
+  gaussianPDFReal m v x + gaussianPDFReal (-m) v x
+
+lemma foldedPDF_nonneg (m : ℝ) (v : ℝ≥0) (x : ℝ) : 0 ≤ foldedPDF m v x :=
+  add_nonneg (gaussianPDFReal_nonneg _ _ _) (gaussianPDFReal_nonneg _ _ _)
+
+lemma foldedPDF_eq (m : ℝ) {v : ℝ≥0} (hv : v ≠ 0) (x : ℝ) :
+    foldedPDF m v x =
+      2 * (√(2 * π * v))⁻¹ * rexp (-(x ^ 2 + m ^ 2) / (2 * v)) * cosh (m * x / v) := by
+  have hv' : (v : ℝ) ≠ 0 := by exact_mod_cast hv
+  simp only [foldedPDF, gaussianPDFReal, cosh_eq]
+  have e1 : rexp (-(x - m) ^ 2 / (2 * v)) =
+      rexp (-(x ^ 2 + m ^ 2) / (2 * v)) * rexp (m * x / v) := by
+    rw [← Real.exp_add]; congr 1; field_simp; ring
+  have e2 : rexp (-(x - -m) ^ 2 / (2 * v)) =
+      rexp (-(x ^ 2 + m ^ 2) / (2 * v)) * rexp (-(m * x / v)) := by
+    rw [← Real.exp_add]; congr 1; field_simp; ring
+  rw [e1, e2]; ring
+
+/-- **Monotone likelihood ratio of the folded normal family.** For `|m'| ≤ |m|` and
+`0 ≤ y ≤ x`, `f_m(y) f_{m'}(x) ≤ f_m(x) f_{m'}(y)`, where `f_m` is the density of `|X|`,
+`X ∼ N(m, v)`. -/
+lemma foldedPDF_mul_le {m m' : ℝ} (hm : |m'| ≤ |m|) (v : ℝ≥0) {x y : ℝ} (hy : 0 ≤ y)
+    (hxy : y ≤ x) :
+    foldedPDF m v y * foldedPDF m' v x ≤ foldedPDF m v x * foldedPDF m' v y := by
+  by_cases hv : v = 0
+  · simp [foldedPDF, hv]
+  have hvpos : (0 : ℝ) < v := by
+    rcases (v.coe_nonneg).eq_or_lt with h | h
+    · exact absurd (by exact_mod_cast h.symm) hv
+    · exact h
+  have hx : 0 ≤ x := hy.trans hxy
+  rw [foldedPDF_eq _ hv, foldedPDF_eq _ hv, foldedPDF_eq _ hv, foldedPDF_eq _ hv]
+  have habs : ∀ (c z : ℝ), 0 ≤ z → cosh (c * z / v) = cosh (|c| / v * z) := by
+    intro c z hz
+    rw [← cosh_abs (c * z / v), ← cosh_abs (|c| / v * z)]
+    congr 1
+    rw [abs_div, abs_mul, abs_of_nonneg hz, abs_of_pos hvpos, abs_mul, abs_div, abs_abs,
+      abs_of_pos hvpos, abs_of_nonneg hz]
+    ring
+  rw [habs m y hy, habs m' x hx, habs m x hx, habs m' y hy]
+  have hc := cosh_mul_cosh_le (a := |m| / v) (b := |m'| / v) (by positivity)
+    (div_le_div_of_nonneg_right hm hvpos.le) hy hxy
+  have hE : rexp (-(y ^ 2 + m ^ 2) / (2 * v)) * rexp (-(x ^ 2 + m' ^ 2) / (2 * v)) =
+      rexp (-(x ^ 2 + m ^ 2) / (2 * v)) * rexp (-(y ^ 2 + m' ^ 2) / (2 * v)) := by
+    rw [← Real.exp_add, ← Real.exp_add]; congr 1; ring
+  have hK : 0 ≤ 2 * (√(2 * π * v))⁻¹ * (2 * (√(2 * π * v))⁻¹) *
+      (rexp (-(x ^ 2 + m ^ 2) / (2 * v)) * rexp (-(y ^ 2 + m' ^ 2) / (2 * v))) := by
+    positivity
+  calc 2 * (√(2 * π * v))⁻¹ * rexp (-(y ^ 2 + m ^ 2) / (2 * v)) * cosh (|m| / v * y) *
+        (2 * (√(2 * π * v))⁻¹ * rexp (-(x ^ 2 + m' ^ 2) / (2 * v)) * cosh (|m'| / v * x))
+      = 2 * (√(2 * π * v))⁻¹ * (2 * (√(2 * π * v))⁻¹) *
+          (rexp (-(y ^ 2 + m ^ 2) / (2 * v)) * rexp (-(x ^ 2 + m' ^ 2) / (2 * v))) *
+          (cosh (|m| / v * y) * cosh (|m'| / v * x)) := by ring
+    _ = 2 * (√(2 * π * v))⁻¹ * (2 * (√(2 * π * v))⁻¹) *
+          (rexp (-(x ^ 2 + m ^ 2) / (2 * v)) * rexp (-(y ^ 2 + m' ^ 2) / (2 * v))) *
+          (cosh (|m| / v * y) * cosh (|m'| / v * x)) := by rw [hE]
+    _ ≤ 2 * (√(2 * π * v))⁻¹ * (2 * (√(2 * π * v))⁻¹) *
+          (rexp (-(x ^ 2 + m ^ 2) / (2 * v)) * rexp (-(y ^ 2 + m' ^ 2) / (2 * v))) *
+          (cosh (|m| / v * x) * cosh (|m'| / v * y)) := mul_le_mul_of_nonneg_left hc hK
+    _ = _ := by ring
+
+/-- The law of `|X|` for `X ∼ N(m, v)`, restricted to subsets of `(0, ∞)`:
+`N(m, v)(S) + N(-m, v)(S)`. -/
+noncomputable def foldedMeasure (m : ℝ) (v : ℝ≥0) (S : Set ℝ) : ℝ≥0∞ :=
+  gaussianReal m v S + gaussianReal (-m) v S
+
+lemma foldedMeasure_eq_lintegral (m : ℝ) {v : ℝ≥0} (hv : v ≠ 0) {S : Set ℝ}
+    (hS : MeasurableSet S) :
+    foldedMeasure m v S = ∫⁻ x in S, ENNReal.ofReal (foldedPDF m v x) := by
+  simp only [foldedMeasure, gaussianReal_of_var_ne_zero _ hv, withDensity_apply _ hS,
+    gaussianPDF, foldedPDF]
+  rw [← lintegral_add_left (measurable_gaussianPDFReal m v).ennreal_ofReal]
+  refine lintegral_congr fun x => ?_
+  rw [ENNReal.ofReal_add (gaussianPDFReal_nonneg _ _ _) (gaussianPDFReal_nonneg _ _ _)]
+
+/-- **Monotone likelihood ratio of the folded normal family, set form.** If `|m'| ≤ |m|`,
+every point of `B` is non-negative and every point of `A` is at least every point of `B`,
+then `F_m(B) F_{m'}(A) ≤ F_m(A) F_{m'}(B)`. -/
+theorem foldedMeasure_mul_le {m m' : ℝ} (hm : |m'| ≤ |m|) {v : ℝ≥0} (hv : v ≠ 0)
+    {A B : Set ℝ} (hA : MeasurableSet A) (hB : MeasurableSet B)
+    (hAB : ∀ x ∈ A, ∀ y ∈ B, 0 ≤ y ∧ y ≤ x) :
+    foldedMeasure m v B * foldedMeasure m' v A ≤ foldedMeasure m v A * foldedMeasure m' v B := by
+  rw [foldedMeasure_eq_lintegral _ hv hA, foldedMeasure_eq_lintegral _ hv hB,
+    foldedMeasure_eq_lintegral _ hv hA, foldedMeasure_eq_lintegral _ hv hB]
+  have hmeas : ∀ m₁ : ℝ, Measurable fun x => ENNReal.ofReal (foldedPDF m₁ v x) := fun m₁ =>
+    ((measurable_gaussianPDFReal m₁ v).add (measurable_gaussianPDFReal (-m₁) v)).ennreal_ofReal
+  have e : ∀ (m₁ m₂ : ℝ) (S T : Set ℝ),
+      (∫⁻ y in S, ENNReal.ofReal (foldedPDF m₁ v y)) * (∫⁻ x in T, ENNReal.ofReal (foldedPDF m₂ v x))
+        = ∫⁻ x in T, ∫⁻ y in S,
+            ENNReal.ofReal (foldedPDF m₁ v y) * ENNReal.ofReal (foldedPDF m₂ v x) := by
+    intro m₁ m₂ S T
+    rw [mul_comm, ← lintegral_mul_const _ (hmeas m₂)]
+    refine lintegral_congr fun x => ?_
+    rw [mul_comm, ← lintegral_mul_const _ (hmeas m₁)]
+  have e' : ∀ (m₁ m₂ : ℝ) (S T : Set ℝ),
+      (∫⁻ x in T, ENNReal.ofReal (foldedPDF m₁ v x)) * (∫⁻ y in S, ENNReal.ofReal (foldedPDF m₂ v y))
+        = ∫⁻ x in T, ∫⁻ y in S,
+            ENNReal.ofReal (foldedPDF m₁ v x) * ENNReal.ofReal (foldedPDF m₂ v y) := by
+    intro m₁ m₂ S T
+    rw [← lintegral_mul_const _ (hmeas m₁)]
+    refine lintegral_congr fun x => ?_
+    rw [← lintegral_const_mul _ (hmeas m₂)]
+  rw [e m m' B A, e' m m' B A]
+  refine setLIntegral_mono' hA fun x hx => setLIntegral_mono' hB fun y hy => ?_
+  rw [← ENNReal.ofReal_mul (foldedPDF_nonneg _ _ _), ← ENNReal.ofReal_mul (foldedPDF_nonneg _ _ _)]
+  exact ENNReal.ofReal_le_ofReal (foldedPDF_mul_le hm v (hAB x hx y hy).1 (hAB x hx y hy).2)
+
+end FoldedNormal
+
+section Folding
+
+/-- The variance `b ^ 2` as a non-negative real. -/
+noncomputable def sqNN (b : ℝ) : ℝ≥0 := ⟨b ^ 2, sq_nonneg b⟩
+
+lemma sqNN_ne_zero {b : ℝ} (hb : b ≠ 0) : sqNN b ≠ 0 := by
+  intro h
+  have h' : b ^ 2 = 0 := congrArg NNReal.toReal h
+  exact hb (pow_eq_zero_iff (n := 2) (by norm_num) |>.mp h')
+
+lemma map_affine_gaussian (t b : ℝ) :
+    (gaussianReal 0 1).map (fun x => t + b * x) = gaussianReal t (sqNN b) := by
+  have : (fun x : ℝ => t + b * x) = (t + ·) ∘ (b * ·) := rfl
+  rw [this, ← Measure.map_map (measurable_const_add t) (measurable_const_mul b),
+    gaussianReal_map_const_mul, gaussianReal_map_const_add]
+  congr 1
+  · simp
+  · ext; simp [sqNN]; rfl
+
+lemma foldedMeasure_union (m : ℝ) (v : ℝ≥0) {A B : Set ℝ} (hd : Disjoint A B)
+    (hB : MeasurableSet B) :
+    foldedMeasure m v (A ∪ B) = foldedMeasure m v A + foldedMeasure m v B := by
+  simp only [foldedMeasure, measure_union hd hB]
+  ring
+
+/-- For `S ⊆ (0, ∞)`, `N(t, v)(|y| ∈ S) = N(t, v)(S) + N(-t, v)(S)`. -/
+lemma gaussianReal_abs_mem (t : ℝ) (v : ℝ≥0) {S : Set ℝ} (hS : MeasurableSet S)
+    (hpos : S ⊆ Set.Ioi 0) :
+    gaussianReal t v {y | |y| ∈ S} = foldedMeasure t v S := by
+  have hset : {y : ℝ | |y| ∈ S} = S ∪ (fun y => -y) ⁻¹' S := by
+    ext y
+    simp only [Set.mem_ofPred_eq, Set.mem_union, Set.mem_preimage]
+    rcases abs_cases y with ⟨h, _⟩ | ⟨h, _⟩ <;> rw [h]
+    · constructor
+      · exact Or.inl
+      · rintro (hy | hy)
+        · exact hy
+        · have := hpos hy; simp only [Set.mem_Ioi] at this; linarith
+    · constructor
+      · exact Or.inr
+      · rintro (hy | hy)
+        · have := hpos hy; simp only [Set.mem_Ioi] at this; linarith
+        · exact hy
+  have hd : Disjoint S ((fun y => -y) ⁻¹' S) := by
+    rw [Set.disjoint_left]
+    intro y hy hy'
+    have h1 := hpos hy
+    have h2 := hpos hy'
+    simp only [Set.mem_Ioi] at h1 h2
+    linarith
+  rw [hset, measure_union hd (measurable_neg hS), ← Measure.map_apply measurable_neg hS,
+    gaussianReal_map_neg, foldedMeasure]
+
+/-- The probability that `|t + b X| ∈ U`, `X` standard normal, `b ≠ 0`, through the folded
+normal law on `(0, ∞)`. -/
+lemma gaussianReal_abs_affine_mem (t : ℝ) {b : ℝ} (hb : b ≠ 0) {U : Set ℝ}
+    (hU : MeasurableSet U) :
+    gaussianReal 0 1 {x | |t + b * x| ∈ U} = foldedMeasure t (sqNN b) (U ∩ Set.Ioi 0) := by
+  have hmeas : Measurable fun x : ℝ => t + b * x := (measurable_const_mul b).const_add t
+  have hU' : MeasurableSet {y : ℝ | |y| ∈ U} := measurable_norm hU
+  have e : gaussianReal 0 1 {x | |t + b * x| ∈ U} = gaussianReal t (sqNN b) {y | |y| ∈ U} := by
+    rw [← map_affine_gaussian, Measure.map_apply hmeas hU']
+    rfl
+  rw [e, ← gaussianReal_abs_mem t _ (hU.inter measurableSet_Ioi) Set.inter_subset_right]
+  have := nullSingletonClass_gaussianReal (μ := t) (sqNN_ne_zero hb)
+  refine le_antisymm ?_ (measure_mono fun y hy => hy.1)
+  calc gaussianReal t (sqNN b) {y | |y| ∈ U}
+      ≤ gaussianReal t (sqNN b) ({y | |y| ∈ U ∩ Set.Ioi 0} ∪ {0}) := by
+        refine measure_mono fun y hy => ?_
+        by_cases h0 : y = 0
+        · exact Or.inr h0
+        · exact Or.inl ⟨hy, abs_pos.mpr h0⟩
+    _ ≤ gaussianReal t (sqNN b) {y | |y| ∈ U ∩ Set.Ioi 0} + gaussianReal t (sqNN b) {0} :=
+        measure_union_le _ _
+    _ = _ := by rw [measure_singleton, add_zero]
+
+end Folding
+
+section Mixture
+
+lemma lintegral_symm_sum (μ : Measure ℝ) {f g : ℝ → ℝ≥0∞} (hf : Measurable f)
+    (hg : Measurable g) :
+    ∫⁻ w, ∫⁻ v, (f w * g v + f v * g w) ∂μ ∂μ =
+      (∫⁻ w, f w ∂μ) * (∫⁻ w, g w ∂μ) + (∫⁻ w, f w ∂μ) * (∫⁻ w, g w ∂μ) := by
+  have inner : ∀ w, ∫⁻ v, (f w * g v + f v * g w) ∂μ =
+      f w * (∫⁻ v, g v ∂μ) + (∫⁻ v, f v ∂μ) * g w := by
+    intro w
+    rw [lintegral_add_left (hg.const_mul _), lintegral_const_mul _ hg, lintegral_mul_const _ hf]
+  simp_rw [inner]
+  rw [lintegral_add_left (hf.mul_const _), lintegral_mul_const _ hf, lintegral_const_mul _ hg]
+
+/-- **Symmetrisation over a mixing variable.** Let `g₀`, `g₁`, `h` be measurable functions of a
+real variable `w` such that `h` is non-decreasing in `|w|` and `g₁ / g₀` is non-decreasing in
+`|w|` (cleared of denominators). Then `∫ g₀ h * ∫ g₁ ≤ ∫ g₁ h * ∫ g₀`. -/
+theorem lintegral_mixture_mul_le (μ : Measure ℝ) {g₀ g₁ h : ℝ → ℝ≥0∞}
+    (hg₀ : Measurable g₀) (hg₁ : Measurable g₁) (hh : Measurable h)
+    (hmono : ∀ w v, |v| ≤ |w| → h v ≤ h w)
+    (hmlr : ∀ w v, |v| ≤ |w| → g₁ v * g₀ w ≤ g₁ w * g₀ v) :
+    (∫⁻ w, g₀ w * h w ∂μ) * ∫⁻ w, g₁ w ∂μ ≤ (∫⁻ w, g₁ w * h w ∂μ) * ∫⁻ w, g₀ w ∂μ := by
+  have key : ∀ w v, |v| ≤ |w| →
+      g₀ w * h w * g₁ v + g₀ v * h v * g₁ w ≤ g₁ w * h w * g₀ v + g₁ v * h v * g₀ w := by
+    intro w v hvw
+    obtain ⟨R, hR⟩ : ∃ R, g₁ w * g₀ v = g₁ v * g₀ w + R :=
+      ⟨_, (add_tsub_cancel_of_le (hmlr w v hvw)).symm⟩
+    have hh' := hmono w v hvw
+    calc g₀ w * h w * g₁ v + g₀ v * h v * g₁ w
+        = g₁ v * g₀ w * h w + (g₁ w * g₀ v) * h v := by ring
+      _ = g₁ v * g₀ w * h w + g₁ v * g₀ w * h v + R * h v := by rw [hR]; ring
+      _ ≤ g₁ v * g₀ w * h w + g₁ v * g₀ w * h v + R * h w := by gcongr
+      _ = (g₁ w * g₀ v) * h w + g₁ v * g₀ w * h v := by rw [hR]; ring
+      _ = _ := by ring
+  have hpt : ∀ w v,
+      g₀ w * h w * g₁ v + g₀ v * h v * g₁ w ≤ g₁ w * h w * g₀ v + g₁ v * h v * g₀ w := by
+    intro w v
+    rcases le_total |v| |w| with h1 | h1
+    · exact key w v h1
+    · calc g₀ w * h w * g₁ v + g₀ v * h v * g₁ w = g₀ v * h v * g₁ w + g₀ w * h w * g₁ v :=
+            add_comm _ _
+        _ ≤ g₁ v * h v * g₀ w + g₁ w * h w * g₀ v := key v w h1
+        _ = _ := add_comm _ _
+  have hint : ∫⁻ w, ∫⁻ v, (g₀ w * h w * g₁ v + g₀ v * h v * g₁ w) ∂μ ∂μ ≤
+      ∫⁻ w, ∫⁻ v, (g₁ w * h w * g₀ v + g₁ v * h v * g₀ w) ∂μ ∂μ :=
+    lintegral_mono fun w => lintegral_mono fun v => hpt w v
+  rw [lintegral_symm_sum μ (f := fun w => g₀ w * h w) (hg₀.mul hh) hg₁,
+    lintegral_symm_sum μ (f := fun w => g₁ w * h w) (hg₁.mul hh) hg₀] at hint
+  by_contra hlt
+  rw [not_le] at hlt
+  exact absurd hint (not_le.mpr (ENNReal.add_lt_add hlt hlt))
+
+end Mixture
+
+section KeyInequality
+
+variable {Ω : Type*} [MeasurableSpace Ω]
+
+/-- Conditioning on the common factor: with `W` independent of `(X, Y)`, `X` independent of `Y`,
+both standard normal, the joint probability of `|a W + b X| ∈ U` and `|c W + d Y| ∈ D` is the
+mixture over the law of `W` of the product of the two conditional probabilities. -/
+lemma measure_abs_inter_eq_lintegral (P : Measure Ω) [IsProbabilityMeasure P] {W X Y : Ω → ℝ}
+    (hW : Measurable W) (hX : Measurable X) (hY : Measurable Y)
+    (hWXY : IndepFun W (fun ω => (X ω, Y ω)) P) (hXY : IndepFun X Y P)
+    (hlawX : P.map X = gaussianReal 0 1) (hlawY : P.map Y = gaussianReal 0 1)
+    (a b c d : ℝ) {U D : Set ℝ} (hU : MeasurableSet U) (hD : MeasurableSet D) :
+    P ({ω | |a * W ω + b * X ω| ∈ U} ∩ {ω | |c * W ω + d * Y ω| ∈ D}) =
+      ∫⁻ w, gaussianReal 0 1 {x | |a * w + b * x| ∈ U} *
+        gaussianReal 0 1 {y | |c * w + d * y| ∈ D} ∂(P.map W) := by
+  have hpair : P.map (fun ω => (X ω, Y ω)) = (P.map X).prod (P.map Y) :=
+    hXY.map_prod_eq_prod_map_map hX.aemeasurable hY.aemeasurable
+  have hjoint : P.map (fun ω => (W ω, (X ω, Y ω))) =
+      (P.map W).prod (P.map (fun ω => (X ω, Y ω))) :=
+    hWXY.map_prod_eq_prod_map_map hW.aemeasurable (hX.prodMk hY).aemeasurable
+  set S : Set (ℝ × ℝ × ℝ) :=
+    {z | |a * z.1 + b * z.2.1| ∈ U} ∩ {z | |c * z.1 + d * z.2.2| ∈ D} with hSdef
+  have hS : MeasurableSet S := by
+    refine MeasurableSet.inter ?_ ?_
+    · exact (measurable_norm.comp ((measurable_fst.const_mul a).add
+        ((measurable_fst.comp measurable_snd).const_mul b))) hU
+    · exact (measurable_norm.comp ((measurable_fst.const_mul c).add
+        ((measurable_snd.comp measurable_snd).const_mul d))) hD
+  have hset : {ω | |a * W ω + b * X ω| ∈ U} ∩ {ω | |c * W ω + d * Y ω| ∈ D} =
+      (fun ω => (W ω, (X ω, Y ω))) ⁻¹' S := rfl
+  rw [hset, ← Measure.map_apply (hW.prodMk (hX.prodMk hY)) hS, hjoint, hpair, hlawX, hlawY,
+    Measure.prod_apply hS]
+  refine lintegral_congr fun w => ?_
+  have hsec : Prod.mk w ⁻¹' S = {x | |a * w + b * x| ∈ U} ×ˢ {y | |c * w + d * y| ∈ D} := rfl
+  rw [hsec, Measure.prod_prod]
+
+lemma measurable_gaussianReal_abs_affine (a b : ℝ) {U : Set ℝ} (hU : MeasurableSet U) :
+    Measurable fun w => gaussianReal 0 1 {x | |a * w + b * x| ∈ U} := by
+  have hT : MeasurableSet {z : ℝ × ℝ | |a * z.1 + b * z.2| ∈ U} :=
+    (measurable_norm.comp ((measurable_fst.const_mul a).add (measurable_snd.const_mul b))) hU
+  exact measurable_measure_prodMk_left hT
+
+/-- The probability that `|c w + d Y| ∈ D`, `Y` standard normal, `d ≠ 0`, is non-decreasing in
+`|w|` when `D` is upward closed on `[0, ∞)` (stochastic monotonicity of the folded normal
+family in its location). -/
+lemma gaussianReal_abs_affine_mono (c : ℝ) {d : ℝ} (hd : d ≠ 0) {D : Set ℝ}
+    (hD : MeasurableSet D) (hDup : ∀ x y, 0 ≤ x → x ≤ y → x ∈ D → y ∈ D) {w v : ℝ}
+    (hvw : |v| ≤ |w|) :
+    gaussianReal 0 1 {y | |c * v + d * y| ∈ D} ≤ gaussianReal 0 1 {y | |c * w + d * y| ∈ D} := by
+  rw [gaussianReal_abs_affine_mem _ hd hD, gaussianReal_abs_affine_mem _ hd hD]
+  have htot : ∀ t : ℝ, foldedMeasure t (sqNN d) (D ∩ Set.Ioi 0) +
+      foldedMeasure t (sqNN d) (Set.Ioi 0 \ D) = 1 := by
+    intro t
+    have h1 := gaussianReal_abs_affine_mem t hd MeasurableSet.univ
+    simp only [Set.mem_univ, Set.ofPred_true, measure_univ, Set.univ_inter] at h1
+    rw [h1, ← foldedMeasure_union _ _ _ (measurableSet_Ioi.diff hD)]
+    · congr 1; ext x; simp only [Set.mem_union, Set.mem_inter_iff, Set.mem_sdiff]; tauto
+    · rw [Set.disjoint_left]; intro x hx hx'; exact hx'.2 hx.1
+  have hm : |c * v| ≤ |c * w| := by
+    rw [abs_mul, abs_mul]; exact mul_le_mul_of_nonneg_left hvw (abs_nonneg c)
+  have hmlr := foldedMeasure_mul_le hm (sqNN_ne_zero hd) (hD.inter measurableSet_Ioi)
+    (measurableSet_Ioi.diff hD) (A := D ∩ Set.Ioi 0) (B := Set.Ioi 0 \ D)
+    (fun x hx y hy => ⟨le_of_lt hy.1, le_of_not_gt fun hxy =>
+      hy.2 (hDup x y (le_of_lt hx.2) hxy.le hx.1)⟩)
+  set A' := foldedMeasure (c * v) (sqNN d) (D ∩ Set.Ioi 0)
+  set A := foldedMeasure (c * w) (sqNN d) (D ∩ Set.Ioi 0)
+  set B' := foldedMeasure (c * v) (sqNN d) (Set.Ioi 0 \ D)
+  set B := foldedMeasure (c * w) (sqNN d) (Set.Ioi 0 \ D)
+  have h1 : A + B = 1 := htot (c * w)
+  have h2 : A' + B' = 1 := htot (c * v)
+  calc A' = A' * (A + B) := by rw [h1, mul_one]
+    _ = A' * A + B * A' := by ring
+    _ ≤ A' * A + A * B' := by gcongr
+    _ = A * (A' + B') := by ring
+    _ = A := by rw [h2, mul_one]
+
+/-- **Key inequality for two-sided tests in a one-factor model.** Let `W` be independent of
+`(X, Y)`, `X` independent of `Y`, both standard normal, `b, d ≠ 0`, and let `U₁ ⊆ U₀` and `D`
+be measurable sets that are upward closed on `[0, ∞)`. With `E U = {|a W + b X| ∈ U}` and
+`F = {|c W + d Y| ∈ D}`, `P (E U₀ ∩ F) P (E U₁) ≤ P (E U₁ ∩ F) P (E U₀)`: conditioning on the
+smaller event `E U₁` makes `F` more likely. The law of `W` is arbitrary. -/
+theorem twoSided_key_ineq (P : Measure Ω) [IsProbabilityMeasure P] {W X Y : Ω → ℝ}
+    (hW : Measurable W) (hX : Measurable X) (hY : Measurable Y)
+    (hWXY : IndepFun W (fun ω => (X ω, Y ω)) P) (hXY : IndepFun X Y P)
+    (hlawX : P.map X = gaussianReal 0 1) (hlawY : P.map Y = gaussianReal 0 1)
+    (a c : ℝ) {b d : ℝ} (hb : b ≠ 0) (hd : d ≠ 0) {U₀ U₁ D : Set ℝ}
+    (hU₀ : MeasurableSet U₀) (hU₁ : MeasurableSet U₁) (hD : MeasurableSet D) (hsub : U₁ ⊆ U₀)
+    (hU₁up : ∀ x y, 0 ≤ x → x ≤ y → x ∈ U₁ → y ∈ U₁)
+    (hDup : ∀ x y, 0 ≤ x → x ≤ y → x ∈ D → y ∈ D) :
+    P ({ω | |a * W ω + b * X ω| ∈ U₀} ∩ {ω | |c * W ω + d * Y ω| ∈ D}) *
+        P {ω | |a * W ω + b * X ω| ∈ U₁}
+      ≤ P ({ω | |a * W ω + b * X ω| ∈ U₁} ∩ {ω | |c * W ω + d * Y ω| ∈ D}) *
+        P {ω | |a * W ω + b * X ω| ∈ U₀} := by
+  have huniv : ∀ U : Set ℝ, P {ω | |a * W ω + b * X ω| ∈ U} =
+      P ({ω | |a * W ω + b * X ω| ∈ U} ∩ {ω | |c * W ω + d * Y ω| ∈ (Set.univ : Set ℝ)}) := by
+    intro U; congr 1; ext ω; simp
+  rw [huniv U₀, huniv U₁]
+  rw [measure_abs_inter_eq_lintegral P hW hX hY hWXY hXY hlawX hlawY a b c d hU₀ hD,
+    measure_abs_inter_eq_lintegral P hW hX hY hWXY hXY hlawX hlawY a b c d hU₁ hD,
+    measure_abs_inter_eq_lintegral P hW hX hY hWXY hXY hlawX hlawY a b c d hU₀ MeasurableSet.univ,
+    measure_abs_inter_eq_lintegral P hW hX hY hWXY hXY hlawX hlawY a b c d hU₁ MeasurableSet.univ]
+  simp only [Set.mem_univ, Set.ofPred_true, measure_univ, mul_one]
+  refine lintegral_mixture_mul_le _ (measurable_gaussianReal_abs_affine a b hU₀)
+    (measurable_gaussianReal_abs_affine a b hU₁) (measurable_gaussianReal_abs_affine c d hD)
+    ?_ ?_
+  · exact fun w v hvw => gaussianReal_abs_affine_mono c hd hD hDup hvw
+  · -- monotone likelihood ratio of `g₁ / g₀` in `|w|`
+    intro w v hvw
+    rw [gaussianReal_abs_affine_mem _ hb hU₀, gaussianReal_abs_affine_mem _ hb hU₀,
+      gaussianReal_abs_affine_mem _ hb hU₁, gaussianReal_abs_affine_mem _ hb hU₁]
+    have hsplit : U₀ ∩ Set.Ioi 0 = U₁ ∩ Set.Ioi 0 ∪ (U₀ \ U₁) ∩ Set.Ioi 0 := by
+      ext x
+      simp only [Set.mem_union, Set.mem_inter_iff, Set.mem_sdiff]
+      constructor
+      · rintro ⟨h0, hx⟩; by_cases h1 : x ∈ U₁
+        · exact Or.inl ⟨h1, hx⟩
+        · exact Or.inr ⟨⟨h0, h1⟩, hx⟩
+      · rintro (⟨h1, hx⟩ | ⟨⟨h0, _⟩, hx⟩)
+        · exact ⟨hsub h1, hx⟩
+        · exact ⟨h0, hx⟩
+    have hdisj : Disjoint (U₁ ∩ Set.Ioi 0) ((U₀ \ U₁) ∩ Set.Ioi 0) := by
+      rw [Set.disjoint_left]; intro x hx hx'; exact hx'.1.2 hx.1
+    have hBm : MeasurableSet ((U₀ \ U₁) ∩ Set.Ioi 0) := (hU₀.diff hU₁).inter measurableSet_Ioi
+    rw [hsplit, foldedMeasure_union _ _ hdisj hBm, foldedMeasure_union _ _ hdisj hBm]
+    have hm : |a * v| ≤ |a * w| := by
+      rw [abs_mul, abs_mul]; exact mul_le_mul_of_nonneg_left hvw (abs_nonneg a)
+    have hmlr := foldedMeasure_mul_le hm (sqNN_ne_zero hb) (hU₁.inter measurableSet_Ioi) hBm
+      (A := U₁ ∩ Set.Ioi 0) (B := (U₀ \ U₁) ∩ Set.Ioi 0) (fun x hx y hy => ⟨le_of_lt hy.2, le_of_not_gt fun hxy =>
+        hy.1.2 (hU₁up x y (le_of_lt hx.2) hxy.le hx.1)⟩)
+    set A' := foldedMeasure (a * v) (sqNN b) (U₁ ∩ Set.Ioi 0)
+    set A := foldedMeasure (a * w) (sqNN b) (U₁ ∩ Set.Ioi 0)
+    set B' := foldedMeasure (a * v) (sqNN b) ((U₀ \ U₁) ∩ Set.Ioi 0)
+    set B := foldedMeasure (a * w) (sqNN b) ((U₀ \ U₁) ∩ Set.Ioi 0)
+    calc A' * (A + B) = A' * A + B * A' := by ring
+      _ ≤ A' * A + A * B' := by gcongr
+      _ = A * (A' + B') := by ring
+
+/-- Conditioning on the first statistic itself: for `W` independent of a standard normal `Y`, the
+joint probability of `|W| ∈ U` and `|c W + d Y| ∈ D` is a mixture over the law of `W`. -/
+lemma measure_abs_inter_eq_lintegral_direct (P : Measure Ω) [IsProbabilityMeasure P]
+    {W Y : Ω → ℝ} (hW : Measurable W) (hY : Measurable Y) (hWY : IndepFun W Y P)
+    (hlawY : P.map Y = gaussianReal 0 1) (c d : ℝ) {U D : Set ℝ} (hU : MeasurableSet U)
+    (hD : MeasurableSet D) :
+    P ({ω | |W ω| ∈ U} ∩ {ω | |c * W ω + d * Y ω| ∈ D}) =
+      ∫⁻ w, {x : ℝ | |x| ∈ U}.indicator 1 w *
+        gaussianReal 0 1 {y | |c * w + d * y| ∈ D} ∂(P.map W) := by
+  have hjoint : P.map (fun ω => (W ω, Y ω)) = (P.map W).prod (P.map Y) :=
+    hWY.map_prod_eq_prod_map_map hW.aemeasurable hY.aemeasurable
+  set S : Set (ℝ × ℝ) := {z | |z.1| ∈ U} ∩ {z | |c * z.1 + d * z.2| ∈ D} with hSdef
+  have hS : MeasurableSet S := by
+    refine MeasurableSet.inter ?_ ?_
+    · exact (measurable_norm.comp measurable_fst) hU
+    · exact (measurable_norm.comp ((measurable_fst.const_mul c).add
+        (measurable_snd.const_mul d))) hD
+  have hset : {ω | |W ω| ∈ U} ∩ {ω | |c * W ω + d * Y ω| ∈ D} =
+      (fun ω => (W ω, Y ω)) ⁻¹' S := rfl
+  rw [hset, ← Measure.map_apply (hW.prodMk hY) hS, hjoint, hlawY, Measure.prod_apply hS]
+  refine lintegral_congr fun w => ?_
+  by_cases hw : |w| ∈ U
+  · have hsec : Prod.mk w ⁻¹' S = {y | |c * w + d * y| ∈ D} := by
+      ext y; simp [S, hw]
+    rw [hsec, Set.indicator_of_mem (show w ∈ {x : ℝ | |x| ∈ U} from hw), Pi.one_apply, one_mul]
+  · have hsec : Prod.mk w ⁻¹' S = ∅ := by
+      ext y; simp [S, hw]
+    rw [hsec, measure_empty, Set.indicator_of_notMem (show w ∉ {x : ℝ | |x| ∈ U} from hw),
+      zero_mul]
+
+/-- **Key inequality, conditioning statistic without noise.** Let `W` be independent of a
+standard normal `Y`, `d ≠ 0`, and let `U₁ ⊆ U₀` and `D` be measurable and upward closed on
+`[0, ∞)`. With `E U = {|W| ∈ U}` and `F = {|c W + d Y| ∈ D}`,
+`P (E U₀ ∩ F) P (E U₁) ≤ P (E U₁ ∩ F) P (E U₀)`. The law of `W` is arbitrary. -/
+theorem twoSided_key_ineq_direct (P : Measure Ω) [IsProbabilityMeasure P] {W Y : Ω → ℝ}
+    (hW : Measurable W) (hY : Measurable Y) (hWY : IndepFun W Y P)
+    (hlawY : P.map Y = gaussianReal 0 1) (c : ℝ) {d : ℝ} (hd : d ≠ 0) {U₀ U₁ D : Set ℝ}
+    (hU₀ : MeasurableSet U₀) (hU₁ : MeasurableSet U₁) (hD : MeasurableSet D) (hsub : U₁ ⊆ U₀)
+    (hU₁up : ∀ x y, 0 ≤ x → x ≤ y → x ∈ U₁ → y ∈ U₁)
+    (hDup : ∀ x y, 0 ≤ x → x ≤ y → x ∈ D → y ∈ D) :
+    P ({ω | |W ω| ∈ U₀} ∩ {ω | |c * W ω + d * Y ω| ∈ D}) * P {ω | |W ω| ∈ U₁}
+      ≤ P ({ω | |W ω| ∈ U₁} ∩ {ω | |c * W ω + d * Y ω| ∈ D}) * P {ω | |W ω| ∈ U₀} := by
+  have huniv : ∀ U : Set ℝ, P {ω | |W ω| ∈ U} =
+      P ({ω | |W ω| ∈ U} ∩ {ω | |c * W ω + d * Y ω| ∈ (Set.univ : Set ℝ)}) := by
+    intro U; congr 1; ext ω; simp
+  rw [huniv U₀, huniv U₁]
+  rw [measure_abs_inter_eq_lintegral_direct P hW hY hWY hlawY c d hU₀ hD,
+    measure_abs_inter_eq_lintegral_direct P hW hY hWY hlawY c d hU₁ hD,
+    measure_abs_inter_eq_lintegral_direct P hW hY hWY hlawY c d hU₀ MeasurableSet.univ,
+    measure_abs_inter_eq_lintegral_direct P hW hY hWY hlawY c d hU₁ MeasurableSet.univ]
+  simp only [Set.mem_univ, Set.ofPred_true, measure_univ, mul_one]
+  have hind : ∀ {U : Set ℝ}, MeasurableSet U →
+      Measurable ({x : ℝ | |x| ∈ U}.indicator (1 : ℝ → ℝ≥0∞)) := fun hU =>
+    measurable_const.indicator (measurable_norm hU)
+  refine lintegral_mixture_mul_le _ (hind hU₀) (hind hU₁)
+    (measurable_gaussianReal_abs_affine c d hD)
+    (fun w v hvw => gaussianReal_abs_affine_mono c hd hD hDup hvw) ?_
+  intro w v hvw
+  by_cases h1 : |v| ∈ U₁
+  · have h1w : |w| ∈ U₁ := hU₁up _ _ (abs_nonneg v) hvw h1
+    have h0v : |v| ∈ U₀ := hsub h1
+    rw [Set.indicator_of_mem (show v ∈ {x : ℝ | |x| ∈ U₁} from h1),
+      Set.indicator_of_mem (show w ∈ {x : ℝ | |x| ∈ U₁} from h1w),
+      Set.indicator_of_mem (show v ∈ {x : ℝ | |x| ∈ U₀} from h0v)]
+    simp only [Pi.one_apply, one_mul]
+    exact Set.indicator_le_self' (fun _ _ => zero_le) w |>.trans le_rfl
+  · rw [Set.indicator_of_notMem (show v ∉ {x : ℝ | |x| ∈ U₁} from h1), zero_mul]
+    exact zero_le
+
+end KeyInequality
+
+section SimesTwo
+
+/-- For two p-values, the Simes test rejects only if the smaller is at most `α / 2` or both are
+at most `α`. -/
+lemma simes_two_cases {α : ℝ} (q : Fin 2 → ℝ) (h : 1 ≤ bhK α q) :
+    (q 0 ≤ α / 2 ∨ q 1 ≤ α / 2) ∨ (q 0 ≤ α ∧ q 1 ≤ α) := by
+  have hle := bhK_le (α := α) q
+  have hc := bhK_le_bhCount (α := α) q
+  simp only [Fintype.card_fin] at hle
+  unfold bhCount at hc
+  simp only [Fintype.card_fin, Nat.cast_ofNat] at hc
+  interval_cases hk : bhK α q
+  · left
+    obtain ⟨j, hj⟩ := Finset.card_pos.mp (lt_of_lt_of_le Nat.one_pos hc)
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Nat.cast_one, mul_one] at hj
+    fin_cases j
+    · exact Or.inl hj
+    · exact Or.inr hj
+  · right
+    have hcard : (Finset.univ.filter fun j : Fin 2 => q j ≤ α * ((2 : ℕ) : ℝ) / 2).card =
+        Fintype.card (Fin 2) := le_antisymm (Finset.card_le_univ _) (by simpa using hc)
+    have huniv := Finset.eq_univ_of_card _ hcard
+    have h0 : (0 : Fin 2) ∈ Finset.univ.filter fun j : Fin 2 => q j ≤ α * ((2 : ℕ) : ℝ) / 2 := by
+      rw [huniv]; exact Finset.mem_univ _
+    have h1 : (1 : Fin 2) ∈ Finset.univ.filter fun j : Fin 2 => q j ≤ α * ((2 : ℕ) : ℝ) / 2 := by
+      rw [huniv]; exact Finset.mem_univ _
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Nat.cast_ofNat] at h0 h1
+    constructor <;> linarith
+
+lemma simes_two_arith_aux {α x a₀ a₁ b₀ b₁ y₀ y₁ : ℝ} (hx : 0 ≤ x) (ha₀ : a₀ ≤ α / 2)
+    (ha₁ : a₁ ≤ α / 2) (hb₁ : b₁ ≤ α) (hxb₀ : x ≤ b₀) (ha₀b : a₀ ≤ b₀) (ha₁b : a₁ ≤ b₁)
+    (ha₀n : 0 ≤ a₀) (_ha₁n : 0 ≤ a₁) (hy₀ : 0 ≤ y₀) (hy₁ : 0 ≤ y₁)
+    (h₀ : x * a₀ ≤ y₀ * b₀) (h₁ : x * a₁ ≤ y₁ * b₁) (hb : b₀ ≤ b₁) :
+    x + (a₀ - y₀) + (a₁ - y₁) ≤ α := by
+  rcases (hx.trans hxb₀).eq_or_lt with hb₀ | hb₀
+  · have : x = 0 := by linarith
+    have : a₀ = 0 := by linarith
+    linarith
+  have hb₁pos : 0 < b₁ := lt_of_lt_of_le hb₀ hb
+  have hg : (x + (a₀ - y₀) + (a₁ - y₁)) * (b₀ * b₁) ≤
+      (b₁ * (b₀ - a₀) - a₁ * b₀) * x + (a₀ + a₁) * (b₀ * b₁) := by
+    nlinarith [mul_le_mul_of_nonneg_right h₀ hb₁pos.le, mul_le_mul_of_nonneg_right h₁ hb₀.le]
+  have hg2 : (b₁ * (b₀ - a₀) - a₁ * b₀) * x + (a₀ + a₁) * (b₀ * b₁) ≤ α * (b₀ * b₁) := by
+    have hpos : 0 ≤ b₀ * b₁ := (mul_pos hb₀ hb₁pos).le
+    rcases le_total (b₁ * (b₀ - a₀) - a₁ * b₀) 0 with hK | hK
+    · nlinarith [mul_nonpos_of_nonpos_of_nonneg hK hx, mul_le_mul_of_nonneg_right
+        (show a₀ + a₁ ≤ α by linarith) hpos]
+    · have hKx : (b₁ * (b₀ - a₀) - a₁ * b₀) * x ≤ (b₁ * (b₀ - a₀) - a₁ * b₀) * b₀ :=
+        mul_le_mul_of_nonneg_left hxb₀ hK
+      nlinarith [mul_nonneg (mul_nonneg (sub_nonneg.2 hb) (sub_nonneg.2 ha₁b)) hb₀.le,
+        mul_nonneg hpos (sub_nonneg.2 hb₁)]
+  exact le_of_mul_le_mul_right (hg.trans hg2) (mul_pos hb₀ hb₁pos)
+
+/-- The arithmetic core of the two-statistic Simes bound. `x = P (B₀ ∩ B₁)`, `aⱼ = P (Aⱼ)`,
+`bⱼ = P (Bⱼ)`, `y₀ = P (A₀ ∩ B₁)`, `y₁ = P (A₁ ∩ B₀)`. -/
+lemma simes_two_arith {α x a₀ a₁ b₀ b₁ y₀ y₁ : ℝ} (hx : 0 ≤ x) (ha₀ : a₀ ≤ α / 2)
+    (ha₁ : a₁ ≤ α / 2) (hb₀ : b₀ ≤ α) (hb₁ : b₁ ≤ α) (hxb₀ : x ≤ b₀) (hxb₁ : x ≤ b₁)
+    (ha₀b : a₀ ≤ b₀) (ha₁b : a₁ ≤ b₁) (ha₀n : 0 ≤ a₀) (ha₁n : 0 ≤ a₁) (hy₀ : 0 ≤ y₀)
+    (hy₁ : 0 ≤ y₁) (h₀ : x * a₀ ≤ y₀ * b₀) (h₁ : x * a₁ ≤ y₁ * b₁) :
+    x + (a₀ - y₀) + (a₁ - y₁) ≤ α := by
+  rcases le_total b₀ b₁ with hb | hb
+  · exact simes_two_arith_aux hx ha₀ ha₁ hb₁ hxb₀ ha₀b ha₁b ha₀n ha₁n hy₀ hy₁ h₀ h₁ hb
+  · have := simes_two_arith_aux hx ha₁ ha₀ hb₀ hxb₁ ha₁b ha₀b ha₁n ha₀n hy₁ hy₀ h₁ h₀ hb
+    linarith
+
+variable {Ω : Type*} [MeasurableSpace Ω]
+
+/-- The set of `r` with `2 (1 - Φ(r)) ≤ t`: the two-sided p-value of `z` is at most `t` exactly
+when `|z|` lies in it. -/
+def twoSidedRegion (t : ℝ) : Set ℝ := {r | 2 * (1 - cdf (gaussianReal 0 1) r) ≤ t}
+
+lemma measurableSet_twoSidedRegion (t : ℝ) : MeasurableSet (twoSidedRegion t) :=
+  measurableSet_le (((monotone_cdf _).measurable.const_sub 1).const_mul 2) measurable_const
+
+lemma twoSidedRegion_up (t : ℝ) :
+    ∀ x y, 0 ≤ x → x ≤ y → x ∈ twoSidedRegion t → y ∈ twoSidedRegion t := by
+  intro x y _ hxy hx
+  have := monotone_cdf (gaussianReal 0 1) hxy
+  simp only [twoSidedRegion, Set.mem_ofPred_eq] at hx ⊢
+  linarith
+
+lemma twoSidedRegion_mono {s t : ℝ} (h : s ≤ t) : twoSidedRegion s ⊆ twoSidedRegion t := by
+  intro x hx
+  simp only [twoSidedRegion, Set.mem_ofPred_eq] at hx ⊢
+  linarith
+
+/-- **Two standard normal statistics: the Simes bound from two conditioning inequalities.** If
+`Z 0`, `Z 1` are standard normal and, for `i ≠ k`, conditioning on the smaller event
+`{p i ≤ α / 2}` rather than `{p i ≤ α}` does not lower the probability of `{p k ≤ α}`
+(`p j = 2 (1 - Φ(|Z j|))`, written through `twoSidedRegion`), then the Simes test at level
+`α ≥ 0` rejects with probability at most `α`. -/
+theorem measure_simes_two_of_key (P : Measure Ω) [IsProbabilityMeasure P] (Z : Fin 2 → Ω → ℝ)
+    (hZm : ∀ j, Measurable (Z j)) (hlaw : ∀ j, P.map (Z j) = gaussianReal 0 1) {α : ℝ}
+    (hα : 0 ≤ α)
+    (hkey : ∀ i k : Fin 2, i ≠ k →
+      P ({ω | |Z i ω| ∈ twoSidedRegion α} ∩ {ω | |Z k ω| ∈ twoSidedRegion α}) *
+          P {ω | |Z i ω| ∈ twoSidedRegion (α / 2)}
+        ≤ P ({ω | |Z i ω| ∈ twoSidedRegion (α / 2)} ∩ {ω | |Z k ω| ∈ twoSidedRegion α}) *
+          P {ω | |Z i ω| ∈ twoSidedRegion α}) :
+    P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)} ≤ ENNReal.ofReal α := by
+  set N := gaussianReal 0 1 with hN
+  set U := twoSidedRegion with hU
+  have hsubU : U (α / 2) ⊆ U α := twoSidedRegion_mono (by linarith)
+  set A : Fin 2 → Set Ω := fun j => {ω | |Z j ω| ∈ U (α / 2)} with hA
+  set B : Fin 2 → Set Ω := fun j => {ω | |Z j ω| ∈ U α} with hB
+  have hmeasU : ∀ j t, MeasurableSet {ω | |Z j ω| ∈ U t} := fun j t =>
+    (measurable_norm.comp (hZm j)) (measurableSet_twoSidedRegion t)
+  have hvalid : ∀ j t, 0 ≤ t → P {ω | |Z j ω| ∈ U t} ≤ ENNReal.ofReal t :=
+    fun j t ht => isValidPValue_zTest_twoSided P _ (hZm j) (hlaw j) t ht
+  -- the rejection region
+  have hsub : {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf N |Z j ω|)} ⊆
+      (B 0 ∩ B 1) ∪ (A 0 \ B 1) ∪ (A 1 \ B 0) := by
+    intro ω hω
+    have hc := simes_two_cases _ hω
+    have hA0 : ω ∈ A 0 → ω ∈ B 0 := fun h => hsubU h
+    have hA1 : ω ∈ A 1 → ω ∈ B 1 := fun h => hsubU h
+    change (ω ∈ A 0 ∨ ω ∈ A 1) ∨ (ω ∈ B 0 ∧ ω ∈ B 1) at hc
+    simp only [Set.mem_union, Set.mem_inter_iff, Set.mem_sdiff]
+    tauto
+  have k₀ : P (B 0 ∩ B 1) * P (A 0) ≤ P (A 0 ∩ B 1) * P (B 0) := hkey 0 1 (by decide)
+  have k₁ : P (B 1 ∩ B 0) * P (A 1) ≤ P (A 1 ∩ B 0) * P (B 1) := hkey 1 0 (by decide)
+  rw [Set.inter_comm (B 1)] at k₁
+  -- pass to real numbers
+  have hfin : ∀ s : Set Ω, P s ≠ ⊤ := fun s => measure_ne_top P s
+  have hdiff : ∀ i k, (P (A i \ B k)).toReal = (P (A i)).toReal - (P (A i ∩ B k)).toReal := by
+    intro i k
+    have h := measure_sdiff_add_inter (μ := P) (A i) (hmeasU k α)
+    have h' := congrArg ENNReal.toReal h
+    rw [ENNReal.toReal_add (hfin _) (hfin _)] at h'
+    linarith
+  have kr : ∀ {s t u v : Set Ω}, P s * P t ≤ P u * P v →
+      (P s).toReal * (P t).toReal ≤ (P u).toReal * (P v).toReal := by
+    intro s t u v h
+    have := ENNReal.toReal_mono (ENNReal.mul_ne_top (hfin _) (hfin _)) h
+    rwa [ENNReal.toReal_mul, ENNReal.toReal_mul] at this
+  have hval : ∀ j t, 0 ≤ t → (P {ω | |Z j ω| ∈ U t}).toReal ≤ t :=
+    fun j t ht => ENNReal.toReal_le_of_le_ofReal ht (hvalid j t ht)
+  have hmono : ∀ {s t : Set Ω}, s ⊆ t → (P s).toReal ≤ (P t).toReal := fun h =>
+    ENNReal.toReal_mono (hfin _) (measure_mono h)
+  have hreal : (P (B 0 ∩ B 1)).toReal + (P (A 0 \ B 1)).toReal + (P (A 1 \ B 0)).toReal ≤ α := by
+    rw [hdiff, hdiff]
+    have k₀' := kr k₀
+    have k₁' := kr k₁
+    exact simes_two_arith ENNReal.toReal_nonneg (hval 0 _ (by positivity))
+      (hval 1 _ (by positivity)) (hval 0 _ hα) (hval 1 _ hα) (hmono Set.inter_subset_left)
+      (hmono Set.inter_subset_right) (hmono fun ω h => hsubU h) (hmono fun ω h => hsubU h)
+      ENNReal.toReal_nonneg ENNReal.toReal_nonneg ENNReal.toReal_nonneg ENNReal.toReal_nonneg
+      (by linarith [k₀']) (by linarith [k₁'])
+  calc P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf N |Z j ω|)}
+      ≤ P ((B 0 ∩ B 1) ∪ (A 0 \ B 1) ∪ (A 1 \ B 0)) := measure_mono hsub
+    _ ≤ P (B 0 ∩ B 1) + P (A 0 \ B 1) + P (A 1 \ B 0) :=
+        (measure_union_le _ _).trans (by gcongr; exact measure_union_le _ _)
+    _ = ENNReal.ofReal ((P (B 0 ∩ B 1)).toReal + (P (A 0 \ B 1)).toReal +
+          (P (A 1 \ B 0)).toReal) := by
+        rw [ENNReal.ofReal_add (by positivity) ENNReal.toReal_nonneg,
+          ENNReal.ofReal_add ENNReal.toReal_nonneg ENNReal.toReal_nonneg,
+          ENNReal.ofReal_toReal (hfin _), ENNReal.ofReal_toReal (hfin _),
+          ENNReal.ofReal_toReal (hfin _)]
+    _ ≤ ENNReal.ofReal α := ENNReal.ofReal_le_ofReal hreal
+
+
+/-- **Simes inequality for two two-sided z-tests with any correlation in `(-1, 1)`.** Let
+`W`, `ε 0`, `ε 1` be standard normal, `W` independent of the pair `(ε 0, ε 1)` and
+`ε 0` independent of `ε 1`, and `Z j = a j W + b j ε j` with `a j ^ 2 + b j ^ 2 = 1` and
+`b j ≠ 0`. Each `Z j` is standard normal and `Corr(Z 0, Z 1) = a 0 a 1`, which takes every
+value in `(-1, 1)` (the loadings may have either sign). For the two-sided p-values
+`p j = 2 (1 - Φ(|Z j|))` and every `α ≥ 0`, the Simes test (`p₍₁₎ ≤ α / 2` or `p₍₂₎ ≤ α`)
+rejects with probability at most `α`. -/
+theorem measure_simes_twoSided_oneFactor_two (P : Measure Ω) [IsProbabilityMeasure P]
+    (W : Ω → ℝ) (ε : Fin 2 → Ω → ℝ) (hW : Measurable W) (hε : ∀ j, Measurable (ε j))
+    (hWε : IndepFun W (fun ω => (ε 0 ω, ε 1 ω)) P) (hε01 : IndepFun (ε 0) (ε 1) P)
+    (hlawW : P.map W = gaussianReal 0 1) (hlawε : ∀ j, P.map (ε j) = gaussianReal 0 1)
+    (a b : Fin 2 → ℝ) (hab : ∀ j, a j ^ 2 + b j ^ 2 = 1) (hb : ∀ j, b j ≠ 0)
+    {α : ℝ} (hα : 0 ≤ α) :
+    P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf (gaussianReal 0 1) |a j * W ω + b j * ε j ω|)}
+      ≤ ENNReal.ofReal α := by
+  have hWj : ∀ j, IndepFun W (ε j) P := by
+    intro j
+    fin_cases j
+    · exact hWε.comp measurable_id measurable_fst
+    · exact hWε.comp measurable_id measurable_snd
+  have hWε' : IndepFun W (fun ω => (ε 1 ω, ε 0 ω)) P :=
+    hWε.comp measurable_id measurable_swap
+  refine measure_simes_two_of_key P (fun j ω => a j * W ω + b j * ε j ω)
+    (fun j => (hW.const_mul _).add ((hε j).const_mul _))
+    (fun j => map_oneFactor_gaussian P W (ε j) hW (hε j) (hWj j) hlawW (hlawε j) (hab j)) hα ?_
+  intro i k hik
+  fin_cases i <;> fin_cases k
+  · exact absurd rfl hik
+  · exact twoSided_key_ineq P hW (hε 0) (hε 1) hWε hε01 (hlawε 0) (hlawε 1) (a 0) (a 1) (hb 0)
+      (hb 1) (measurableSet_twoSidedRegion α) (measurableSet_twoSidedRegion (α / 2))
+      (measurableSet_twoSidedRegion α) (twoSidedRegion_mono (by linarith)) (twoSidedRegion_up _)
+      (twoSidedRegion_up _)
+  · exact twoSided_key_ineq P hW (hε 1) (hε 0) hWε' hε01.symm (hlawε 1) (hlawε 0) (a 1) (a 0)
+      (hb 1) (hb 0) (measurableSet_twoSidedRegion α) (measurableSet_twoSidedRegion (α / 2))
+      (measurableSet_twoSidedRegion α) (twoSidedRegion_mono (by linarith)) (twoSidedRegion_up _)
+      (twoSidedRegion_up _)
+  · exact absurd rfl hik
+
+end SimesTwo
+
+section Identical
+
+variable {Ω ι : Type*} [MeasurableSpace Ω] [Fintype ι]
+
+/-- If all p-values equal one valid p-value `p₀`, the Simes test rejects only when `p₀ ≤ α`. -/
+theorem measure_simes_le_of_forall_eq (P : Measure Ω) (p : ι → Ω → ℝ) (p₀ : Ω → ℝ)
+    (heq : ∀ j ω, p j ω = p₀ ω) (hvalid : IsValidPValue P p₀) {α : ℝ} (hα : 0 ≤ α) :
+    P {ω | 1 ≤ bhK α fun j => p j ω} ≤ ENNReal.ofReal α := by
+  refine (measure_mono fun ω hω => ?_).trans (hvalid α hα)
+  simp only [Set.mem_ofPred_eq] at hω ⊢
+  have hc := bhK_le_bhCount (α := α) fun j => p j ω
+  have hle := bhK_le (α := α) fun j => p j ω
+  unfold bhCount at hc
+  obtain ⟨j, hj⟩ := Finset.card_pos.mp (lt_of_lt_of_le hω hc)
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hj
+  have hcard : (0 : ℝ) < Fintype.card ι := by
+    exact_mod_cast Fintype.card_pos_iff.mpr ⟨j⟩
+  rw [heq] at hj
+  refine hj.trans ?_
+  rw [div_le_iff₀ hcard]
+  exact mul_le_mul_of_nonneg_left (by exact_mod_cast hle) hα
+
+/-- **Simes inequality for perfectly correlated two-sided z-tests.** If `|Z j| = |Z₀|` for every
+`j` (for example every `Z j` is `Z₀` or `-Z₀`, correlations `±1`) and `Z₀` is standard normal,
+the Simes test applied to the two-sided p-values `2 (1 - Φ(|Z j|))` rejects with probability at
+most `α`, for every `α ≥ 0`. -/
+theorem measure_simes_twoSided_abs_eq (P : Measure Ω) (Z : ι → Ω → ℝ) (Z₀ : Ω → ℝ)
+    (hZ₀ : Measurable Z₀) (hlaw : P.map Z₀ = gaussianReal 0 1) (habs : ∀ j ω, |Z j ω| = |Z₀ ω|)
+    {α : ℝ} (hα : 0 ≤ α) :
+    P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)} ≤ ENNReal.ofReal α :=
+  measure_simes_le_of_forall_eq P _ _ (fun j ω => by rw [habs])
+    (isValidPValue_zTest_twoSided P Z₀ hZ₀ hlaw) hα
+
+end Identical
+
+section BivariateGaussian
+
+variable {Ω : Type*} [MeasurableSpace Ω]
+
+/-- **Key inequality for a bivariate normal pair with `|ρ| < 1`.** If `(X, V)` is jointly
+Gaussian with standard normal coordinates and `Cov(X, V) ^ 2 < 1`, then for measurable
+`U₁ ⊆ U₀` and `D` upward closed on `[0, ∞)`,
+`P (|X| ∈ U₀, |V| ∈ D) P (|X| ∈ U₁) ≤ P (|X| ∈ U₁, |V| ∈ D) P (|X| ∈ U₀)`. Proof: write
+`V = ρ X + √(1 - ρ²) Y` with `Y = (V - ρ X) / √(1 - ρ²)`, which is standard normal and, being
+jointly Gaussian with `X` and uncorrelated with it, independent of `X`. -/
+theorem twoSided_key_ineq_gaussianPair (P : Measure Ω) [IsProbabilityMeasure P] {X V : Ω → ℝ}
+    (hX : Measurable X) (hV : Measurable V) (hXV : HasGaussianLaw (fun ω => (X ω, V ω)) P)
+    (hlawX : P.map X = gaussianReal 0 1) (hlawV : P.map V = gaussianReal 0 1)
+    (hρ : cov[X, V; P] ^ 2 < 1) {U₀ U₁ D : Set ℝ}
+    (hU₀ : MeasurableSet U₀) (hU₁ : MeasurableSet U₁) (hD : MeasurableSet D) (hsub : U₁ ⊆ U₀)
+    (hU₁up : ∀ x y, 0 ≤ x → x ≤ y → x ∈ U₁ → y ∈ U₁)
+    (hDup : ∀ x y, 0 ≤ x → x ≤ y → x ∈ D → y ∈ D) :
+    P ({ω | |X ω| ∈ U₀} ∩ {ω | |V ω| ∈ D}) * P {ω | |X ω| ∈ U₁}
+      ≤ P ({ω | |X ω| ∈ U₁} ∩ {ω | |V ω| ∈ D}) * P {ω | |X ω| ∈ U₀} := by
+  set ρ := cov[X, V; P] with hρdef
+  set β := √(1 - ρ ^ 2) with hβ
+  have hβpos : 0 < β := Real.sqrt_pos.mpr (by linarith)
+  have hβsq : β ^ 2 = 1 - ρ ^ 2 := Real.sq_sqrt (by linarith)
+  set Y : Ω → ℝ := fun ω => β⁻¹ * (V ω - ρ * X ω) with hY
+  have hYm : Measurable Y := (hV.sub (hX.const_mul ρ)).const_mul _
+  have hHX : HasLaw X (gaussianReal 0 1) P := ⟨hX.aemeasurable, hlawX⟩
+  have hHV : HasLaw V (gaussianReal 0 1) P := ⟨hV.aemeasurable, hlawV⟩
+  have hmX : MemLp X 2 P := hXV.fst.memLp_two
+  have hmV : MemLp V 2 P := hXV.snd.memLp_two
+  have hEX : P[X] = 0 := by rw [hHX.integral_eq, integral_id_gaussianReal]
+  have hEV : P[V] = 0 := by rw [hHV.integral_eq, integral_id_gaussianReal]
+  have hVX : Var[X; P] = 1 := by rw [hHX.variance_eq, variance_id_gaussianReal]; simp
+  have hVV : Var[V; P] = 1 := by rw [hHV.variance_eq, variance_id_gaussianReal]; simp
+  have hcXX : cov[X, X; P] = 1 := by rw [covariance_self hX.aemeasurable, hVX]
+  have hcVV : cov[V, V; P] = 1 := by rw [covariance_self hV.aemeasurable, hVV]
+  have hcVX : cov[V, X; P] = ρ := by rw [covariance_comm]
+  have hmρX : MemLp (fun ω => ρ * X ω) 2 P := hmX.const_mul ρ
+  have hmD : MemLp (fun ω => V ω - ρ * X ω) 2 P := hmV.sub hmρX
+  -- the pair `(X, Y)` is Gaussian
+  let L : ℝ × ℝ →L[ℝ] ℝ × ℝ :=
+    (ContinuousLinearMap.fst ℝ ℝ ℝ).prod
+      (β⁻¹ • (ContinuousLinearMap.snd ℝ ℝ ℝ - ρ • ContinuousLinearMap.fst ℝ ℝ ℝ))
+  have hXY : HasGaussianLaw (fun ω => (X ω, Y ω)) P := by
+    have h := hXV.map_fun L
+    have e : (fun ω => L (X ω, V ω)) = fun ω => (X ω, Y ω) := by
+      funext ω
+      simp [L, Y, smul_eq_mul]
+    rwa [e] at h
+  -- `X` and `Y` are uncorrelated
+  have hcov : cov[X, Y; P] = 0 := by
+    simp only [hY]
+    rw [covariance_const_mul_right, covariance_fun_sub_right hmX hmV hmρX,
+      covariance_const_mul_right, hcXX]
+    ring
+  have hind : IndepFun X Y P := hXY.indepFun_of_covariance_eq_zero hcov
+  -- `Y` is standard normal
+  have hEY : P[Y] = 0 := by
+    simp only [hY]
+    rw [integral_const_mul, integral_sub (hmV.integrable one_le_two) (hmρX.integrable one_le_two), integral_const_mul,
+      hEV, hEX]
+    ring
+  have hVY : Var[Y; P] = 1 := by
+    rw [← covariance_self hYm.aemeasurable]
+    simp only [hY]
+    rw [covariance_const_mul_left, covariance_const_mul_right,
+      covariance_fun_sub_left hmV hmρX hmD, covariance_fun_sub_right hmV hmV hmρX,
+      covariance_fun_sub_right hmρX hmV hmρX, covariance_const_mul_left,
+      covariance_const_mul_left, covariance_const_mul_right, covariance_const_mul_right,
+      hcVV, hcVX, hcXX, ← hρdef]
+    field_simp
+    linarith
+  have hlawY : P.map Y = gaussianReal 0 1 := by
+    rw [hXY.snd.map_eq_gaussianReal, hEY, hVY]
+    simp
+  -- `V = ρ X + β Y`
+  have hVeq : ∀ ω, V ω = ρ * X ω + β * Y ω := by
+    intro ω
+    simp only [hY]
+    field_simp
+    ring
+  have hset : ∀ U : Set ℝ, {ω | |V ω| ∈ U} = {ω | |ρ * X ω + β * Y ω| ∈ U} := by
+    intro U; ext ω; simp only [Set.mem_ofPred_eq, hVeq ω]
+  rw [hset D]
+  exact twoSided_key_ineq_direct P hX hYm hind hlawY ρ hβpos.ne' hU₀ hU₁ hD hsub hU₁up hDup
+
+/-- **Simes inequality for two two-sided z-tests of a bivariate normal vector, any correlation.**
+Let `Z 0`, `Z 1` be measurable, jointly Gaussian (the law of `ω ↦ (Z 0 ω, Z 1 ω)` on
+`Fin 2 → ℝ` is Gaussian) and each standard normal; the correlation `ρ ∈ [-1, 1]` is arbitrary.
+For the two-sided p-values `p j = 2 (1 - Φ(|Z j|))` and every `α ≥ 0`, the Simes test
+(`p₍₁₎ ≤ α / 2` or `p₍₂₎ ≤ α`) rejects with probability at most `α`. -/
+theorem measure_simes_twoSided_bivariateGaussian (P : Measure Ω) [IsProbabilityMeasure P]
+    (Z : Fin 2 → Ω → ℝ) (hZ : ∀ i, Measurable (Z i)) (hG : IsGaussian (P.map fun ω i => Z i ω))
+    (hlaw : ∀ i, P.map (Z i) = gaussianReal 0 1) {α : ℝ} (hα : 0 ≤ α) :
+    P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)} ≤ ENNReal.ofReal α := by
+  have hvec : HasGaussianLaw (fun ω i => Z i ω) P :=
+    IsGaussian.hasGaussianLaw (measurable_pi_iff.mpr hZ).aemeasurable
+  have hpair : ∀ i k, HasGaussianLaw (fun ω => (Z i ω, Z k ω)) P := fun i k => hvec.prodMk i k
+  have hHL : ∀ i, HasLaw (Z i) (gaussianReal 0 1) P := fun i => ⟨(hZ i).aemeasurable, hlaw i⟩
+  have hmem : ∀ i, MemLp (Z i) 2 P := fun i => (hvec.eval i).memLp_two
+  have hE : ∀ i, P[Z i] = 0 := fun i => by rw [(hHL i).integral_eq, integral_id_gaussianReal]
+  have hc : ∀ i, cov[Z i, Z i; P] = 1 := fun i => by
+    rw [covariance_self (hZ i).aemeasurable, (hHL i).variance_eq, variance_id_gaussianReal]; simp
+  set ρ := cov[Z 0, Z 1; P] with hρdef
+  have hc10 : cov[Z 1, Z 0; P] = ρ := by rw [covariance_comm]
+  have hmρ : MemLp (fun ω => ρ * Z 0 ω) 2 P := (hmem 0).const_mul ρ
+  have hmD : MemLp (fun ω => Z 1 ω - ρ * Z 0 ω) 2 P := (hmem 1).sub hmρ
+  have hDm : Measurable fun ω => Z 1 ω - ρ * Z 0 ω := (hZ 1).sub ((hZ 0).const_mul ρ)
+  have hvarD : Var[fun ω => Z 1 ω - ρ * Z 0 ω; P] = 1 - ρ ^ 2 := by
+    rw [← covariance_self hDm.aemeasurable, covariance_fun_sub_left (hmem 1) hmρ hmD,
+      covariance_fun_sub_right (hmem 1) (hmem 1) hmρ, covariance_fun_sub_right hmρ (hmem 1) hmρ,
+      covariance_const_mul_left, covariance_const_mul_left, covariance_const_mul_right,
+      covariance_const_mul_right, hc 0, hc 1, hc10, ← hρdef]
+    ring
+  have hle : ρ ^ 2 ≤ 1 := by
+    have := variance_nonneg (fun ω => Z 1 ω - ρ * Z 0 ω) P
+    linarith
+  rcases hle.lt_or_eq with hlt | heq
+  · refine measure_simes_two_of_key P Z hZ hlaw hα ?_
+    intro i k hik
+    fin_cases i <;> fin_cases k
+    · exact absurd rfl hik
+    · exact twoSided_key_ineq_gaussianPair P (hZ 0) (hZ 1) (hpair 0 1) (hlaw 0) (hlaw 1) hlt
+        (measurableSet_twoSidedRegion α) (measurableSet_twoSidedRegion (α / 2))
+        (measurableSet_twoSidedRegion α) (twoSidedRegion_mono (by linarith))
+        (twoSidedRegion_up _) (twoSidedRegion_up _)
+    · exact twoSided_key_ineq_gaussianPair P (hZ 1) (hZ 0) (hpair 1 0) (hlaw 1) (hlaw 0)
+        (by rw [hc10]; exact hlt)
+        (measurableSet_twoSidedRegion α) (measurableSet_twoSidedRegion (α / 2))
+        (measurableSet_twoSidedRegion α) (twoSidedRegion_mono (by linarith))
+        (twoSidedRegion_up _) (twoSidedRegion_up _)
+    · exact absurd rfl hik
+  · -- `|ρ| = 1`: `Z 1 = ρ Z 0` almost surely
+    have hρabs : |ρ| = 1 := by
+      have h : |ρ| ^ 2 = 1 := by rw [sq_abs]; exact heq
+      exact (pow_eq_one_iff_of_nonneg (abs_nonneg ρ) two_ne_zero).mp h
+    have hED : P[fun ω => Z 1 ω - ρ * Z 0 ω] = 0 := by
+      rw [integral_sub ((hmem 1).integrable one_le_two) (hmρ.integrable one_le_two),
+        integral_const_mul, hE 0, hE 1]
+      ring
+    have hae0 := ae_eq_integral_of_variance_eq_zero hmD (by rw [hvarD, heq]; ring)
+    have hae : ∀ᵐ ω ∂P, ∀ j, |Z j ω| = |Z 0 ω| := by
+      filter_upwards [hae0] with ω hω
+      rw [hED] at hω
+      intro j
+      fin_cases j
+      · rfl
+      · have h1 : Z 1 ω = ρ * Z 0 ω := by linarith
+        change |Z 1 ω| = |Z 0 ω|
+        rw [h1, abs_mul, hρabs, one_mul]
+    calc P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)}
+        = P {ω | 1 ≤ bhK α fun _ : Fin 2 => 2 * (1 - cdf (gaussianReal 0 1) |Z 0 ω|)} := by
+          refine measure_congr ?_
+          filter_upwards [hae] with ω hω
+          have e : (fun j => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)) =
+              fun _ : Fin 2 => 2 * (1 - cdf (gaussianReal 0 1) |Z 0 ω|) := by
+            funext j; rw [hω j]
+          rw [e]
+      _ ≤ ENNReal.ofReal α :=
+          measure_simes_twoSided_abs_eq P (fun _ : Fin 2 => Z 0) (Z 0) (hZ 0) (hlaw 0)
+            (fun _ _ => rfl) hα
+
+end BivariateGaussian
+
+section AtMostTwoNulls
+
+variable {Ω ι : Type*} [MeasurableSpace Ω] [Fintype ι] [DecidableEq ι]
+
+omit [DecidableEq ι] in
+/-- The Benjamini–Hochberg cut-off does not depend on how the hypotheses are indexed. -/
+lemma bhK_comp_equiv {κ : Type*} [Fintype κ] {α : ℝ} (e : κ ≃ ι) (q : ι → ℝ) :
+    bhK α (q ∘ e) = bhK α q := by
+  unfold bhK bhCount
+  rw [Fintype.card_congr e]
+  congr 1
+  funext k
+  congr 2
+  exact Finset.card_equiv e (by simp)
+
+omit [DecidableEq ι] in
+/-- **Simes local test for at most two true nulls with jointly normal two-sided statistics.**
+If the statistics `Z i`, `i ∈ H₀`, are jointly Gaussian and each standard normal, and `H₀` has at
+most two elements, the Simes test of the intersection hypothesis `H₀` based on the two-sided
+p-values `2 (1 - Φ(|Z i|))` rejects with probability at most `α` (`α ≥ 0`). -/
+theorem measure_simesLocal_twoSided_le_of_card_le_two (P : Measure Ω) [IsProbabilityMeasure P]
+    (Z : ι → Ω → ℝ) (hZ : ∀ i, Measurable (Z i)) (H₀ : Finset ι) (hcard : H₀.card ≤ 2)
+    (hG : IsGaussian (P.map fun ω (j : H₀) => Z j ω))
+    (hlaw : ∀ i ∈ H₀, P.map (Z i) = gaussianReal 0 1) {α : ℝ} (hα : 0 ≤ α) :
+    P {ω | simesLocal α (fun j ω => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)) H₀ ω}
+      ≤ ENNReal.ofReal α := by
+  unfold simesLocal
+  interval_cases hc : H₀.card
+  · -- no true null: the local test never rejects
+    have hempty : {ω | 1 ≤ bhK α fun j : H₀ => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)} = ∅ := by
+      ext ω
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, not_le, Nat.lt_one_iff]
+      have := bhK_le (α := α) fun j : H₀ => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)
+      rw [Fintype.card_coe, hc] at this
+      omega
+    rw [hempty, measure_empty]
+    exact zero_le
+  · -- one true null
+    obtain ⟨i, hi⟩ := Finset.card_eq_one.mp hc
+    have hiH : i ∈ H₀ := by rw [hi]; exact Finset.mem_singleton_self i
+    refine measure_simes_le_of_forall_eq P (fun (j : H₀) ω =>
+      2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)) (fun ω => 2 * (1 - cdf (gaussianReal 0 1) |Z i ω|))
+      (fun j ω => ?_) (isValidPValue_zTest_twoSided P (Z i) (hZ i) (hlaw i hiH)) hα
+    have hj : (j : ι) = i := by
+      have h := j.2
+      simp only [hi, Finset.mem_singleton] at h
+      exact h
+    simp only [hj]
+  · -- two true nulls: reindex by `Fin 2`
+    have hcardT : Fintype.card H₀ = Fintype.card (Fin 2) := by
+      rw [Fintype.card_coe, hc, Fintype.card_fin]
+    let e : Fin 2 ≃ H₀ := Fintype.equivOfCardEq hcardT.symm
+    have hset : {ω | 1 ≤ bhK α fun j : H₀ => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)} =
+        {ω | 1 ≤ bhK α fun j : Fin 2 => 2 * (1 - cdf (gaussianReal 0 1) |Z (e j) ω|)} := by
+      ext ω
+      simp only [Set.mem_ofPred_eq]
+      rw [← bhK_comp_equiv e]
+      rfl
+    rw [hset]
+    let R : (H₀ → ℝ) →L[ℝ] (Fin 2 → ℝ) :=
+      ContinuousLinearMap.pi fun j => ContinuousLinearMap.proj (e j)
+    have hmap : P.map (fun ω (j : Fin 2) => Z (e j) ω) =
+        (P.map fun ω (j : H₀) => Z j ω).map R := by
+      rw [Measure.map_map R.continuous.measurable
+        (measurable_pi_iff.mpr fun j => hZ j)]
+      rfl
+    have hG' : IsGaussian (P.map fun ω (j : Fin 2) => Z (e j) ω) := by
+      rw [hmap]; infer_instance
+    exact measure_simes_twoSided_bivariateGaussian P (fun j => Z (e j)) (fun j => hZ _) hG'
+      (fun j => hlaw _ (e j).2) hα
+
+/-- **Hommel's procedure for two-sided z-tests with at most two true nulls.** If the true-null
+statistics (at most two) are jointly Gaussian and standard normal, Hommel's procedure based on
+the two-sided p-values controls the family-wise error rate at `α ≥ 0`; the false-null
+statistics are arbitrary measurable functions. -/
+theorem fwer_hommel_twoSided_le_of_card_le_two (P : Measure Ω) [IsProbabilityMeasure P]
+    (Z : ι → Ω → ℝ) (hZ : ∀ i, Measurable (Z i)) (H₀ : Finset ι) (hcard : H₀.card ≤ 2)
+    (hG : IsGaussian (P.map fun ω (j : H₀) => Z j ω))
+    (hlaw : ∀ i ∈ H₀, P.map (Z i) = gaussianReal 0 1) {α : ℝ} (hα : 0 ≤ α) :
+    fwer P H₀ (hommel α fun j ω => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|))
+      ≤ ENNReal.ofReal α :=
+  fwer_closedTest_le P _ H₀ _
+    (measure_simesLocal_twoSided_le_of_card_le_two P Z hZ H₀ hcard hG hlaw hα)
+
+/-- **Hochberg's procedure for two-sided z-tests with at most two true nulls** (in particular
+for any two hypotheses): same hypotheses as `fwer_hommel_twoSided_le_of_card_le_two`. -/
+theorem fwer_hochberg_twoSided_le_of_card_le_two (P : Measure Ω) [IsProbabilityMeasure P]
+    (Z : ι → Ω → ℝ) (hZ : ∀ i, Measurable (Z i)) (H₀ : Finset ι) (hcard : H₀.card ≤ 2)
+    (hG : IsGaussian (P.map fun ω (j : H₀) => Z j ω))
+    (hlaw : ∀ i ∈ H₀, P.map (Z i) = gaussianReal 0 1) {α : ℝ} (hα : 0 ≤ α) :
+    fwer P H₀ (hochberg α fun j ω => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|))
+      ≤ ENNReal.ofReal α := by
+  refine (measure_mono ?_).trans (fwer_hommel_twoSided_le_of_card_le_two P Z hZ H₀ hcard hG
+    hlaw hα)
+  rintro ω ⟨i, hi, hrej⟩
+  exact ⟨i, hi, hochberg_subset_hommel hα _ ω hrej⟩
+
+end AtMostTwoNulls
+
+
+end Applied.MultipleTesting

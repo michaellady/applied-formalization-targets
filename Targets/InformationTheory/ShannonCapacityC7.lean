@@ -37,6 +37,18 @@ Better lower bounds from explicit independent sets, up to `α(C₇^{⊠5}) ≥ 3
 Not covered: the Lovász theta function and the bound `Θ ≤ ϑ` (so `Θ(C₅) = √5` and
 `Θ(C₇) ≤ 3.3177` are not formalized); that the supremum is a limit
 (Fekete's lemma); the link between `Θ` and zero-error codes for a channel.
+
+Lovász's bound (added later; it supersedes the "Not covered" sentence above as far as the
+bound `Θ ≤ ϑ`, `Θ(C₅) = √5` and `Θ(C₇) ≤ 7 cos(π/7)/(1 + cos(π/7))` go). Lovász's
+orthonormal-representation bound `Θ(G) ≤ max_v 1/⟪c, u v⟫²`, for one representation at a time,
+is formalized in `Targets/InformationTheory/LovaszThetaBound.lean`
+(`shannonCapacity_le_of_isOrthonormalRep`). The `≤` half of `ShannonCapacityC7EqLovaszTheta`,
+`shannonCapacityC7 ≤ 7 cos(π/7)/(1 + cos(π/7))`, is `shannonCapacityC7_le_lovaszTheta` in
+`Targets/InformationTheory/LovaszOddCycle.lean` (from the bound for all odd cycles); a purely
+rational bound `shannonCapacityC7 ≤ 70000/21099 ≈ 3.3176928` is `shannonCapacityC7_le` in
+`LovaszThetaBound.lean`. `Θ(C₅) = √5` is in `Targets/InformationTheory/ShannonCapacityC5.lean`.
+The Lovász theta function itself is not defined, and the reverse inequality (the open part)
+is untouched.
 -/
 
 open Applied.InformationTheory
