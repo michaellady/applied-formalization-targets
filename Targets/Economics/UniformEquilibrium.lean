@@ -57,8 +57,19 @@ Review notes (modelling choices to check).
 
 What is proved: the definitions are meaningful in a trivial case: with constant stage
 payoffs, the `n`-stage average is that constant (`avgPayoff_of_const`) and every profile is a
-uniform `ε`-equilibrium (`isUniformEquilibrium_of_const`). Nothing else is proved; in
-particular none of the known cases (zero-sum, two players, absorbing three-player games).
+uniform `ε`-equilibrium (`isUniformEquilibrium_of_const`). Nothing else is proved in this
+file; in particular none of the known cases (general zero-sum, two players, absorbing
+three-player games) is proved anywhere in the project.
+
+Related partial results, all for **two-player zero-sum** games and in a separate two-player
+model (`Applied/Economics/ShapleyStochastic.lean`, no formal bridge to `StochasticGame`):
+`Targets/Economics/ShapleyStochasticGame.lean` proves Shapley's theorem (discounted games have a
+value and stationary optimal strategies); `Targets/Economics/ZeroSumUniformValueConstant.lean`
+proves that `g` is the uniform value (with stationary uniformly `ε`-optimal strategies, in the
+`n`-stage average sense used here) when the average-payoff optimality equation has a solution
+attained by stationary strategies, in particular when all stage games have the same value, e.g.
+repeated matrix games; `Targets/Economics/MatrixGameValue.lean` proves that the matrix-game
+value is monotone and 1-Lipschitz. None of these touches the open multiplayer question.
 -/
 
 namespace Targets.Economics
