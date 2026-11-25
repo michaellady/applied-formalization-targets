@@ -76,7 +76,9 @@ foundations are the real next piece of work for this group.
 | Cramér–Rao inequality | partial | Regularity conditions linking the model to the inequality; matrix form |
 | Put–call parity | done | — |
 | Revenue equivalence | partial | Single-bidder form only |
-| Remaining backlog entries (about 34) | todo | Not yet stated |
+| First welfare theorem | done | Production economies; second welfare theorem |
+| Rao–Blackwell | partial | Sufficiency; Lehmann–Scheffé |
+| Remaining backlog entries (about 32) | todo | Not yet stated |
 
 ## After the tracker is worked through
 
