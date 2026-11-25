@@ -146,4 +146,79 @@ theorem IsSingleDeletionCode.card_mul_le {m : ℕ} {C : Finset (Fin (m + 1) → 
   have := Nat.mul_le_mul_left (k + 2) hlo
   omega
 
+/-- **Levenshtein's asymptotic upper bound.** For every `ε > 0` there is `N` such that for all
+`m ≥ N`, every single-deletion-correcting code of length `n = m + 1` has
+`|C| ≤ (1 + ε) · 2ⁿ / n`. -/
+theorem IsSingleDeletionCode.card_le_asymptotic {ε : ℝ} (hε : 0 < ε) :
+    ∃ N : ℕ, ∀ m ≥ N, ∀ C : Finset (Fin (m + 1) → Bool), IsSingleDeletionCode C →
+      (C.card : ℝ) ≤ (1 + ε) * 2 ^ (m + 1) / (m + 1) := by
+  set δ : ℝ := 1 / (2 + ε) with hδ
+  have hδ0 : 0 < δ := by positivity
+  have hδ2 : δ < 2⁻¹ := by
+    rw [hδ, one_div]; exact inv_strictAnti₀ (by norm_num) (by linarith)
+  set H := binEntropyBits δ with hH
+  have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  have hH1 : H < 1 := by
+    rw [hH, binEntropyBits, div_lt_one hlog2]
+    exact Real.binEntropy_lt_log_two.mpr hδ2.ne
+  set q : ℝ := (2 : ℝ) ^ (H - 1) with hq
+  have hq0 : 0 ≤ q := by positivity
+  have hq1 : q < 1 := Real.rpow_lt_one_of_one_lt_of_neg (by norm_num) (by linarith)
+  have hlim : Filter.Tendsto (fun m : ℕ => (m : ℝ) * q ^ m + q ^ m) Filter.atTop (nhds 0) := by
+    simpa using (tendsto_self_mul_const_pow_of_lt_one hq0 hq1).add
+      (tendsto_pow_atTop_nhds_zero_of_lt_one hq0 hq1)
+  obtain ⟨N, hN⟩ := Filter.eventually_atTop.mp (hlim.eventually (gt_mem_nhds (half_pos hε)))
+  refine ⟨N, fun m hm C hC => ?_⟩
+  have hmq : ((m : ℝ) + 1) * q ^ m ≤ ε / 2 := by have := hN m hm; nlinarith
+  set k := ⌊δ * m⌋₊ with hk
+  have hkδ : (k : ℝ) ≤ δ * m := Nat.floor_le (by positivity)
+  have hk2 : 2 * k ≤ m := by
+    have : (2 * k : ℝ) ≤ m := by nlinarith
+    exact_mod_cast this
+  -- the finite bound, in `ℝ`
+  have hfin : ((k : ℝ) + 2) * C.card ≤ 2 ^ m + ((k : ℝ) + 2) * (2 * ballCard m (k + 1)) := by
+    exact_mod_cast hC.card_mul_le k
+  -- the ball estimate
+  have hball : (ballCard m (k + 1) : ℝ) ≤ q ^ m * 2 ^ m := by
+    refine (ballCard_le_two_rpow m k hk2).trans ?_
+    have hHk : binEntropyBits (k / m) ≤ H := by
+      rw [hH, binEntropyBits, binEntropyBits]
+      refine div_le_div_of_nonneg_right ?_ hlog2.le
+      have hkm : (k : ℝ) / m ≤ δ := by
+        rcases Nat.eq_zero_or_pos m with h | h
+        · simp [h, hδ0.le]
+        · rw [div_le_iff₀ (by exact_mod_cast h)]; linarith
+      exact Real.binEntropy_strictMonoOn.monotoneOn
+        ⟨by positivity, hkm.trans hδ2.le⟩ ⟨hδ0.le, hδ2.le⟩ hkm
+    calc (2 : ℝ) ^ ((m : ℝ) * binEntropyBits (k / m)) ≤ 2 ^ ((m : ℝ) * H) :=
+          Real.rpow_le_rpow_of_exponent_le (by norm_num)
+            (mul_le_mul_of_nonneg_left hHk (Nat.cast_nonneg m))
+      _ = q ^ m * 2 ^ m := by
+          rw [hq, ← Real.rpow_mul_natCast (by norm_num), ← Real.rpow_natCast 2 m,
+            ← Real.rpow_add (by norm_num)]
+          congr 1; ring
+  -- the number of runs threshold
+  have hK : (m : ℝ) + 1 ≤ (2 + ε) * ((k : ℝ) + 2) := by
+    have h1 : δ * m < k + 1 := Nat.lt_floor_add_one _
+    have h2 : (2 + ε) * δ = 1 := by rw [hδ]; field_simp
+    nlinarith
+  have hP : (0 : ℝ) ≤ 2 ^ m := by positivity
+  have hKpos : (0 : ℝ) < (k : ℝ) + 2 := by positivity
+  have hc0 : (0 : ℝ) ≤ C.card := Nat.cast_nonneg _
+  have e1 : ((m : ℝ) + 1) * 2 ^ m ≤ (2 + ε) * ((k : ℝ) + 2) * 2 ^ m :=
+    mul_le_mul_of_nonneg_right hK hP
+  have e2 : ((m : ℝ) + 1) * (ballCard m (k + 1) : ℝ) ≤ ε / 2 * 2 ^ m := by
+    calc ((m : ℝ) + 1) * (ballCard m (k + 1) : ℝ) ≤ ((m : ℝ) + 1) * (q ^ m * 2 ^ m) :=
+          mul_le_mul_of_nonneg_left hball (by positivity)
+      _ = (((m : ℝ) + 1) * q ^ m) * 2 ^ m := by ring
+      _ ≤ ε / 2 * 2 ^ m := mul_le_mul_of_nonneg_right hmq hP
+  have e3 : ((k : ℝ) + 2) * (((m : ℝ) + 1) * C.card) ≤
+      ((k : ℝ) + 2) * ((2 + 2 * ε) * 2 ^ m) := by
+    have := mul_le_mul_of_nonneg_left hfin (show (0 : ℝ) ≤ (m : ℝ) + 1 by positivity)
+    have e2' := mul_le_mul_of_nonneg_left e2 (show (0 : ℝ) ≤ 2 * ((k : ℝ) + 2) by positivity)
+    nlinarith
+  have e4 := le_of_mul_le_mul_left e3 hKpos
+  rw [le_div_iff₀ (by positivity), pow_succ]
+  linarith
+
 end Applied.Coding
