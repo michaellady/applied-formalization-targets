@@ -10,9 +10,9 @@ set `D` of p-value vectors, the conditional probability of `D` given `p i ≤ t`
 decrease in `t`. It is written without division, so no conditioning on null events is needed.
 
 This conditioning-on-`p i ≤ t` form (sometimes called weak PRDS) is not the definition of
-Benjamini and Yekutieli (2001), whose PRDS conditions on `p i = t`. The classical condition is
-believed to imply the form used here (standard in the literature), but that implication is
-not formalized in this project. All theorems below named "under positive dependence" or
+Benjamini and Yekutieli (2001), whose PRDS conditions on `p i = t`. The classical condition
+implies the form used here; that is proved in `Applied/Statistics/ClassicalPRDS.lean`
+(`IsClassicalPRDSOn.isPRDSOn`), which imports this file. All theorems below named "under positive dependence" or
 `_of_prds` are proved under `IsPRDSOn`, i.e. under this form.
 
 `fdr_bhReject_le_of_prds`: under this condition the Benjamini–Hochberg procedure at level `α`
@@ -123,8 +123,8 @@ measurable set `D` of p-value vectors and `s ≤ t`,
 `P (D, p i ≤ s) * P (p i ≤ t) ≤ P (D, p i ≤ t) * P (p i ≤ s)`.
 
 This is the form of Blanchard and Roquain (2008), sometimes called weak PRDS. It is not
-Benjamini and Yekutieli's PRDS, which conditions on `p i = t`; the classical condition is
-believed to imply this one (standard in the literature), but that is not formalized here. -/
+Benjamini and Yekutieli's PRDS, which conditions on `p i = t`; the classical condition
+implies this one (`IsClassicalPRDSOn.isPRDSOn` in `Applied/Statistics/ClassicalPRDS.lean`). -/
 def IsPRDSOn (P : Measure Ω) (p : ι → Ω → ℝ) (H₀ : Finset ι) : Prop :=
   ∀ i ∈ H₀, ∀ D : Set (ι → ℝ), MeasurableSet D → IsUpperSet D → ∀ s t : ℝ, s ≤ t →
     P ((fun ω j => p j ω) ⁻¹' D ∩ p i ⁻¹' Set.Iic s) * P (p i ⁻¹' Set.Iic t)

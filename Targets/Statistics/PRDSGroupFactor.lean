@@ -15,8 +15,8 @@ Informal statement. Throughout, `P` is a probability measure, the hypotheses are
 finite type `ι`, the groups by a finite type `κ`, `Φ` is the standard normal distribution
 function, and "positively regression dependent" means `Applied.MultipleTesting.IsPRDSOn`: the
 conditioning-on-`pᵢ ≤ t` form of Blanchard and Roquain (weak PRDS), cleared of denominators,
-not the definition of Benjamini and Yekutieli, which conditions on `pᵢ = t`. That the
-classical condition implies this form is not formalized.
+not the definition of Benjamini and Yekutieli, which conditions on `pᵢ = t`. That the classical condition
+implies this form is proved separately, in `Applied/Statistics/ClassicalPRDS.lean`.
 
 Model. A map `g : ι → κ` assigns each hypothesis to a group. There is one measurable factor
 `W k` per group and one measurable noise `ε j` per hypothesis, and the whole family

@@ -4,6 +4,46 @@ import Mathlib.Probability.Distributions.Gaussian.HasGaussianLaw.Independence
 
 /-!
 # Non-negatively correlated normal test statistics are PRDS
+
+Benjamini and Yekutieli (2001, Section 3.1, Case 1): if the test statistics `Z` are jointly
+normal and `Cov (Z i, Z j) ≥ 0` for every true null `i` and every `j`, then one-sided p-values
+are positively regression dependent on the true nulls, so the Benjamini–Hochberg procedure
+controls the false discovery rate. This file proves that for an arbitrary covariance structure
+(no factor model), both for the definition of Benjamini and Yekutieli (`IsClassicalPRDSOn`,
+`Applied/Statistics/ClassicalPRDS.lean`) and for the conditioning-on-`p i ≤ t` form `IsPRDSOn`
+used by the error-rate theorems of this library.
+
+## Proof
+
+Fix a true null `i`. Regress every statistic on `Z i`: `Z j = c j * Z i + R j` with
+`c j = Cov (Z i, Z j) / Var (Z i) ≥ 0`. The residual vector `R` is uncorrelated with `Z i` and
+jointly Gaussian with it, hence independent of it (`indepFun_gaussian_residual`, from Mathlib's
+`HasGaussianLaw.indepFun_of_covariance_eval`). So every p-value `ψ j (Z j)`, `ψ j`
+non-increasing, is a non-increasing function of `Z i` for a frozen residual, and `Z i` is
+independent of the residual. For such a "monotone regression on an independent pair" the
+conditional probability of an increasing event given `Z i = x` is `P (F (x, R) ∈ D)`, which is
+non-increasing in `x` by pointwise monotonicity alone (no density, no total positivity):
+`isClassicalPRDSOn_singleton_of_regression`, `isPRDSOn_singleton_of_regression`.
+
+## Main results
+
+* `isPRDSOn_singleton_of_regression`, `isClassicalPRDSOn_singleton_of_regression`: the general
+  statement for `p j = h j X R`, `X` independent of `R`, `h j` non-increasing in `X`.
+* `indepFun_gaussian_residual`: the regression decomposition of a Gaussian vector.
+* `isPRDSOn_gaussian_of_cov_nonneg`, `isClassicalPRDSOn_gaussian_of_cov_nonneg`: p-values
+  `ψ j (Z j)` of a jointly Gaussian vector with non-negative covariances from the true nulls.
+* `isValidPValue_zTest_upper_of_mean_nonpos`: `1 - Φ (Z)` is a valid p-value for `Z` normal with
+  unit variance and mean `≤ 0` (composite one-sided null).
+* `fdr_bhReject_le_gaussian_zTests`, `measure_simes_le_gaussian_zTests`,
+  `fwer_hochberg_le_gaussian_zTests`, `fwer_hommel_le_gaussian_zTests`: the end-to-end
+  statements for one-sided z-tests `1 - Φ (Z j)`.
+
+## Hypotheses to keep in mind
+
+Joint normality is Mathlib's `HasGaussianLaw (fun ω => (Z · ω)) P` (the law of the vector on
+`ι → ℝ` is Gaussian; degenerate covariance matrices are allowed), and each `Z j` is assumed
+measurable. The tests are one-sided (`ψ j` non-increasing); two-sided tests are not covered.
+The variances are known: studentized statistics are not covered.
 -/
 
 open MeasureTheory Finset ProbabilityTheory Real
