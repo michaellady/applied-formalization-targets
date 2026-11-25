@@ -325,4 +325,238 @@ theorem delExp_runEnc_deficit {d : ℝ} (h0 : 0 ≤ d) (h1 : d ≤ 1) {L C : ℕ
         mul_le_mul_of_nonneg_left this (by positivity)
     _ = _ := by rw [inv_mul_eq_div]
 
+/-! ### Numerical bounds -/
+
+lemma chernoff_num {t a : ℕ} (ht : t ≤ 8 * a + 7) :
+    8 * (1 + 63 * (1 / 1000 : ℝ)) ^ t / 2 ^ (a + 1) ≤ 8 * (33 / 40) ^ a := by
+  have hb : (1 + 63 * (1 / 1000 : ℝ)) ^ t ≤ (33 / 20) ^ a * 2 := by
+    calc (1 + 63 * (1 / 1000 : ℝ)) ^ t ≤ (1 + 63 * (1 / 1000 : ℝ)) ^ (8 * a + 7) :=
+          pow_le_pow_right₀ (by norm_num) ht
+      _ = ((1 + 63 * (1 / 1000 : ℝ)) ^ 8) ^ a * (1 + 63 * (1 / 1000 : ℝ)) ^ 7 := by
+          rw [pow_add, pow_mul]
+      _ ≤ (33 / 20) ^ a * 2 :=
+          mul_le_mul (pow_le_pow_left₀ (by norm_num) (by norm_num) a) (by norm_num)
+            (by norm_num) (by positivity)
+  rw [div_le_iff₀ (by positivity)]
+  have h2 : (33 / 40 : ℝ) ^ a * 2 ^ a = (33 / 20) ^ a := by rw [← mul_pow]; norm_num
+  calc 8 * (1 + 63 * (1 / 1000 : ℝ)) ^ t ≤ 8 * ((33 / 20) ^ a * 2) :=
+        mul_le_mul_of_nonneg_left hb (by norm_num)
+    _ = 8 * (33 / 40) ^ a * 2 ^ (a + 1) := by rw [pow_succ, ← h2]; ring
+
+lemma supCount_num {t a cr : ℕ} (h8 : 8 * a ≤ t) (ht : t ≤ 8 * a + 7) (hcr : cr ≤ 2) :
+    (supCount (3 * t - a) (3 * t + cr) : ℝ) / 2 ^ t ≤ 1024 * (5 / 16) ^ a := by
+  have hmk : 3 * t + cr - (3 * t - a) = a + cr := by omega
+  have h := supCount_mul_le (p := 1 / 16) (by norm_num) (by norm_num) (3 * t - a) (3 * t + cr)
+  rw [hmk] at h
+  set S : ℝ := (supCount (3 * t - a) (3 * t + cr) : ℝ) with hS
+  set k := 3 * t - a with hk
+  have hA : (256 : ℝ) ^ a ≤ 2 ^ t := by
+    calc (256 : ℝ) ^ a = 2 ^ (8 * a) := by rw [pow_mul]; norm_num
+      _ ≤ 2 ^ t := pow_le_pow_right₀ (by norm_num) h8
+  have hB : (1 / 16 : ℝ) ^ (a + 2) ≤ (1 / 16) ^ (a + cr) :=
+    pow_le_pow_of_le_one (by norm_num) (by norm_num) (by omega)
+  have hC : (1 / 5 : ℝ) ^ a * (1 / 4) ≤ (1 - 1 / 16) ^ k := by
+    calc (1 / 5 : ℝ) ^ a * (1 / 4) ≤ ((1 - 1 / 16 : ℝ) ^ 24) ^ a * (1 - 1 / 16) ^ 21 :=
+          mul_le_mul (pow_le_pow_left₀ (by norm_num) (by norm_num) a) (by norm_num)
+            (by norm_num) (by positivity)
+      _ = (1 - 1 / 16 : ℝ) ^ (24 * a + 21) := by rw [pow_add, pow_mul]
+      _ ≤ (1 - 1 / 16) ^ k := pow_le_pow_of_le_one (by norm_num) (by norm_num) (by omega)
+  have e : (5 / 16 : ℝ) ^ a * 256 ^ a * (1 / 16) ^ a * (1 / 5) ^ a = 1 := by
+    rw [← mul_pow, ← mul_pow, ← mul_pow]; norm_num
+  have hw : (0 : ℝ) < (1 / 16) ^ (a + cr) * (1 - 1 / 16) ^ k := by positivity
+  have key : 1 ≤ 1024 * (5 / 16 : ℝ) ^ a * 2 ^ t * ((1 / 16) ^ (a + cr) * (1 - 1 / 16) ^ k) := by
+    have h1 := mul_le_mul hA (mul_le_mul hB hC (by positivity) (by positivity))
+      (by positivity) (by positivity)
+    have h2 := mul_le_mul_of_nonneg_left h1 (by positivity : (0 : ℝ) ≤ 1024 * (5 / 16) ^ a)
+    calc (1 : ℝ) = 1024 * (5 / 16) ^ a *
+          (256 ^ a * ((1 / 16) ^ (a + 2) * ((1 / 5) ^ a * (1 / 4)))) := by
+          rw [pow_add]; linear_combination -e
+      _ ≤ _ := by rw [mul_assoc (1024 * (5 / 16 : ℝ) ^ a)]; exact h2
+  rw [div_le_iff₀ (by positivity)]
+  refine le_of_mul_le_mul_right ?_ hw
+  linarith
+
+/-! ### The coding theorem for the run-length code -/
+
+open Classical in
+/-- **Positive rates over the deletion channel from a run-length code.** Let `0 ≤ d ≤ 1`,
+`C ≥ 2`, `0 < lam ≤ 1`. If the block-damage bound `blockBad d L C lam` is at most `1/1000`,
+then the rate `log 2 / (8 (C + 1) (L + 1))` nats per input bit is achievable over the deletion
+channel with deletion probability `d`. -/
+theorem achievable_deletionChannel_runLength {d : ℝ} (h0 : 0 ≤ d) (h1 : d ≤ 1) {L C : ℕ}
+    (hC : 2 ≤ C) {lam : ℝ} (hl0 : 0 < lam) (hl1 : lam ≤ 1)
+    (hbad : blockBad d L C lam ≤ 1 / 1000) :
+    Achievable (deletionChannel d) (log 2 / (8 * (((C : ℝ) + 1) * ((L : ℝ) + 1)))) := by
+  set q0 : ℕ := (C + 1) * (L + 1) with hq0
+  have hq0pos : 0 < q0 := by positivity
+  have hq0r : (((C : ℝ) + 1) * ((L : ℝ) + 1)) = (q0 : ℝ) := by rw [hq0]; push_cast; ring
+  rw [hq0r]
+  have hq0r0 : (0 : ℝ) < q0 := by exact_mod_cast hq0pos
+  have hq : ∀ v, delExp d (runBlock L C v) (fun z => if GoodOut L z then 0 else 1) ≤ 1 / 1000 :=
+    fun v => (delExp_runBlock_bad h0 h1 L C hl0 hl1 v).trans hbad
+  intro ε hε
+  obtain ⟨A1, hA1⟩ := exists_pow_lt_of_lt_one (show (0 : ℝ) < ε / 16 by positivity)
+    (show (33 / 40 : ℝ) < 1 by norm_num)
+  obtain ⟨A2, hA2⟩ := exists_pow_lt_of_lt_one (show (0 : ℝ) < ε / 147456 by positivity)
+    (show (5 / 8 : ℝ) < 1 by norm_num)
+  refine ⟨8 * q0 * (max A1 A2 + 1), fun n hn => ?_⟩
+  obtain ⟨t, ht⟩ : ∃ t, t = n / q0 := ⟨_, rfl⟩
+  obtain ⟨r, hr⟩ : ∃ r, r = n % q0 := ⟨_, rfl⟩
+  obtain ⟨a, ha⟩ : ∃ a, a = t / 8 := ⟨_, rfl⟩
+  have hnt : q0 * t + r = n := by rw [ht, hr]; exact Nat.div_add_mod n q0
+  have hrlt : r < q0 := by rw [hr]; exact Nat.mod_lt n hq0pos
+  have ht8 : 8 * (max A1 A2 + 1) ≤ t := by
+    rw [ht, Nat.le_div_iff_mul_le hq0pos]
+    calc 8 * (max A1 A2 + 1) * q0 = 8 * q0 * (max A1 A2 + 1) := by ring
+      _ ≤ n := hn
+  have ha8 : 8 * a ≤ t := by omega
+  have hta : t ≤ 8 * a + 7 := by omega
+  have haA1 : A1 ≤ a := by have := le_max_left A1 A2; omega
+  have haA2 : A2 ≤ a := by have := le_max_right A1 A2; omega
+  set R : ℝ := log 2 / (8 * (q0 : ℝ)) with hR
+  have hR0 : 0 ≤ R := by have := Real.log_nonneg (show (1 : ℝ) ≤ 2 by norm_num); positivity
+  set M : ℕ := ⌈exp (n * R)⌉₊ with hM
+  set cr : ℕ := capCount L r with hcr
+  let w : (Fin t → Bool) → Fin n → Bool := fun u => toWord n (runEnc L C r (List.ofFn u))
+  have hw : ∀ u, List.ofFn (w u) = runEnc L C r (List.ofFn u) := fun u =>
+    ofFn_toWord (by rw [length_runEnc, List.length_ofFn]; exact hnt)
+  obtain ⟨c, -, hc⟩ := exists_deletion_code h0 h1 w
+    (fun y => 3 * t - a ≤ (runCap L (outList y)).length)
+    (τ := 8 * (1 + 63 * (1 / 1000 : ℝ)) ^ t / 2 ^ (a + 1))
+    (B := (supCount (3 * t - a) (3 * t + cr) : ℝ)) (Nat.cast_nonneg _)
+    (by
+      intro u
+      have h := sum_delWeight_eq_delExp d (w u)
+        (fun z => if 3 * t - a ≤ (runCap L z).length then (0 : ℝ) else 1)
+      have h2 := delExp_runEnc_deficit h0 h1 (by norm_num) hq r a (List.ofFn u)
+      rw [List.length_ofFn] at h2
+      rw [hw] at h
+      refine le_trans (le_of_eq (Finset.sum_congr rfl fun s _ => ?_)) (h.le.trans h2)
+      congr)
+    (by
+      intro u s hg
+      set z := runCap L (outList (deleteBits (w u) s)) with hz
+      have hsub : (univ.filter fun u' => ∃ s', deleteBits (w u') s' = deleteBits (w u) s) ⊆
+          univ.filter fun u' : Fin t → Bool => z.Sublist (virtEnc cr (List.ofFn u')) := by
+        intro u' hu'
+        obtain ⟨s', hs'⟩ := (Finset.mem_filter.mp hu').2
+        refine Finset.mem_filter.mpr ⟨mem_univ _, ?_⟩
+        have e1 := outList_sublist (w u') s'
+        rw [hs', hw] at e1
+        have e2 := runCap_mono (L := L) e1
+        rwa [runCap_runEnc L hC] at e2
+      have hinj : (univ.filter fun u' : Fin t → Bool =>
+            z.Sublist (virtEnc cr (List.ofFn u'))).card ≤
+          (univ.filter fun x : Fin (3 * t + cr) → Bool => z.Sublist (List.ofFn x)).card := by
+        refine Finset.card_le_card_of_injOn
+          (fun u' => toWord (3 * t + cr) (virtEnc cr (List.ofFn u'))) ?_ ?_
+        · intro u' hu'
+          have := (Finset.mem_filter.mp hu').2
+          refine Finset.mem_filter.mpr ⟨mem_univ _, ?_⟩
+          rw [ofFn_toWord (by rw [length_virtEnc, List.length_ofFn])]
+          exact this
+        · intro u1 _ u2 _ h
+          have h' := congrArg List.ofFn h
+          simp only at h'
+          rw [ofFn_toWord (by rw [length_virtEnc, List.length_ofFn]),
+            ofFn_toWord (by rw [length_virtEnc, List.length_ofFn])] at h'
+          exact List.ofFn_injective (virtEnc_injective cr _ _ (by simp) h')
+      rw [card_supersequences] at hinj
+      have hanti : supCount z.length (3 * t + cr) ≤ supCount (3 * t - a) (3 * t + cr) :=
+        supCount_antitone _ hg
+      exact_mod_cast (Finset.card_le_card hsub).trans (hinj.trans hanti)) M
+  have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
+  have hnle : n ≤ 8 * q0 * (a + 1) := by
+    calc n = q0 * t + r := hnt.symm
+      _ ≤ q0 * t + q0 := by omega
+      _ = q0 * (t + 1) := by ring
+      _ ≤ q0 * (8 * a + 8) := Nat.mul_le_mul_left _ (by omega)
+      _ = 8 * q0 * (a + 1) := by ring
+  have hexp : exp (n * R) ≤ 2 ^ (a + 1) := by
+    have h2 : (2 : ℝ) ^ (a + 1) = exp (((a + 1 : ℕ) : ℝ) * log 2) := by
+      rw [Real.exp_nat_mul, Real.exp_log (by norm_num)]
+    rw [h2]
+    apply exp_le_exp.mpr
+    have hnle' : (n : ℝ) ≤ 8 * q0 * ((a + 1 : ℕ) : ℝ) := by exact_mod_cast hnle
+    have hlog : 0 ≤ log 2 := Real.log_nonneg (by norm_num)
+    rw [hR, ← mul_div_assoc, div_le_iff₀ (by positivity)]
+    calc (n : ℝ) * log 2 ≤ 8 * q0 * ((a + 1 : ℕ) : ℝ) * log 2 :=
+          mul_le_mul_of_nonneg_right hnle' hlog
+      _ = ((a + 1 : ℕ) : ℝ) * log 2 * (8 * q0) := by ring
+  refine ⟨M + 1, c, ?_, hc.trans ?_⟩
+  · push_cast
+    exact (Nat.le_ceil _).trans (by linarith)
+  have hM6 : (M : ℝ) + 1 ≤ 6 * 2 ^ a := by
+    have := Nat.ceil_lt_add_one (exp_pos (n * R)).le
+    rw [← hM] at this
+    have h1' : (1 : ℝ) ≤ 2 ^ a := one_le_pow₀ (by norm_num)
+    rw [pow_succ] at hexp
+    linarith
+  have hcard : (Fintype.card (Fin t → Bool) : ℝ) = 2 ^ t := by simp
+  rw [hcard]
+  have hτ := chernoff_num hta
+  have hBn := supCount_num (cr := cr) ha8 hta (capCount_le_two L r)
+  have hp1 : (33 / 40 : ℝ) ^ a ≤ (33 / 40) ^ A1 :=
+    pow_le_pow_of_le_one (by norm_num) (by norm_num) haA1
+  have hp2 : (5 / 8 : ℝ) ^ a ≤ (5 / 8) ^ A2 :=
+    pow_le_pow_of_le_one (by norm_num) (by norm_num) haA2
+  have h58 : (2 : ℝ) ^ a * (5 / 16) ^ a = (5 / 8) ^ a := by rw [← mul_pow]; norm_num
+  have hB0 : (0 : ℝ) ≤ (supCount (3 * t - a) (3 * t + cr) : ℝ) / 2 ^ t := by positivity
+  have hterm : 12 * ((M : ℝ) + 1) * ((supCount (3 * t - a) (3 * t + cr) : ℝ) / 2 ^ t) ≤
+      73728 * (5 / 8) ^ a := by
+    calc 12 * ((M : ℝ) + 1) * ((supCount (3 * t - a) (3 * t + cr) : ℝ) / 2 ^ t)
+        ≤ 12 * (6 * 2 ^ a) * (1024 * (5 / 16) ^ a) := by gcongr
+      _ = 73728 * (5 / 8) ^ a := by rw [← h58]; ring
+  linarith
+
+/-- For every deletion probability `d < 1` there are parameters of the run-length code with
+block-damage bound at most `1/1000`. -/
+theorem exists_blockBad_le {d : ℝ} (h0 : 0 ≤ d) (hd : d < 1) :
+    ∃ L C : ℕ, 2 ≤ C ∧ blockBad d L C (1 / 2) ≤ 1 / 1000 := by
+  set b : ℝ := d + (1 - d) * (1 / 2) with hb
+  have hb0 : 0 ≤ b := by rw [hb]; nlinarith
+  have hb1 : b < 1 := by rw [hb]; linarith
+  obtain ⟨C0, hC0⟩ := exists_pow_lt_of_lt_one (show (0 : ℝ) < 1 / 4 by norm_num) hb1
+  obtain ⟨L1, hL1⟩ := exists_pow_lt_of_lt_one (show (0 : ℝ) < 1 / 2000 by norm_num) hd
+  obtain ⟨L2, hL2⟩ := exists_pow_lt_of_lt_one (show (0 : ℝ) < 1 / 2000 by norm_num)
+    (show (1 / 2 : ℝ) < 1 by norm_num)
+  refine ⟨max L1 L2, C0 + 2, by omega, ?_⟩
+  have hbC : b ^ (C0 + 2) ≤ 1 / 4 :=
+    (pow_le_pow_of_le_one hb0 hb1.le (by omega)).trans hC0.le
+  have hd1 : d ^ (max L1 L2 + 1) ≤ 1 / 2000 :=
+    (pow_le_pow_of_le_one h0 hd.le (by have := le_max_left L1 L2; omega)).trans hL1.le
+  have h2 : (1 / 2 : ℝ)⁻¹ ^ (max L1 L2 + 1) * b ^ ((C0 + 2) * (max L1 L2 + 1)) ≤ 1 / 2000 := by
+    rw [pow_mul, ← mul_pow]
+    have hx0 : 0 ≤ (1 / 2 : ℝ)⁻¹ * b ^ (C0 + 2) := by positivity
+    have hx : (1 / 2 : ℝ)⁻¹ * b ^ (C0 + 2) ≤ 1 / 2 := by
+      have : (1 / 2 : ℝ)⁻¹ = 2 := by norm_num
+      rw [this]; linarith
+    calc ((1 / 2 : ℝ)⁻¹ * b ^ (C0 + 2)) ^ (max L1 L2 + 1) ≤ (1 / 2) ^ (max L1 L2 + 1) :=
+          pow_le_pow_left₀ hx0 hx _
+      _ ≤ (1 / 2) ^ L2 :=
+          pow_le_pow_of_le_one (by norm_num) (by norm_num) (by have := le_max_right L1 L2; omega)
+      _ ≤ 1 / 2000 := hL2.le
+  unfold blockBad
+  rw [← hb]
+  linarith
+
+/-- **The deletion channel has positive capacity for every deletion probability below one.** -/
+theorem deletionCapacity_pos {d : ℝ} (h0 : 0 ≤ d) (hd : d < 1) : 0 < deletionCapacity d := by
+  obtain ⟨L, C, hC, hbad⟩ := exists_blockBad_le h0 hd
+  have hach := achievable_deletionChannel_runLength h0 hd.le hC (by norm_num) (by norm_num) hbad
+  have hle := le_opCapacity (isStochastic_deletionChannel h0 hd.le) hach
+  have hpos : 0 < log 2 / (8 * (((C : ℝ) + 1) * ((L : ℝ) + 1))) := by
+    have := Real.log_pos (show (1 : ℝ) < 2 by norm_num)
+    positivity
+  exact hpos.trans_le hle
+
+/-- Explicit form: under the hypotheses of `achievable_deletionChannel_runLength`,
+`log 2 / (8 (C + 1) (L + 1)) ≤ deletionCapacity d`. -/
+theorem le_deletionCapacity_runLength {d : ℝ} (h0 : 0 ≤ d) (h1 : d ≤ 1) {L C : ℕ}
+    (hC : 2 ≤ C) {lam : ℝ} (hl0 : 0 < lam) (hl1 : lam ≤ 1)
+    (hbad : blockBad d L C lam ≤ 1 / 1000) :
+    log 2 / (8 * (((C : ℝ) + 1) * ((L : ℝ) + 1))) ≤ deletionCapacity d :=
+  le_opCapacity (isStochastic_deletionChannel h0 h1)
+    (achievable_deletionChannel_runLength h0 h1 hC hl0 hl1 hbad)
+
 end Applied.InformationTheory
