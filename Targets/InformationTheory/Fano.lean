@@ -9,6 +9,7 @@ import Applied.InformationTheory.Fano
 - source: R. M. Fano, "Transmission of Information" (1961); textbook form e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Theorem 2.10.1 (number to be confirmed)
 - used-in: converse of the channel coding theorem; minimax lower bounds in statistics
 - prerequisites: Gibbs' inequality; concavity of the binary entropy (Mathlib, `Real.strictConcave_binEntropy`); Jensen's inequality for finite sums
+- formalized-elsewhere: yes: LeanInfoTheory (github.com/serhatemrecoban/LeanInfoTheory), `LeanInfoTheory/Shannon/Fano.lean` :: `condEntropy_fano` (PMFs; equivalent); atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/InformationTheory/Fano.lean` :: `fano_inequality` (assumes full support and `|X| ≥ 2`); FujiHaruka/information-theory (github.com/FujiHaruka/information-theory), `InformationTheory/Fano.lean` and `InformationTheory/Fano/Measure.lean` (measure-theoretic) (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. Let `X` and `Y` be finite sets, `P` a function `X × Y → ℝ` with nonnegative

@@ -9,7 +9,7 @@ import Applied.InformationTheory.ZeroErrorEndpoints
 - source: elementary special case of C. E. Shannon, "A Mathematical Theory of Communication", Bell Syst. Tech. J. 27 (1948); textbook form of the BSC coding theorem e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Sections 7.1 and 7.7 (numbers to be confirmed). These degenerate cases are folklore.
 - used-in: partial progress towards achievability in Shannon's channel coding theorem (`Targets/InformationTheory/OperationalCapacity.lean`, `Targets/InformationTheory/BinarySymmetricChannel.lean`)
 - prerequisites: block codes and operational capacity (`Applied/InformationTheory/BlockCodes.lean`); `bsc`, `capacity_bsc` (`Applied/InformationTheory/Channel.lean`)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: no direct statement found in the projects checked on 2026-11-25 (elementary special cases)
 - statement-review: unreviewed
 
 Informal statement. Rates are in nats per channel use; achievability is in the library's sense

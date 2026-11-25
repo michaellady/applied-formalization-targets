@@ -9,7 +9,7 @@ import Applied.InformationTheory.Channel
 - source: C. E. Shannon, "A Mathematical Theory of Communication", Bell Syst. Tech. J. 27 (1948); textbook form e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Section 7.1 (number to be confirmed)
 - used-in: the baseline example of channel capacity; the reliability function of the binary symmetric channel (an open problem) is stated relative to this capacity
 - prerequisites: information capacity (`Applied/InformationTheory/Channel.lean`); `Real.binEntropy` (Mathlib)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: yes: LeanInfoTheory (github.com/serhatemrecoban/LeanInfoTheory), `LeanInfoTheory/Shannon/StandardChannelCapacity.lean` :: `channelCapacity_binarySymmetricChannel` (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. For `q ∈ [0, 1]` the binary symmetric channel `bsc q` has input and output

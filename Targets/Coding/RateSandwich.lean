@@ -9,6 +9,7 @@ import Targets.Coding.EliasBassalygo
 - source: Gilbert–Varshamov: E. N. Gilbert, Bell Syst. Tech. J. 31 (1952), 504–522, and R. R. Varshamov (1957); Elias–Bassalygo: L. A. Bassalygo, Problemy Peredachi Informatsii 1:4 (1965), 41–44; combined textbook statement e.g. F. J. MacWilliams, N. J. A. Sloane, "The Theory of Error-Correcting Codes" (1977), Ch. 17 (to be confirmed)
 - used-in: the state of the Gilbert–Varshamov tightness problem (`coding-gilbert-varshamov-tightness`)
 - prerequisites: the finite Gilbert–Varshamov and Elias–Bassalygo bounds; entropy bounds on Hamming balls; `lim inf` and `lim sup`
+- formalized-elsewhere: no combined statement found in the projects checked on 2026-11-25; the two ingredients are formalized elsewhere (see `coding-gilbert-varshamov-rate` and `coding-elias-bassalygo`). The MRRW bound is stated with `sorry` in tCSlib (github.com/Shilun-Allan-Li/tCSlib), `TCSlib/ErrorCorrectingCodes/MRRW.lean` :: `mrrw_bound`
 - statement-review: unreviewed
 
 Informal statement. Let `A(n, d)` be the largest size of a binary code of length `n` and minimum
@@ -26,7 +27,8 @@ for every `0 < δ < 1/2` (`elias_above_gv`); nothing here decides the problem.
 Differences from the textbook statement: the textbook states the bounds for `0 ≤ δ ≤ 1/2` (or
 `0 < δ < 1/2`) with minimum distance `⌊δ n⌋` or `δ n`; here the minimum distance is `⌊δ n⌋` and
 the sandwich is proved for `0 < δ < 1/2`. The best known upper bound (MRRW, the linear
-programming bound) is not formalized, so the upper end of the interval is not the best known.
+programming bound) is not formalized (here, or as far as we found anywhere: tCSlib states it as
+`mrrw_bound` with `sorry`), so the upper end of the interval is not the best known.
 
 Not covered: the MRRW bound; whether `R(n)` converges; linear codes in the `lim inf` (the finite
 linear bound is `coding-varshamov-linear`).

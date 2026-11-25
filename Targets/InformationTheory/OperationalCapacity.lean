@@ -9,7 +9,7 @@ import Applied.InformationTheory.BlockCodes
 - source: C. E. Shannon, "A Mathematical Theory of Communication", Bell Syst. Tech. J. 27 (1948); textbook form e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Section 7.5 (definitions of codes, achievable rates and capacity; section number to be confirmed)
 - used-in: prerequisite for stating open capacity problems (deletion channel, reliability function of the binary symmetric channel)
 - prerequisites: row-stochastic matrices (`Applied/InformationTheory/Channel.lean`); nothing from Mathlib beyond finite sums and `sSup`
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: equivalent notions of achievable rate (maximal error, all large `n`) are in FujiHaruka/information-theory (github.com/FujiHaruka/information-theory), `InformationTheory/Shannon/ChannelCoding/ShannonTheoremMaxError.lean`; atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/InformationTheory/ChannelCodingAchievability.lean` :: `channelCoding_achievability` (bits); cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Probability/BitString/BinarySymmetricChannel/Capacity.lean` :: `IsAchievableRate` (binary symmetric channel only, bits, exactly `2^⌈Rn⌉` messages). No bridge to these is formalized (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. A *channel family* with input alphabet `X` (finite in every theorem
@@ -66,12 +66,20 @@ converse half `opCapacity (memoryless W) ≤ capacity W`, together with the weak
 `(1 - Pₑ) log M ≤ capacity (F.kernel n) + log 2` for a single code and
 `opCapacity F ≤ limsup capacity (F.kernel n) / n` for a general family, is proved in
 `Targets/InformationTheory/ChannelCodingConverse.lean`; achievability is not formalized in
-general. It is proved for the binary erasure channel and the binary symmetric channel, giving
+general in this project (it is formalized elsewhere, in other channel models and without a
+bridge to ours: FujiHaruka/information-theory, `shannon_noisy_channel_coding_theorem_general`;
+atlas-lean, `channelCoding_achievability`). It is proved for the binary erasure channel and the
+binary symmetric channel, giving
 the full coding theorems `opCapacity (memoryless (bec e)) = (1 - e) log 2`
 (`Targets/InformationTheory/BecCodingTheorem.lean`) and `opCapacity (memoryless (bsc q)) =
 log 2 - h(q)` (`Targets/InformationTheory/BscCodingTheorem.lean`), and for letter-wise
 zero-error-decodable channels (`Targets/InformationTheory/ZeroErrorCodingEndpoints.lean`). Also
-not covered: the equivalence of maximal and average error criteria; strong converses.
+not covered: the equivalence of maximal and average error criteria; strong converses (formalized
+elsewhere: for the binary symmetric channel in cslib-frontier,
+`CslibFrontier/Probability/BitString/BinarySymmetricChannel/StrongConverse.lean`; for memoryless
+channels in atlas-lean, `MathlibExt/InformationTheory/ChannelCodingStrongConverse.lean`, and
+FujiHaruka/information-theory, `InformationTheory/Shannon/ChannelCoding/StrongConverse.lean`;
+files located on 2026-11-25, statements not compared in detail).
 -/
 
 namespace Targets.InformationTheory

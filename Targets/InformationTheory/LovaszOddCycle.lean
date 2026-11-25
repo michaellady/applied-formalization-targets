@@ -10,7 +10,7 @@ import Targets.InformationTheory.ShannonCapacityC7
 - source: L. Lovász, "On the Shannon capacity of a graph", IEEE Trans. Inform. Theory 25 (1979), Corollary 5 (`ϑ(Cₙ) = n cos(π/n)/(1 + cos(π/n))` for odd `n`; numbering to be confirmed)
 - used-in: the open problem `Targets/InformationTheory/ShannonCapacityC7.lean` (the upper bound in `ShannonCapacityC7EqLovaszTheta`)
 - prerequisites: Lovász's orthonormal-representation bound (`Targets/InformationTheory/LovaszThetaBound.lean`); sums of roots of unity (`geom_sum_eq`, `Complex.exp_eq_one_iff`, Mathlib)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: not found proved in the projects checked on 2026-11-25. The case `n = 7` is stated without proof in atlas-lean (github.com/facebookresearch/atlas-lean), `WantedExt/Combinatorics/Coding/CycleShannonBoundsWanted.lean` :: `lovasz1979UpperBound` (`theorem_wanted`) and in formal-conjectures (github.com/google-deepmind/formal-conjectures), `FormalConjectures/GreensOpenProblems/38.lean` :: `green_38.variants.best_upper` (`sorry`); the theorem here would give both after a bridge between the definitions, which is not formalized
 - statement-review: unreviewed
 
 Informal statement. Let `n ≥ 3` be odd, `Cₙ = SimpleGraph.cycleGraph n` (vertices `ℤ/n`, `i`
@@ -34,8 +34,10 @@ is proved; that this number equals `ϑ(Cₙ)` (the matching lower bound on `ϑ`)
 and `ϑ` is not defined. The hypotheses `n ≥ 3` and `n` odd are explicit (for `n = 1, 2` the
 cycle graph of Mathlib is not a cycle; oddness is used only for `λ_k ≥ 0`).
 
-Not covered: `ϑ(Cₙ)` itself and its lower bound; even cycles; lower bounds on `Θ(Cₙ)` (for
-`n = 7` the library has only `3 ≤ Θ(C₇)` here); whether `Θ(C₇)` equals the bound (open).
+Not covered: `ϑ(Cₙ)` itself and its lower bound; even cycles; lower bounds on `Θ(Cₙ)` (none in
+this file; for `n = 7` the library proves
+`367^{1/5} ≤ Θ(C₇)` in `Targets/InformationTheory/ShannonCapacityC7Lower.lean`, and for `n = 5`
+the matching `√5 ≤ Θ(C₅)`); whether `Θ(C₇)` equals the bound (open).
 -/
 
 namespace Targets.InformationTheory

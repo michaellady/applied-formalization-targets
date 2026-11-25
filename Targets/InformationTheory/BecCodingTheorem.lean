@@ -9,7 +9,7 @@ import Applied.InformationTheory.ErasureCapacity
 - source: P. Elias, "Coding for noisy channels", IRE Convention Record (1955) (to be confirmed); special case of C. E. Shannon, "A Mathematical Theory of Communication", Bell Syst. Tech. J. 27 (1948); textbook form e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Sections 7.1 and 7.7 (numbers to be confirmed)
 - used-in: first complete instance of the channel coding theorem in this library (`Targets/InformationTheory/OperationalCapacity.lean`); baseline for the binary deletion channel, whose capacity is open
 - prerequisites: block codes and operational capacity (`Applied/InformationTheory/BlockCodes.lean`); converse (`Applied/InformationTheory/MemorylessConverse.lean`); consistency decoder (`Applied/InformationTheory/ErasureAchievability.lean`)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: no explicit operational coding theorem for the erasure channel found in the projects checked on 2026-11-25. It would follow from the general memoryless-channel theorem in FujiHaruka/information-theory (github.com/FujiHaruka/information-theory), `InformationTheory/Shannon/ChannelCoding/ShannonTheoremGeneral.lean` :: `shannon_noisy_channel_coding_theorem_general`, or atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/InformationTheory/ChannelCodingAchievability.lean` :: `channelCoding_achievability`, via a bridge between channel models that is not formalized. The informational capacity is in LeanInfoTheory (github.com/serhatemrecoban/LeanInfoTheory) (`channelCapacity_binaryErasureChannel`)
 - statement-review: unreviewed
 
 Informal statement. Let `0 ≤ e ≤ 1` (Lean hypotheses `h0`, `h1`) and `bec e` the binary

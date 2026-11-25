@@ -9,6 +9,7 @@ import Applied.Coding.BallCard
 - source: standard; e.g. F. J. MacWilliams, N. J. A. Sloane, "The Theory of Error-Correcting Codes" (1977), Ch. 10 (lemma number to be confirmed)
 - used-in: asymptotic (rate) forms of the Gilbert–Varshamov and Hamming bounds; counting arguments in information theory
 - prerequisites: binomial theorem; real logarithm and powers
+- formalized-elsewhere: yes: cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Foundations/Data/Nat/Choose/Entropy.lean` :: `sum_choose_le_exp_mul_binEntropy` (natural logarithms, real `α ≥ r/n`) and `CslibFrontier/Foundations/Data/Code/BallVolume.lean` :: `card_filter_hammingDist_le_le_exp_mul_qaryEntropy` (`q`-ary); atlas-lean (github.com/facebookresearch/atlas-lean), `v1/Atlas/ProbabilisticMethodsInCombinatorics/code/Chapter10/EntropyUniformBound.lean` :: `binomial_tail_entropy_bound` (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. For natural numbers `k`, `n` with `2k ≤ n`,

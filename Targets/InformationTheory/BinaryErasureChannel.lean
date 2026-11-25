@@ -9,7 +9,7 @@ import Applied.InformationTheory.Channel
 - source: P. Elias, "Coding for noisy channels" (1955) (to be confirmed); textbook form e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Section 7.1 (number to be confirmed)
 - used-in: baseline example of channel capacity; comparison point for the binary deletion channel, whose capacity is open
 - prerequisites: information capacity (`Applied/InformationTheory/Channel.lean`)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: yes: LeanInfoTheory (github.com/serhatemrecoban/LeanInfoTheory), `LeanInfoTheory/Shannon/StandardChannelCapacity.lean` :: `channelCapacity_binaryErasureChannel` (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. For `e ∈ [0, 1]` the binary erasure channel `bec e` has input alphabet

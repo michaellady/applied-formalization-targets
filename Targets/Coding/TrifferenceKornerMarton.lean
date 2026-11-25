@@ -9,6 +9,7 @@ import Applied.Coding.TrifferenceKornerMarton
 - source: J. Körner, K. Marton, "New bounds for perfect hashing via information theory", European J. Combin. 9 (1988) 523–530 (the rate bound `(1/4) log₂ (9/5)`; theorem number to be confirmed)
 - used-in: best known lower bound for the trifference problem (to our knowledge)
 - prerequisites: finite combinatorics and real logarithms; the tetracode and the plain random-coding bound are in `Applied/Coding/TrifferenceSmall.lean` and `TrifferenceLower.lean`
+- formalized-elsewhere: no Lean formalization found in the projects checked on 2026-11-25 (local clones and GitHub code search; see `PRIOR-ART-VERIFICATION-2.md`)
 - statement-review: unreviewed
 
 Informal statement. Let `T(n)` be the largest size of a trifferent code in `{0,1,2}ⁿ` (any three

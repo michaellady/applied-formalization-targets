@@ -9,7 +9,7 @@ import Applied.InformationTheory.RelayCutSet
 - source: T. M. Cover, A. El Gamal, "Capacity theorems for the relay channel", IEEE Trans. Inform. Theory 25 (1979), 572–584, Theorem 4 (theorem number to be confirmed); textbook form A. El Gamal, Y.-H. Kim, "Network Information Theory" (2011), Section 16.2 (cut-set bound for the relay channel; section number to be confirmed); T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Section 15.10 (general cut-set bound, to be confirmed)
 - used-in: upper bound for the open problem `Targets/InformationTheory/RelayChannelCapacity.lean`; it is tight for the degraded relay channel (not formalized here)
 - prerequisites: relay codes (`Applied/InformationTheory/MultiTerminal.lean`); Fano's inequality, data processing, subadditivity of entropy (`Applied/InformationTheory/{Fano,DataProcessing,MemorylessConverse}.lean`); concavity of `negMulLog` from Mathlib
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: partly: FujiHaruka/information-theory (github.com/FujiHaruka/information-theory), `InformationTheory/Shannon/RelayCutset.lean` :: `relay_cutset_outer_bound` (also `relay_mac_cut_outer_bound`, `relay_broadcast_cut_outer_bound`) proves the per-code multi-letter bound, with the channel structure as Markov and memorylessness hypotheses and the sharper Fano term; the single-letter form `sup_p min{·, ·}` and the bound on a capacity were not found elsewhere (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. All logarithms are natural (nats). Let `X, X₁, Y, Y₁` be finite types and

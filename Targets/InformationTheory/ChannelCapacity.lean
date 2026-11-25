@@ -9,7 +9,7 @@ import Applied.InformationTheory.Channel
 - source: C. E. Shannon, "A Mathematical Theory of Communication", Bell Syst. Tech. J. 27 (1948); textbook form e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Chapter 7 (section and theorem numbers to be confirmed)
 - used-in: every capacity statement; prerequisite for stating open capacity problems (deletion, relay, broadcast channels)
 - prerequisites: finite entropy and mutual information (`Applied/InformationTheory/Entropy.lean`)
-- formalized-elsewhere: not in Mathlib; other projects to be confirmed
+- formalized-elsewhere: not in Mathlib. The same definition (in nats) is in LeanInfoTheory (github.com/serhatemrecoban/LeanInfoTheory), `LeanInfoTheory/Shannon/ChannelCapacity.lean` :: `channelCapacity` (`sSup` over PMFs, nonempty input alphabet) and FujiHaruka/information-theory (github.com/FujiHaruka/information-theory), `InformationTheory/Shannon/ChannelCoding/ShannonTheorem.lean` :: `capacity` (`sSup` over the standard simplex) (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. A channel from a finite set `X` to a finite set `Y` is a matrix
@@ -31,7 +31,15 @@ Logarithms are natural, so the capacity is in nats per channel use.
 Important: this is the *information* capacity, a supremum of mutual information. The channel
 coding theorem (achievability and converse), which identifies it with the *operational*
 capacity (the supremum of rates of codes with vanishing error probability), is NOT formalized
-here. Nothing in this file is about codes.
+here. Nothing in this file is about codes. (In this project the operational capacity is
+`Targets/InformationTheory/OperationalCapacity.lean`, the converse is
+`Targets/InformationTheory/ChannelCodingConverse.lean`, and achievability is proved for the
+binary erasure and binary symmetric channels only. Achievability for general memoryless
+channels is formalized elsewhere: FujiHaruka/information-theory,
+`InformationTheory/Shannon/ChannelCoding/ShannonTheoremGeneral.lean` ::
+`shannon_noisy_channel_coding_theorem_general`, and atlas-lean,
+`MathlibExt/InformationTheory/ChannelCodingAchievability.lean` :: `channelCoding_achievability`;
+statements read at source on 2026-11-25, proofs not re-checked, no bridge formalized.)
 
 Difference from the textbook statement: the textbook writes `max_p`; here the capacity is a
 supremum (`sSup` of a bounded set of reals) and it is not proved that the supremum is attained
