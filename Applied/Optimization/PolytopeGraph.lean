@@ -35,23 +35,30 @@ def AdjVertices (S : Set E) (u v : E) : Prop :=
 def VertexDistLE (S : Set E) (u v : E) (N : ℕ) : Prop :=
   ∃ p : ℕ → E, p 0 = u ∧ ∃ k ≤ N, p k = v ∧ ∀ i < k, AdjVertices S (p i) (p (i + 1))
 
+/-- Adjacency of vertices is symmetric. -/
 theorem AdjVertices.symm {S : Set E} {u v : E} (h : AdjVertices S u v) : AdjVertices S v u :=
   ⟨h.1.symm, h.2.2.1, h.2.1, by rw [segment_symm]; exact h.2.2.2⟩
 
+/-- Every point is at distance at most `N` from itself, for every `N` (the empty walk; `u` is
+not required to be a vertex). -/
 theorem VertexDistLE.refl (S : Set E) (u : E) (N : ℕ) : VertexDistLE S u u N :=
   ⟨fun _ => u, rfl, 0, Nat.zero_le _, rfl, fun _ hi => absurd hi (Nat.not_lt_zero _)⟩
 
+/-- `VertexDistLE` is monotone in the length bound. -/
 theorem VertexDistLE.mono {S : Set E} {u v : E} {N N' : ℕ} (h : VertexDistLE S u v N)
     (hN : N ≤ N') : VertexDistLE S u v N' :=
   let ⟨p, h0, k, hk, h'⟩ := h
   ⟨p, h0, k, hk.trans hN, h'⟩
 
+/-- Adjacent vertices are at distance at most `1`. -/
 theorem AdjVertices.vertexDistLE {S : Set E} {u v : E} (h : AdjVertices S u v) :
     VertexDistLE S u v 1 :=
   ⟨fun i => if i = 0 then u else v, rfl, 1, le_rfl, rfl, fun i hi => by
     obtain rfl : i = 0 := by omega
     simpa using h⟩
 
+/-- Walks concatenate: distance at most `N` from `u` to `v` and at most `N'` from `v` to `w`
+give distance at most `N + N'` from `u` to `w`. -/
 theorem VertexDistLE.trans {S : Set E} {u v w : E} {N N' : ℕ} (h : VertexDistLE S u v N)
     (h' : VertexDistLE S v w N') : VertexDistLE S u w (N + N') := by
   obtain ⟨p, hp0, k, hk, hpk, hp⟩ := h
@@ -73,6 +80,7 @@ theorem VertexDistLE.trans {S : Set E} {u v w : E} {N N' : ℕ} (h : VertexDistL
         have h2 : i + 1 - k = (i - k) + 1 := by omega
         simpa [hik, h1, h2] using hq (i - k) (by omega)
 
+/-- `VertexDistLE` is symmetric (reverse the walk). -/
 theorem VertexDistLE.symm {S : Set E} {u v : E} {N : ℕ} (h : VertexDistLE S u v N) :
     VertexDistLE S v u N := by
   obtain ⟨p, hp0, k, hk, hpk, hp⟩ := h

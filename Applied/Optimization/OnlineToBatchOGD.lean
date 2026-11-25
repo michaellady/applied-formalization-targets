@@ -19,6 +19,16 @@ variable {Ω E 𝒵 : Type*} {mΩ : MeasurableSpace Ω} {P : Measure Ω} [IsProb
   [NormedAddCommGroup E] [InnerProductSpace ℝ E] [CompleteSpace E] [MeasurableSpace E]
   [MeasurableSpace 𝒵]
 
+/-- **Online-to-batch conversion of projected online gradient descent.** Let `Z t` have law `μZ`
+with `x t` independent of `Z t`, let the population risk `F y = ∫ ℓ (y, z) ∂μZ` be convex, and
+let each sample loss `y ↦ ℓ (y, Z t ω)` be convex and differentiable. Suppose that for every
+outcome `ω` the iterates `x t ω` are those of projected online gradient descent on a convex set
+`K` of diameter at most `D`, with step sizes `c / √(t+1)` (`hstep`: `x (t+1) ω` is a point of
+`K` nearest to the gradient step from `x t ω`), and that the gradients along the first `T`
+iterates have norm at most `G`. Then for every comparator `u ∈ K` the average iterate
+`x̄ = T⁻¹ • ∑_{t<T} x t` satisfies `E[F x̄] - F u ≤ (D² / (2c) + c G²) / √T`.
+The measurability and integrability hypotheses (`hx`, `hZ`, `hℓ`, `hu`, `hbar`) are assumed,
+not derived. -/
 theorem projected_ogd_online_to_batch (x : ℕ → Ω → E) (Z : ℕ → Ω → 𝒵) (μZ : Measure 𝒵)
     (ℓ : E × 𝒵 → ℝ)
     (hx : ∀ t, Measurable (x t)) (hZ : ∀ t, Measurable (Z t))
