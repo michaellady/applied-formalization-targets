@@ -17,7 +17,7 @@ Informal statement. `n` agents with additive non-negative valuations divide `m` 
 goods. An allocation is EFX if no agent envies another after removing any single good from the
 other's bundle. Existence is proved in the separate entry `EFXTwoAgents.lean` (not in this file) for `n = 2`,
 and for every `n` under identical valuations (which covers `n = 1`); it is reported on paper for `n = 3`
-(not checked against this strong form), and open for `n ≥ 4`.
+(believed to be for this strong form; to be confirmed, see the review note), and open for `n ≥ 4`.
 
 The two-agent case and the identical-valuations case are proved for this strong form in
 `Targets/Economics/EFXTwoAgents.lean` (theorems `efx_exists_two` and `efx_exists_identical`).
@@ -33,8 +33,16 @@ agent), and `EFXExists` assumes `0 < n` (with no agents and `m > 0` goods no all
 exists).
 
 Review note: this uses the strong form (removing *any* good, including ones the envious agent
-values at zero). Which form each cited paper proves must be checked before relying on
-`EFXExistsThree`.
+values at zero), often written EFX₀. For the three-agent case: econcslib-bei
+(`EconCSLib/OpenProblem/EFXExistence.lean`, `EconCSLib/OpenProblem/New/EFXAdditiveExistence/Problem.lean`)
+uses the same strong definition (removal of every good of the other bundle, zero-valued ones
+included) and records the three-agent additive case as known in the literature, citing
+Chaudhury–Garg–Mehlhorn (EC 2020; journal version J. ACM 2024); it does not formalize it. The
+cross-check against that repository believes that Chaudhury–Garg–Mehlhorn define EFX with the
+removal of *every* good `g` of the other bundle, i.e. the strong form used here, but this was
+flagged as uncertain and the paper's definition has not been compared with `IsEFX` line by
+line: to be confirmed against the J. ACM version. `EFXExistsThree` is therefore still only a
+stated proposition; nothing in this file asserts it.
 -/
 
 namespace Targets.Economics
@@ -50,9 +58,10 @@ def EFXExists : Prop :=
   ∀ (n m : ℕ), 0 < n → ∀ v : Fin n → Fin m → ℝ, (∀ i g, 0 ≤ v i g) →
     ∃ a : Fin m → Fin n, IsEFX v a
 
-/-- The three-agent case, reported proved on paper (Chaudhury–Garg–Mehlhorn 2020). Stated as a
-proposition because it is not proved here and the form of EFX in that paper has not been
-checked against `IsEFX`. -/
+/-- The three-agent case, reported proved on paper (Chaudhury–Garg–Mehlhorn, EC 2020; J. ACM
+2024). Stated as a proposition because it is not proved here. The form of EFX in that paper is
+believed to be the strong form `IsEFX` (removal of every good, zero-valued ones included), as
+in econcslib-bei's statement of the problem; this is to be confirmed against the paper. -/
 def EFXExistsThree : Prop :=
   ∀ (m : ℕ) (v : Fin 3 → Fin m → ℝ), (∀ i g, 0 ≤ v i g) → ∃ a : Fin m → Fin 3, IsEFX v a
 
