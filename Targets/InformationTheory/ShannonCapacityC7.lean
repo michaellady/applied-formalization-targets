@@ -30,6 +30,8 @@ aware; it is one natural candidate for the answer, not a consensus conjecture.
 
 What is proved (in `Applied/`): `3 ≤ Θ(C₇) ≤ 7` (the trivial bounds `α(G) ≤ Θ(G) ≤ |V|`);
 `α(G^{⊠k})^{1/k} ≤ Θ(G)` for every `k ≥ 1`; `α(C₅ ⊠ C₅) ≥ 5` and hence `√5 ≤ Θ(C₅)`.
+Better lower bounds from explicit independent sets, `α(C₇^{⊠4}) ≥ 108` and hence
+`108^{1/4} ≈ 3.2237 ≤ Θ(C₇)`, are in `Targets/InformationTheory/ShannonCapacityC7Lower.lean`.
 
 Not covered: the Lovász theta function and the bound `Θ ≤ ϑ` (so `Θ(C₅) = √5` and
 `Θ(C₇) ≤ 3.3177` are not formalized); the lower bound `367^{1/5}`; that the supremum is a limit
