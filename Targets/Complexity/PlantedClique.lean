@@ -31,8 +31,11 @@ symmetric and loopless and the planted set is a clique (`sampleAdj_symm`, `sampl
 `plantedAdj_symm`, `plantedAdj_of_mem`); planting on at most one vertex changes nothing, so
 `advantage A n k = 0` for `k ≤ 1`, `k ≤ n` (`advantage_eq_zero_of_le_one`); constant
 algorithms are polynomial time (`RandAlg.isPolyTime_const`), so the quantifier over
-polynomial-time algorithms is not empty. Not proved: any hardness or any algorithm, including
-the fact that the conjecture's conclusion fails for `k ≥ c √n`.
+polynomial-time algorithms is not empty. Easy regime (`Targets/Complexity/PlantedCliqueEdgeTest.lean`):
+the edge-count test has advantage at least `1 - 2 exp (-k⁴ / (64 n²))` for `2 ≤ k ≤ n`, hence
+advantage tending to `1` when `k²/n → ∞`; that test is not proved to be polynomial time and its
+threshold depends on `k`. Not proved: any hardness; polynomial-time computability of any
+distinguisher; the fact that the conjecture's conclusion fails for `k ≥ c √n`.
 
 Review notes (modelling choices to check).
 * This is the detection (decision) form with vanishing advantage, for uniform randomized
