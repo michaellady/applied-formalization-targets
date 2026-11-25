@@ -694,6 +694,110 @@ theorem path_eq {R : PivotRule ℚ} (hR : R.IsDantzigRule) :
     rw [kmBasis, eq_of_isDantzigPivot N.testBit hbn k₀ h0 hlow this, kmBasis,
       grayT_succ N k₀ k₀.2 h0 hlow]
 
+/-! ### Main results -/
+
+theorem isFeasibleBasis_kmBasis (N : ℕ) : (kleeMinty n).IsFeasibleBasis (kmBasis n N) :=
+  isFeasibleBasis_basisOf _
+
+theorem isOptimalBasis_kmBasis : (kleeMinty n).IsOptimalBasis (kmBasis n (2 ^ n - 1)) :=
+  isOptimalBasis_of_all _ (by simp) fun k => by simp
+
+/-- The Klee–Minty program is bounded (it has an optimal basis). -/
+theorem isBounded : (kleeMinty n).IsBounded := by
+  obtain ⟨-, x, -, hx, hopt⟩ := isOptimalBasis_kmBasis (n := n)
+  exact ⟨_, hopt⟩
+
+variable {R : PivotRule ℚ}
+
+/-- Every step of a Dantzig rule along the first `2^n - 1` steps is a simplex pivot. -/
+theorem isSimplexPivot_path (hR : R.IsDantzigRule) {N : ℕ} (hN : N < 2 ^ n - 1) :
+    (kleeMinty n).IsSimplexPivot (R.path (kleeMinty n) (kmBasis n 0) N)
+      (R.path (kleeMinty n) (kmBasis n 0) (N + 1)) := by
+  rw [path_eq hR N (by omega), path_eq hR (N + 1) (by omega)]
+  obtain ⟨k₀, h0, hlow⟩ := exists_first_zero (n := n) hN
+  have hbn : N.testBit n = false := Nat.testBit_eq_false_of_lt (by omega)
+  rw [kmBasis, kmBasis, grayT_succ N k₀ k₀.2 h0 hlow]
+  exact (isDantzigPivot_flip N.testBit hbn k₀ h0 hlow).1
+
+/-- Before step `2^n - 1` the current basis is not optimal. -/
+theorem not_isOptimalBasis_path (hR : R.IsDantzigRule) {N : ℕ} (hN : N < 2 ^ n - 1) :
+    ¬ (kleeMinty n).IsOptimalBasis (R.path (kleeMinty n) (kmBasis n 0) N) := fun h =>
+  h.not_isSimplexPivot nondegenerate (isSimplexPivot_path hR hN)
+
+theorem isOptimalBasis_path (hR : R.IsDantzigRule) :
+    (kleeMinty n).IsOptimalBasis (R.path (kleeMinty n) (kmBasis n 0) (2 ^ n - 1)) := by
+  rw [path_eq hR _ le_rfl]; exact isOptimalBasis_kmBasis
+
+/-- The objective value strictly increases along the first `2^n - 1` steps. -/
+theorem basisValue_path_lt (hR : R.IsDantzigRule) {i j : ℕ} (hij : i < j) (hj : j ≤ 2 ^ n - 1) :
+    (kleeMinty n).basisValue (R.path (kleeMinty n) (kmBasis n 0) i) <
+      (kleeMinty n).basisValue (R.path (kleeMinty n) (kmBasis n 0) j) := by
+  induction j with
+  | zero => omega
+  | succ j ih =>
+    have hstep := (isSimplexPivot_path (n := n) hR (N := j) (by omega)).basisValue_lt
+      nondegenerate
+    rcases Nat.lt_succ_iff_lt_or_eq.1 hij with h | rfl
+    · exact (ih h (by omega)).trans hstep
+    · exact hstep
+
+/-- The `2^n` bases `path 0, …, path (2^n - 1)` are pairwise distinct. -/
+theorem path_injOn (hR : R.IsDantzigRule) :
+    Set.InjOn (R.path (kleeMinty n) (kmBasis n 0)) (Set.Iio (2 ^ n)) := by
+  intro i hi j hj hij
+  simp only [Set.mem_Iio] at hi hj
+  by_contra hne
+  rcases Nat.lt_or_gt_of_ne hne with h | h
+  · have := basisValue_path_lt (n := n) hR h (show j ≤ 2 ^ n - 1 by omega)
+    rw [hij] at this; exact lt_irrefl _ this
+  · have := basisValue_path_lt (n := n) hR h (show i ≤ 2 ^ n - 1 by omega)
+    rw [hij] at this; exact lt_irrefl _ this
+
+open Classical in
+/-- The Klee–Minty program has at most `2^n` feasible bases. -/
+theorem card_feasibleBases_le :
+    (univ.filter fun B => (kleeMinty n).IsFeasibleBasis B).card ≤ 2 ^ n := by
+  have := card_le_card_of_injOn (fun B : Finset (Fin (n + n)) => fun i : Fin n => decide (xc i ∈ B))
+    (s := univ.filter fun B => (kleeMinty n).IsFeasibleBasis B) (t := univ)
+    (fun _ _ => mem_univ _) (fun B hB B' hB' h => by
+      simp only [coe_filter, mem_univ, true_and, Set.mem_ofPred_eq] at hB hB'
+      rw [eq_basisOf hB, eq_basisOf hB']
+      exact congrArg basisOf h)
+  simpa using this
+
+/-- Dantzig's rule visits every feasible basis (vertex) of the Klee–Minty program. -/
+theorem exists_path_eq (hR : R.IsDantzigRule) {B : Finset (Fin (n + n))}
+    (hB : (kleeMinty n).IsFeasibleBasis B) :
+    ∃ N < 2 ^ n, R.path (kleeMinty n) (kmBasis n 0) N = B := by
+  open Classical in
+  set p := R.path (kleeMinty n) (kmBasis n 0)
+  have hsub : (range (2 ^ n)).image p ⊆ univ.filter fun B => (kleeMinty n).IsFeasibleBasis B := by
+    intro C hC
+    obtain ⟨N, hN, rfl⟩ := mem_image.1 hC
+    rw [mem_range] at hN
+    simp only [mem_filter, mem_univ, true_and, p]
+    rw [path_eq hR N (by omega)]
+    exact isFeasibleBasis_kmBasis N
+  have hcard : ((range (2 ^ n)).image p).card = 2 ^ n := by
+    rw [card_image_of_injOn (by simpa [Set.InjOn] using path_injOn hR), card_range]
+  have heq := eq_of_subset_of_card_le hsub (by rw [hcard]; exact card_feasibleBases_le)
+  have hBmem : B ∈ univ.filter fun B => (kleeMinty n).IsFeasibleBasis B := by simpa using hB
+  rw [← heq] at hBmem
+  obtain ⟨N, hN, hNB⟩ := mem_image.1 hBmem
+  exact ⟨N, mem_range.1 hN, hNB⟩
+
+/-- **Klee–Minty lower bound for Dantzig's rule.** Every Dantzig rule reaches an optimal basis
+of the Klee–Minty program from the slack basis within `2^n - 1` pivots ... -/
+theorem reachesOptimumWithin (hR : R.IsDantzigRule) :
+    R.ReachesOptimumWithin (kleeMinty n) (kmBasis n 0) (2 ^ n - 1) :=
+  ⟨2 ^ n - 1, le_rfl, fun _ hi => isSimplexPivot_path hR hi, isOptimalBasis_path hR⟩
+
+/-- ... and not within fewer. -/
+theorem not_reachesOptimumWithin (hR : R.IsDantzigRule) {N : ℕ} (hN : N < 2 ^ n - 1) :
+    ¬ R.ReachesOptimumWithin (kleeMinty n) (kmBasis n 0) N := by
+  rintro ⟨k, hk, -, hopt⟩
+  exact not_isOptimalBasis_path hR (by omega) hopt
+
 end KleeMinty
 
 end Applied.Optimization
