@@ -27,8 +27,9 @@ asymptotic (`coding-elias-bassalygo`). Together (`coding-binary-rate-sandwich`,
 `Targets.Coding.rate_sandwich`), for `0 < δ < 1/2`,
 `1 - H(δ) ≤ lim inf log₂ A(n, ⌊δn⌋) / n ≤ lim sup log₂ A(n, ⌊δn⌋) / n ≤ 1 - H((1 - √(1 - 2δ)) / 2)`,
 and the two outer bounds differ for every such `δ`. These are classical partial results; they
-do not decide `GilbertVarshamovTight`. The best known upper bound (McEliece–Rodemich–Rumsey–Welch,
-linear programming) is not formalized.
+do not decide `GilbertVarshamovTight`. The Delsarte linear programming bound is formalized in
+finite form with checked certificates (`coding-delsarte-lp`), but the best known asymptotic upper
+bound derived from it (McEliece–Rodemich–Rumsey–Welch) is not formalized.
 -/
 
 open Finset Filter Applied.Coding

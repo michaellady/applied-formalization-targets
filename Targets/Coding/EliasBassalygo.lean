@@ -42,8 +42,9 @@ confirmed against the source). The asymptotic form is stated for minimum distanc
 `0 < δ < 1/2` (the endpoints are excluded); the textbook allows `0 ≤ δ ≤ 1/2`.
 
 Not covered: the McEliece–Rodemich–Rumsey–Welch (linear programming) bound, which is better
-than Elias–Bassalygo for every `0 < δ < 1/2`; the Delsarte linear programming bound;
-non-binary alphabets; the constant-weight version of the Johnson bound.
+than Elias–Bassalygo for every `0 < δ < 1/2` (the finite Delsarte bound with explicit
+certificates is `coding-delsarte-lp`); non-binary alphabets; the constant-weight version of the
+Johnson bound.
 -/
 
 open Filter
