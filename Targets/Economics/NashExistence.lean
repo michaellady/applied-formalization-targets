@@ -27,7 +27,8 @@ definitions: a pure profile is a mixed Nash equilibrium iff it is a pure Nash eq
 ordinal potential (`Targets/Economics/PotentialGames.lean`); and, for a separately defined
 two-player notion, existence in zero-sum games (`Targets/Economics/NashZeroSum.lean`). For
 this very definition `IsMixedNash`, the statement is proved when `ι = Fin 2` and
-`u 1 = -u 0` (two-player zero-sum games, via the minimax theorem):
+`u 1 = -u 0` (two-player zero-sum games, via the minimax theorem), and when `ι = Fin 2` and
+every `S i = Fin 2` (general-sum `2 × 2` games, by case analysis):
 `Targets/Economics/NashTwoPlayerZeroSum.lean`.
 
 Edge case: with no players the empty profile is trivially an equilibrium, so `ι` is not

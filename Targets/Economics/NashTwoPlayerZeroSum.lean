@@ -1,12 +1,12 @@
 import Applied.Economics.NashTwoPlayer
 
 /-!
-# Nash existence for two-player zero-sum games in strategic form
+# Nash existence for two-player zero-sum games and for `2 × 2` games
 
 - id: econ-nash-two-player-zero-sum-mixed
 - area: economics
 - status: formalized
-- source: J. von Neumann, "Zur Theorie der Gesellschaftsspiele", Math. Annalen 100 (1928); textbook form: M. Osborne, A. Rubinstein, "A Course in Game Theory" (1994), Section 2.5 (proposition numbering to be confirmed). Classical special case of Nash's theorem; nothing new is claimed.
+- source: J. von Neumann, "Zur Theorie der Gesellschaftsspiele", Math. Annalen 100 (1928); textbook form: M. Osborne, A. Rubinstein, "A Course in Game Theory" (1994), Section 2.5 (proposition numbering to be confirmed). For `2 × 2` games: standard textbook case analysis of best-response correspondences, e.g. M. Osborne, "An Introduction to Game Theory" (2004), Chapter 4 (section to be confirmed). Classical special cases of Nash's theorem; nothing new is claimed.
 - used-in: zero-sum games; the special case of `Targets/Economics/NashExistence.lean` that needs no fixed-point theorem
 - prerequisites: `Applied.Economics.exists_saddle_point` (this project, from Mathlib's Sion minimax theorem `Sion.exists_isSaddlePointOn`)
 - formalized-elsewhere: not checked
@@ -25,14 +25,26 @@ to another probability vector.
   players, `mixedPayoff u σ i` equals the bimatrix payoff `(σ 0)ᵀ M (σ 1)`, where
   `M a b = u i (a, b)` (`twoPlayerMatrix u i`). This links `IsMixedNash` to the bimatrix
   notion `IsBimatrixNash` of `Targets/Economics/NashZeroSum.lean`.
+* `nash_twoPlayer_iff_bimatrix` (no hypotheses): for two players, `IsMixedNash u σ` holds iff
+  `IsBimatrixNash (twoPlayerMatrix u 0) (twoPlayerMatrix u 1) (σ 0) (σ 1)`.
+* `nash_twoByTwo_exists_bimatrix`: every general-sum bimatrix game with payoff matrices
+  `A B : Matrix (Fin 2) (Fin 2) ℝ` has a Nash equilibrium `IsBimatrixNash A B p q`.
+* `nash_twoByTwo_exists_mixed`: every game with player set `Fin 2`, each player having pure
+  strategy set `Fin 2`, and arbitrary real payoffs `u : Fin 2 → (Fin 2 → Fin 2) → ℝ`, has a
+  mixed Nash equilibrium `IsMixedNash u σ`. Proof by direct case analysis on the signs of each
+  player's gain from switching strategy at the opponent's two pure strategies; no fixed-point
+  or minimax theorem is used.
 
 Differences from the textbook statement: zero-sum is the exact condition `u 1 = -u 0`;
 constant-sum games (`u 0 + u 1 = c`) are not stated separately (they have the same equilibria,
 but this is not formalized here). Player set is literally `Fin 2`, so a two-player game indexed
 by another two-element type must be transported by hand.
 
-Not covered: general-sum two-player games (even `2 × 2`), games with three or more players,
-and Nash's theorem itself, which remains open in this project (`sorry` in
+For the `2 × 2` results the pure strategy sets are literally `Fin 2`; games whose two-element
+strategy sets are other types must be transported by hand.
+
+Not covered: general-sum two-player games beyond `2 × 2` (e.g. `2 × n`, `3 × 3`), games with
+three or more players, and Nash's theorem itself, which remains open in this project (`sorry` in
 `Targets/Economics/NashExistence.lean`).
 -/
 
@@ -48,6 +60,23 @@ theorem mixedPayoff_twoPlayer_eq_gamePayoff {S : Fin 2 → Type*} [∀ i, Fintyp
     Applied.Economics.mixedPayoff u σ i
       = Applied.Economics.gamePayoff (Applied.Economics.twoPlayerMatrix u i) (σ 0) (σ 1) :=
   Applied.Economics.mixedPayoff_fin_two_eq_gamePayoff u σ i
+
+theorem nash_twoPlayer_iff_bimatrix {S : Fin 2 → Type*} [∀ i, Fintype (S i)]
+    (u : Fin 2 → (∀ j, S j) → ℝ) (σ : ∀ j, S j → ℝ) :
+    Applied.Economics.IsMixedNash u σ ↔
+      Applied.Economics.IsBimatrixNash (Applied.Economics.twoPlayerMatrix u 0)
+        (Applied.Economics.twoPlayerMatrix u 1) (σ 0) (σ 1) :=
+  Applied.Economics.isMixedNash_fin_two_iff u σ
+
+theorem nash_twoByTwo_exists_bimatrix (A B : Matrix (Fin 2) (Fin 2) ℝ) :
+    ∃ p q, Applied.Economics.IsBimatrixNash A B p q :=
+  Applied.Economics.exists_isBimatrixNash_two_by_two A B
+
+theorem nash_twoByTwo_exists_mixed (u : Fin 2 → (Fin 2 → Fin 2) → ℝ) :
+    ∃ σ : Fin 2 → Fin 2 → ℝ, Applied.Economics.IsMixedNash u σ :=
+  Applied.Economics.exists_isMixedNash_two_by_two u
+
+alias nash_existence_two_by_two := nash_twoByTwo_exists_mixed
 
 alias nash_existence_two_player_zero_sum := nash_twoPlayer_zeroSum_exists_mixed
 
