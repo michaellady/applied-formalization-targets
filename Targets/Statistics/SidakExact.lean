@@ -20,8 +20,10 @@ correction (reject `i` when `pᵢ ≤ 1 - (1 - α)^(1/m)`) has family-wise error
 More generally, for any `H₀` whose p-values are exactly uniform and `0 ≤ c ≤ 1`,
 `P(∃ i ∈ H₀, pᵢ ≤ c) = 1 - (1 - c)^|H₀|`.
 
-Not covered: the case `H₀ ≠ univ` for the Šidák FWER (it is then `1 - (1 - α)^(|H₀|/m) < α`,
-which follows from the general formula but is not stated); dependent p-values.
+Not covered: the case `H₀ ≠ univ` for the Šidák FWER (on paper it is then
+`1 - (1 - α)^(|H₀|/m) ≤ α`, with strict inequality when `0 < α < 1` and `H₀ ≠ ∅`; the general
+formula `measure_exists_le_eq_of_iIndepFun` gives the probability for the per-test level, but
+this FWER identity is not stated as a Lean theorem); dependent p-values.
 -/
 
 namespace Targets.Statistics

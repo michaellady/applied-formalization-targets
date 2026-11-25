@@ -24,7 +24,10 @@ and `W` is independent of the vector `(ε j)`. The statistics are
 
 (1) End-to-end theorems. Assume `W` is standard normal, `a j ≥ 0` for every `j`, and for every
 true null `i ∈ H₀`: `a i < 1`, `ε i` is standard normal and `μ i = 0`. Nothing is assumed about
-`ε j`, `μ j` or an upper bound on `a j` for false nulls. Then, for every `α ≥ 0`:
+`ε j`, `μ j` or an upper bound on `a j` for false nulls. (Lean convention: for a false null
+with `a j > 1`, `√(1 - a j ^ 2)` is `0`, so its statistic is `a j W + μ j`, with variance
+`a j²` rather than one. This affects only false nulls and does not weaken the error bounds.)
+Then, for every `α ≥ 0`:
 (a) the Benjamini–Hochberg procedure at level `α` has false discovery rate at most `α m₀ / m`
 (`m₀ = |H₀|`, `m` the number of hypotheses);
 (b) Hochberg's step-up procedure (the textbook rule, ties included) and (c) Hommel's procedure
@@ -45,8 +48,10 @@ the Hochberg and Hommel theorems.
 (3) The model. If `W` and `e` are independent standard normal and `a² + b² = 1`, then
 `a W + b e` is standard normal and `1 - Φ(a W + b e)` is a valid p-value. For `W`, `e₁`, `e₂`
 pairwise independent and square-integrable with `Var W = 1` and any reals `a, b, a', b'`, the
-covariance of `a W + b e₁` and `a' W + b' e₂` is `a a'`; with standard normal variables and
-`b = √(1 - a²)` both statistics have variance one, so `Corr(Z i, Z j) = a i a j` for `i ≠ j`.
+covariance of `a W + b e₁` and `a' W + b' e₂` is `a a'` (`covariance_oneFactor`, stated without
+the shifts `μ j`). Informally, for `0 ≤ a ≤ 1`, standard normal variables and `b = √(1 - a²)`,
+both statistics have variance one, so `Corr(Z i, Z j) = a i a j` for `i ≠ j`; this consequence
+of `map_oneFactor_gaussian` and `covariance_oneFactor` is not stated as a separate theorem.
 
 Differences from the textbook statements. The dependence condition is the weak form above. The
 statistics are given by an explicit one-factor representation on the sample space, not by an

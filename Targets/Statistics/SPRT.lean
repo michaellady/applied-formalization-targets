@@ -6,7 +6,7 @@ import Applied.Statistics.SPRT
 - id: stat-sprt-type-one-error
 - area: statistics
 - status: formalized
-- source: A. Wald, "Sequential tests of statistical hypotheses", Ann. Math. Statist. 16 (1945) (the bound `α ≤ 1/A` on the type-I error; equation number to be confirmed). The proof here goes through Ville's inequality rather than Wald's likelihood-ratio identity.
+- source: A. Wald, "Sequential tests of statistical hypotheses", Ann. Math. Statist. 16 (1945) (Wald's inequality `A ≤ (1-β)/α`, i.e. `α ≤ (1-β)/A`, on the type-I error; equation number to be confirmed; this entry proves only the weaker corollary `α ≤ 1/A`). The proof here goes through Ville's inequality rather than Wald's likelihood-ratio identity.
 - used-in: sequential clinical trials, quality control, sequential A/B testing
 - prerequisites: Ville's inequality (`Applied/Statistics/Ville.lean`), conditional expectation of a product with an independent factor, densities via `Measure.withDensity`
 - statement-review: unreviewed
@@ -32,7 +32,8 @@ null probability under `P`).
   likelihood-ratio factors, and for every `A > 0`, `P(∃ n, Λ n ≥ A) ≤ 1/A`. Consequently, for
   any random time `τ : Ω → ℕ` (in particular the time at which the SPRT stops, when it
   stops), `P(Λ τ ≥ A) ≤ 1/A`: the SPRT with upper threshold `A` has type-I error at most
-  `1/A`, whatever the lower threshold.
+  `1/A`, whatever the lower threshold. This is weaker than Wald's bound `α ≤ (1-β)/A`, which
+  also involves the type-II error `β`; that sharper bound is not formalized here.
 * If `∫ p₁ dν = 1` and `p₁ = 0` `ν`-almost everywhere on `{p₀ = 0}`, then `Λ` is a
   martingale and `E[Λ n] = 1` for all `n`.
 
