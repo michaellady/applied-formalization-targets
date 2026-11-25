@@ -67,7 +67,9 @@ converse half `opCapacity (memoryless W) ≤ capacity W`, together with the weak
 `opCapacity F ≤ limsup capacity (F.kernel n) / n` for a general family, is proved in
 `Targets/InformationTheory/ChannelCodingConverse.lean`; achievability is not formalized in
 general (only for the binary erasure channel at the degenerate endpoints `e = 0, 1`, in
-`Targets/InformationTheory/BecCodingEndpoints.lean`). Also
+`Targets/InformationTheory/BecCodingEndpoints.lean`, and for the BSC at `q = 0, 1/2, 1` and
+letter-wise zero-error-decodable channels, in
+`Targets/InformationTheory/ZeroErrorCodingEndpoints.lean`). Also
 not covered: the equivalence of maximal and average error criteria; strong converses.
 -/
 

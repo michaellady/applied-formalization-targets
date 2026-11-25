@@ -27,8 +27,10 @@ Difference from the textbook statement: none in content; units are nats, not bit
 *information* capacity; the coding theorem identifying it with the operational capacity is not
 formalized.
 
-Not covered: uniqueness of the maximizing input (for `q ≠ 1/2`); the coding theorem; error
-exponents.
+Not covered: uniqueness of the maximizing input (for `q ≠ 1/2`); the coding theorem for
+`q ∉ {0, 1/2, 1}` (the converse half is in `Targets/InformationTheory/ChannelCodingConverse.lean`;
+the full coding theorem at `q = 0, 1/2, 1` is in
+`Targets/InformationTheory/ZeroErrorCodingEndpoints.lean`); error exponents.
 -/
 
 namespace Targets.InformationTheory
