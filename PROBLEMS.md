@@ -32,7 +32,7 @@ States: **done** (all three points), **partial** (statement plus some proved con
 | 441 | Trifference problem | partial | Körner's bound `T(n) ≤ 2 (3/2)ⁿ`; exact values `T(1..4) = 3, 4, 6, 9` |
 | 138 | Binary Gilbert–Varshamov tightness | partial | Gilbert–Varshamov bound in finite and rate form; Hamming, Singleton, Plotkin bounds |
 | 260 | Sample compression conjecture | stated | Definition is satisfiable |
-| 343 | Matroid secretary conjecture | todo | |
+| 343 | Matroid secretary conjecture | partial | Stated; `1/n`-competitive for every matroid; `1/4`-competitive for rank one (classical secretary) |
 | 136 | Polynomial pivot rule for simplex | todo | Needs a usable formal model of polynomial-time computation first |
 | 342 | Li–Li network coding conjecture | todo | |
 | 94 | Strongly polynomial linear programming | todo | Needs a usable formal model of polynomial-time computation first |
@@ -48,7 +48,7 @@ States: **done** (all three points), **partial** (statement plus some proved con
 | 232 | Classical worst-case reduction for LWE | todo | Needs a usable formal model of polynomial-time computation first |
 | 286 | Worst-case to average-case reduction for LPN | todo | Needs a usable formal model of polynomial-time computation first |
 | 422 | Witsenhausen counterexample | todo | |
-| 406 | Uniform ε-equilibrium in stochastic games | todo | |
+| 406 | Uniform ε-equilibrium in stochastic games | stated | Definitions and a sanity lemma only; fidelity of the definition needs review |
 | 233 | Quantum capacity of the depolarizing channel | todo | Needs channel capacity definitions first |
 | 315 | Good quantum locally testable codes | todo | |
 
@@ -99,13 +99,14 @@ quantum channels.
 | VCG mechanism truthfulness | done | General Groves payments |
 | Kelly criterion | done | Almost-sure growth interpretation |
 | Minimax theorem for matrix games | done | — |
-| Stable matchings: opposition of interests | partial | Existence of the proposer-optimal matching; lattice structure |
+| Stable matchings: opposition of interests; unique proposer-optimal matching | done | Lattice structure; the deferred-acceptance algorithm |
 | AdaBoost training-error bound | done | Optimality of the vote weights |
 | Frank–Wolfe O(1/k) rate | done | Existence of the linear minimiser |
 | Approximate differential privacy: post-processing, adaptive composition | done | Advanced composition; Gaussian mechanism |
 | Projected online gradient descent; stochastic gradient descent in expectation | done | Decreasing step sizes; high-probability bounds |
 | Entropy, mutual information, channel capacity; binary symmetric and erasure channels; data processing | done | The channel coding theorem |
 | Hochberg- and Benjamini–Hochberg-adjusted p-values | done | Hommel-adjusted p-values |
+| Arrow's impossibility theorem | done | Version with indifference |
 | Remaining backlog entries (about 14) | todo | Not yet stated |
 
 ## After the tracker is worked through
