@@ -1,5 +1,6 @@
 import Applied.Statistics.CombinationTests
 import Applied.Statistics.LowerTailPValue
+import Applied.Statistics.StandardNormal
 import Mathlib.Probability.Distributions.Gaussian.Real
 import Mathlib.Probability.HasLaw
 
@@ -43,20 +44,9 @@ noncomputable def normalTail (z : ℝ) : ℝ := 1 - cdf (gaussianReal 0 1) z
 lemma normalTail_antitone : Antitone normalTail := fun _ _ h =>
   sub_le_sub_left (monotone_cdf _ h) 1
 
-/-- The standard normal distribution function is strictly increasing. -/
-lemma cdf_gaussianReal_strictMono : StrictMono (cdf (gaussianReal 0 1)) := by
-  intro a b hab
-  refine lt_of_le_of_ne (monotone_cdf _ hab.le) fun heq => ?_
-  have h1 : gaussianReal 0 1 (Iic a) = gaussianReal 0 1 (Iic b) := by
-    rw [← ofReal_cdf, ← ofReal_cdf, heq]
-  have h2 : gaussianReal 0 1 (Ioc a b) = 0 := by
-    refine nonpos_iff_eq_zero.mp ((measure_mono (t := Iic b \ Iic a)
-      fun x (hx : x ∈ Ioc a b) => ⟨hx.2, not_le.mpr hx.1⟩).trans_eq ?_)
-    rw [measure_sdiff (Iic_subset_Iic.mpr hab.le) measurableSet_Iic.nullMeasurableSet
-      (measure_ne_top _ _), h1, tsub_self]
-  have h3 := gaussianReal_absolutelyContinuous' 0 one_ne_zero h2
-  rw [Real.volume_Ioc, ENNReal.ofReal_eq_zero] at h3
-  linarith
+/-- The standard normal distribution function is strictly increasing. Alias of
+`Applied.StdNormal.strictMono_cdf`. -/
+alias cdf_gaussianReal_strictMono := StdNormal.strictMono_cdf
 
 lemma normalTail_strictAnti : StrictAnti normalTail := fun _ _ h =>
   sub_lt_sub_left (cdf_gaussianReal_strictMono h) 1
