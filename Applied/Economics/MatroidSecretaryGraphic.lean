@@ -114,17 +114,19 @@ lemma incVec_apply_head_ne_zero (ω : VertexOrder V) {e : E} (he : src e ≠ tgt
   unfold head
   split_ifs <;> simp [incVec, he, he.symm]
 
-/-- **Triangularity.** If no edge is a loop and the edges of `S` have pairwise distinct later
-endpoints in some vertex order, then `S` is independent in the graphic matroid. -/
-theorem graphic_indep_of_injOn_head (hl : ∀ e, src e ≠ tgt e) (ω : VertexOrder V) (S : Finset E)
+/-- **Triangularity.** If no edge of `S` is a loop and the edges of `S` have pairwise distinct
+later endpoints in some vertex order, then `S` is independent in the graphic matroid. -/
+theorem graphic_indep_of_injOn_head (ω : VertexOrder V) (S : Finset E)
+    (hl : ∀ e ∈ S, src e ≠ tgt e)
     (hS : Set.InjOn (head src tgt ω) S) : (graphic src tgt).Indep (S : Set E) := by
   rw [graphic_indep_iff]
   induction S using Finset.induction_on_max_value (fun e => ω (head src tgt ω e)) with
   | empty => simp
   | insert a s ha hmax ih =>
     have hS' : Set.InjOn (head src tgt ω) s := hS.mono (by simp [Set.subset_insert])
+    have hl' : ∀ e ∈ s, src e ≠ tgt e := fun e he => hl e (mem_insert_of_mem he)
     rw [Finset.coe_insert, linearIndepOn_insert (by simpa using ha)]
-    refine ⟨ih hS', fun hspan => ?_⟩
+    refine ⟨ih hl' hS', fun hspan => ?_⟩
     have hzero : ∀ x ∈ Submodule.span ℚ (incVec src tgt '' s), x (head src tgt ω a) = 0 := by
       intro x hx
       induction hx using Submodule.span_induction with
@@ -136,13 +138,13 @@ theorem graphic_indep_of_injOn_head (hl : ∀ e, src e ≠ tgt e) (ω : VertexOr
         have hlt : ω (head src tgt ω e) < ω (head src tgt ω a) :=
           lt_of_le_of_ne (hmax e he) fun h => hne (ω.injective h)
         refine incVec_apply_eq_zero ω (Ne.symm hne) fun h => ?_
-        have := tail_lt_head ω (hl e)
+        have := tail_lt_head ω (hl' e he)
         rw [← h] at this
         exact lt_asymm this hlt
       | zero => rfl
       | add x y _ _ hx hy => simp [hx, hy]
       | smul r x _ hx => simp [hx]
-    exact incVec_apply_head_ne_zero ω (hl a) (hzero _ hspan)
+    exact incVec_apply_head_ne_zero ω (hl a (mem_insert_self a s)) (hzero _ hspan)
 
 omit [Fintype V] in
 /-- **Hall.** In an independent set of the graphic matroid, every edge can be assigned one of
@@ -181,6 +183,14 @@ theorem exists_endpoint_injOn {I : Finset E} (hI : (graphic src tgt).Indep (I : 
   · have := hft ⟨e, he⟩
     simp only [ht, mem_insert, mem_singleton] at this
     simpa [he] using this
+
+omit [Fintype V] in
+/-- Loops are never in an independent set of the graphic matroid. -/
+lemma src_ne_tgt_of_indep {I : Set E} (hI : (graphic src tgt).Indep I) {e : E} (he : e ∈ I) :
+    src e ≠ tgt e := by
+  intro h
+  rw [graphic_indep_iff] at hI
+  exact hI.ne_zero he (by simp [incVec, h])
 
 /-! ### Random vertex orders -/
 
@@ -261,28 +271,57 @@ end Graphic
 
 /-! ### The reduction and the main theorem -/
 
-/-- **Reduction to partition matroids (Korula–Pál).** Let the multigraph have no loops, and
-suppose that for every map `f : E → V` there is a feasible deterministic `c`-competitive online
-algorithm `A f` for the partition matroid `partitionOne f`. Then the graphic matroid has a
+lemma expWeight_restrictAlg (R : Set E) (A : OnlineAlg E) (w : E → ℝ) :
+    expWeight (restrictAlg R A) w = expWeight A (fun x => if x ∈ R then w x else 0) := by
+  unfold expWeight
+  congr 1
+  refine sum_congr rfl fun σ _ => ?_
+  have : selected (restrictAlg R A) σ w =
+      (selected A σ (fun x => if x ∈ R then w x else 0)).filter (· ∈ R) := by
+    ext x; simp [accepts_restrictAlg, and_comm]
+  rw [this, sum_filter]
+
+/-- **Reduction to partition matroids (Korula–Pál).** Suppose that for every map `f : E → V`
+there is a feasible deterministic `c`-competitive online algorithm `A f` for the partition
+matroid `partitionOne f`. Then the graphic matroid of every finite multigraph has a
 `c/2`-competitive randomized online algorithm: draw a uniformly random vertex order `ω` and run
-`A (head ω)`, where `head ω e` is the later endpoint of `e`. -/
+`A (head ω)` (where `head ω e` is the later endpoint of `e`) with loops ignored (they get
+weight `0` and are never accepted). -/
 theorem hasCompetitiveRandomized_graphic_of_partition {V : Type} [Fintype V] {src tgt : E → V}
-    (hl : ∀ e, src e ≠ tgt e) {c : ℝ} (A : (E → V) → OnlineAlg E)
+    {c : ℝ} (A : (E → V) → OnlineAlg E)
     (hA : ∀ f, IsFeasible (partitionOne f) (A f))
     (hAc : ∀ f, IsCompetitive (partitionOne f) (A f) c) :
     HasCompetitiveRandomized (graphic src tgt) (c / 2) := by
+  obtain ⟨R, hR⟩ : ∃ R : Set E, R = {e | src e ≠ tgt e} := ⟨_, rfl⟩
+  have hw' : ∀ w : E → ℝ, (∀ e, 0 ≤ w e) → ∀ e, 0 ≤ (fun x => if x ∈ R then w x else 0) e :=
+    fun w hw e => by dsimp only; split_ifs <;> simp [hw e]
   refine ⟨VertexOrder V, inferInstance, orderMeasure V, inferInstance,
-    fun ω => A (head src tgt ω), fun ω σ w hw => ?_, fun w hw I hI => ?_⟩
-  · exact graphic_indep_of_injOn_head hl ω _ (partitionOne_indep_iff.1 (hA _ σ w hw))
+    fun ω => restrictAlg R (A (head src tgt ω)), fun ω σ w hw => ?_, fun w hw I hI => ?_⟩
+  · have hsel : selected (restrictAlg R (A (head src tgt ω))) σ w =
+        (selected (A (head src tgt ω)) σ (fun x => if x ∈ R then w x else 0)).filter (· ∈ R) := by
+      ext x; simp [accepts_restrictAlg, and_comm]
+    rw [hsel]
+    refine graphic_indep_of_injOn_head ω _ (fun e he => by
+      have := (mem_filter.1 he).2; rw [hR] at this; exact this) ?_
+    refine (partitionOne_indep_iff.1 (hA _ σ _ (hw' w hw))).mono ?_
+    intro x hx
+    exact (mem_filter.1 hx).1
   · obtain ⟨g, hg, hgI⟩ := exists_endpoint_injOn hI
+    have hIR' : ∀ e ∈ I, src e ≠ tgt e := fun e he => src_ne_tgt_of_indep hI (by simpa using he)
+    have hIR : ∀ e ∈ I, e ∈ R := fun e he => by rw [hR]; exact hIR' e he
     have hne : Nonempty (VertexOrder V) := ⟨Fintype.equivFin V⟩
     set N := Fintype.card (VertexOrder V) with hNdef
     have hN : (0 : ℝ) < N := by exact_mod_cast Fintype.card_pos (α := VertexOrder V)
     rw [integral_orderMeasure, le_div_iff₀ hN]
     set S : VertexOrder V → Finset E := fun ω => I.filter fun e => head src tgt ω e = g e with hS
-    have hstep : ∀ ω, c * ∑ e ∈ S ω, w e ≤ expWeight (A (head src tgt ω)) w := by
+    have hstep : ∀ ω, c * ∑ e ∈ S ω, w e ≤
+        expWeight (restrictAlg R (A (head src tgt ω))) w := by
       intro ω
-      refine hAc _ w hw _ (partitionOne_indep_iff.2 ?_)
+      rw [expWeight_restrictAlg]
+      have hSw : ∑ e ∈ S ω, w e = ∑ e ∈ S ω, (fun x => if x ∈ R then w x else 0) e :=
+        sum_congr rfl fun e he => by simp [hIR e (mem_filter.1 he).1]
+      rw [hSw]
+      refine hAc _ _ (hw' w hw) _ (partitionOne_indep_iff.2 ?_)
       intro x hx y hy hxy
       simp only [hS, coe_filter, Set.mem_ofPred_eq] at hx hy
       exact hg hx.1 hy.1 (by rw [← hx.2, ← hy.2, hxy])
@@ -294,7 +333,7 @@ theorem hasCompetitiveRandomized_graphic_of_partition {V : Type} [Fintype V] {sr
       rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
     have hcount : ∀ e ∈ I, (#{ω : VertexOrder V | head src tgt ω e = g e} : ℝ) = N / 2 := by
       intro e he
-      have h := two_mul_card_head_eq (hl e) (hgI e he)
+      have h := two_mul_card_head_eq (hIR' e he) (hgI e he)
       have h' : (2 : ℝ) * (#{ω : VertexOrder V | head src tgt ω e = g e} : ℝ) = N := by
         exact_mod_cast h
       linarith
@@ -303,7 +342,8 @@ theorem hasCompetitiveRandomized_graphic_of_partition {V : Type} [Fintype V] {sr
       _ = c * ∑ ω, ∑ e ∈ S ω, w e := by
           rw [hswap, Finset.sum_congr rfl fun e he => by rw [← hcount e he]]
       _ = ∑ ω, c * ∑ e ∈ S ω, w e := Finset.mul_sum _ _ _
-      _ ≤ ∑ ω, expWeight (A (head src tgt ω)) w := Finset.sum_le_sum fun ω _ => hstep ω
+      _ ≤ ∑ ω, expWeight (restrictAlg R (A (head src tgt ω))) w :=
+          Finset.sum_le_sum fun ω _ => hstep ω
 
 section PartitionSecretary
 
@@ -331,10 +371,10 @@ multigraph (vertex type `V`, edge type `E`, edge `e` joining `src e ≠ tgt e`),
 matroid has a feasible randomized online algorithm that is `1/(2e)`-competitive: draw a
 uniformly random vertex order, orient every edge towards its later endpoint and run the
 `⌊nᵥ/e⌋` rule independently among the edges entering each vertex `v`. -/
-theorem hasCompetitiveRandomized_graphic {V : Type} [Fintype V] {src tgt : E → V}
-    (hl : ∀ e, src e ≠ tgt e) :
+theorem hasCompetitiveRandomized_graphic {V : Type} [Fintype V] (src tgt : E → V) :
     HasCompetitiveRandomized (graphic src tgt) (1 / (2 * Real.exp 1)) := by
-  have := hasCompetitiveRandomized_graphic_of_partition hl (fun f => partitionSecretaryRule f)
+  have := hasCompetitiveRandomized_graphic_of_partition (src := src) (tgt := tgt)
+    (fun f => partitionSecretaryRule f)
     (fun f => partitionSecretaryRule_isFeasible f) (fun f => partitionSecretaryRule_isCompetitive f)
   convert this using 1
   ring
@@ -349,10 +389,6 @@ def simpleGraphic {V : Type*} [Fintype V] (G : SimpleGraph V) [Fintype G.edgeSet
 theorem hasCompetitiveRandomized_simpleGraphic {V : Type} [Fintype V] (G : SimpleGraph V)
     [Fintype G.edgeSet] :
     HasCompetitiveRandomized (simpleGraphic G) (1 / (2 * Real.exp 1)) := by
-  refine hasCompetitiveRandomized_graphic fun e h => ?_
-  have he := e.2
-  rw [← Quot.out_eq e.1] at he
-  have hadj : G.Adj (Quot.out e.1).1 (Quot.out e.1).2 := (SimpleGraph.mem_edgeSet G).1 he
-  exact G.ne_of_adj hadj h
+  exact hasCompetitiveRandomized_graphic _ _
 
 end Applied.Economics.MatroidSecretary
