@@ -26,6 +26,10 @@ definitions: a pure profile is a mixed Nash equilibrium iff it is a pure Nash eq
 (`Applied.Economics.isMixedNash_pure_iff`), so the statement holds for games with a generalized
 ordinal potential (`Targets/Economics/PotentialGames.lean`); and, for a separately defined
 two-player notion, existence in zero-sum games (`Targets/Economics/NashZeroSum.lean`).
+Only the one-dimensional case of Brouwer's fixed point theorem is proved in this project
+(`Targets/Topology/BrouwerOneDim.lean`: continuous self-maps of `[a, b]` and of
+`stdSimplex ℝ (Fin 2)` have fixed points); this does not suffice for Nash's theorem, which needs
+the theorem for products of higher-dimensional simplices.
 
 Edge case: with no players the empty profile is trivially an equilibrium, so `ι` is not
 required to be non-empty.
