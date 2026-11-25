@@ -69,6 +69,62 @@ theorem sum_prod_causal_mul {Z : Type*} [Fintype Z] [Nonempty Z] :
       simp only [e, hsum, mul_one]
       exact ih
 
+/-! ### Conditional kernels -/
+
+section CondKernel
+
+variable {B Z : Type*} [Fintype Z]
+
+/-- The conditional law of the second coordinate given the first, for a nonnegative function
+`J` on `B × Z`: `J b w / ∑_w' J b w'`, and the uniform law where the row sum vanishes. -/
+noncomputable def condKernel (J : B → Z → ℝ) (b : B) (w : Z) : ℝ :=
+  if ∑ w', J b w' = 0 then (Fintype.card Z : ℝ)⁻¹ else J b w / ∑ w', J b w'
+
+lemma condKernel_nonneg {J : B → Z → ℝ} (hJ : ∀ b w, 0 ≤ J b w) (b : B) (w : Z) :
+    0 ≤ condKernel J b w := by
+  unfold condKernel
+  split_ifs
+  · positivity
+  · exact div_nonneg (hJ b w) (Finset.sum_nonneg fun w' _ => hJ b w')
+
+lemma sum_condKernel [Nonempty Z] (J : B → Z → ℝ) (b : B) : ∑ w, condKernel J b w = 1 := by
+  unfold condKernel
+  split_ifs with h
+  · rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul,
+      mul_inv_cancel₀ (by exact_mod_cast Fintype.card_ne_zero)]
+  · rw [← Finset.sum_div, div_self h]
+
+lemma condKernel_pos {J : B → Z → ℝ} (hJ : ∀ b w, 0 ≤ J b w) {b : B} {w : Z}
+    (h : 0 < J b w) : 0 < condKernel J b w := by
+  have hs : 0 < ∑ w', J b w' :=
+    h.trans_le (Finset.single_le_sum (f := fun w' => J b w') (fun w' _ => hJ b w') (mem_univ w))
+  unfold condKernel
+  rw [ite_eq_right hs.ne']
+  exact div_pos h hs
+
+lemma mul_neg_log_condKernel {J : B → Z → ℝ} (hJ : ∀ b w, 0 ≤ J b w) (b : B) (w : Z) :
+    J b w * -log (condKernel J b w) = J b w * log ((∑ w', J b w') / J b w) := by
+  rcases (hJ b w).eq_or_lt with h | h
+  · simp [← h]
+  · have hs : 0 < ∑ w', J b w' :=
+      h.trans_le (Finset.single_le_sum (f := fun w' => J b w') (fun w' _ => hJ b w')
+        (mem_univ w))
+    unfold condKernel
+    rw [ite_eq_right hs.ne', ← log_inv, inv_div]
+
+/-- `J = (row sum) * condKernel J`. -/
+lemma mul_condKernel {J : B → Z → ℝ} (hJ : ∀ b w, 0 ≤ J b w) (b : B) (w : Z) :
+    (∑ w', J b w') * condKernel J b w = J b w := by
+  unfold condKernel
+  split_ifs with h
+  · have : J b w = 0 := le_antisymm
+      (h ▸ Finset.single_le_sum (f := fun w' => J b w') (fun w' _ => hJ b w') (mem_univ w))
+      (hJ b w)
+    rw [h, this, zero_mul]
+  · field_simp
+
+end CondKernel
+
 /-! ### Relay codes: the inputs at time `t` and their distribution -/
 
 section Relay
@@ -156,5 +212,228 @@ lemma sum_timeInput [Nonempty Y] [Nonempty Y₁] {W : X × X₁ → Y × Y₁ �
 end RelayCode
 
 end Relay
+
+/-! ### Single-letter quantities of the relay channel -/
+
+section SingleLetter
+
+variable {X X₁ Y Y₁ : Type*} [Fintype X] [Fintype X₁] [Fintype Y] [Fintype Y₁]
+
+/-- The channel from the pair of inputs `(x, x₁)` to the receiver's output `y` alone:
+`V(y | x, x₁) = ∑_{y₁} W(y, y₁ | x, x₁)`. -/
+def relayRecv (W : X × X₁ → Y × Y₁ → ℝ) (a : X × X₁) (y : Y) : ℝ := ∑ y₁, W a (y, y₁)
+
+/-- The joint mass function of the relay input `X₁` and the pair of outputs `(Y, Y₁)` when the
+inputs `(X, X₁)` have joint law `p`: `∑ₓ p(x, x₁) W(y, y₁ | x, x₁)`. -/
+def relayJointX1 (W : X × X₁ → Y × Y₁ → ℝ) (p : X × X₁ → ℝ) (x₁ : X₁) (w : Y × Y₁) : ℝ :=
+  ∑ x, p (x, x₁) * W (x, x₁) w
+
+/-- The multiple-access cut `I(X, X₁; Y)` for the input law `p`. -/
+noncomputable def cutMAC (W : X × X₁ → Y × Y₁ → ℝ) (p : X × X₁ → ℝ) : ℝ :=
+  mutualInfo (joint p (relayRecv W))
+
+/-- The broadcast cut `I(X; Y, Y₁ | X₁) = H(Y, Y₁ | X₁) - H(Y, Y₁ | X, X₁)` for the input law
+`p`; here `H(Y, Y₁ | X, X₁) = ∑ₐ p(a) H(W(· | a))`. -/
+noncomputable def cutBC (W : X × X₁ → Y × Y₁ → ℝ) (p : X × X₁ → ℝ) : ℝ :=
+  condEntropy (fun w x₁ => relayJointX1 W p x₁ w) - ∑ a, p a * entropy (W a)
+
+/-- The **cut-set bound** of the relay channel:
+`max_{p(x, x₁)} min { I(X, X₁; Y), I(X; Y, Y₁ | X₁) }` (as a supremum). -/
+noncomputable def relayCutSet (W : X × X₁ → Y × Y₁ → ℝ) : ℝ :=
+  sSup ((fun p => min (cutMAC W p) (cutBC W p)) '' inputDists (X × X₁))
+
+omit [Fintype X] [Fintype X₁] in
+lemma isChannel_relayRecv {W : X × X₁ → Y × Y₁ → ℝ} (hW : IsChannel W) :
+    IsChannel (relayRecv W) where
+  nonneg a y := Finset.sum_nonneg fun y₁ _ => hW.nonneg _ _
+  sum_eq_one a := by
+    unfold relayRecv
+    rw [← Fintype.sum_prod_type' (fun y y₁ => W a (y, y₁)), hW.sum_eq_one]
+
+omit [Fintype X₁] in
+lemma relayJointX1_nonneg {W : X × X₁ → Y × Y₁ → ℝ} (hW : IsChannel W) {p : X × X₁ → ℝ}
+    (hp : ∀ a, 0 ≤ p a) (x₁ : X₁) (w : Y × Y₁) : 0 ≤ relayJointX1 W p x₁ w :=
+  Finset.sum_nonneg fun _ _ => mul_nonneg (hp _) (hW.nonneg _ _)
+
+/-- The expected value of `-log` of the conditional law of `(Y, Y₁)` given `X₁` is the
+conditional entropy `H(Y, Y₁ | X₁)`. -/
+lemma sum_mul_neg_log_condKernel_relayJointX1 {W : X × X₁ → Y × Y₁ → ℝ} (hW : IsChannel W)
+    {p : X × X₁ → ℝ} (hp : ∀ a, 0 ≤ p a) :
+    ∑ a, p a * ∑ w, W a w * -log (condKernel (relayJointX1 W p) a.2 w)
+      = condEntropy (fun w x₁ => relayJointX1 W p x₁ w) := by
+  have hJ := relayJointX1_nonneg hW hp
+  unfold condEntropy
+  simp only [← mul_neg_log_condKernel hJ]
+  rw [Fintype.sum_prod_type, Finset.sum_comm]
+  refine Finset.sum_congr rfl fun x₁ _ => ?_
+  simp only [Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun w _ => ?_
+  unfold relayJointX1
+  rw [Finset.sum_mul]
+  exact Finset.sum_congr rfl fun x _ => by ring
+
+end SingleLetter
+
+/-! ### The broadcast cut for one code -/
+
+section BroadcastCut
+
+variable {X X₁ Y Y₁ : Type*} [Fintype X] [Fintype X₁] [Fintype Y] [Fintype Y₁]
+  [DecidableEq X] [DecidableEq X₁]
+
+namespace RelayCode
+
+variable {n M : ℕ}
+
+/-- The joint mass function of the uniformly distributed message and the pair of output
+sequences `(Yⁿ, Y₁ⁿ)`. -/
+noncomputable def fullJoint (W : X × X₁ → Y × Y₁ → ℝ) (c : RelayCode X X₁ Y Y₁ n M) (m : Fin M)
+    (z : Fin n → Y × Y₁) : ℝ :=
+  c.outProb W m z / M
+
+omit [Fintype X] [Fintype X₁] [DecidableEq X] [DecidableEq X₁] in
+lemma fullJoint_nonneg {W : X × X₁ → Y × Y₁ → ℝ} (hW : IsChannel W)
+    (c : RelayCode X X₁ Y Y₁ n M) (m : Fin M) (z : Fin n → Y × Y₁) : 0 ≤ c.fullJoint W m z :=
+  div_nonneg (c.outProb_nonneg hW m z) (Nat.cast_nonneg _)
+
+omit [Fintype X] [Fintype X₁] [DecidableEq X] [DecidableEq X₁] in
+lemma sum_fullJoint [Nonempty Y] [Nonempty Y₁] {W : X × X₁ → Y × Y₁ → ℝ} (hW : IsChannel W)
+    (c : RelayCode X X₁ Y Y₁ n M) (m : Fin M) : ∑ z, c.fullJoint W m z = (M : ℝ)⁻¹ := by
+  simp [fullJoint, ← Finset.sum_div, c.sum_outProb hW]
+
+/-- `H(Yⁿ, Y₁ⁿ | message) = ∑ₜ H(Yₜ, Y₁ₜ | Xₜ, X₁ₜ)`. -/
+lemma condEntropy_fullJoint [Nonempty Y] [Nonempty Y₁] {W : X × X₁ → Y × Y₁ → ℝ}
+    (hW : IsChannel W) (c : RelayCode X X₁ Y Y₁ n M) (hM : 0 < M) :
+    condEntropy (fun z m => c.fullJoint W m z)
+      = ∑ t, ∑ a, c.timeInput W t a * entropy (W a) := by
+  have hpt : ∀ m z, c.fullJoint W m z * log ((∑ z', c.fullJoint W m z') / c.fullJoint W m z)
+      = ∑ t, c.outProb W m z / M * -log (W (c.inputAt m z t) (z t)) := by
+    intro m z
+    rw [sum_fullJoint hW c m, ← Finset.mul_sum]
+    unfold fullJoint
+    by_cases h0 : c.outProb W m z = 0
+    · simp [h0]
+    · have hne : ∀ t ∈ univ, W (c.inputAt m z t) (z t) ≠ 0 := by
+        intro t _ h
+        exact h0 (Finset.prod_eq_zero (mem_univ t) h)
+      have hM' : (M : ℝ) ≠ 0 := by exact_mod_cast hM.ne'
+      have : (M : ℝ)⁻¹ / (c.outProb W m z / M) = (c.outProb W m z)⁻¹ := by field_simp
+      rw [this, log_inv, outProb_eq_prod, log_prod hne, Finset.sum_neg_distrib]
+  unfold condEntropy
+  simp only [hpt]
+  rw [Finset.sum_congr rfl fun m _ => Finset.sum_comm, Finset.sum_comm]
+  refine Finset.sum_congr rfl fun t _ => ?_
+  rw [sum_outProb_mul_at hW c t (fun a w => -log (W a w))]
+  refine Finset.sum_congr rfl fun a _ => ?_
+  congr 1
+  unfold entropy
+  refine Finset.sum_congr rfl fun w _ => ?_
+  rw [negMulLog]
+  ring
+
+/-- The probability of a message and an output sequence is at most the probability that the
+relay input and the outputs at time `t` take the corresponding values. -/
+lemma fullJoint_le_relayJointX1 [Nonempty Y] [Nonempty Y₁] {W : X × X₁ → Y × Y₁ → ℝ}
+    (hW : IsChannel W) (c : RelayCode X X₁ Y Y₁ n M) (t : Fin n) (m : Fin M)
+    (z : Fin n → Y × Y₁) :
+    c.fullJoint W m z ≤ relayJointX1 W (c.timeInput W t) (c.inputAt m z t).2 (z t) := by
+  classical
+  set x₁ := (c.inputAt m z t).2
+  set f : X × X₁ → Y × Y₁ → ℝ := fun a w => if a.2 = x₁ then (if w = z t then 1 else 0) else 0
+  have h := sum_outProb_mul_at hW c t f
+  have hr : ∑ a, c.timeInput W t a * ∑ w, W a w * f a w
+      = relayJointX1 W (c.timeInput W t) x₁ (z t) := by
+    unfold relayJointX1
+    rw [Fintype.sum_prod_type]
+    refine Finset.sum_congr rfl fun _ _ => ?_
+    simp [f, mul_ite, Finset.sum_ite_eq']
+  rw [hr] at h
+  rw [← h]
+  have hf : ∀ m' z', 0 ≤ c.outProb W m' z' / M * f (c.inputAt m' z' t) (z' t) := fun m' z' =>
+    mul_nonneg (div_nonneg (c.outProb_nonneg hW m' z') (Nat.cast_nonneg _))
+      (by simp only [f]; split_ifs <;> norm_num)
+  have h1 : c.outProb W m z / M * f (c.inputAt m z t) (z t)
+      ≤ ∑ z', c.outProb W m z' / M * f (c.inputAt m z' t) (z' t) :=
+    Finset.single_le_sum (f := fun z' => c.outProb W m z' / M * f (c.inputAt m z' t) (z' t))
+      (fun z' _ => hf m z') (mem_univ z)
+  have h2 : ∑ z', c.outProb W m z' / M * f (c.inputAt m z' t) (z' t)
+      ≤ ∑ m', ∑ z', c.outProb W m' z' / M * f (c.inputAt m' z' t) (z' t) :=
+    Finset.single_le_sum (f := fun m' => ∑ z', c.outProb W m' z' / M * f (c.inputAt m' z' t) (z' t))
+      (fun m' _ => Finset.sum_nonneg fun z' _ => hf m' z') (mem_univ m)
+  have h3 : f (c.inputAt m z t) (z t) = 1 := by simp [f, x₁]
+  rw [h3, mul_one] at h1
+  exact h1.trans h2
+
+/-- **Broadcast cut for one relay code** (multi-letter to single-letter). With the message
+uniform on `Fin M`, `I(message; Yⁿ, Y₁ⁿ) ≤ ∑ₜ I(Xₜ; Yₜ, Y₁ₜ | X₁ₜ)`, the `t`-th term computed
+for the time-`t` input law `timeInput W c t`. -/
+theorem mutualInfo_fullJoint_le [Nonempty Y] [Nonempty Y₁] {W : X × X₁ → Y × Y₁ → ℝ}
+    (hW : IsChannel W) (c : RelayCode X X₁ Y Y₁ n M) (hM : 0 < M) :
+    mutualInfo (c.fullJoint W) ≤ ∑ t, cutBC W (c.timeInput W t) := by
+  set J : Fin n → X₁ → Y × Y₁ → ℝ := fun t => relayJointX1 W (c.timeInput W t) with hJdef
+  have hJ : ∀ t x₁ w, 0 ≤ J t x₁ w := fun t =>
+    relayJointX1_nonneg hW (c.timeInput_nonneg hW t)
+  set R : (Fin n → Y × Y₁) → ℝ :=
+    fun z => ∏ t, condKernel (J t) (c.relay t fun j => (z j).2) (z t) with hRdef
+  have hR0 : ∀ z, 0 ≤ R z := fun z =>
+    Finset.prod_nonneg fun t _ => condKernel_nonneg (hJ t) _ _
+  have hRsum : ∑ z, R z = 1 :=
+    sum_prod_causal_eq_one n (fun t z => condKernel (J t) (c.relay t fun j => (z j).2))
+      (fun t z => sum_condKernel _ _)
+      (fun t z z' h => by rw [c.causal t _ _ fun j hj => by rw [h j hj]])
+  have hpos : ∀ m z, c.fullJoint W m z ≠ 0 →
+      ∀ t, 0 < condKernel (J t) (c.relay t fun j => (z j).2) (z t) := fun m z h t =>
+    condKernel_pos (hJ t) (lt_of_lt_of_le
+      (lt_of_le_of_ne (c.fullJoint_nonneg hW m z) (Ne.symm h))
+      (c.fullJoint_le_relayJointX1 hW t m z))
+  set Qz : (Fin n → Y × Y₁) → ℝ := fun z => ∑ m, c.fullJoint W m z with hQdef
+  have hQ0 : ∀ z, 0 ≤ Qz z := fun z => Finset.sum_nonneg fun m _ => c.fullJoint_nonneg hW m z
+  have hQsum : ∑ z, Qz z = 1 := by
+    rw [hQdef, Finset.sum_comm]
+    simp only [sum_fullJoint hW c, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+      nsmul_eq_mul]
+    have : (M : ℝ) ≠ 0 := by exact_mod_cast hM.ne'
+    field_simp
+  have hac : ∀ z, R z = 0 → Qz z = 0 := by
+    intro z hz
+    refine Finset.sum_eq_zero fun m _ => ?_
+    by_contra h
+    obtain ⟨t, _, ht⟩ := Finset.prod_eq_zero_iff.mp hz
+    exact (hpos m z h t).ne' ht
+  have hH : entropy Qz ≤ -∑ z, Qz z * log (R z) :=
+    sum_negMulLog_le_neg_sum_mul_log univ Qz R (fun z _ => hQ0 z) (fun z _ => hR0 z)
+      (fun z _ => hac z) (by rw [hRsum, hQsum])
+  have hpt : ∀ z, Qz z * log (R z) = ∑ t, ∑ m, c.outProb W m z / M *
+      log (condKernel (J t) (c.inputAt m z t).2 (z t)) := by
+    intro z
+    rw [hQdef, Finset.sum_mul, Finset.sum_comm]
+    refine Finset.sum_congr rfl fun m _ => ?_
+    rw [← Finset.mul_sum]
+    change c.fullJoint W m z * _ = c.fullJoint W m z * _
+    by_cases h0 : c.fullJoint W m z = 0
+    · simp [h0]
+    · rw [hRdef, log_prod fun t _ => (hpos m z h0 t).ne']
+      rfl
+  have hcross : -∑ z, Qz z * log (R z) = ∑ t, condEntropy (fun w x₁ => J t x₁ w) := by
+    simp only [hpt]
+    rw [Finset.sum_comm, ← Finset.sum_neg_distrib]
+    refine Finset.sum_congr rfl fun t _ => ?_
+    rw [Finset.sum_comm, ← Finset.sum_neg_distrib]
+    have := sum_outProb_mul_at hW c t (fun a w => -log (condKernel (J t) a.2 w))
+    simp only [mul_neg, Finset.sum_neg_distrib] at this ⊢
+    rw [this]
+    simp only [← mul_neg, ← Finset.sum_neg_distrib]
+    exact sum_mul_neg_log_condKernel_relayJointX1 hW (c.timeInput_nonneg hW t)
+  rw [← mutualInfo_swap, mutualInfo_eq_entropy_sub_condEntropy _
+    (fun z m => c.fullJoint_nonneg hW m z), condEntropy_fullJoint hW c hM]
+  unfold cutBC
+  rw [Finset.sum_sub_distrib]
+  change entropy Qz - _ ≤ _
+  linarith
+
+end RelayCode
+
+end BroadcastCut
 
 end Applied.InformationTheory
