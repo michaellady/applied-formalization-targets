@@ -117,4 +117,290 @@ theorem isClassicalPRDSOn_singleton_of_regression (hX : Measurable X) (hR : Meas
 
 end Regression
 
+section Gaussian
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- A random variable with zero variance is uncorrelated with everything. -/
+lemma covariance_eq_zero_of_variance_eq_zero (P : Measure Ω) [IsFiniteMeasure P] {X Y : Ω → ℝ}
+    (hX : MemLp X 2 P) (h : Var[X; P] = 0) : cov[X, Y; P] = 0 := by
+  have hae := ae_eq_integral_of_variance_eq_zero hX h
+  rw [covariance]
+  refine integral_eq_zero_of_ae ?_
+  filter_upwards [hae] with ω hω
+  simp [hω]
+
+omit [DecidableEq ι] in
+/-- **Regression decomposition of a Gaussian vector.** If `Z` is jointly Gaussian, then `Z i`
+is independent of the vector of residuals `Z j - c j * Z i`, where
+`c j = Cov (Z i, Z j) / Var (Z i)` (with Lean's `x / 0 = 0` when `Z i` is degenerate). -/
+theorem indepFun_gaussian_residual (P : Measure Ω) (Z : ι → Ω → ℝ)
+    (hZ : HasGaussianLaw (fun ω => (Z · ω)) P) (i : ι) :
+    IndepFun (Z i) (fun ω j => Z j ω - cov[Z i, Z j; P] / Var[Z i; P] * Z i ω) P := by
+  have := hZ.isProbabilityMeasure
+  set c : ι → ℝ := fun j => cov[Z i, Z j; P] / Var[Z i; P] with hc
+  let L : (ι → ℝ) →L[ℝ] (Unit → ℝ) × (ι → ℝ) :=
+    (ContinuousLinearMap.pi fun _ => ContinuousLinearMap.proj i).prod
+      (ContinuousLinearMap.pi fun j => ContinuousLinearMap.proj j - c j • ContinuousLinearMap.proj i)
+  have hG : HasGaussianLaw
+      (fun ω => ((fun _ : Unit => Z i ω), fun j => Z j ω - c j * Z i ω)) P := by
+    have h := hZ.map L
+    have hfun : (L ∘ fun ω => (Z · ω))
+        = fun ω => ((fun _ : Unit => Z i ω), fun j => Z j ω - c j * Z i ω) := by
+      funext ω
+      refine Prod.ext ?_ ?_
+      · funext u; simp [L]
+      · funext j; simp [L]
+    rwa [hfun] at h
+  have hi2 : MemLp (Z i) 2 P := (hZ.eval i).memLp_two
+  have hind := HasGaussianLaw.indepFun_of_covariance_eval (X := fun _ : Unit => Z i)
+    (Y := fun j ω => Z j ω - c j * Z i ω) hG (fun _ j => by
+      have hj2 : MemLp (Z j) 2 P := (hZ.eval j).memLp_two
+      have hfun : (fun ω => Z j ω - c j * Z i ω) = Z j - fun ω => c j * Z i ω := rfl
+      rw [hfun, covariance_sub_right hi2 hj2 (hi2.const_mul _), covariance_const_mul_right,
+        covariance_self hi2.aestronglyMeasurable.aemeasurable]
+      by_cases hv : Var[Z i; P] = 0
+      · rw [covariance_eq_zero_of_variance_eq_zero P hi2 hv, hv]; simp
+      · simp only [hc]; field_simp; ring)
+  exact hind.comp (φ := fun f : Unit → ℝ => f ()) (ψ := id) (measurable_pi_apply ())
+    measurable_id
+
+/-- The p-value of hypothesis `j` as a function of `x = Z i` and of the residual vector. -/
+noncomputable def gaussReg (ψ : ι → ℝ → ℝ) (c : ι → ℝ) (i j : ι) (x : ℝ) (r : ι → ℝ) : ℝ :=
+  if j = i then ψ i x else ψ j (c j * x + r j)
+
+omit [Fintype ι] in
+lemma measurable_uncurry_gaussReg {ψ : ι → ℝ → ℝ} (hψ : ∀ j, Measurable (ψ j)) (c : ι → ℝ)
+    (i j : ι) : Measurable (Function.uncurry (gaussReg ψ c i j)) := by
+  by_cases hj : j = i
+  · have : Function.uncurry (gaussReg ψ c i j) = fun q : ℝ × (ι → ℝ) => ψ i q.1 := by
+      funext q; simp [Function.uncurry, gaussReg, hj]
+    rw [this]; exact (hψ i).comp measurable_fst
+  · have : Function.uncurry (gaussReg ψ c i j)
+        = fun q : ℝ × (ι → ℝ) => ψ j (c j * q.1 + q.2 j) := by
+      funext q; simp [Function.uncurry, gaussReg, hj]
+    rw [this]
+    exact (hψ j).comp ((measurable_fst.const_mul _).add ((measurable_pi_apply j).comp
+      measurable_snd))
+
+omit [Fintype ι] in
+lemma antitone_gaussReg {ψ : ι → ℝ → ℝ} (hψ : ∀ j, Antitone (ψ j)) {c : ι → ℝ}
+    (hc : ∀ j, 0 ≤ c j) (i j : ι) (r : ι → ℝ) : Antitone fun x => gaussReg ψ c i j x r := by
+  intro x y hxy
+  by_cases hj : j = i
+  · simp only [gaussReg, hj, ↓reduceIte]; exact hψ i hxy
+  · simp only [gaussReg, hj, ↓reduceIte]
+    exact hψ j (by have := mul_le_mul_of_nonneg_left hxy (hc j); linarith)
+
+omit [Fintype ι] [MeasurableSpace Ω] in
+lemma gaussReg_residual (ψ : ι → ℝ → ℝ) (c : ι → ℝ) (i : ι) (Z : ι → Ω → ℝ) :
+    (fun j ω => gaussReg ψ c i j (Z i ω) (fun k => Z k ω - c k * Z i ω))
+      = fun j ω => ψ j (Z j ω) := by
+  funext j ω
+  by_cases hj : j = i
+  · subst hj; simp [gaussReg]
+  · simp only [gaussReg, hj, ↓reduceIte]; congr 1; ring
+
+/-- **Non-negatively correlated normal statistics give PRDS p-values** (Benjamini and Yekutieli
+2001, Section 3.1, Case 1, in the conditioning-on-`p i ≤ t` form). Let `Z` be a jointly Gaussian
+vector of measurable statistics with `Cov (Z i, Z j) ≥ 0` for every true null `i` and every `j`,
+and let `p j = ψ j (Z j)` with every `ψ j` non-increasing (one-sided tests). Then the p-values
+are positively regression dependent on the true nulls. Nothing is assumed about means,
+variances (degenerate coordinates are allowed) or the correlations among non-nulls. -/
+theorem isPRDSOn_gaussian_of_cov_nonneg (P : Measure Ω) (Z : ι → Ω → ℝ)
+    (hmeas : ∀ j, Measurable (Z j)) (hZ : HasGaussianLaw (fun ω => (Z · ω)) P) (H₀ : Finset ι)
+    (hcov : ∀ i ∈ H₀, ∀ j, 0 ≤ cov[Z i, Z j; P]) (ψ : ι → ℝ → ℝ) (hψ : ∀ j, Antitone (ψ j)) :
+    IsPRDSOn P (fun j ω => ψ j (Z j ω)) H₀ := by
+  have := hZ.isProbabilityMeasure
+  rw [isPRDSOn_iff_forall_singleton]
+  intro i hi
+  set c : ι → ℝ := fun j => cov[Z i, Z j; P] / Var[Z i; P] with hc
+  have hc0 : ∀ j, 0 ≤ c j := fun j => div_nonneg (hcov i hi j) (variance_nonneg _ _)
+  have hR : Measurable fun ω (j : ι) => Z j ω - c j * Z i ω :=
+    measurable_pi_iff.mpr fun j => (hmeas j).sub ((hmeas i).const_mul _)
+  have key := isPRDSOn_singleton_of_regression P (Z i) (fun ω j => Z j ω - c j * Z i ω)
+    (hmeas i) hR (indepFun_gaussian_residual P Z hZ i) (gaussReg ψ c i)
+    (measurable_uncurry_gaussReg (fun j => (hψ j).measurable) c i)
+    (fun j r => antitone_gaussReg hψ hc0 i j r) i (ψ i) (hψ i)
+    (fun x e => by simp [gaussReg])
+  rwa [gaussReg_residual ψ c i Z] at key
+
+/-- **Non-negatively correlated normal statistics give classically PRDS p-values**
+(Benjamini and Yekutieli 2001, Section 3.1, Case 1, with their own definition of PRDS). As
+`isPRDSOn_gaussian_of_cov_nonneg`, with the p-value transforms `ψ i` of the true nulls strictly
+decreasing; the conclusion is `IsClassicalPRDSOn`. -/
+theorem isClassicalPRDSOn_gaussian_of_cov_nonneg (P : Measure Ω) (Z : ι → Ω → ℝ)
+    (hmeas : ∀ j, Measurable (Z j)) (hZ : HasGaussianLaw (fun ω => (Z · ω)) P) (H₀ : Finset ι)
+    (hcov : ∀ i ∈ H₀, ∀ j, 0 ≤ cov[Z i, Z j; P]) (ψ : ι → ℝ → ℝ) (hψ : ∀ j, Antitone (ψ j))
+    (hstrict : ∀ i ∈ H₀, StrictAnti (ψ i)) :
+    IsClassicalPRDSOn P (fun j ω => ψ j (Z j ω)) H₀ := by
+  have := hZ.isProbabilityMeasure
+  rw [isClassicalPRDSOn_iff_forall_singleton]
+  intro i hi
+  set c : ι → ℝ := fun j => cov[Z i, Z j; P] / Var[Z i; P] with hc
+  have hc0 : ∀ j, 0 ≤ c j := fun j => div_nonneg (hcov i hi j) (variance_nonneg _ _)
+  have hR : Measurable fun ω (j : ι) => Z j ω - c j * Z i ω :=
+    measurable_pi_iff.mpr fun j => (hmeas j).sub ((hmeas i).const_mul _)
+  have key := isClassicalPRDSOn_singleton_of_regression P (Z i)
+    (fun ω j => Z j ω - c j * Z i ω)
+    (hmeas i) hR (indepFun_gaussian_residual P Z hZ i) (gaussReg ψ c i)
+    (measurable_uncurry_gaussReg (fun j => (hψ j).measurable) c i)
+    (fun j r => antitone_gaussReg hψ hc0 i j r) i (ψ i) (hstrict i hi)
+    (fun x e => by simp [gaussReg])
+  rwa [gaussReg_residual ψ c i Z] at key
+
+end Gaussian
+
+section ZTests
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-- The standard normal distribution function is strictly increasing. -/
+lemma strictMono_cdf_gaussianReal : StrictMono (cdf (gaussianReal 0 1)) := by
+  intro x y hxy
+  by_contra hcon
+  have hle : cdf (gaussianReal 0 1) y - cdf (gaussianReal 0 1) x ≤ 0 := by linarith
+  have h0 : gaussianReal 0 1 (Set.Ioc x y) = 0 := by
+    rw [← measure_cdf (gaussianReal 0 1), StieltjesFunction.measure_Ioc]
+    exact ENNReal.ofReal_eq_zero.mpr hle
+  have hvol := gaussianReal_absolutelyContinuous' 0 one_ne_zero h0
+  rw [Real.volume_Ioc, ENNReal.ofReal_eq_zero] at hvol
+  linarith
+
+lemma strictAnti_one_sub_cdf_gaussianReal :
+    StrictAnti fun z : ℝ => 1 - cdf (gaussianReal 0 1) z := fun x y hxy => by
+  have := strictMono_cdf_gaussianReal hxy
+  show 1 - _ < 1 - _
+  linarith
+
+lemma antitone_one_sub_cdf_gaussianReal :
+    Antitone fun z : ℝ => 1 - cdf (gaussianReal 0 1) z :=
+  strictAnti_one_sub_cdf_gaussianReal.antitone
+
+/-- **One-sided z-test with a composite null.** If `Z` is normal with unit variance and mean
+`m ≤ 0`, then `1 - Φ (Z)` is a valid p-value. -/
+theorem isValidPValue_zTest_upper_of_mean_nonpos (P : Measure Ω) (Z : Ω → ℝ) (hZ : Measurable Z)
+    {m : ℝ} (hm : m ≤ 0) (hlaw : P.map Z = gaussianReal m 1) :
+    IsValidPValue P fun ω => 1 - cdf (gaussianReal 0 1) (Z ω) := by
+  have hlaw' : P.map (fun ω => Z ω - m) = gaussianReal 0 1 := by
+    have : (fun ω => Z ω - m) = (fun z => z - m) ∘ Z := rfl
+    rw [this, ← Measure.map_map (measurable_sub_const m) hZ, hlaw,
+      gaussianReal_map_sub_const, sub_self]
+  intro t ht
+  refine (measure_mono ?_).trans
+    (isValidPValue_zTest_upper P _ (hZ.sub_const m) hlaw' t ht)
+  intro ω hω
+  have : cdf (gaussianReal 0 1) (Z ω) ≤ cdf (gaussianReal 0 1) (Z ω - m) :=
+    monotone_cdf _ (by linarith)
+  simp only [Set.mem_ofPred_eq] at hω ⊢
+  linarith
+
+lemma measurable_zTest {Z : Ω → ℝ} (hZ : Measurable Z) :
+    Measurable fun ω => 1 - cdf (gaussianReal 0 1) (Z ω) :=
+  antitone_one_sub_cdf_gaussianReal.measurable.comp hZ
+
+/-- **One-sided z-tests on non-negatively correlated normal statistics are classically PRDS.**
+For a jointly Gaussian vector `Z` of measurable statistics with `Cov (Z i, Z j) ≥ 0` for every
+true null `i` and every `j`, the p-values `1 - Φ (Z j)` satisfy Benjamini and Yekutieli's own
+PRDS condition on the true nulls. -/
+theorem isClassicalPRDSOn_gaussian_zTests (P : Measure Ω) (Z : ι → Ω → ℝ)
+    (hmeas : ∀ j, Measurable (Z j)) (hZ : HasGaussianLaw (fun ω => (Z · ω)) P) (H₀ : Finset ι)
+    (hcov : ∀ i ∈ H₀, ∀ j, 0 ≤ cov[Z i, Z j; P]) :
+    IsClassicalPRDSOn P (fun j ω => 1 - cdf (gaussianReal 0 1) (Z j ω)) H₀ :=
+  isClassicalPRDSOn_gaussian_of_cov_nonneg P Z hmeas hZ H₀ hcov
+    (fun _ z => 1 - cdf (gaussianReal 0 1) z) (fun _ => antitone_one_sub_cdf_gaussianReal)
+    (fun _ _ => strictAnti_one_sub_cdf_gaussianReal)
+
+/-- The same in the conditioning-on-`p i ≤ t` form, via `IsClassicalPRDSOn.isPRDSOn`. -/
+theorem isPRDSOn_gaussian_zTests (P : Measure Ω) (Z : ι → Ω → ℝ)
+    (hmeas : ∀ j, Measurable (Z j)) (hZ : HasGaussianLaw (fun ω => (Z · ω)) P) (H₀ : Finset ι)
+    (hcov : ∀ i ∈ H₀, ∀ j, 0 ≤ cov[Z i, Z j; P]) :
+    IsPRDSOn P (fun j ω => 1 - cdf (gaussianReal 0 1) (Z j ω)) H₀ :=
+  (isClassicalPRDSOn_gaussian_zTests P Z hmeas hZ H₀ hcov).isPRDSOn
+    fun i _ => (measurable_zTest (hmeas i)).aemeasurable
+
+omit [Fintype ι] [DecidableEq ι] in
+/-- A subfamily of a jointly Gaussian family is jointly Gaussian. -/
+lemma HasGaussianLaw.restrict_finset [Finite ι] {P : Measure Ω} {Z : ι → Ω → ℝ}
+    (hZ : HasGaussianLaw (fun ω => (Z · ω)) P) (S : Finset ι) :
+    HasGaussianLaw (fun ω (j : S) => Z j ω) P := by
+  have := Fintype.ofFinite ι
+  exact hZ.map (ContinuousLinearMap.pi fun j : S => ContinuousLinearMap.proj (j : ι))
+
+/-- **The Gaussian structure restricts to subfamilies.** If `Cov (Z i, Z j) ≥ 0` for all
+`i, j` in a set `S` of hypotheses, the p-values `1 - Φ (Z j)`, `j ∈ S`, as a family on their
+own, are positively regression dependent on all of `S`. This is the hypothesis of the Hochberg
+and Hommel theorems with `S` the set of true nulls. -/
+theorem isPRDSOn_gaussian_zTests_restrict (P : Measure Ω) (Z : ι → Ω → ℝ)
+    (hmeas : ∀ j, Measurable (Z j)) (hZ : HasGaussianLaw (fun ω => (Z · ω)) P) (S : Finset ι)
+    (hcov : ∀ i ∈ S, ∀ j ∈ S, 0 ≤ cov[Z i, Z j; P]) :
+    IsPRDSOn P (fun (j : S) ω => 1 - cdf (gaussianReal 0 1) (Z j ω)) univ :=
+  isPRDSOn_gaussian_zTests (ι := S) P (fun j => Z j) (fun j => hmeas j)
+    (HasGaussianLaw.restrict_finset hZ S) univ (fun i _ j => hcov i i.2 j j.2)
+
+variable {α : ℝ}
+
+/-- **Benjamini–Hochberg for one-sided z-tests on arbitrary non-negatively correlated normal
+statistics** (Benjamini and Yekutieli 2001, Theorem 1.2 with Section 3.1, Case 1). Let `Z` be a
+jointly Gaussian vector of measurable statistics. Assume that every true null statistic is
+normal with unit variance and mean `μ i ≤ 0`, and that `Cov (Z i, Z j) ≥ 0` for every true null
+`i` and every hypothesis `j`. Then the Benjamini–Hochberg procedure applied to the p-values
+`1 - Φ (Z j)` at level `α ≥ 0` has false discovery rate at most `α m₀ / m`. -/
+theorem fdr_bhReject_le_gaussian_zTests (P : Measure Ω) (Z : ι → Ω → ℝ)
+    (hmeas : ∀ j, Measurable (Z j)) (hZ : HasGaussianLaw (fun ω => (Z · ω)) P) (H₀ : Finset ι)
+    (μ : ι → ℝ) (hμ : ∀ i ∈ H₀, μ i ≤ 0) (hlaw : ∀ i ∈ H₀, P.map (Z i) = gaussianReal (μ i) 1)
+    (hcov : ∀ i ∈ H₀, ∀ j, 0 ≤ cov[Z i, Z j; P]) (hα : 0 ≤ α) :
+    fdr P H₀ (fun ω => bhReject α fun j => 1 - cdf (gaussianReal 0 1) (Z j ω))
+      ≤ ENNReal.ofReal (α * H₀.card / Fintype.card ι) :=
+  have := hZ.isProbabilityMeasure
+  fdr_bhReject_le_of_prds P hα _ (fun j => measurable_zTest (hmeas j)) H₀
+    (fun i hi => isValidPValue_zTest_upper_of_mean_nonpos P (Z i) (hmeas i) (hμ i hi)
+      (hlaw i hi))
+    (isPRDSOn_gaussian_zTests P Z hmeas hZ H₀ hcov)
+
+/-- **Simes inequality for non-negatively correlated normal statistics.** If all hypotheses
+are true nulls (`Z i` normal with unit variance and mean `μ i ≤ 0`), `Z` is jointly Gaussian
+and all covariances are non-negative, the Simes test at level `α ≥ 0` on the p-values
+`1 - Φ (Z j)` rejects with probability at most `α`. -/
+theorem measure_simes_le_gaussian_zTests (P : Measure Ω) (Z : ι → Ω → ℝ)
+    (hmeas : ∀ j, Measurable (Z j)) (hZ : HasGaussianLaw (fun ω => (Z · ω)) P)
+    (μ : ι → ℝ) (hμ : ∀ i, μ i ≤ 0) (hlaw : ∀ i, P.map (Z i) = gaussianReal (μ i) 1)
+    (hcov : ∀ i j, 0 ≤ cov[Z i, Z j; P]) (hα : 0 ≤ α) :
+    P {ω | 1 ≤ bhK α fun j => 1 - cdf (gaussianReal 0 1) (Z j ω)} ≤ ENNReal.ofReal α :=
+  have := hZ.isProbabilityMeasure
+  measure_one_le_bhK_le_of_prds P hα _ (fun j => measurable_zTest (hmeas j))
+    (fun i => isValidPValue_zTest_upper_of_mean_nonpos P (Z i) (hmeas i) (hμ i) (hlaw i))
+    (isPRDSOn_gaussian_zTests P Z hmeas hZ univ fun i _ j => hcov i j)
+
+/-- **Hochberg's procedure for one-sided z-tests on non-negatively correlated normal
+statistics** controls the family-wise error rate at level `α`. Only the covariances among the
+true nulls need to be non-negative; the non-null statistics are arbitrary coordinates of the
+jointly Gaussian vector. -/
+theorem fwer_hochberg_le_gaussian_zTests (P : Measure Ω) (Z : ι → Ω → ℝ)
+    (hmeas : ∀ j, Measurable (Z j)) (hZ : HasGaussianLaw (fun ω => (Z · ω)) P) (H₀ : Finset ι)
+    (μ : ι → ℝ) (hμ : ∀ i ∈ H₀, μ i ≤ 0) (hlaw : ∀ i ∈ H₀, P.map (Z i) = gaussianReal (μ i) 1)
+    (hcov : ∀ i ∈ H₀, ∀ j ∈ H₀, 0 ≤ cov[Z i, Z j; P]) (hα : 0 ≤ α) :
+    fwer P H₀ (hochberg α fun j ω => 1 - cdf (gaussianReal 0 1) (Z j ω)) ≤ ENNReal.ofReal α :=
+  have := hZ.isProbabilityMeasure
+  fwer_hochberg_le_of_prds P hα _ (fun j => measurable_zTest (hmeas j)) H₀
+    (fun i hi => isValidPValue_zTest_upper_of_mean_nonpos P (Z i) (hmeas i) (hμ i hi)
+      (hlaw i hi))
+    (isPRDSOn_gaussian_zTests_restrict P Z hmeas hZ H₀ hcov)
+
+/-- **Hommel's procedure for one-sided z-tests on non-negatively correlated normal
+statistics** controls the family-wise error rate at level `α`, under the hypotheses of
+`fwer_hochberg_le_gaussian_zTests`. -/
+theorem fwer_hommel_le_gaussian_zTests (P : Measure Ω) (Z : ι → Ω → ℝ)
+    (hmeas : ∀ j, Measurable (Z j)) (hZ : HasGaussianLaw (fun ω => (Z · ω)) P) (H₀ : Finset ι)
+    (μ : ι → ℝ) (hμ : ∀ i ∈ H₀, μ i ≤ 0) (hlaw : ∀ i ∈ H₀, P.map (Z i) = gaussianReal (μ i) 1)
+    (hcov : ∀ i ∈ H₀, ∀ j ∈ H₀, 0 ≤ cov[Z i, Z j; P]) (hα : 0 ≤ α) :
+    fwer P H₀ (hommel α fun j ω => 1 - cdf (gaussianReal 0 1) (Z j ω)) ≤ ENNReal.ofReal α :=
+  have := hZ.isProbabilityMeasure
+  fwer_hommel_le_of_prds P hα _ (fun j => measurable_zTest (hmeas j)) H₀
+    (fun i hi => isValidPValue_zTest_upper_of_mean_nonpos P (Z i) (hmeas i) (hμ i hi)
+      (hlaw i hi))
+    (isPRDSOn_gaussian_zTests_restrict P Z hmeas hZ H₀ hcov)
+
+end ZTests
+
 end Applied.MultipleTesting
