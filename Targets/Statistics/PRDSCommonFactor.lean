@@ -16,8 +16,8 @@ Informal statement. Throughout, "positively regression dependent on `H₀`" mean
 of p-value vectors and all `s ≤ t`,
 `P(D, pᵢ ≤ s) · P(pᵢ ≤ t) ≤ P(D, pᵢ ≤ t) · P(pᵢ ≤ s)`. This is the conditioning-on-`pᵢ ≤ t`
 form of Blanchard and Roquain (weak PRDS), not the definition of Benjamini and Yekutieli,
-which conditions on `pᵢ = t`. The classical condition is believed to imply this form; that
-implication is not formalized. The hypotheses are indexed by a finite type and `P` is a
+which conditions on `pᵢ = t`. The classical condition implies this form
+(`Targets/Statistics/ClassicalPRDS.lean`). The hypotheses are indexed by a finite type and `P` is a
 probability measure.
 
 (1) General common-factor model. Let `W` be a measurable real random variable, `ε j` measurable

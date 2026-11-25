@@ -16,7 +16,8 @@ finite type, `Φ` is the standard normal distribution function (Mathlib's
 `cdf (gaussianReal 0 1)`), and "positively regression dependent" means
 `Applied.MultipleTesting.IsPRDSOn`: the conditioning-on-`pᵢ ≤ t` form of Blanchard and Roquain
 (weak PRDS), cleared of denominators, not the definition of Benjamini and Yekutieli, which
-conditions on `pᵢ = t`. That the classical condition implies this form is not formalized.
+conditions on `pᵢ = t`. That the classical condition
+implies this form is proved separately, in `Applied/Statistics/ClassicalPRDS.lean`.
 
 Model. `W` and `ε j` are measurable real random variables, the `ε j` are mutually independent
 and `W` is independent of the vector `(ε j)`. The statistics are
