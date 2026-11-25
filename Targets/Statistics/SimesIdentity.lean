@@ -20,7 +20,8 @@ same event without sorting.
 
 The same holds for the Simes test of a non-empty set `H₀` of hypotheses (`simesLocal`), when
 the p-values indexed by `ι` are mutually independent and those in `H₀` are exactly uniform;
-`m` is then `|H₀|`.
+`m` is then `|H₀|`. Mutual independence of all p-values is more than needed there:
+`simes_local_identity_of_null_independent` assumes independence only among the p-values of `H₀`.
 
 Not covered: `α > 1` (the probability is then `1`, not `α`); p-values that are only valid
 (the inequality `≤ α` is `stat-simes-hommel-hochberg`); positive dependence.
@@ -30,5 +31,7 @@ namespace Targets.Statistics
 
 alias simes_identity := Applied.MultipleTesting.measure_one_le_bhK_eq
 alias simes_local_identity := Applied.MultipleTesting.measure_simesLocal_eq
+alias simes_local_identity_of_null_independent :=
+  Applied.MultipleTesting.measure_simesLocal_eq_of_null_iIndepFun
 
 end Targets.Statistics
