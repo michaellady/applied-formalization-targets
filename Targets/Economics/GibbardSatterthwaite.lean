@@ -12,7 +12,8 @@ import Applied.Economics.GibbardSatterthwaite
 - statement-review: unreviewed
 
 Informal statement. Let `V` be a finite set of voters and `X` a set of at least three
-alternatives (`X` may be infinite). A profile gives every voter a strict linear order on `X`
+alternatives. (The Lean statement does not require `X` to be finite, but for infinite `X` its
+hypotheses cannot all hold, so the result has content only for finite `X`; see below.) A profile gives every voter a strict linear order on `X`
 (`(P i).lt x y`: voter `i` ranks `y` above `x`). A social choice function `f` maps every
 profile to an alternative. Suppose `f` is
 
@@ -31,7 +32,9 @@ Differences from textbook statements and edge cases. Preferences are strict (lin
 and the domain is all profiles, as in the textbook version. The classical hypothesis "the
 range of `f` has at least three elements" is replaced by the stronger "`f` is onto and `X` has
 at least three elements"; the range version follows by restricting `X` to the range only when
-preferences are restricted accordingly, which is not done here. `X` may be infinite; then a
+preferences are restricted accordingly, which is not done here. For infinite `X` the theorem is vacuous: some profile gives the would-be dictator an order with
+no best element, where no outcome can satisfy the dictatorship condition, so no rule is both
+strategy-proof and onto in the sense required. In that case a
 voter's order need not have a best element, and "dictator" means that nothing is ranked above
 the outcome by `d` (so the outcome is `d`'s maximum, which must then exist at every profile).
 With no voters there is a single profile, so `f` cannot be onto and the theorem is vacuous.

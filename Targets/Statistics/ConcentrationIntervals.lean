@@ -19,7 +19,9 @@ then for every `ε > 0`, `P(|mean - m| ≥ ε) ≤ v / (n ε²)`; and for every 
 `P(|mean - m| ≤ √(v / (n α))) ≥ 1 - α` (closed interval; `√(v / (n α)) = σ / √(n α)` with
 `σ = √v`).
 
-Hoeffding. If the `Xᵢ` are mutually independent, almost-everywhere measurable, and almost
+Hoeffding. If the whole sequence `X₀, X₁, …` is mutually independent (the Lean hypothesis is
+independence of the infinite sequence, slightly more than the first `n` terms need), and the
+first `n` terms are almost-everywhere measurable, and almost
 surely in `[a, b]`, then for every `ε ≥ 0`, `P(mean - m ≥ ε) ≤ exp(-2 n ε² / (b - a)²)`, the
 same for `m - mean`, and `P(|mean - m| ≥ ε) ≤ 2 exp(-2 n ε² / (b - a)²)`. Hence
 `P(|mean - m| < ε) ≥ 1 - 2 exp(-2 n ε² / (b - a)²)`, and if `a < b` and `α > 0` then

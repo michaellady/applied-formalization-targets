@@ -20,7 +20,8 @@ All logarithms are natural; rates are in nats per channel use.
   `bscReliability_nonneg`, `bscReliability_le`.
 * `bscCriticalRate q`: the critical rate `log 2 - h(√q / (√q + √(1 - q)))`.
 
-The value of `bscReliability q R` for `0 < R < bscCriticalRate q` is an open problem.
+The value of `bscReliability q R` at low rates below `bscCriticalRate q` is an open problem
+(the exact open range is to be confirmed against the literature).
 -/
 
 open Finset Real Filter

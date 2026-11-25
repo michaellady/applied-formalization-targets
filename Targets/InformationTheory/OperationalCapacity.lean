@@ -12,7 +12,8 @@ import Applied.InformationTheory.BlockCodes
 - formalized-elsewhere: to be confirmed
 - statement-review: unreviewed
 
-Informal statement. A *channel family* with input alphabet `X` gives, for every block length
+Informal statement. A *channel family* with input alphabet `X` (finite in every theorem
+here, though the definitions allow any type) gives, for every block length
 `n`, a finite set `Out n` of possible outputs and a kernel `kernel n x y`: the probability of
 receiving `y ∈ Out n` when the word `x ∈ Xⁿ` is sent. It is *stochastic* if every kernel has
 nonnegative entries and rows summing to `1`. For a single-letter channel `W`, `memoryless W` is

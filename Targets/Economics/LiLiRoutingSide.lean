@@ -44,8 +44,10 @@ Review notes (modelling choices of the routing side).
   at most the capacity (`∑ i, (f i u v + f i v u) ≤ cap u v`); opposite flows do not cancel.
 * Rates are a vector `r : K → ℝ` (not a single common rate); negative entries are not
   excluded by the definition but force a net inflow at the source.
-* The rate region is the set of exactly achievable vectors; it is not closed under lowering a
-  single coordinate by any lemma proved here (true, but it needs a path decomposition).
+* The rate region is the set of exactly achievable vectors (the rate constraint is an
+  equality and negative entries are not excluded), so it is NOT closed under lowering a
+  coordinate. A faithful statement of the conjecture would use the downward closure within
+  the non-negative orthant, or an inequality in the rate constraint.
 
 What is proved (`Applied/Economics/MulticommodityFlow.lean`): the zero vector is routable
 (`routable_zero`); the routable region is convex and closed under scaling by `t ∈ [0, 1]`

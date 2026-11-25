@@ -18,9 +18,11 @@ length `n` with at least `exp(n R)` codewords. The reliability function is
 `E(R) = limsup_{n → ∞} -(1/n) log P_e(n, R)`. For `0 < q < 1/2` its value is known at rates
 between the critical rate `R_crit = log 2 - h(√q / (√q + √(1 - q)))` and the capacity
 `log 2 - h(q)`, where the random-coding lower bound and the sphere-packing upper bound agree,
-and in the limit `R → 0`. For `0 < R < R_crit` only bounds are known (expurgated and
-random-coding lower bounds; straight-line and linear-programming upper bounds). The open
-problem is to determine `E(R)` there.
+and in the limit `R → 0`. Below `R_crit` the value is not known in general: there are expurgated and random-coding lower
+bounds and straight-line and linear-programming upper bounds. We recall, without having checked
+it, that the exact value has been established on a further interval just below `R_crit`
+(Barg and McEliece 2005, to be confirmed), so the open range is the low-rate part of
+`(0, R_crit)`, not necessarily all of it. The open problem is to determine `E(R)` there.
 
 There is no consensus conjecture for the answer, so the problem is recorded as the quantity
 `bscReliability q R` together with what is proved; no proposition is asserted.
@@ -65,8 +67,9 @@ alias half_mul_pow_le_avgError := Applied.InformationTheory.BlockCode.half_mul_p
 alias reliabilityFunction_nonneg := Applied.InformationTheory.reliabilityFunction_nonneg
 
 /-- The open quantity: the reliability function `E(R)` of the binary symmetric channel with
-crossover probability `q` at rate `R` (nats per channel use). Its value is not known for
-`0 < q < 1/2` and `0 < R < bscCriticalRate q`. -/
+crossover probability `q` at rate `R` (nats per channel use). Its value is not known in
+general for `0 < q < 1/2` and low rates `R` below `bscCriticalRate q` (the exact open range
+is to be confirmed against the literature). -/
 noncomputable def bscReliability (q R : ℝ) : ℝ := Applied.InformationTheory.bscReliability q R
 
 /-- The critical rate of the binary symmetric channel. -/

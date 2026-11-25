@@ -15,7 +15,11 @@ Informal statement. Suppose the p-values are valid under their nulls and positiv
 dependent on the true nulls in the following form: for a true null `i` and an increasing set `D` of p-value vectors,
 the conditional probability of `D` given `p i ≤ t` does not decrease in `t`. Then
 Benjamini–Hochberg at level `α` has false discovery rate at most `α m₀ / m`. Under the global
-null this gives the Simes inequality, hence family-wise error control for Hommel and Hochberg.
+null this gives the Simes inequality. Family-wise error control for Hommel and Hochberg is
+proved under a differently placed assumption: the p-values of the true nulls, taken as a family
+on their own, must be valid and satisfy the dependence condition on all of their indices (this
+is what the closed-testing argument needs, and it is not implied by the condition on the full
+vector as stated above).
 
 The dependence condition, stated plainly. `Applied.MultipleTesting.IsPRDSOn` is the
 conditioning-on-`pᵢ ≤ t` form used by Blanchard and Roquain (sometimes called weak PRDS),

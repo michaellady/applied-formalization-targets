@@ -18,8 +18,10 @@ distinct codewords take three different values in some coordinate. The open prob
 determine the growth rate `lim sup (log₂ T(n)) / n` (`trifferenceRate` below). It is a quantity
 whose value is unknown, so there is no proposition to assert.
 
-What is proved: Körner's upper bound `T(n) ≤ 2 (3/2)ⁿ`, which gives rate at most
-`log₂ (3/2) ≈ 0.585`. No lower bound is formalized yet.
+What is proved: Körner's upper bound `T(n) ≤ 2 (3/2)ⁿ`, stated both for individual codes and for
+`trifferenceMax`. On paper this gives rate at most `log₂ (3/2) ≈ 0.585`; that consequence for
+`trifferenceRate` is not formalized. Exact values of `T(n)` for `n ≤ 4` are in
+`Targets/Coding/TrifferenceSmall.lean`; no lower bound growing with `n` is formalized.
 -/
 
 namespace Targets.Coding

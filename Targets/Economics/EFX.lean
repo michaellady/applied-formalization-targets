@@ -23,7 +23,7 @@ The two-agent case and the identical-valuations case are proved for this strong 
 
 Review note: this uses the strong form (removing *any* good, including ones the envious agent
 values at zero). Which form each cited paper proves must be checked before relying on
-`efx_exists_three`.
+`EFXExistsThree`.
 -/
 
 namespace Targets.Economics
