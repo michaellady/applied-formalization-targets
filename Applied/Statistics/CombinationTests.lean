@@ -1,4 +1,5 @@
 import Applied.Statistics.PValues
+import Applied.Statistics.SidakExact
 import Mathlib.MeasureTheory.Integral.Layercake
 import Mathlib.MeasureTheory.Function.Floor
 import Mathlib.MeasureTheory.Measure.Prod
@@ -507,5 +508,71 @@ theorem measure_fisher_product_le (hm : m1 ≤ mΩ) [IsProbabilityMeasure P]
   ring
 
 end Fisher
+
+section Exact
+
+variable {P : Measure Ω} {p1 p2 : Ω → ℝ}
+
+/-- A measurable p-value that is exactly uniform in the sense of its distribution function
+(`IsUniformPValue`) has law Lebesgue measure on `[0, 1]`. -/
+theorem map_eq_of_isUniformPValue [IsProbabilityMeasure P] (hp : Measurable p1)
+    (h : IsUniformPValue P p1) : P.map p1 = volume.restrict (Icc (0 : ℝ) 1) := by
+  have : IsProbabilityMeasure (P.map p1) :=
+    (Measure.isProbabilityMeasure_map_iff hp.aemeasurable).mpr inferInstance
+  refine Measure.ext_of_Iic _ _ fun a => ?_
+  rw [Measure.map_apply hp measurableSet_Iic, Measure.restrict_apply measurableSet_Iic]
+  show P {ω | p1 ω ≤ a} = _
+  rcases lt_or_ge a 0 with ha | ha
+  · have h0 : P {ω | p1 ω ≤ a} = 0 := by
+      refine nonpos_iff_eq_zero.mp ((measure_mono fun ω hω => ?_).trans
+        (h 0 le_rfl zero_le_one).le |>.trans (by simp))
+      exact (show p1 ω ≤ a from hω).trans ha.le
+    have hset : Iic a ∩ Icc (0 : ℝ) 1 = ∅ := by
+      ext x
+      simp only [mem_inter_iff, mem_Iic, mem_Icc, mem_empty_iff_false, iff_false]
+      rintro ⟨hx1, hx2, -⟩
+      linarith
+    rw [h0, hset, measure_empty]
+  · rcases le_or_gt a 1 with ha1 | ha1
+    · have hset : Iic a ∩ Icc (0 : ℝ) 1 = Icc 0 a := by
+        ext x
+        simp only [mem_inter_iff, mem_Iic, mem_Icc]
+        constructor
+        · rintro ⟨hx1, hx2, -⟩
+          exact ⟨hx2, hx1⟩
+        · rintro ⟨hx1, hx2⟩
+          exact ⟨hx2, hx1, hx2.trans ha1⟩
+      rw [h a ha ha1, hset, Real.volume_Icc, sub_zero]
+    · have hone : P {ω | p1 ω ≤ a} = 1 := by
+        refine le_antisymm prob_le_one ?_
+        calc (1 : ℝ≥0∞) = P {ω | p1 ω ≤ 1} := by rw [h 1 zero_le_one le_rfl, ENNReal.ofReal_one]
+          _ ≤ P {ω | p1 ω ≤ a} :=
+            measure_mono fun ω hω => (show p1 ω ≤ 1 from hω).trans ha1.le
+      have hset : Iic a ∩ Icc (0 : ℝ) 1 = Icc 0 1 := by
+        ext x
+        simp only [mem_inter_iff, mem_Iic, mem_Icc]
+        constructor
+        · rintro ⟨-, hx⟩
+          exact hx
+        · rintro ⟨hx1, hx2⟩
+          exact ⟨hx2.trans ha1.le, hx1, hx2⟩
+      rw [hone, hset, Real.volume_Icc, sub_zero, ENNReal.ofReal_one]
+
+/-- For independent p-values whose laws are Lebesgue measure on `[0, 1]`, the chance that the
+pair falls in a measurable set `S` is the Lebesgue measure of `S ∩ [0,1]²`. -/
+theorem measure_mem_eq_of_indepFun_uniform [IsProbabilityMeasure P] (hp1 : Measurable p1)
+    (hp2 : Measurable p2) (hind : IndepFun p1 p2 P)
+    (hu1 : P.map p1 = volume.restrict (Icc (0 : ℝ) 1))
+    (hu2 : P.map p2 = volume.restrict (Icc (0 : ℝ) 1))
+    {S : Set (ℝ × ℝ)} (hS : MeasurableSet S) :
+    P {ω | (p1 ω, p2 ω) ∈ S} = volume (S ∩ Icc (0 : ℝ) 1 ×ˢ Icc (0 : ℝ) 1) := by
+  have hjoint :=
+    (indepFun_iff_map_prod_eq_prod_map_map hp1.aemeasurable hp2.aemeasurable).mp hind
+  have hmap : P {ω | (p1 ω, p2 ω) ∈ S} = P.map (fun ω => (p1 ω, p2 ω)) S :=
+    (Measure.map_apply (hp1.prodMk hp2) hS).symm
+  rw [hmap, hjoint, hu1, hu2, Measure.prod_restrict, Measure.restrict_apply hS,
+    Measure.volume_eq_prod]
+
+end Exact
 
 end Applied.CombinationTests
