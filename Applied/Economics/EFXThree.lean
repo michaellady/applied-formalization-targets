@@ -514,4 +514,78 @@ theorem efx3_nondegenerate [Fintype G] (a b c : G → ℝ) (ha : ∀ g, 0 < a g)
   · obtain ⟨Y1, Y2, Y3, hY, hlt⟩ := h
     exact absurd (hmax ⟨(Y1, Y2, Y3), hY⟩) (not_le.2 hlt)
 
+omit [DecidableEq G] in
+/-- Perturbation to a non-degenerate instance: for non-negative valuations `v` there are
+positive valuations `v'` under which every agent values different sets of goods differently,
+and such that every weak comparison of two sets under `v' i` also holds under `v i`. -/
+lemma exists_pos_nondegenerate {A : Type*} [Fintype A] [Fintype G] (v : A → G → ℝ)
+    (hv : ∀ i g, 0 ≤ v i g) :
+    ∃ v' : A → G → ℝ, (∀ i g, 0 < v' i g) ∧
+      (∀ i (S T : Finset G), S ≠ T → ∑ g ∈ S, v' i g ≠ ∑ g ∈ T, v' i g) ∧
+      ∀ i (S T : Finset G), ∑ g ∈ S, v' i g ≤ ∑ g ∈ T, v' i g →
+        ∑ g ∈ S, v i g ≤ ∑ g ∈ T, v i g := by
+  obtain ⟨w, hwpos, hwinj, hwlt⟩ := exists_perturbation v
+  have hsum' : ∀ i (S : Finset G), ∑ g ∈ S, (v i g + w g) = ∑ g ∈ S, v i g + ∑ g ∈ S, w g :=
+    fun i S => sum_add_distrib
+  refine ⟨fun i g => v i g + w g, fun i g => by linarith [hv i g, hwpos g],
+    fun i S T hST h => ?_, fun i S T h => ?_⟩
+  · rw [hsum', hsum'] at h
+    by_cases hvST : ∑ g ∈ S, v i g = ∑ g ∈ T, v i g
+    · exact hST (hwinj S T (by linarith))
+    · have := hwlt i S T hvST
+      rw [show ∑ g ∈ S, w g - ∑ g ∈ T, w g = -(∑ g ∈ S, v i g - ∑ g ∈ T, v i g) by linarith,
+        abs_neg] at this
+      exact lt_irrefl _ this
+  · by_contra hlt
+    push Not at hlt
+    have h1 := hwlt i T S hlt.ne
+    rw [hsum', hsum'] at h
+    rw [abs_of_neg (sub_neg.2 hlt)] at h1
+    have h2 := le_abs_self (∑ g ∈ T, w g - ∑ g ∈ S, w g)
+    linarith
+
+/-- **EFX for three agents** (Chaudhury–Garg–Mehlhorn). Three agents with additive
+non-negative valuations over a finite set of goods have an EFX allocation (strong form,
+`IsEFX`). -/
+theorem efx_exists_three [Fintype G] (v : Fin 3 → G → ℝ) (hv : ∀ i g, 0 ≤ v i g) :
+    ∃ al : G → Fin 3, IsEFX v al := by
+  obtain ⟨v', hpos, hnd, htrans⟩ := exists_pos_nondegenerate v hv
+  obtain ⟨A, B, C, hP, ab, ac, ba, bc, ca, cb⟩ :=
+    efx3_nondegenerate (v' 0) (v' 1) (v' 2) (hpos 0) (hpos 1) (hpos 2) (hnd 0)
+  have hall : ∀ k : Fin 3, k = 0 ∨ k = 1 ∨ k = 2 := by decide
+  obtain ⟨X, hX0, hX1, hX2⟩ : ∃ X : Fin 3 → Finset G, X 0 = A ∧ X 1 = B ∧ X 2 = C :=
+    ⟨![A, B, C], rfl, rfl, rfl⟩
+  set al : G → Fin 3 := fun x => if x ∈ A then 0 else if x ∈ B then 1 else 2 with hal
+  have hfil : ∀ j x, al x = j ↔ x ∈ X j := by
+    intro j x
+    have := hP x
+    rcases hall j with rfl | rfl | rfl <;> by_cases h1 : x ∈ A <;> by_cases h2 : x ∈ B <;>
+      simp [hal, hX0, hX1, hX2, h1, h2] <;> tauto
+  have hno : ∀ i j, NoSE (v' i) (X i) (X j) := by
+    intro i j
+    rcases hall i with rfl | rfl | rfl <;> rcases hall j with rfl | rfl | rfl <;>
+      simp only [hX0, hX1, hX2] <;>
+      first
+        | assumption
+        | exact NoSE.of_le (fun g => (hpos _ g).le) le_rfl
+  refine ⟨al, fun i j g hg => ?_⟩
+  have h1 : (univ.filter fun h => al h = j ∧ h ≠ g) = (X j).erase g := by
+    ext h
+    simp [hfil, and_comm]
+  have h2 : (univ.filter fun h => al h = i) = X i := by
+    ext h
+    simp [hfil]
+  rw [h1, h2]
+  exact htrans i _ _ (hno i j g ((hfil j g).1 hg))
+
+/-- EFX for three agents, for any type of agents with exactly three elements. -/
+theorem efx_exists_card_three {A : Type*} [DecidableEq A] [Fintype A] [Fintype G]
+    (hA : Fintype.card A = 3) (v : A → G → ℝ) (hv : ∀ i g, 0 ≤ v i g) :
+    ∃ al : G → A, IsEFX v al := by
+  have e : A ≃ Fin 3 := Fintype.equivFinOfCardEq hA
+  obtain ⟨al, hal⟩ := efx_exists_three (fun k => v (e.symm k)) (fun k g => hv _ g)
+  refine ⟨fun g => e.symm (al g), fun i j g hg => ?_⟩
+  have := hal (e i) (e j) g (by rw [← hg]; simp)
+  simpa [Equiv.symm_apply_eq] using this
+
 end Applied.Economics
