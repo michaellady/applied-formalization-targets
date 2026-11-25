@@ -21,12 +21,12 @@ assumptions hold in practice, so every target states its assumptions in plain la
 | 5 | False discovery rate (FDR); Benjamini–Hochberg under independence | proved | — |
 | 6 | Benjamini–Yekutieli (arbitrary dependence) | proved | — |
 | 7 | Šidák correction (independent p-values) | proved | — |
-| 8 | Closed weighted Bonferroni tests; sequentially rejective shortcut | proved | The graphical weight-update rule (Bretz et al. 2009) and its monotonicity; fallback as an instance |
+| 8 | Closed weighted Bonferroni tests; sequentially rejective shortcut | proved | The general graphical weight-update rule (Bretz et al. 2009) and its monotonicity (Holm and fallback are done as instances) |
 | 9 | Simes inequality, Hommel, Hochberg (independence) | proved | — |
 | 10 | Benjamini–Hochberg, Simes, Hommel, Hochberg under positive dependence | proved | That concrete distributions (one-sided tests of positively correlated normals) satisfy the condition |
 | 11 | Group-sequential designs: alpha-spending principle | proved | Joint normal law of interim statistics; boundaries achieving a spending function |
 | 12 | Split conformal prediction: finite-sample coverage | proved | Upper bound on coverage without ties; full and cross-conformal methods |
-| 13 | Open problems stated in Lean, with partial results | stated | Validity of two-sided normal p-values; any progress on the conjectures themselves |
+| 13 | Open problems stated in Lean, with partial results | stated | Any progress on the conjectures themselves (validity of the p-values and the independent case are proved) |
 
 Every proved result depends only on the axioms `propext`, `Classical.choice` and `Quot.sound`.
 
@@ -45,10 +45,10 @@ rung 10. The open content is the gap between arbitrary correlation and that cond
 
 ## Next steps, in order
 
-1. Validity of one- and two-sided p-values for a normal statistic (probability integral
-   transform), so the rung-13 partial result has no extra hypothesis.
-2. One-sided tests of positively correlated normals satisfy the rung-10 condition.
-3. The graphical weight-update rule and fallback procedure as instances of rung 8.
+1. One-sided tests of positively correlated normals satisfy the rung-10 condition.
+2. The general graphical weight-update rule as an instance of rung 8.
+3. First applied open problems from the ProofAtlas list (see `BACKLOG.md`): sample
+   compression, trifference, matroid secretary.
 4. Statement review of every target against its source.
 5. Check which of these results exist in other Lean projects; offer the general pieces to
    Mathlib.
