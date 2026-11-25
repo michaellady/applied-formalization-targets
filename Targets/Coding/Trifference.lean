@@ -33,6 +33,11 @@ What is proved:
 The Körner–Marton bound `T(n) ≥ (1/4) (9/5)^⌊n/4⌋`, hence rate `≥ (1/4) log₂ (9/5) ≈ 0.212`,
 is proved in `Targets/Coding/TrifferenceKornerMarton.lean`.
 
+The Fredman–Komlós bound for perfect `k`-hash codes is proved in
+`Targets/Coding/FredmanKomlos.lean` (via Hansel's lemma, `Targets/Coding/Hansel.lean`); for
+`k = 3` it gives only `trifferenceRate ≤ 2/3`, which is weaker than Körner's `log₂ (3/2)`
+(`logb_three_halves_lt_fredmanKomlos_three`).
+
 Status of the upper bound (to be confirmed against the literature). To our knowledge no
 improvement of the *rate* bound `log₂ (3/2)` is known for general codes: the known improvements
 of `T(n) ≤ 2 (3/2)ⁿ` are by constant or sub-exponential factors only (for example S. Bhandari,
