@@ -4,7 +4,7 @@ import Applied.Economics.SecretaryRankOptimal
 # Optimality of threshold rules in the arrival-order model (classical secretary problem)
 
 This file connects the relative-rank model of `Applied/Economics/SecretaryRankOptimal.lean`
-with the arrival-order model of `Applied/Economics/MatroidSecretary.lean`.
+with the arrival-order model of `Applied/Economics/MatroidSecretaryModel.lean`.
 
 ## Results
 
@@ -175,6 +175,7 @@ lemma eq_of_pattern {f : E → α} (hf : Injective f) {σ τ : ArrivalOrder E}
   congr 1
   exact Finset.filter_congr fun j _ => h j i
 
+/-- For distinct keys, an arrival order is determined by its relative-rank sequence. -/
 theorem rankSeqOf_injective {f : E → α} (hf : Injective f) :
     Injective (rankSeqOf (E := E) f) := by
   intro σ τ hστ

@@ -5,7 +5,7 @@ import Mathlib.Combinatorics.SimpleGraph.Finite
 /-!
 # The matroid secretary problem for graphic matroids
 
-Everything uses the model of `Applied/Economics/MatroidSecretary.lean` unchanged.
+Everything uses the model of `Applied/Economics/MatroidSecretaryModel.lean` unchanged.
 
 ## Graphic matroids
 
@@ -90,6 +90,8 @@ def linearMatroid (v : E → W) : Matroid E :=
       omega)
     (fun _ _ => Set.subset_univ _)).matroid
 
+/-- A set is independent in `linearMatroid K v` iff the vectors `v e`, `e ∈ I`, are linearly
+independent over `K`. -/
 @[simp] lemma linearMatroid_indep_iff {v : E → W} {I : Set E} :
     (linearMatroid K v).Indep I ↔ LinearIndepOn K v I := by
   simp [linearMatroid]
@@ -111,11 +113,14 @@ matrix. -/
 def graphic : Matroid E := linearMatroid ℚ (incVec src tgt)
 
 omit [Fintype V] in
+/-- A set of edges is independent in the graphic matroid iff its signed incidence vectors are
+linearly independent over `ℚ`. -/
 @[simp] lemma graphic_indep_iff {I : Set E} :
     (graphic src tgt).Indep I ↔ LinearIndepOn ℚ (incVec src tgt) I := by
   simp [graphic]
 
 omit [Fintype V] in
+/-- The ground set of the graphic matroid is the set of all edges. -/
 @[simp] lemma graphic_ground : (graphic src tgt).E = Set.univ := rfl
 
 /-- An order of the vertices: `ω v` is the rank of `v`. -/
@@ -320,6 +325,7 @@ instance : DiscreteMeasurableSpace (VertexOrder V) := ⟨fun _ => trivial⟩
 def orderMeasure (V : Type*) [Fintype V] : MeasureTheory.Measure (VertexOrder V) :=
   ((Fintype.card (VertexOrder V) : ENNReal)⁻¹) • MeasureTheory.Measure.count
 
+/-- The uniform measure on vertex orders is a probability measure. -/
 instance orderMeasure_isProbability :
     MeasureTheory.IsProbabilityMeasure (orderMeasure V) := by
   have hne : Nonempty (VertexOrder V) := ⟨Fintype.equivFin V⟩
@@ -331,6 +337,8 @@ instance orderMeasure_isProbability :
   simp only [ENat.toENNReal_coe]
   exact ENNReal.inv_mul_cancel hpos (ENNReal.natCast_ne_top _)
 
+/-- Integration against the uniform measure on vertex orders is the average over all vertex
+orders. -/
 lemma integral_orderMeasure (F : VertexOrder V → ℝ) :
     ∫ ω, F ω ∂(orderMeasure V) = (∑ ω, F ω) / Fintype.card (VertexOrder V) := by
   rw [orderMeasure, MeasureTheory.integral_smul_measure, MeasureTheory.integral_count,
@@ -424,6 +432,8 @@ def partitionSecretaryRule (f : E → ι) : OnlineAlg E :=
   MatroidSecretary.blockSum f fun i => secretaryRuleLex (Block f i)
 
 omit [Fintype ι] in
+/-- Running the `⌊n/e⌋` rule inside each block accepts at most one element per block, so it is
+feasible for the partition matroid `partitionOne f`. -/
 theorem partitionSecretaryRule_isFeasible (f : E → ι) :
     IsFeasible (partitionOne f) (partitionSecretaryRule f) :=
   blockSum_isFeasible (partitionOne_isBlockSum f) fun _ => secretaryRuleLex_isFeasible

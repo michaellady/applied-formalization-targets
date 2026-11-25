@@ -50,8 +50,13 @@ Lean hypotheses and conventions disclosed.
 
 Differences from the textbook statement. The textbook result (Im–Wang; Jaillet–Soto–Zenklusen)
 gives a constant independent of the laminar family; here the constant degrades linearly with the
-depth `h`. The constant `1/(8e(h+1))` is far from the known constants even for small `h` (for
-`h = 1`, i.e. partition matroids with capacities, the library already has `(1 - 1/e)/e`). The
+depth `h`. The constant `1/(8e(h+1))` is far from the known constants even for small `h`: for
+`h = 1`, i.e. partition matroids with capacities, the library already has the constant `e⁻²`
+(`hasCompetitiveRandomized_partitionCap` in `Applied/Economics/MatroidSecretaryUniform.lean`,
+which this file imports through the library file) and the better constant `(1 - 1/e)/e`
+(`hasCompetitiveRandomized_partitionCap_top` in
+`Applied/Economics/MatroidSecretaryUniformTop.lean`, registry entry
+`Targets/Economics/MatroidSecretaryUniformTop.lean`; that file is not imported here). The
 laminar matroid is defined directly by capacities, as in the literature.
 
 What is proved (all in `Applied/Economics/MatroidSecretaryLaminar.lean`).

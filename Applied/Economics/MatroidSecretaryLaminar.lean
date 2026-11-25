@@ -3,7 +3,7 @@ import Applied.Economics.MatroidSecretaryGraphic
 /-!
 # The matroid secretary problem for laminar matroids of bounded depth
 
-Everything uses the model of `Applied/Economics/MatroidSecretary.lean` unchanged.
+Everything uses the model of `Applied/Economics/MatroidSecretaryModel.lean` unchanged.
 
 ## Laminar matroids
 
@@ -177,13 +177,17 @@ def laminar (F : Finset (Finset E)) (hF : IsLaminar F) (c : Finset E → ℕ) : 
       exact he A hA)
     (fun _ _ => Set.subset_univ _)).matroid
 
+/-- The ground set of the laminar matroid is all of `E`. -/
 @[simp] lemma laminar_ground (F : Finset (Finset E)) (hF : IsLaminar F) (c : Finset E → ℕ) :
     (laminar F hF c).E = Set.univ := rfl
 
+/-- A set `I` is independent in the laminar matroid iff `|I ∩ A| ≤ c A` for every member `A` of
+the family. -/
 lemma laminar_indep_iff {F : Finset (Finset E)} {hF : IsLaminar F} {c : Finset E → ℕ}
     {I : Set E} : (laminar F hF c).Indep I ↔ ∀ A ∈ F, (I ∩ (A : Set E)).ncard ≤ c A := by
   simp [laminar]
 
+/-- `laminar_indep_iff` for finsets, with finset cardinalities. -/
 lemma laminar_indep_iff_finset {F : Finset (Finset E)} {hF : IsLaminar F} {c : Finset E → ℕ}
     {I : Finset E} : (laminar F hF c).Indep (I : Set E) ↔ ∀ A ∈ F, #(I ∩ A) ≤ c A := by
   simp only [laminar_indep_iff, ncard_inter_coe]
