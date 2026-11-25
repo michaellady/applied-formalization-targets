@@ -29,8 +29,8 @@ States: **done** (all three points), **partial** (statement plus some proved con
 
 | Rank | Problem | State | Proved here, or what blocks it |
 |---|---|---|---|
-| 441 | Trifference problem | partial | Körner's bound `T(n) ≤ 2 (3/2)ⁿ` |
-| 138 | Binary Gilbert–Varshamov tightness | partial | Finite Gilbert–Varshamov bound |
+| 441 | Trifference problem | partial | Körner's bound `T(n) ≤ 2 (3/2)ⁿ`; exact values `T(1..4) = 3, 4, 6, 9` |
+| 138 | Binary Gilbert–Varshamov tightness | partial | Gilbert–Varshamov bound in finite and rate form; Hamming, Singleton, Plotkin bounds |
 | 260 | Sample compression conjecture | stated | Definition is satisfiable |
 | 343 | Matroid secretary conjecture | todo | |
 | 136 | Polynomial pivot rule for simplex | todo | Needs a usable formal model of polynomial-time computation first |
@@ -87,7 +87,8 @@ foundations are the real next piece of work for this group.
 | Hamming, Singleton, Plotkin bounds; entropy bound on Hamming balls | done | Sharper Plotkin form |
 | Vickrey auction truthfulness | done | Reserve prices; uniqueness |
 | Stable matching existence | done | The algorithm itself; proposer-optimality |
-| Remaining backlog entries (about 25) | todo | Not yet stated |
+| Fano's inequality; Gibbs' inequality; source-coding lower bound | done | Random-variable form of Fano; achievability |
+| Remaining backlog entries (about 22) | todo | Not yet stated |
 
 ## After the tracker is worked through
 
