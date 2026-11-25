@@ -38,8 +38,10 @@ error by the sum over all messages instead of expurgating. Since `½ log(2/(1+e)
 for `0 ≤ e < 1`, this is strictly weaker than capacity. For `e = 1` the statement only covers
 negative rates. Units are nats.
 
-Not covered: rates between `½ R₀` and the capacity `(1 - e) log 2`; the BSC and general
-channels; error exponents.
+Not covered here: rates between `½ R₀` and the capacity `(1 - e) log 2`; these are covered by
+the full BEC coding theorem in `Targets/InformationTheory/BecCodingTheorem.lean`, which
+supersedes the achievability statement here (the explicit Bhattacharyya bound remains of
+independent interest). Also not covered: the BSC and general channels; error exponents.
 -/
 
 namespace Targets.InformationTheory

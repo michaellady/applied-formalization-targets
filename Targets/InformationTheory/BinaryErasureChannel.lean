@@ -23,15 +23,16 @@ Also recorded: for every input distribution `p`, `I(p, bec e) = (1 - e) H(p)`
 (`mutualInfo_bec`).
 
 Difference from the textbook statement: none in content; units are nats. This is the
-*information* capacity; the coding theorem is not formalized.
+*information* capacity; the coding theorem is in
+`Targets/InformationTheory/BecCodingTheorem.lean`.
 
-Not covered: the coding theorem for `0 < e < 1`; erasure channels over larger alphabets.
-The converse `opCapacity (memoryless (bec e)) ≤ (1 - e) log 2` is in
-`Targets/InformationTheory/ChannelCodingConverse.lean`, and the full coding theorem at the
-degenerate endpoints `e = 0, 1` is in `Targets/InformationTheory/BecCodingEndpoints.lean`.
-For `0 ≤ e ≤ 1`, every rate `R < ½ log (2 / (1 + e))` (half the cutoff rate, strictly below
-capacity for `e < 1`) is shown achievable in
-`Targets/InformationTheory/BecCutoffRateAchievability.lean`.
+Not covered here: the coding theorem, which is proved in
+`Targets/InformationTheory/BecCodingTheorem.lean` (`opCapacity (memoryless (bec e)) =
+(1 - e) log 2` for all `0 ≤ e ≤ 1`; converse in
+`Targets/InformationTheory/ChannelCodingConverse.lean`; weaker earlier steps in
+`Targets/InformationTheory/BecCodingEndpoints.lean` and
+`Targets/InformationTheory/BecCutoffRateAchievability.lean`); erasure channels over larger
+alphabets.
 -/
 
 namespace Targets.InformationTheory
