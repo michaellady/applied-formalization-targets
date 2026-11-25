@@ -1,0 +1,15 @@
+name = "AppliedFormalizationTargets"
+defaultTargets = ["Targets"]
+
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "fc4f59e577feb1a4956671bc04ac18aaaf8cd842"
+
+[[lean_lib]]
+name = "Targets"
+globs = ["Targets.+"]
