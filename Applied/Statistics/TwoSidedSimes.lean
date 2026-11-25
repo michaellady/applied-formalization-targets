@@ -599,4 +599,39 @@ theorem measure_simes_twoSided_oneFactor_two (P : Measure Ω) [IsProbabilityMeas
 
 end SimesTwo
 
+section Identical
+
+variable {Ω ι : Type*} [MeasurableSpace Ω] [Fintype ι]
+
+/-- If all p-values equal one valid p-value `p₀`, the Simes test rejects only when `p₀ ≤ α`. -/
+theorem measure_simes_le_of_forall_eq (P : Measure Ω) (p : ι → Ω → ℝ) (p₀ : Ω → ℝ)
+    (heq : ∀ j ω, p j ω = p₀ ω) (hvalid : IsValidPValue P p₀) {α : ℝ} (hα : 0 ≤ α) :
+    P {ω | 1 ≤ bhK α fun j => p j ω} ≤ ENNReal.ofReal α := by
+  refine (measure_mono fun ω hω => ?_).trans (hvalid α hα)
+  simp only [Set.mem_ofPred_eq] at hω ⊢
+  have hc := bhK_le_bhCount (α := α) fun j => p j ω
+  have hle := bhK_le (α := α) fun j => p j ω
+  unfold bhCount at hc
+  obtain ⟨j, hj⟩ := Finset.card_pos.mp (lt_of_lt_of_le hω hc)
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hj
+  have hcard : (0 : ℝ) < Fintype.card ι := by
+    exact_mod_cast Fintype.card_pos_iff.mpr ⟨j⟩
+  rw [heq] at hj
+  refine hj.trans ?_
+  rw [div_le_iff₀ hcard]
+  exact mul_le_mul_of_nonneg_left (by exact_mod_cast hle) hα
+
+/-- **Simes inequality for perfectly correlated two-sided z-tests.** If `|Z j| = |Z₀|` for every
+`j` (for example every `Z j` is `Z₀` or `-Z₀`, correlations `±1`) and `Z₀` is standard normal,
+the Simes test applied to the two-sided p-values `2 (1 - Φ(|Z j|))` rejects with probability at
+most `α`, for every `α ≥ 0`. -/
+theorem measure_simes_twoSided_abs_eq (P : Measure Ω) (Z : ι → Ω → ℝ) (Z₀ : Ω → ℝ)
+    (hZ₀ : Measurable Z₀) (hlaw : P.map Z₀ = gaussianReal 0 1) (habs : ∀ j ω, |Z j ω| = |Z₀ ω|)
+    {α : ℝ} (hα : 0 ≤ α) :
+    P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)} ≤ ENNReal.ofReal α :=
+  measure_simes_le_of_forall_eq P _ _ (fun j ω => by rw [habs])
+    (isValidPValue_zTest_twoSided P Z₀ hZ₀ hlaw) hα
+
+end Identical
+
 end Applied.MultipleTesting
