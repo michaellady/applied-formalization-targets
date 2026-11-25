@@ -9,7 +9,7 @@ import Applied.InformationTheory.DeletionUpperBound
 - source: folklore genie argument; stated e.g. in M. Mitzenmacher, "A survey of results for deletion channels and related synchronization channels", Probability Surveys 6 (2009) (location in the survey to be confirmed)
 - used-in: the open problem `Targets/InformationTheory/DeletionChannelCapacity.lean`
 - prerequisites: weak converse (`Targets/InformationTheory/ChannelCodingConverse.lean`); the deletion kernel (`Applied/InformationTheory/DeletionChannel.lean`); erasure channel capacity (`Applied/InformationTheory/Channel.lean`)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: no Lean formalization found in the projects checked on 2026-11-25 (local clones and GitHub code search; see `PRIOR-ART-VERIFICATION-2.md`)
 - statement-review: unreviewed
 
 Informal statement. All logarithms are natural (nats).

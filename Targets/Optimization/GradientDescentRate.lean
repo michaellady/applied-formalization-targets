@@ -9,7 +9,7 @@ import Applied.Optimization.Smooth
 - source: A. Beck, "First-Order Methods in Optimization" (2017), Chapter 10 (theorem number to be confirmed)
 - used-in: machine learning training analyses, numerical optimization
 - prerequisites: Mathlib `gradient`, `ConvexOn`, `LipschitzWith`
-- formalized-elsewhere: possibly in the optlib project (not checked)
+- formalized-elsewhere: optlib `Optlib/Algorithm/GD/GradientDescent.lean` :: `gradient_method` (any step `a ≤ 1/L`, any comparison point; identical to ours at `a = 1/L`); atlas-lean `MathlibExt/Analysis/Convex/GradientDescent.lean` :: `gradient_descent_convex_sublinear_rate` (step in `(0, 1/L]`, finite-dimensional space, minimiser) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `f` be convex and differentiable with `L`-Lipschitz gradient, and let
@@ -18,6 +18,9 @@ Informal statement. Let `f` be convex and differentiable with `L`-Lipschitz grad
 
 The proof never uses that `x⋆` is a minimiser: the bound holds against any comparison point.
 The hypothesis `hmin` is kept so the statement matches the textbook form.
+
+Weaker than prior formal work in one respect: only the step `1/L` is covered. optlib and
+atlas-lean prove the bound `‖x 0 - x⋆‖² / (2 k η)` for every step `η ≤ 1/L`.
 -/
 
 open scoped NNReal RealInnerProductSpace

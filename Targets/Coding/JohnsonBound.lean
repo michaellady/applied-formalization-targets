@@ -9,6 +9,7 @@ import Applied.Coding.Johnson
 - source: S. M. Johnson, "A new upper bound for error-correcting codes", IRE Trans. Inform. Theory 8 (1962), 203–207; the form used here (codewords in a ball, via the sum of pairwise distances and Cauchy–Schwarz) is the one used for the Elias–Bassalygo bound, e.g. F. J. MacWilliams, N. J. A. Sloane, "The Theory of Error-Correcting Codes" (1977), Ch. 17 (theorem number to be confirmed)
 - used-in: the Elias–Bassalygo bound; list decoding (the Johnson radius)
 - prerequisites: Hamming distance; double counting; the Cauchy–Schwarz inequality for sums
+- formalized-elsewhere: yes: atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/Combinatorics/Coding/JohnsonBound.lean` :: `qary_johnson_bound` (`q`-ary, over `ℤ`; at `q = 2` the same inequality as `johnson_bound_mul`); ArkLib (github.com/Verified-zkEVM/ArkLib), `ArkLib/Data/CodingTheory/JohnsonBound/Basic.lean` :: `johnson_bound` (list-size form over `ℚ`); cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Foundations/Data/Code/ListDecoding/JohnsonBound.lean` :: `isListDecodable_of_le_johnsonRadius` (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. Let `C` be a set of binary words of length `n` in which any two distinct

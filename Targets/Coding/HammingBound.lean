@@ -10,6 +10,7 @@ import Applied.Coding.BallCard
 - source: R. W. Hamming, "Error detecting and error correcting codes", Bell Syst. Tech. J. 29 (1950), 147–160; textbook form e.g. F. J. MacWilliams, N. J. A. Sloane, "The Theory of Error-Correcting Codes" (1977), Ch. 1 (theorem number to be confirmed)
 - used-in: limits on error-correcting codes; definition of perfect codes
 - prerequisites: Hamming distance and its triangle inequality; counting
+- formalized-elsewhere: yes: cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Foundations/Data/Code/HammingBound.lean` :: `card_mul_card_filter_hammingDist_le_le_prod` (mixed alphabets; ours is its binary case); atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/Combinatorics/Coding/HammingSpherePacking.lean` :: `hamming_sphere_packing_bound`; tCSlib (github.com/Shilun-Allan-Li/tCSlib), `TCSlib/ErrorCorrectingCodes/HammingBound.lean` :: `hamming_bound` (assumes a pair of codewords at distance exactly `d`) (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. Let `C` be a set of binary words of length `n` in which any two distinct

@@ -9,6 +9,7 @@ import Applied.Economics.Nash
 - source: J. von Neumann, "Zur Theorie der Gesellschaftsspiele", Math. Annalen 100 (1928); J. von Neumann, O. Morgenstern, "Theory of Games and Economic Behavior" (1944); textbook form: M. Osborne, A. Rubinstein, "A Course in Game Theory" (1994), Section 2.5 (proposition numbering to be confirmed)
 - used-in: zero-sum games, adversarial training, robust optimisation, the equivalence of equilibrium and maximin play
 - prerequisites: `Applied.Economics.exists_saddle_point` (this project, from Mathlib's Sion minimax theorem)
+- formalized-elsewhere: atlas-lean `MathlibExt/GameTheory/ZeroSumMinimax.lean` :: `matrixGame_minimax`; elazarg/GameTheory `GameTheory/Analysis/MatrixValue.lean` :: `optimal_pairs_iff_isNash` (equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Rows are indexed by a finite type `m`, columns by a finite type `n`. For

@@ -79,6 +79,22 @@ theorem measure_exists_le_eq_of_iIndepFun (P : Measure Ω) [IsProbabilityMeasure
       ENNReal.ofReal_pow (by linarith)]
   rw [← compl_compl {ω | ∃ i ∈ H₀, p i ω ≤ c}, prob_compl_eq_one_sub hEmeas.compl, hEc]
 
+/-- Version of `measure_exists_le_eq_of_iIndepFun` that assumes independence only among the
+p-values indexed by `H₀`. -/
+theorem measure_exists_le_eq_of_null_iIndepFun (P : Measure Ω) [IsProbabilityMeasure P]
+    (p : ι → Ω → ℝ) (hmeas : ∀ i, Measurable (p i)) (H₀ : Finset ι)
+    (hindep : iIndepFun (fun j : H₀ => p j) P)
+    (hp : ∀ i ∈ H₀, IsUniformPValue P (p i)) (c : ℝ) (hc0 : 0 ≤ c) (hc1 : c ≤ 1) :
+    P {ω | ∃ i ∈ H₀, p i ω ≤ c} = 1 - ENNReal.ofReal ((1 - c) ^ H₀.card) := by
+  have h := measure_exists_le_eq_of_iIndepFun P (fun j : H₀ => p j) (fun j => hmeas j) hindep
+    Finset.univ (fun j _ => hp j j.2) c hc0 hc1
+  have hset : {ω | ∃ i ∈ H₀, p i ω ≤ c}
+      = {ω | ∃ j ∈ (Finset.univ : Finset H₀), p j ω ≤ c} := by
+    ext ω
+    simp
+  rw [hset]
+  simpa using h
+
 /-- **The Šidák correction is exact.** Under the global null (every hypothesis is a true null,
 `H₀ = univ`), with at least one hypothesis and mutually independent p-values that are exactly
 uniform on `[0, 1]`, the Šidák correction rejects some hypothesis with probability exactly `α`,

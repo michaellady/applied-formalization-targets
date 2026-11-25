@@ -9,7 +9,7 @@ import Applied.Complexity.PolyTime
 - source: standard definition of the class P, e.g. M. Sipser, "Introduction to the Theory of Computation", Chapter 7 (to be confirmed); machine model and time bound from Mathlib, `Mathlib/Computability/TuringMachine/Computable.lean` (P. Spelier, D. van Gent)
 - used-in: stating open problems about polynomial-time algorithms (`Targets/Complexity/SDPFeasibility.lean`, `Targets/Complexity/PlantedClique.lean`, `Targets/Optimization/PolynomialPivotRule.lean`)
 - prerequisites: `Turing.FinTM2`, `Turing.TM2ComputableInPolyTime`, `Computability.encodeNat` (Mathlib)
-- formalized-elsewhere: not checked
+- formalized-elsewhere: cslib-frontier `CslibFrontier/Computability/Complexity/Classes/P.lean` :: `P`, `empty_mem_P`, `univ_mem_P`, `compl_mem_P` (the class P over that project's multitape machines, with closure under complement); `CslibFrontier/Computability/Machines/Turing/TM2/PolyTime.lean` :: `Turing.TM2ComputableInPolyTime.computableInPolyTime_encList` (transfers Mathlib `TM2ComputableInPolyTime` certificates with finite alphabets to that model); not connected to the definitions here (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. A language `L ⊆ {0,1}*` is in P (`InP L`) if some total function
@@ -33,11 +33,19 @@ What is proved.
   `prefixFree_encRat`, `PrefixFree.list`, `PrefixFree.vec`, `PrefixFree.prod`,
   `PrefixFree.injective`).
 
-Not proved, and what is missing in Mathlib: there is no construction of machines beyond the
-identity machine (no composition, no simulation of one machine by another, no loops with
-verified running time other than the one built here), so no closure property of P (complement,
-union, composition with polynomial-time maps) and no non-trivial member of P is available.
-Consequently nothing here shows that the class is the usual P beyond the definition itself.
+Not proved here, and what is missing in Mathlib: Mathlib has no construction of machines
+beyond the identity machine (no composition, no simulation of one machine by another, no loops
+with verified running time other than the one built here), so in this project no closure
+property of `InP` (complement, union, composition with polynomial-time maps) and no
+non-trivial member of `InP` is available. Consequently nothing here shows that the class is
+the usual P beyond the definition itself.
+
+Available elsewhere (not imported, not connected to `InP`): cslib-frontier defines `P` over
+its own multitape machines, proves `∅ ∈ P`, `univ ∈ P` and closure under complement
+(`compl_mem_P`), and proves a transfer theorem from Mathlib's `TM2ComputableInPolyTime` (with
+finite stack alphabets) to its model, together with a compiler in the other direction. Through
+these, `InP L` should be equivalent to membership in that `P`, which would make its closure
+properties usable for the open problems stated with `InP`; this bridge is not formalized.
 
 Review notes (modelling choices to check).
 * Machine model: Mathlib's `Turing.FinTM2`: finitely many stacks, finitely many labels and

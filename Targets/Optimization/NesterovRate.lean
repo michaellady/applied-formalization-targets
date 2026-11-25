@@ -9,7 +9,7 @@ import Applied.Optimization.Nesterov
 - source: Yu. Nesterov, "A method of solving a convex programming problem with convergence rate O(1/k²)", Soviet Math. Dokl. 27 (1983); the three-sequence form and potential argument follow P. Tseng, "On accelerated proximal gradient methods for convex-concave optimization" (2008, manuscript) and Z. Allen-Zhu, L. Orecchia, "Linear coupling" (ITCS 2017) (exact theorem numbers to be confirmed)
 - used-in: accelerated first-order methods in machine learning and signal processing (FISTA and relatives)
 - prerequisites: Mathlib `gradient`, `ConvexOn`, `LipschitzWith`; descent lemma
-- formalized-elsewhere: possibly in the optlib project (not checked)
+- formalized-elsewhere: optlib `Optlib/Algorithm/Nesterov/NesterovSmooth.lean` :: `nesterov_algorithm_smooth` (the same scheme after a change of variables, the same bound `2L/(k+1)²`, for `k ≥ 1`); atlas-lean `MathlibExt/Analysis/Convex/AcceleratedGradient.lean` :: `nesterov_accelerated_rate` (bound `2L‖z 0 - u‖²/(k(k+1))`, slightly weaker) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `f` be convex and differentiable with `L`-Lipschitz gradient (`L > 0`)

@@ -10,7 +10,7 @@ import Applied.Statistics.PValues
 - status: formalized
 - source: Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Section 3.1 (positively correlated normal statistics; section number to be confirmed)
 - used-in: studies where test statistics share a common source of variation (a shared control group, a batch effect, a market factor)
-- prerequisites: one-factor positive dependence, Benjamini–Hochberg under positive dependence, validity of one-sided z-test p-values
+- prerequisites: one-factor positive dependence and Benjamini–Hochberg under positive dependence, both in the weak (Blanchard–Roquain, conditioning on `p ≤ t`) PRDS form `IsPRDSOn`; validity of one-sided z-test p-values
 - statement-review: unreviewed
 
 Informal statement. Let the test statistics be `Z j = √ρ · W + √(1 - ρ) · ε j + μ j`, where the
@@ -23,6 +23,14 @@ This is an end-to-end statement: nothing about dependence or p-value validity is
 beyond the model. Scope: one common factor with equal loadings (every pair of statistics has
 correlation `ρ`); `ρ = 1` is excluded; shifts are arbitrary real numbers for the false nulls
 (so both directions of alternative are allowed, though the test is one-sided).
+
+Notion of positive dependence. The proof goes through `IsPRDSOn`, which is the **weak**
+(Blanchard–Roquain 2008) form of positive regression dependence: it conditions on `p i ≤ t`,
+not on `p i = t` as in Benjamini–Yekutieli's classical PRDS. The intermediate fact proved for
+this model is therefore weak PRDS of the p-values on the true nulls
+(`isPRDSOn_gaussian_commonFactor`); classical PRDS of the model is not established here, and
+the implication classical ⇒ weak is not used. The final statement above does not mention
+either notion.
 -/
 
 open MeasureTheory ProbabilityTheory Applied.MultipleTesting
@@ -41,7 +49,7 @@ theorem benjaminiHochberg_equicorrelated_zTests {Ω ι : Type*} [MeasurableSpace
       ≤ ENNReal.ofReal (α * H₀.card / Fintype.card ι) := by
   set Φ := cdf (gaussianReal 0 1) with hΦ
   have hΦmeas : Measurable fun z : ℝ => (Φ z : ℝ) := (monotone_cdf _).measurable
-  -- positive dependence from the one-factor structure
+  -- weak (Blanchard–Roquain) PRDS from the one-factor structure
   have hprds : IsPRDSOn P (fun j ω => 1 - Φ (√ρ * W ω + √(1 - ρ) * ε j ω + μ j)) H₀ := by
     have h := isPRDSOn_gaussian_commonFactor P W ε hW hε hWε hindep (fun _ => √ρ)
       (fun _ => √(1 - ρ)) (fun _ => Real.sqrt_nonneg _) (fun j z => 1 - Φ (z + μ j))

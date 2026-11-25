@@ -9,6 +9,7 @@ import Applied.Economics.Arrow
 - source: K. J. Arrow, "A difficulty in the concept of social welfare", J. Political Economy 58 (1950); K. J. Arrow, "Social Choice and Individual Values" (2nd ed. 1963), Chapter VIII (theorem numbering to be confirmed); the proof via decisive coalitions forming an ultrafilter follows A. P. Kirman, D. Sondermann, J. Econ. Theory 5 (1972) (attribution to be confirmed)
 - used-in: social choice theory, voting rules, preference and rank aggregation
 - prerequisites: linear orders; Mathlib has no social choice theory (no `Arrow`, `dictator` or `SocialChoice` declarations found)
+- formalized-elsewhere: atlas-lean `MathlibExt/GameTheory/SocialChoice/Arrow.lean` :: `arrow_impossibility` (strict-order social welfare functions as here; equivalent); econcslib-bei `EconCSLib/SocialChoice/Voting/Arrow.lean` :: `arrow_impossibility` (social output a weak preference: a larger class of rules, so a stronger theorem than the one here); elazarg/GameTheory `GameTheory/Core/Arrow.lean`. Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `V` be a finite set of voters and `X` a set of at least three

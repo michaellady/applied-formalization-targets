@@ -9,7 +9,7 @@ import Applied.Complexity.PlantedCliqueEdgeTest
 - source: folklore (the total edge count, equivalently the sum of degrees, detects a planted clique of size `k ≫ √n`); the easy regime of the problem goes back to L. Kučera, "Expected complexity of graph partitioning problems", Discrete Appl. Math. 57 (1995) (degree-based recovery for `k ≥ C √(n log n)`); an explicit analysis of the total-degree test for dense planted subgraphs is in E. Arias-Castro, N. Verzelen, "Community detection in dense random networks", Ann. Statist. 42 (2014) (exact statement to be confirmed); the counting Chernoff–Hoeffding bound is W. Hoeffding (1963)
 - used-in: the boundary `k ≈ √n` of the planted clique conjecture (`Targets/Complexity/PlantedClique.lean`)
 - prerequisites: `Applied/Complexity/PlantedClique.lean` (the two distributions, `RandAlg`, `advantage`); Mathlib's `Real.cosh_le_exp_half_sq`
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: the edge-count test itself: none found; a stronger result for the easy regime is cslib-frontier `CslibFrontier/Algorithms/PlantedClique/CommonNeighborAsymptotics.lean` :: `exists_commonNeighborRecover_ppt_tendsto_failure` (one polynomial-time program, in that project's machine model, recovers the clique with probability tending to `1` whenever `k ≥ c √n`, for every `c > 0`); degree statistics in `CslibFrontier/Probability/PlantedClique/Degree.lean` (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. All in the model of `Targets/Complexity/PlantedClique.lean`: `G(n, 1/2)` is
@@ -57,6 +57,12 @@ not proved to run in polynomial time** (`RandAlg.IsPolyTime` is not established 
 threshold need not even be computable), so these results do not by themselves say that the
 conclusion of `PlantedCliqueConjecture` fails for a polynomial-time algorithm — and in any
 case they concern `k ≫ √n`, outside the conjecture's range `k ≤ n^(1/2 - δ)`.
+
+Comparison with prior formal work. cslib-frontier proves more for this regime: a
+polynomial-time recovery algorithm (common-neighbour method) that succeeds with probability
+`→ 1` for all `k ≥ c √n`, with a polynomial-time certificate in its own machine model. The
+result here is weaker in every respect except simplicity: a different statistic, detection
+only, no polynomial-time certificate, and the growth condition `k²/n → ∞`.
 
 Not covered: the max-degree test and the `√(n log n)` recovery threshold; spectral methods at
 `k ≥ c √n`; polynomial-time computability of the test; any lower bound or hardness.

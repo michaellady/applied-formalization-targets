@@ -11,13 +11,22 @@ import Mathlib.Tactic
 - source: R. Myerson, "Optimal auction design", Math. Oper. Res. 6 (1981); textbook form: T. Roughgarden, "Twenty Lectures on Algorithmic Game Theory", Theorem 3.7
 - used-in: auction design, ad auctions, spectrum auctions, mechanism design
 - prerequisites: Mathlib interval integrals, monotone functions
-- formalized-elsewhere: possibly in EconCSLib (not checked)
+- formalized-elsewhere: econcslib-bei `EconCSLib/MechanismDesign/Auction/Myerson.lean` :: `payment_formula_of_isDSIC_of_zeroNormalized` (payment identity), `isMonotone_of_isDSIC`, `isImplementable_iff_isMonotone` (multi-bidder form with the other bids fixed by `Function.update`; types in all of `ℝ` as here; read, not compiled here). elazarg `Analysis/RevenueEquivalence.lean` :: `revenue_equivalence` is a different model (types in an interval `[a, b]`, PMF priors)
 - statement-review: unreviewed
 
 Informal statement. Fix the other bidders' reports, so one bidder faces an allocation rule
 `x : ℝ → ℝ` and a payment rule `p : ℝ → ℝ` as functions of their own bid. Truthful bidding is
 dominant (`IsTruthful`) iff `x` is monotone and payments are given, up to the constant `p 0`,
 by `p v = v · x v - ∫₀ᵛ x`.
+
+Modelling note. `IsTruthful` quantifies over **all real** types and bids, `v, b ∈ ℝ`, including
+negative ones; there is no type interval `[0, v̄]`. econcslib-bei uses the same convention. This
+loses no generality for mechanisms given on an interval: if `x`, `p` satisfy the truthfulness
+inequality for all `v, b ∈ [0, v̄]`, then the rules frozen outside the interval,
+`v ↦ x (max 0 (min v v̄))` and `v ↦ p (max 0 (min v v̄))`, are truthful on all of `ℝ` and agree
+with `x`, `p` on `[0, v̄]` (`isTruthful_clamp`). So `myerson_monotone` and
+`myerson_payment_identity` apply to interval mechanisms through the clamped rules. The converse
+direction is immediate (restrict the quantifiers).
 -/
 
 namespace Targets.Economics
@@ -161,5 +170,41 @@ theorem revenue_equivalence (x p p' : ℝ → ℝ) (h : IsTruthful x p) (h' : Is
   have e1 := myerson_payment_identity x p h v
   have e2 := myerson_payment_identity x p' h' v
   linarith
+
+/-- A mechanism that is truthful for types and bids in `[0, v̄]` extends to a mechanism that is
+truthful for all real types and bids, by freezing the allocation and the payment outside the
+interval. The extension agrees with the original rules on `[0, v̄]`
+(`max 0 (min v v̄) = v` there). -/
+theorem isTruthful_clamp (x p : ℝ → ℝ) (vbar : ℝ) (hv : 0 ≤ vbar)
+    (h : ∀ v ∈ Set.Icc 0 vbar, ∀ b ∈ Set.Icc 0 vbar, v * x b - p b ≤ v * x v - p v) :
+    IsTruthful (fun v => x (max 0 (min v vbar))) (fun v => p (max 0 (min v vbar))) := by
+  intro v b
+  have hmem : ∀ t : ℝ, max 0 (min t vbar) ∈ Set.Icc 0 vbar := fun t =>
+    ⟨le_max_left _ _, max_le hv (min_le_right _ _)⟩
+  set v' := max 0 (min v vbar) with hv'
+  set b' := max 0 (min b vbar) with hb'
+  have h1 := h v' (hmem v) b' (hmem b)
+  have h2 := h b' (hmem b) v' (hmem v)
+  have hb0 : 0 ≤ b' := (hmem b).1
+  have hb1 : b' ≤ vbar := (hmem b).2
+  show v * x b' - p b' ≤ v * x v' - p v'
+  rcases le_total v 0 with hv0 | hv0
+  · have e : v' = 0 := by
+      rw [hv', min_eq_left (hv0.trans hv), max_eq_left hv0]
+    rw [e] at h1 h2 ⊢
+    rcases hb0.eq_or_lt with hb | hb
+    · rw [← hb]
+    · have hx : x 0 ≤ x b' := by nlinarith
+      nlinarith
+  · rcases le_total v vbar with hvv | hvv
+    · have e : v' = v := by rw [hv', min_eq_left hvv, max_eq_right hv0]
+      rw [e] at h1 ⊢
+      exact h1
+    · have e : v' = vbar := by rw [hv', min_eq_right hvv, max_eq_right hv]
+      rw [e] at h1 h2 ⊢
+      rcases hb1.eq_or_lt with hb | hb
+      · rw [hb]
+      · have hx : x b' ≤ x vbar := by nlinarith
+        nlinarith
 
 end Targets.Economics

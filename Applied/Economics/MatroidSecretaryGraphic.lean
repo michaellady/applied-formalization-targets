@@ -435,6 +435,31 @@ theorem partitionSecretaryRule_isCompetitive (f : E → ι) :
 
 end PartitionSecretary
 
+/-- **Partition matroids with capacities one, any index type, constant `1/e`.** For every map
+`f : E → ι` (the block of each element; `ι` arbitrary), the partition matroid `partitionOne f`
+has a feasible deterministic `1/e`-competitive online algorithm: the `⌊nᵢ/e⌋` rule inside each
+block. This improves the constant `1/4` of `exists_isCompetitive_partitionOne`. -/
+theorem exists_isCompetitive_partitionOne_inv_exp {ι : Type*} (f : E → ι) :
+    ∃ A : OnlineAlg E, IsFeasible (partitionOne f) A ∧
+      IsCompetitive (partitionOne f) A (1 / Real.exp 1) := by
+  -- reduce to the finite index type `Set.range f`
+  let f' : E → Set.range f := fun e => ⟨f e, e, rfl⟩
+  have heq : partitionOne f = partitionOne f' := by
+    refine Matroid.ext_indep rfl fun I _ => ?_
+    simp only [partitionOne_indep_iff]
+    constructor
+    · exact fun h a ha b hb hab => h ha hb (congrArg Subtype.val hab)
+    · exact fun h a ha b hb hab => h ha hb (Subtype.ext hab)
+  rw [heq]
+  exact ⟨partitionSecretaryRule f', partitionSecretaryRule_isFeasible f',
+    partitionSecretaryRule_isCompetitive f'⟩
+
+/-- Partition matroids with capacities one are `1/e`-competitive in the randomized sense. -/
+theorem hasCompetitiveRandomized_partitionOne_inv_exp {ι : Type*} (f : E → ι) :
+    HasCompetitiveRandomized (partitionOne f) (1 / Real.exp 1) := by
+  obtain ⟨A, hA, hc⟩ := exists_isCompetitive_partitionOne_inv_exp f
+  exact hc.hasCompetitiveRandomized hA
+
 /-- **Graphic matroids of loopless multigraphs: constant `1/(2e)`.** For every finite loopless
 multigraph (vertex type `V`, edge type `E`, edge `e` joining `src e ≠ tgt e`), the graphic
 matroid has a feasible randomized online algorithm that is `1/(2e)`-competitive: draw a

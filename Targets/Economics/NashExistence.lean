@@ -9,7 +9,7 @@ import Applied.Economics.NashExistence
 - source: J. F. Nash, "Equilibrium points in n-person games", Proc. Nat. Acad. Sci. USA 36 (1950); J. F. Nash, "Non-cooperative games", Ann. of Math. 54 (1951) (theorem numbering to be confirmed)
 - used-in: all of non-cooperative game theory; equilibrium computation (PPAD); mechanism and market design
 - prerequisites: Brouwer's fixed point theorem for finite products of simplices, proved in this project (`Applied.Topology.brouwer_pi_probSimplex`, `Targets/Topology/Brouwer.lean`) from a Sperner-type lemma for the Kuhn triangulation of the cube (`Targets/Topology/SpernerCube.lean`); the pinned Mathlib has no Brouwer or Kakutani theorem. The definitions of the statement are in `Applied/Economics/Nash.lean`, the proof in `Applied/Economics/NashExistence.lean`.
-- formalized-elsewhere: not checked
+- formalized-elsewhere: atlas-lean `MathlibExt/GameTheory/MixedNashExistence.lean` :: `exists_isMixedNash`; cslib-frontier `CslibFrontier/GameTheory/Strategic/Nash.lean` :: `exists_isMixedNash` (equivalent; the simplex is a subtype there and a membership condition here). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `ι` be a finite set of players, each with a finite non-empty set `S i`

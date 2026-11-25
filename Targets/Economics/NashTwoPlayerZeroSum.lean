@@ -9,7 +9,7 @@ import Applied.Economics.NashTwoPlayer
 - source: J. von Neumann, "Zur Theorie der Gesellschaftsspiele", Math. Annalen 100 (1928); textbook form: M. Osborne, A. Rubinstein, "A Course in Game Theory" (1994), Section 2.5 (proposition numbering to be confirmed). For `2 × 2` games: standard textbook case analysis of best-response correspondences, e.g. M. Osborne, "An Introduction to Game Theory" (2004), Chapter 4 (section to be confirmed). Classical special cases of Nash's theorem; nothing new is claimed.
 - used-in: zero-sum games; the special case of `Targets/Economics/NashExistence.lean` that needs no fixed-point theorem
 - prerequisites: `Applied.Economics.exists_saddle_point` (this project, from Mathlib's Sion minimax theorem `Sion.exists_isSaddlePointOn`)
-- formalized-elsewhere: not checked
+- formalized-elsewhere: atlas-lean `MathlibExt/GameTheory/ZeroSumMinimax.lean` :: `matrixGame_minimax`; elazarg/GameTheory `GameTheory/Analysis/MatrixValue.lean` :: `optimal_pairs_iff_isNash` (equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Take exactly two players, indexed by `Fin 2`, with finite non-empty sets

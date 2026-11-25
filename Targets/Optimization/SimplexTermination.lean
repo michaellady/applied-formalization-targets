@@ -10,7 +10,7 @@ import Applied.Optimization.SimplexExample
 - source: G. B. Dantzig, "Linear Programming and Extensions", Princeton University Press (1963); textbook form e.g. D. Bertsimas, J. N. Tsitsiklis, "Introduction to Linear Optimization" (1997), Chapter 3 (theorem numbers to be confirmed)
 - used-in: linear programming; foundation for the open pivot-rule question (`Targets/Optimization/PolynomialPivotRule.lean`)
 - prerequisites: matrices, `LinearIndependent`, finite-dimensional span (Mathlib)
-- formalized-elsewhere: not checked
+- formalized-elsewhere: cslib-frontier `CslibFrontier/Algorithms/Lean/Simplex/Bland.lean` :: `add_one_le_choose_of_blandPivot`, `simplex_spec` (a different statement: Bland's rule, degenerate programs allowed, the same `C(n, m) - 1` bound on the number of pivots; here every simplex rule, nondegenerate programs only) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `K` be a linearly ordered field and consider

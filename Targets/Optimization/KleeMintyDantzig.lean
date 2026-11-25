@@ -9,7 +9,7 @@ import Applied.Optimization.KleeMintyNotPolynomial
 - source: V. Klee, G. J. Minty, "How good is the simplex algorithm?", in O. Shisha (ed.), Inequalities III, Academic Press (1972), pp. 159–175 (original construction, a deformed cube); the specific program used here is the form in V. Chvátal, "Linear Programming", W. H. Freeman (1983), Chapter 4 (exact page and wording to be confirmed)
 - used-in: complexity of the simplex method; partial result towards the open question `Targets/Optimization/PolynomialPivotRule.lean` (it rules out Dantzig's rule)
 - prerequisites: matrices, linear independence (Mathlib); the simplex model of `Applied/Optimization/Simplex.lean`; `Nat.testBit`; `tendsto_pow_const_div_const_pow_of_one_lt` (Mathlib) for the corollary
-- formalized-elsewhere: not known to us (to be confirmed)
+- formalized-elsewhere: cslib-frontier `CslibFrontier/Algorithms/Lean/Simplex/KleeMinty.lean` :: `dantzigRun_kleeMinty`, `exists_dantzigRun_kleeMinty_eq_outOfFuel_iff` (the same Chvátal program and `2^n - 1` pivots; there for one Dantzig rule with smallest-index ratio test over any linearly ordered field, here for every rule satisfying `IsDantzigRule` over `ℚ`; since no ties occur on this program the two results have the same content) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. For `n ≥ 0` let `KM_n` be the rational program in standard equality form

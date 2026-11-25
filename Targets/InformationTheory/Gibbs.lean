@@ -9,7 +9,7 @@ import Applied.InformationTheory.Gibbs
 - source: standard; e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Theorem 2.6.3 (information inequality; number to be confirmed)
 - used-in: source coding lower bounds, Fano's inequality, maximum-entropy arguments
 - prerequisites: `Real.log x ≤ x - 1`
-- formalized-elsewhere: Mathlib has the measure-theoretic statement (`InformationTheory.klDiv` takes values in `ℝ≥0∞`, with `InformationTheory.integral_llr_add_sub_measure_univ_nonneg` and `InformationTheory.klDiv_eq_zero_iff`), but no statement for finite sums of real numbers
+- formalized-elsewhere: Mathlib has the measure-theoretic statement (`InformationTheory.klDiv` takes values in `ℝ≥0∞`, with `InformationTheory.integral_llr_add_sub_measure_univ_nonneg` and `InformationTheory.klDiv_eq_zero_iff`), but no statement for finite sums of real numbers. Finite-sum log-sum inequalities, of which this is a special case, are in LeanInfoTheory (github.com/serhatemrecoban/LeanInfoTheory), `LeanInfoTheory/Shannon/LogSum.lean` :: `logSum_inequality`, and atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/InformationTheory/LogSum.lean` :: `sum_mul_log_sum_div_sum_le_sum_mul_log_div` (assumes `q > 0`) (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. Let `p` and `q` be nonnegative real vectors indexed by a finite set, with

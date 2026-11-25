@@ -9,6 +9,7 @@ import Applied.Economics.ShapleyStochastic
 - source: L. S. Shapley, "Stochastic games", Proc. Natl. Acad. Sci. USA 39 (1953) 1095–1100 (main theorem; Shapley's paper uses state-dependent stopping probabilities, which is equivalent to discounting); textbook form e.g. J. Filar, K. Vrieze, "Competitive Markov Decision Processes", Springer 1997 (theorem number to be confirmed)
 - used-in: dynamic zero-sum games, robust Markov decision processes, the zero-sum case of the uniform-value problem (`Targets/Economics/UniformEquilibrium.lean`)
 - prerequisites: von Neumann's minimax theorem (`Applied.Economics.exists_value`), Mathlib's Banach fixed point theorem (`ContractingWith.fixedPoint`), geometric Cauchy sequences
+- formalized-elsewhere: elazarg/GameTheory `GameTheory/Analysis/Stochastic/Discounted.lean` :: `existsUnique_shapleyValue`, `stationarySaddleProfile_isSaddlePoint` (weaker game content: unique bounded fixed point of the normalised operator `(1-β) r + β E v` and stationary saddle actions of the auxiliary matrix game, with no path law and no claim against history-dependent strategies; more general state space, arbitrary with bounded payoffs; their value is `(1-β)` times the one here). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 This is the **two-player zero-sum discounted** case. It is a classical theorem and is not the

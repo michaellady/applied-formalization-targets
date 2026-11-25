@@ -9,7 +9,7 @@ import Applied.Statistics.Ville
 - source: J. Ville, "Étude critique de la notion de collectif", Gauthier-Villars (1939) (the inequality; page and statement number to be confirmed); for the testing interpretation see A. Ramdas, P. Grünwald, V. Vovk, G. Shafer, "Game-theoretic statistics and safe anytime-valid inference", Statist. Sci. 38 (2023) (statement numbers to be confirmed)
 - used-in: anytime-valid and sequential testing, e-processes, confidence sequences, optional stopping in A/B tests
 - prerequisites: Mathlib's optional stopping theorem for submartingales (`MeasureTheory.Submartingale.expected_stoppedValue_mono`) and hitting times; continuity of measure along increasing unions
-- formalized-elsewhere: Mathlib has Doob's maximal inequality for non-negative submartingales (`MeasureTheory.maximal_ineq`), not the supermartingale inequality
+- formalized-elsewhere: lmlexplore `LMLExplore/Probability/Martingale/Ville.lean` :: `measure_exists_le_le`, `maximal_ineq` (equivalent supermartingale inequality; read, not compiled here). Mathlib has Doob's maximal inequality for non-negative submartingales (`MeasureTheory.maximal_ineq`), not the supermartingale inequality
 - statement-review: unreviewed
 
 Informal statement. Time is discrete (`ℕ`). Let `μ` be a finite measure, `𝒢` a filtration and

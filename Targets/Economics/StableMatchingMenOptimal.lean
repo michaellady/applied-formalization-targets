@@ -9,6 +9,7 @@ import Applied.Economics.StableMatchingMenOptimal
 - source: D. Gale, L. S. Shapley, "College admissions and the stability of marriage", Amer. Math. Monthly 69 (1962), Theorem 2 (numbering to be confirmed); textbook form: A. E. Roth, M. Sotomayor, "Two-Sided Matching" (1990), Chapter 2 (theorem numbers to be confirmed)
 - used-in: market design (the proposing side's optimal outcome of deferred acceptance), structure theory of stable matchings
 - prerequisites: `econ-stable-matching-existence`, `econ-stable-matching-opposition`
+- formalized-elsewhere: cslib-frontier `CslibFrontier/Algorithms/Lean/StableMatching/DeferredAcceptance.lean` :: `isProposerOptimal_deferredAcceptance`, `isReceiverPessimal_deferredAcceptance`; `StableMatching/Basic.lean` :: `IsProposerOptimal.unique` (equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Setting of `econ-stable-matching-existence`: finite sets `M` ("men") and

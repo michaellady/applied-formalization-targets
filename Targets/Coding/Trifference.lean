@@ -9,6 +9,7 @@ import Applied.Coding.TrifferenceLower
 - source: J. Körner, "Coding of an information source having ambiguous alphabet and the entropy of graphs" (1973); V. Guruswami, A. Riazanov, "Beating Fredman–Komlós for perfect k-hashing" (2022); ProofAtlas Top 500 (Nov 2026), rank 441
 - used-in: perfect hashing, zero-error information theory, list decoding
 - prerequisites: finite combinatorics only
+- formalized-elsewhere: no Lean formalization found in the projects checked on 2026-11-25 (local clones and GitHub code search; see `PRIOR-ART-VERIFICATION-2.md`); the only related item is the perfect-hash-family definition in cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Foundations/Combinatorics/PerfectHashFamily/Defs.lean` :: `IsPerfectHashFamily`
 - statement-review: unreviewed
 
 Informal statement. Let `T(n)` (`trifferenceMax n` below) be the largest size of a code in
@@ -37,8 +38,16 @@ The Fredman–Komlós bound for perfect `k`-hash codes is proved in
 `k = 3` it gives only `trifferenceRate ≤ 2/3`, which is weaker than Körner's `log₂ (3/2)`
 (`logb_three_halves_lt_fredmanKomlos_three`).
 
-Not covered: the improvements of the upper bound below `log₂ (3/2)` (reported in recent work,
-to be confirmed).
+Status of the upper bound (to be confirmed against the literature). To our knowledge no
+improvement of the *rate* bound `log₂ (3/2)` is known for general codes: the known improvements
+of `T(n) ≤ 2 (3/2)ⁿ` are by constant or sub-exponential factors only (for example S. Bhandari,
+A. Khetan, "Improved upper bound for the size of a trifferent code", 2022). Exponential
+improvements are known only for *linear* codes over `𝔽₃` (C. Pohoata, D. Zakharov, "On the
+trifference problem for linear codes", IEEE Trans. Inform. Theory, 2022). Whether the rate is
+strictly below `log₂ (3/2)` is the open proposition `RateLtKorner` of
+`Targets/Coding/TrifferenceOpen.lean`.
+
+Not covered: the sub-exponential improvements of Körner's bound; the bounds for linear codes.
 -/
 
 namespace Targets.Coding

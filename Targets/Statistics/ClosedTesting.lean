@@ -9,6 +9,7 @@ import Applied.Statistics.ClosedTesting
 - source: R. Marcus, E. Peritz, K. R. Gabriel, "On closed testing procedures with special reference to ordered analysis of variance", Biometrika 63 (1976)
 - used-in: confirmatory clinical trials; the basis of gatekeeping and graphical multiple-testing procedures
 - prerequisites: none beyond the family-wise error rate
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/MultipleTesting/ClosedTesting.lean` :: `measure_closed_familywiseError_le` (same statement). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Give every intersection of null hypotheses a local test, and reject an

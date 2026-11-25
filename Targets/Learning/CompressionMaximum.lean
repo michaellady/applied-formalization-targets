@@ -9,6 +9,7 @@ import Applied.Learning.SampleCompressionMaximum
 - source: S. Floyd, M. Warmuth, "Sample compression, learnability, and the Vapnik–Chervonenkis dimension", Machine Learning 21 (1995) (maximum classes of VC dimension `d` have labelled compression schemes of size `d`; theorem number to be confirmed); the restriction and reduction facts for maximum classes are due to E. Welzl, "Complete range spaces" (unpublished notes, 1987) and appear in Floyd–Warmuth (exact location to be confirmed)
 - used-in: the sample compression conjecture for maximum classes, with constant `1`
 - prerequisites: the definitions of `Applied.Learning.SampleCompression`; Mathlib's `Finset.Shatters`, `Finset.card_le_card_shatterer` (Pajor), `Finset.memberSubfamily` / `nonMemberSubfamily`
+- formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)
 - statement-review: unreviewed
 
 Informal statement. Let `X` be a finite type with decidable equality, `𝒞` a finite set of
@@ -77,6 +78,12 @@ Not covered: maximum classes on infinite domains; unlabelled compression schemes
 for maximum classes (Kuzmin–Warmuth 2007; Rubinstein–Rubinstein 2012); ample / extremal
 classes (Moran–Warmuth 2016); the sample compression conjecture for classes that are not
 maximum (untouched for every `d ≥ 2`).
+
+Scheme model. `CompressionScheme` keeps an unordered **set** of labelled examples and
+reconstructs from that set alone (no order, no side information); cslib-frontier's
+`SampleCompressionScheme` keeps an ordered list. The existence result here is therefore the
+stronger form: it gives an ordered-list scheme of the same size (on paper), not conversely.
+See "Scheme model" in `Targets/Learning/SampleCompression.lean`.
 -/
 
 namespace Targets.Learning

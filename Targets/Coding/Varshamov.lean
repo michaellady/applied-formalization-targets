@@ -9,6 +9,7 @@ import Applied.Coding.Varshamov
 - source: R. R. Varshamov, "Estimate of the number of signals in error correcting codes", Dokl. Akad. Nauk SSSR 117 (1957), 739–741; textbook form e.g. F. J. MacWilliams, N. J. A. Sloane, "The Theory of Error-Correcting Codes" (1977), Ch. 1, §10 (theorem number to be confirmed)
 - used-in: existence of good linear codes; the linear version of the Gilbert–Varshamov benchmark
 - prerequisites: linear algebra over `𝔽₂` (rank–nullity); counting
+- formalized-elsewhere: related statements: atlas-lean (github.com/facebookresearch/atlas-lean), `CSLibExt/Coding/GilbertVarshamovLinear.lean` :: `exists_linearCode_finrank_eq` (`q`-ary, hypothesis `q^k · V(n, d - 1) < q^n`, dimension exactly `k + 1`; for `q = 2` its hypothesis implies ours); cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Foundations/Data/Code/Varshamov.lean` :: `exists_linearMap_injective_and_le_hammingDist` (asymptotic form); tCSlib (github.com/Shilun-Allan-Li/tCSlib), `TCSlib/ErrorCorrectingCodes/GilbertVarshamov.lean` :: `gv_bound`; TauCeti (github.com/TauCetiProject/TauCeti), `TauCeti/InformationTheory/Hamming/VarshamovGilbert.lean` (a different statement) (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. Let `n, k, d` be natural numbers with `k ≤ n`, and suppose

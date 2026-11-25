@@ -9,6 +9,7 @@ import Applied.Topology.SpernerCube
 - source: E. Sperner, "Neuer Beweis für die Invarianz der Dimensionszahl und des Gebietes", Abh. Math. Sem. Univ. Hamburg 6 (1928); cubical version with the Kuhn (Freudenthal) triangulation: H. W. Kuhn, "Some combinatorial lemmas in topology", IBM J. Res. Develop. 4 (1960), and H. Freudenthal, Ann. of Math. 43 (1942) (the exact form of the boundary condition used here is our own variant; the closest published statement is to be confirmed)
 - used-in: combinatorial proof of Brouwer's fixed point theorem (`Targets/Topology/Brouwer.lean`), hence Nash's theorem
 - prerequisites: none beyond finite sets and permutations
+- formalized-elsewhere: cslib-frontier `CslibFrontier/Foundations/Combinatorics/Sperner/Kuhn.lean` :: `IsHypergridSperner.exists_isPanchromatic`, `IsHypergridSperner.odd_card_isPanchromatic` (Kuhn triangulation of a grid with per-coordinate sizes `N i`, a different boundary condition, also with parity; neither statement is literally the other) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Fix `m : ℕ` and `N > 0`. A Kuhn simplex of the grid `{0, …, N}^m` is a

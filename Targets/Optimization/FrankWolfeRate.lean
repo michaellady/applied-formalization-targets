@@ -9,7 +9,7 @@ import Applied.Optimization.FrankWolfe
 - source: M. Frank, P. Wolfe, "An algorithm for quadratic programming", Naval Res. Logist. Quart. 3 (1956); the `2/(k+2)` step-size analysis follows M. Jaggi, "Revisiting Frank-Wolfe: projection-free sparse convex optimization", ICML 2013, Theorem 1 (stated there with the curvature constant; theorem number and the exact constant in the source to be confirmed)
 - used-in: projection-free optimization over polytopes and nuclear-norm balls, sparse and low-rank learning, traffic assignment
 - prerequisites: Mathlib `gradient`, `ConvexOn`, `LipschitzWith`; descent lemma
-- formalized-elsewhere: not checked
+- formalized-elsewhere: econcslib-garg `AppliedModelingLib/Foundations/Optimization/ConditionalGradient.lean` :: `conditionalGradient_suboptimality_le_of_smoothness` (the same bound `2 L D² / (k + 2)`; there convexity is assumed only on the feasible set, in first-order form, and feasibility of the iterates is a hypothesis, so its hypotheses are weaker than ours on convexity) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `f` be convex and differentiable with `L`-Lipschitz gradient on a

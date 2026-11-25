@@ -9,6 +9,7 @@ import Applied.Economics.StableMatching
 - source: D. Gale, L. S. Shapley, "College admissions and the stability of marriage", Amer. Math. Monthly 69 (1962), Theorem 1
 - used-in: two-sided matching markets (residency matching, school choice), market design
 - prerequisites: finite sets, linear orders
+- formalized-elsewhere: cslib-frontier `CslibFrontier/Algorithms/Lean/StableMatching/DeferredAcceptance.lean` :: `exists_isStable` (on `Fin n` with permutation preference lists; equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `M` and `W` be finite sets with the same number of elements. Each

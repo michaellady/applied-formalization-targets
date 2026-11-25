@@ -11,6 +11,7 @@ import Mathlib.Data.Fintype.Basic
 - source: I. Caragiannis et al., "The unreasonable fairness of maximum Nash welfare", EC 2016 (problem); B. Plaut, T. Roughgarden, SODA 2018 (two agents); B. Chaudhury, J. Garg, K. Mehlhorn, "EFX exists for three agents", EC 2020
 - used-in: fair division of indivisible goods (inheritance, course allocation, resource scheduling)
 - prerequisites: finite sums only
+- formalized-elsewhere: the open statement: econcslib-bei `EconCSLib/OpenProblem/EFXExistence.lean` :: `EFXExistenceStatement` and `EconCSLib/OpenProblem/New/EFXAdditiveExistence/Problem.lean` (same strong EFX definition; stated for `n ≥ 4`, here for all `n ≥ 1`). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. `n` agents with additive non-negative valuations divide `m` indivisible
@@ -39,8 +40,17 @@ agent), and `EFXExists` assumes `0 < n` (with no agents and `m > 0` goods no all
 exists).
 
 Review note: this uses the strong form (removing *any* good, including ones the envious agent
-values at zero). Which form each cited paper proves must be checked before relying on
-`EFXExistsThree`.
+values at zero), often written EFX₀. For the three-agent case: econcslib-bei
+(`EconCSLib/OpenProblem/EFXExistence.lean`, `EconCSLib/OpenProblem/New/EFXAdditiveExistence/Problem.lean`)
+uses the same strong definition (removal of every good of the other bundle, zero-valued ones
+included) and records the three-agent additive case as known in the literature, citing
+Chaudhury–Garg–Mehlhorn (EC 2020; journal version J. ACM 2024); it does not formalize it. The
+cross-check against that repository believes that Chaudhury–Garg–Mehlhorn define EFX with the
+removal of *every* good `g` of the other bundle, i.e. the strong form used here, but this was
+flagged as uncertain and the paper's definition has not been compared with `IsEFX` line by
+line: to be confirmed against the J. ACM version. Independently of that comparison,
+`EFXExistsThree` (stated below for the strong form) is now proved in
+`Targets/Economics/EFXThreeAgents.lean`; this file itself still only states it.
 -/
 
 namespace Targets.Economics

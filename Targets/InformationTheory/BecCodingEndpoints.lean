@@ -9,7 +9,7 @@ import Applied.InformationTheory.ErasureEndpoints
 - source: elementary special case of C. E. Shannon, "A Mathematical Theory of Communication", Bell Syst. Tech. J. 27 (1948), and P. Elias, "Coding for noisy channels" (1955) (to be confirmed); textbook form of the BEC coding theorem e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Sections 7.1 and 7.7 (numbers to be confirmed). The endpoint cases are folklore.
 - used-in: partial progress towards achievability in Shannon's channel coding theorem (`Targets/InformationTheory/OperationalCapacity.lean`, `Targets/InformationTheory/BinaryErasureChannel.lean`)
 - prerequisites: block codes and operational capacity (`Applied/InformationTheory/BlockCodes.lean`); `bec`, `capacity_bec` (`Applied/InformationTheory/Channel.lean`)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: no direct statement found in the projects checked on 2026-11-25; these are degenerate cases of the erasure-channel coding theorem (see `Targets/InformationTheory/BecCodingTheorem.lean` for related formalizations elsewhere)
 - statement-review: unreviewed
 
 Informal statement. Let `bec e` be the binary erasure channel (input `Bool`, output

@@ -10,7 +10,7 @@ import Targets.InformationTheory.ShannonCapacityC7
 - source: L. Lovász, "On the Shannon capacity of a graph", IEEE Trans. Inform. Theory 25 (1979), Lemmas 1–3 and Theorem 1 (`Θ(G) ≤ ϑ(G)`; numbering to be confirmed); the value `ϑ(C₇) = 7 cos(π/7)/(1 + cos(π/7))` is in the same paper (Corollary 5, numbering to be confirmed)
 - used-in: the open problem `Targets/InformationTheory/ShannonCapacityC7.lean`; `Targets/InformationTheory/ShannonCapacityC5.lean`
 - prerequisites: strong powers and `shannonCapacity` (`Applied/InformationTheory/ShannonCapacity.lean`); Mathlib's real inner product spaces, `EuclideanSpace`, Bessel's inequality (`Orthonormal.sum_inner_products_le`)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: yes for the general bound: cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Foundations/Combinatorics/SimpleGraph/LovaszTheta.lean` :: `lovaszTheta`, `indepNum_le_of_rep`, `lovaszTheta_le_of_rep`, `shannonCapacity_le_lovaszTheta` (`ϑ` is defined; any real inner product space); atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/Combinatorics/SimpleGraph/LovaszTheta.lean` :: `sandwich` and `LovaszThetaStrongPower.lean` :: `indepNum_le_lovaszTheta_pow`. The rational bound for `C₇` was not found elsewhere (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. Conventions are those of the library: in `G` adjacent letters are
@@ -59,8 +59,8 @@ The exact bound `Θ(C₇) ≤ 7 cos(π/7)/(1 + cos(π/7))`, and the bound for ev
 purely rational check.
 
 Not covered: the definition of `ϑ` and its other characterizations (eigenvalue and
-semidefinite-programming forms); `ϑ(G) ϑ(Ḡ) ≥ |V|`; any lower bound on `Θ(C₇)` beyond the
-library's `3 ≤ Θ(C₇)`.
+semidefinite-programming forms); `ϑ(G) ϑ(Ḡ) ≥ |V|`; lower bounds on `Θ(C₇)` (none in this file;
+the library proves `367^{1/5} ≤ Θ(C₇)` in `Targets/InformationTheory/ShannonCapacityC7Lower.lean`).
 -/
 
 namespace Targets.InformationTheory

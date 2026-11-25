@@ -9,7 +9,7 @@ import Applied.InformationTheory.MultiTerminal
 - source: E. C. van der Meulen, "Three-terminal communication channels", Adv. Appl. Probab. 3 (1971); T. M. Cover, A. El Gamal, "Capacity theorems for the relay channel", IEEE Trans. Inform. Theory 25 (1979); textbook form A. El Gamal, Y.-H. Kim, "Network Information Theory" (2011), Chapter 16 (chapter number to be confirmed); ProofAtlas Top 500 (Nov 2026), rank 155
 - used-in: cooperative and multi-hop wireless communication
 - prerequisites: row-stochastic matrices (`Applied/InformationTheory/Channel.lean`); relay codes (`Applied/InformationTheory/MultiTerminal.lean`)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: the open quantity was not found in any project checked on 2026-11-25. FujiHaruka/information-theory (github.com/FujiHaruka/information-theory), `InformationTheory/Shannon/RelayCutset.lean` has the same strictly causal relay-code model (`RelayCode`) and the cut-set outer bound `relay_cutset_outer_bound`, but no capacity object and no achievability (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. A discrete memoryless relay channel has a sender input `x ∈ X`, a relay

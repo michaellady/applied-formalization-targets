@@ -9,6 +9,7 @@ import Applied.Learning.SampleCompressionVCOne
 - source: S. Ben-David, A. Litman, "Combinatorial variability of Vapnik–Chervonenkis classes with applications to sample compression schemes", Discrete Applied Mathematics 86 (1998) (classes of VC dimension 1 have labelled schemes of size 1; exact statement and location to be confirmed); see also S. Floyd, M. Warmuth, Machine Learning 21 (1995) for maximum classes. The direct argument used here (keep a deviating example whose set of agreeing concepts is smallest) is not known to us in this exact form, but it is elementary and close to the known tree structure of dimension-1 classes
 - used-in: the sample compression conjecture for `d ≤ 1`, with constant `1`
 - prerequisites: the definitions of `Applied.Learning.SampleCompression`; Sauer–Shelah from `Applied.Learning.SampleCompressionBounds` for the case `d = 0`
+- formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)
 - statement-review: unreviewed
 
 Informal statement. Let `X` be a finite type with decidable equality and `𝒞` a finite set of
@@ -50,6 +51,12 @@ examples form a set (no repetition or order).
 Not covered: the sample compression conjecture for any `d ≥ 2` (untouched); unlabelled
 schemes; infinite domains; and the converse direction for `d = 1` (a scheme of size `1` only
 gives `vcDim 𝒞 ≤ 5` by `CompressionLowerBound.lean`).
+
+Scheme model. `CompressionScheme` keeps an unordered **set** of labelled examples and
+reconstructs from that set alone (no order, no side information); cslib-frontier's
+`SampleCompressionScheme` keeps an ordered list. The existence result here is therefore the
+stronger form: it gives an ordered-list scheme of the same size (on paper), not conversely.
+See "Scheme model" in `Targets/Learning/SampleCompression.lean`.
 -/
 
 namespace Targets.Learning

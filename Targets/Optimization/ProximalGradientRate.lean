@@ -9,7 +9,7 @@ import Applied.Optimization.ProximalGradient
 - source: A. Beck, M. Teboulle, "A fast iterative shrinkage-thresholding algorithm for linear inverse problems", SIAM J. Imaging Sci. 2 (2009), the rate for ISTA with constant step size (theorem number to be confirmed)
 - used-in: lasso and sparse regression, compressed sensing, image deblurring, projected gradient methods
 - prerequisites: Mathlib `gradient`, `ConvexOn`, `LipschitzWith`; descent lemma and first-order convexity inequality from `Applied/Optimization/Smooth.lean`
-- formalized-elsewhere: not checked
+- formalized-elsewhere: optlib `Optlib/Algorithm/ProximalGradient.lean` :: `proximal_gradient_method_converge` (the same `O(1/k)` constant at step `1/L`; there any step `t ≤ 1/L`, comparison with a minimiser, no constraint set; here a constraint set `C`, `g` convex only on `C`, any comparison point; neither statement contains the other) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement (`ista_rate`). Let `E` be a real Hilbert space, `f : E → ℝ` convex and

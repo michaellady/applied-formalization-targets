@@ -9,7 +9,7 @@ import Applied.Optimization.OnlineStronglyConvex
 - source: E. Hazan, A. Agarwal, S. Kale, "Logarithmic regret algorithms for online convex optimization", Machine Learning 69 (2007), Theorem 1 (theorem number to be confirmed)
 - used-in: online learning with strongly convex losses, fast rates for stochastic optimization
 - prerequisites: Mathlib `gradient`, `StrongConvexOn`, Hilbert projection theorem, harmonic-number bound `harmonic_le_one_add_log`
-- formalized-elsewhere: not checked
+- formalized-elsewhere: atlas-lean `MathlibExt/Analysis/Convex/OnlineGradientDescentStronglyConvex.lean` :: `ogd_regret_strongly_convex`; cslib-frontier `CslibFrontier/MachineLearning/OnlineLearning/OnlineGradientDescent.lean` :: `ogd_regret_le_log` (the same bound `G²/(2μ) (1 + log T)`; theirs assume strong convexity only at the iterates or on `K` and allow subgradients; ours needs neither `x 0 ∈ K` nor `T ≥ 1`) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `K` be a convex set in a real Hilbert space and `μ > 0`. Suppose each

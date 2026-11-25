@@ -9,7 +9,7 @@ import Applied.Optimization.OnlineGradientAnytime
 - source: M. Zinkevich, "Online convex programming and generalized infinitesimal gradient ascent", ICML 2003, Theorem 1 (the constant `3/2` and the exact form of the bound in the source to be confirmed); also E. Hazan, "Introduction to Online Convex Optimization", Theorem 3.1 (number to be confirmed)
 - used-in: online convex optimization, online-to-batch conversion, stochastic gradient methods
 - prerequisites: Mathlib `gradient`, `ConvexOn`, Hilbert projection theorem
-- formalized-elsewhere: OGD regret bounds reportedly exist in other Lean projects (atlas-lean, cslib-frontier, LMLExplore; not checked whether they cover decreasing step sizes)
+- formalized-elsewhere: atlas-lean `CSLibExt/MachineLearning/OnlineGradientDescentAnytime.lean` :: `ogd_regret_anytime`; cslib-frontier `CslibFrontier/MachineLearning/OnlineLearning/OnlineGradientDescent.lean` :: `ogd_sum_inner_le` (non-increasing steps), `ogd_regret_le_three_halves` (the same `(3/2) D G √T`; with subgradients and convexity only on `K`, so more general than ours) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `K` be a convex set in a real Hilbert space with `‖a - b‖ ≤ D` for all

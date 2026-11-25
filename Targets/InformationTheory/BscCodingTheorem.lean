@@ -9,7 +9,7 @@ import Applied.InformationTheory.BscCapacity
 - source: C. E. Shannon, "A Mathematical Theory of Communication", Bell Syst. Tech. J. 27 (1948); textbook form e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory" (2nd ed., 2006), Sections 7.1 and 7.7 (numbers to be confirmed); the Hamming-ball volume bound is standard (e.g. MacWilliams–Sloane, "The Theory of Error-Correcting Codes", Ch. 10, to be confirmed)
 - used-in: complete instance of the channel coding theorem (`Targets/InformationTheory/OperationalCapacity.lean`); baseline for the open reliability function of the BSC (`Targets/InformationTheory/BscReliabilityFunction.lean`)
 - prerequisites: block codes and operational capacity (`Applied/InformationTheory/BlockCodes.lean`); converse (`Applied/InformationTheory/MemorylessConverse.lean`); greedy/expurgation and Chernoff lemmas (`Applied/InformationTheory/ErasureCapacity.lean`)
-- formalized-elsewhere: to be confirmed
+- formalized-elsewhere: yes: cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Probability/BitString/BinarySymmetricChannel/Capacity.lean` :: `sSup_isAchievableRate`, `isAchievableRate_iff_lt` (bits, exactly `2^⌈Rn⌉` messages; equivalent up to units), with the strong converse in `StrongConverse.lean` of the same directory (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. Let `0 ≤ q ≤ 1` (Lean hypotheses `h0`, `h1`) and `bsc q` the binary
@@ -44,8 +44,9 @@ only negative rates are claimed, which is all that `R < log 2 - h(1/2) = 0` allo
 half is `opCapacity_memoryless_bsc_le` (`Targets/InformationTheory/ChannelCodingConverse.lean`).
 
 Not covered: error exponents (the reliability function of the BSC is open; see
-`Targets/InformationTheory/BscReliabilityFunction.lean`), linear codes, explicit constructions,
-general memoryless channels.
+`Targets/InformationTheory/BscReliabilityFunction.lean`), the strong converse (formalized in
+cslib-frontier, `CslibFrontier/Probability/BitString/BinarySymmetricChannel/StrongConverse.lean`),
+linear codes, explicit constructions, general memoryless channels.
 -/
 
 namespace Targets.InformationTheory

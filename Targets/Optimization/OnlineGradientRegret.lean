@@ -9,6 +9,7 @@ import Applied.Optimization.OnlineGradient
 - source: M. Zinkevich, "Online convex programming and generalized infinitesimal gradient ascent", ICML 2003, Theorem 1 (stated there with projection onto a bounded convex set and decreasing step sizes; the fixed-step form used here is the standard textbook variant, e.g. E. Hazan, "Introduction to Online Convex Optimization", Chapter 3, theorem number to be confirmed)
 - used-in: online learning, stochastic gradient descent analyses, adversarial training
 - prerequisites: Mathlib `gradient`, `ConvexOn`
+- formalized-elsewhere: atlas-lean `MathlibExt/Analysis/Convex/OnlineGradientDescent.lean` :: `ogd_regret` (stronger: `(η/2) ∑ ‖g_t‖²` in place of `η G² T / 2`, abstract 1-Lipschitz projection); lmlexplore `LMLExplore/OnlineLearning/SubgradientDescent.lean` (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
 - statement-review: unreviewed
 
 Informal statement. Let `f 0, f 1, …` be convex differentiable functions on a real Hilbert

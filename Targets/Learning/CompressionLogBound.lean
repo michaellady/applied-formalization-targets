@@ -9,6 +9,7 @@ import Applied.Learning.SampleCompressionReductions
 - source: folklore: the halving scheme of size `log₂ |𝒞|` (Littlestone–Warmuth 1986; Floyd–Warmuth, Machine Learning 21 (1995)) combined with the Sauer–Shelah bound `|𝒞| ≤ (n + 1)^d`; exact location in the literature to be confirmed
 - used-in: the sample compression conjecture up to a factor `log n`
 - prerequisites: `Targets/Learning/CompressionHalving.lean`, `Targets/Learning/SauerShelahVC.lean`
+- formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)
 - statement-review: unreviewed
 
 Informal statement. Let `X` be a finite type with decidable equality, `n = |X|`, and `𝒞` a
@@ -31,6 +32,12 @@ constant is explicit but not optimised.
 
 Not covered: bounds in terms of the sample size; bounds independent of `n`, in particular the
 sample compression conjecture (size `O(d)`) and the Moran–Yehudayoff bound `exp(O(d))`.
+
+Scheme model. `CompressionScheme` keeps an unordered **set** of labelled examples and
+reconstructs from that set alone (no order, no side information); cslib-frontier's
+`SampleCompressionScheme` keeps an ordered list. The existence result here is therefore the
+stronger form: it gives an ordered-list scheme of the same size (on paper), not conversely.
+See "Scheme model" in `Targets/Learning/SampleCompression.lean`.
 -/
 
 namespace Targets.Learning

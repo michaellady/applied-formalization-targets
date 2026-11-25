@@ -9,6 +9,7 @@ import Applied.Coding.BallCardLower
 - source: standard; e.g. T. M. Cover, J. A. Thomas, "Elements of Information Theory", 2nd ed. (2006), Ch. 11 (method of types; theorem number to be confirmed); F. J. MacWilliams, N. J. A. Sloane, "The Theory of Error-Correcting Codes" (1977), Ch. 10 (lemma number to be confirmed)
 - used-in: asymptotic (rate) forms of the Hamming and Elias–Bassalygo upper bounds
 - prerequisites: binomial theorem; real logarithm and powers
+- formalized-elsewhere: yes: cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Foundations/Data/Nat/Choose/Entropy.lean` :: `exp_mul_binEntropy_le_succ_mul_choose` (the same inequality as item 3 in natural logarithms) (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. For natural numbers `k ≤ n`:

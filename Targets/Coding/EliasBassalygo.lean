@@ -10,6 +10,7 @@ import Targets.Coding.GilbertVarshamov
 - source: L. A. Bassalygo, "New upper bounds for error correcting codes", Problemy Peredachi Informatsii 1:4 (1965), 41–44; attributed also to P. Elias (unpublished); textbook form e.g. F. J. MacWilliams, N. J. A. Sloane, "The Theory of Error-Correcting Codes" (1977), Ch. 17 (theorem numbers to be confirmed)
 - used-in: the best upper bound on the rate of binary codes before the linear-programming (MRRW) bound; the upper side of the Gilbert–Varshamov tightness question
 - prerequisites: the Johnson bound in a ball; double counting; entropy bounds on binomial coefficients; limits
+- formalized-elsewhere: yes: cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Foundations/Data/Code/EliasBassalygo.lean` :: `card_mul_sum_choose_mul_le` (`q`-ary; at `q = 2` the same inequality as `elias_bassalygo_finite`) and `eventually_rate_le_one_sub_qaryEntropy_johnsonRadius` (asymptotic form, endpoints `δ ∈ {0, 1/2}` included); atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/Combinatorics/Coding/EliasBassalygo.lean` :: `card_mul_sum_le` (alphabet-free radius, weaker for binary codes); tCSlib (github.com/Shilun-Allan-Li/tCSlib), `TCSlib/ErrorCorrectingCodes/Elias_Bassalygo_bound.lean` :: `elias_bassalygo_bound` (weaker by polynomial factors) (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. Let `C` be a set of binary words of length `n` in which any two distinct
@@ -36,9 +37,15 @@ words differ in at least `d` positions, and let `r` be a natural number with `2r
    Hamming rate bound itself is not stated here as a limit; only the comparison of the numbers.
 
 Differences from the textbook statement: the finite bound (2) is stated with the factor
-`n d / (n d - 2 r (n - r))`; the textbook factor in MacWilliams–Sloane is, as far as we recall,
-`n d / (r² - n r + n d / 2)`, which is twice ours, so (2) would be at least as strong (to be
-confirmed against the source). The asymptotic form is stated for minimum distance `⌊δ n⌋` with
+`n d / (n d - 2 r (n - r))`, which equals the textbook factor. The Elias bound for binary codes
+is usually written with the factor `(n d / 2) / (r² - n r + n d / 2)`, and
+`r² - n r + n d / 2 = (n d - 2 r (n - r)) / 2`. (W. C. Huffman, V. Pless, "Fundamentals of
+Error-Correcting Codes" (2003), give the `q`-ary factor `θ n d / (w² - 2 θ n w + θ n d)` with
+`θ = 1 - 1/q`, which is this one at `q = 2`; the exact wording and theorem numbers there and in
+MacWilliams–Sloane are to be confirmed.) The same inequality is the case `q = 2` of
+`card_mul_sum_choose_mul_le` in cslib-frontier. An earlier version of this header said that
+the textbook factor was twice ours; that was a mistake.
+The asymptotic form is stated for minimum distance `⌊δ n⌋` with
 `0 < δ < 1/2` (the endpoints are excluded); the textbook allows `0 ≤ δ ≤ 1/2`.
 
 Not covered: the McEliece–Rodemich–Rumsey–Welch (linear programming) bound, which is better
