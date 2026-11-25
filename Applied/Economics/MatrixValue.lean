@@ -40,6 +40,20 @@ lemma gamePayoff_le_of_le {C : Matrix m n ℝ} {c : ℝ} (hC : ∀ i j, C i j �
         simp only [← Finset.sum_mul, ← Finset.mul_sum, hq.2, hp.2]
         ring
 
+/-- If every entry of `C` is at least `c`, every mixed-strategy payoff of `C` is at least `c`. -/
+lemma le_gamePayoff_of_le {C : Matrix m n ℝ} {c : ℝ} (hC : ∀ i j, c ≤ C i j)
+    {p : m → ℝ} (hp : p ∈ mixedStrategies m) {q : n → ℝ} (hq : q ∈ mixedStrategies n) :
+    c ≤ gamePayoff C p q := by
+  rw [gamePayoff_eq_sum]
+  calc c = ∑ i, ∑ j, p i * c * q j := by
+        simp only [← Finset.sum_mul, ← Finset.mul_sum, hq.2, hp.2]
+        ring
+    _ ≤ ∑ i, ∑ j, p i * C i j * q j := by
+        gcongr with i _ j _
+        · exact hq.1 j
+        · exact hp.1 i
+        · exact hC i j
+
 /-- If `A i j ≤ B i j + c` entrywise, the same holds for every mixed-strategy payoff. -/
 lemma gamePayoff_le_add_of_le {A B : Matrix m n ℝ} {c : ℝ} (h : ∀ i j, A i j ≤ B i j + c)
     {p : m → ℝ} (hp : p ∈ mixedStrategies m) {q : n → ℝ} (hq : q ∈ mixedStrategies n) :
