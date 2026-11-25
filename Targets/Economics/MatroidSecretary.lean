@@ -99,9 +99,16 @@ Further results in separate registry entries.
   defined there by linear independence of signed incidence vectors over `ℚ`; its equivalence
   with the acyclicity definition is textbook but not formalized. The same file proves `c = 1/e`
   for partition matroids with capacities one.
+* `Targets/Economics/MatroidSecretaryLaminar.lean`: laminar matroids are defined (capacity
+  constraints on a laminar family) and, if every element lies in at most `h` members of the
+  family, the conclusion holds with `c = 1/(8e(h+1))` (weight-oblivious random colouring with at
+  most `c A` colours in each member `A`, then the `1/e` rule per colour). The constant depends on
+  the depth `h`; the known constant-competitive algorithms for all laminar matroids (Im–Wang
+  2011, Jaillet–Soto–Zenklusen 2013) are not formalized.
 
 Not proved: optimality of the `1/e` rule among all online rules for the classical problem;
-any constant for general matroids or for other classes (transversal, laminar, co-graphic, …);
+any constant for general matroids or for other classes (transversal, co-graphic, …), and a
+depth-independent constant for laminar matroids;
 the known constants for uniform matroids; the known `O(log log rank)`-competitive
 algorithms.
 -/
