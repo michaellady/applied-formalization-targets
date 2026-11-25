@@ -70,7 +70,16 @@ What is proved (all in `Applied/Economics/MatroidSecretary.lean`).
   arbitrary non-negative weights, by a deterministic algorithm (`exists_isCompetitive_rankOne`,
   `hasCompetitiveRandomized_rankOne`).
 
-Not proved: the optimal `1/e` bound for the classical problem; any constant for general
+* In `Applied/Economics/SecretaryOneOverE.lean` (registry entry
+  `Targets/Economics/SecretaryOneOverE.lean`, id `econ-secretary-one-over-e`): the exact
+  success probability `(r/n) · ∑_{i=r+1}^{n} 1/(i-1)` of the threshold rule for distinct
+  weights, the `1/e` bound for the `⌊n/e⌋` rule for every `n ≥ 1`, and, for rank-one uniform
+  matroids, `c = 1/e` for arbitrary non-negative weights (ties broken by a fixed order of `E`)
+  by a deterministic algorithm (`exists_isCompetitive_rankOne_inv_exp`,
+  `hasCompetitiveRandomized_rankOne_inv_exp`).
+
+Not proved: optimality of the `1/e` rule among all online rules for the classical problem;
+any constant for general
 matroids or for other classes (graphic, transversal, laminar, …); the known
 `O(log log rank)`-competitive algorithms.
 -/
