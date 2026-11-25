@@ -1,20 +1,39 @@
-import Mathlib.Tactic
+import Applied.Economics.FairDivisionBasic
 
 /-!
 # EFX allocations: identical valuations and two agents
 
 Agents `i : A` have additive non-negative valuations `v i : G → ℝ` over a finite set `G` of
 indivisible goods. An allocation is a map `a : G → A` (good `g` goes to agent `a g`). It is
-*envy-free up to any good* (EFX, `IsEFX`) if no agent `i` values another agent `j`'s bundle,
-with any single good removed, more than their own bundle. This is the strong form: the removed
-good may be one that `i` values at zero.
+*envy-free up to any good* (EFX, `IsEFX`, defined in `FairDivisionBasic.lean`) if no agent `i`
+values another agent `j`'s bundle, with any single good removed, more than their own bundle.
+This is the strong form: the removed good may be one that `i` values at zero.
+
+## Main statements
 
 * `efx_exists_identical`: an EFX allocation exists for any (non-zero) number of agents who
   all have the same additive valuation. Proof: hand out the goods in order of decreasing
   value, each to a currently poorest agent.
 * `efx_exists_two`: an EFX allocation exists for two agents with arbitrary additive
-  valuations. Proof: cut and choose. Agent `0` divides using the identical-valuations rule
-  with their own valuation, agent `1` takes the bundle they prefer.
+  valuations. Proof: cut and choose (`isEFX_two_of_cut_and_choose`). Agent `0` divides using
+  the identical-valuations rule with their own valuation, agent `1` takes the bundle they
+  prefer.
+* `IsEFX.comp_perm_of_identical`: under identical valuations, EFX survives any permutation
+  of the bundles.
+
+## Related files
+
+`FairDivisionBasic.lean` (definition of `IsEFX`, bundle sums, perturbation) is imported here.
+The other existence theorems build on this file: `EFXAllButOne.lean` (all agents but one
+identical), `EFXOrdered.lean` (common ranking of the goods), `EFXFewGoods.lean` and
+`EFXTwoExtraGoods.lean` (at most `n + 1`, `n + 2` goods), `EFXBinary.lean` (`0/1` valuations),
+`EFXTwoTypes.lean` (two valuation types), `EFXThree.lean` (three agents). `PMMS.lean` relates
+EFX to pairwise maximin shares.
+
+## Not in this file
+
+EFX for four or more agents with arbitrary additive valuations (open problem); non-additive
+valuations; chores.
 -/
 
 open Finset Function
@@ -22,13 +41,6 @@ open Finset Function
 namespace Applied.Economics
 
 variable {A G : Type*} [Fintype G] [DecidableEq A] [DecidableEq G]
-
-/-- The allocation `a` (good `g` goes to agent `a g`) is envy-free up to any good for the
-additive valuations `v`: for all agents `i`, `j` and every good `g` in `j`'s bundle, agent `i`
-values `j`'s bundle without `g` at most as much as their own bundle. -/
-def IsEFX (v : A → G → ℝ) (a : G → A) : Prop :=
-  ∀ i j : A, ∀ g : G, a g = j →
-    ∑ h with a h = j ∧ h ≠ g, v i h ≤ ∑ h with a h = i, v i h
 
 omit [Fintype G] in
 /-- Greedy allocation of a set `S` of goods under a common valuation `u`: there is an
@@ -67,14 +79,6 @@ private lemma exists_greedy [Finite A] [Nonempty A] (u : G → ℝ)
       have h6 := hmin g hgs
       split_ifs <;> first | linarith | (subst_vars; linarith)
 
-/-- Removing one good `g` from the bundle of the agent who holds it. -/
-private lemma sum_filter_and_ne (u : G → ℝ) (a : G → A) (g : G) :
-    ∑ h with a h = a g ∧ h ≠ g, u h + u g = ∑ h with a h = a g, u h := by
-  have : (univ.filter fun h => a h = a g ∧ h ≠ g) = (univ.filter fun h => a h = a g).erase g := by
-    ext h
-    simp [and_comm]
-  rw [this, sum_erase_add _ _ (by simp)]
-
 /-- **EFX for identical valuations.** If all agents (at least one) share the same additive
 non-negative valuation `u`, an EFX allocation exists. -/
 theorem efx_exists_identical [Finite A] [Nonempty A] (u : G → ℝ) (hu : ∀ g, 0 ≤ u g) :
@@ -83,7 +87,7 @@ theorem efx_exists_identical [Finite A] [Nonempty A] (u : G → ℝ) (hu : ∀ g
   refine ⟨a, fun i j g hg => ?_⟩
   subst hg
   have h1 := ha i (a g) g (mem_univ g) rfl
-  have h2 := sum_filter_and_ne u a g
+  have h2 := sum_filter_eq_and_ne_add u a (rfl : a g = a g)
   rw [sum_filter, sum_filter] at *
   linarith
 
@@ -103,8 +107,7 @@ lemma isEFX_two_of_cut_and_choose (v : Fin 2 → G → ℝ) (hv : ∀ i g, 0 ≤
   intro i j g hg
   -- dropping a good never increases the value of a bundle
   have hdrop : ∑ h with a h = j ∧ h ≠ g, v i h ≤ ∑ h with a h = j, v i h :=
-    sum_le_sum_of_subset_of_nonneg (fun h hh => by simp at hh ⊢; exact hh.1)
-      (fun h _ _ => hv i h)
+    sum_filter_and_ne_le (hv i) a j g
   fin_cases i
   · exact h0 0 j g hg
   · fin_cases j

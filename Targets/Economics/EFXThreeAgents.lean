@@ -36,7 +36,8 @@ of the proposition `EFXExistsThree` of `EFX.lean`).
   worth at least `μ` and, for all bundles `i ≠ j` and every good `g ∈ S` of bundle `j`, bundle
   `j` without `g` is worth at most bundle `i`.
 
-Proof. Valuations are perturbed as in `EFXTwoTypes.lean` (`exists_pos_nondegenerate`), so that
+Proof. Valuations are perturbed as in `EFXTwoTypes.lean` (`exists_pos_nondegenerate`, in the
+shared library file `Applied/Economics/FairDivisionBasic.lean`), so that
 they are positive and non-degenerate and EFX for the perturbed valuations implies EFX for the
 original ones. For the perturbed instance we follow Akrami et al.: among all partitions
 `(X1, X2, X3)` such that `X1` and `X2` are EFX-feasible for the first agent and `X3` is

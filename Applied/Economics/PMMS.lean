@@ -1,4 +1,3 @@
-import Mathlib.Tactic
 import Applied.Economics.EFX
 
 /-!
@@ -82,20 +81,6 @@ def IsApproxPMMS (α : ℝ) (v : A → G → ℝ) (a : G → A) : Prop :=
   ∀ i j : A, i ≠ j →
     α * mms2 (v i) (univ.filter fun h => a h = i ∨ a h = j) ≤ ∑ h with a h = i, v i h
 
-/-- The union of two distinct bundles has value equal to the sum of their values. -/
-lemma sum_filter_or_eq (f : G → ℝ) (a : G → A) {i j : A} (hij : i ≠ j) :
-    ∑ h with (a h = i ∨ a h = j), f h = ∑ h with a h = i, f h + ∑ h with a h = j, f h := by
-  rw [filter_or, sum_union]
-  exact disjoint_filter.2 fun h _ h1 h2 => hij (h1 ▸ h2)
-
-/-- Removing one good `g` from the bundle `j` containing it. -/
-lemma sum_filter_eq_and_ne_add (f : G → ℝ) (a : G → A) {j : A} {g : G} (hg : a g = j) :
-    ∑ h with a h = j ∧ h ≠ g, f h + f g = ∑ h with a h = j, f h := by
-  have : (univ.filter fun h => a h = j ∧ h ≠ g) = (univ.filter fun h => a h = j).erase g := by
-    ext h
-    simp [and_comm]
-  rw [this, sum_erase_add _ _ (by simp [hg])]
-
 /-- **PMMS implies EFX for positively valued goods.** If `a` is PMMS, then for distinct agents
 `i ≠ j` and every good `g` in `j`'s bundle that `i` values strictly positively, `i` values
 `j`'s bundle without `g` at most as much as their own bundle. No sign condition is needed. -/
@@ -143,8 +128,7 @@ theorem IsPMMS.isEFX {v : A → G → ℝ} {a : G → A} (hv : ∀ i g, 0 < v i 
   intro i j g hg
   by_cases hij : i = j
   · subst hij
-    exact sum_le_sum_of_subset_of_nonneg (fun h hh => by simp at hh ⊢; exact hh.1)
-      (fun h _ _ => (hv i h).le)
+    exact sum_filter_and_ne_le (fun h => (hv i h).le) a i g
   · exact hp.efx_of_pos hij hg (hv i g)
 
 /-- **The positivity hypothesis cannot be dropped.** With two agents sharing the valuation
@@ -301,12 +285,6 @@ theorem pmms_exists_two (v : Fin 2 → G → ℝ) : ∃ a : G → Fin 2, IsPMMS 
         ext h; by_cases hh : h ∈ T <;> simp [hh]
       rw [this]; linarith
 
-omit [Fintype G] [DecidableEq G] in
-private lemma sum_split_two' [Fintype A] (F : A → ℝ) {i j : A} (hij : i ≠ j) :
-    ∑ l, F l = F i + F j + ∑ l ∈ (univ.erase i).erase j, F l := by
-  rw [← add_sum_erase univ F (mem_univ i),
-    ← add_sum_erase (univ.erase i) F (mem_erase.2 ⟨hij.symm, mem_univ j⟩), add_assoc]
-
 /-- **PMMS exists for identical valuations.** If all agents (a finite nonempty set) share the
 same additive real valuation `u`, a PMMS allocation exists: any allocation minimising the sum
 of the squared bundle values is PMMS. -/
@@ -370,7 +348,7 @@ theorem pmms_exists_identical [Fintype A] [Nonempty A] (u : G → ℝ) :
       · simp [h1, h2]
   have hΦb : Φ b = p ^ 2 + q ^ 2 + ∑ l ∈ (univ.erase i).erase j, (∑ h with a h = l, u h) ^ 2 := by
     simp only [Φ]
-    rw [sum_split_two' _ hij, hbi, hbj]
+    rw [sum_split_two _ hij, hbi, hbj]
     congr 1
     refine sum_congr rfl fun l hl => ?_
     have hlj := ne_of_mem_erase hl
@@ -378,7 +356,7 @@ theorem pmms_exists_identical [Fintype A] [Nonempty A] (u : G → ℝ) :
     rw [hbk l hli hlj]
   have hΦa : Φ a = x ^ 2 + y ^ 2 + ∑ l ∈ (univ.erase i).erase j, (∑ h with a h = l, u h) ^ 2 := by
     simp only [Φ]
-    rw [sum_split_two' _ hij]
+    rw [sum_split_two _ hij]
   have hlt : p ^ 2 + q ^ 2 < x ^ 2 + y ^ 2 := by
     have h1 : 0 < (p - x) * (q - x) := mul_pos (by linarith) (by linarith)
     have h2 : x ^ 2 + y ^ 2 - (p ^ 2 + q ^ 2) = 2 * ((p - x) * (q - x)) := by

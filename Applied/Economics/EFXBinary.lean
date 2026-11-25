@@ -35,6 +35,7 @@ def sqPotential [Fintype A] (w : A → G → ℕ) (b : G → A) : ℕ := ∑ i, 
 variable {w : A → G → ℕ}
 
 omit [DecidableEq A] [DecidableEq G] [Fintype G] in
+/-- In a clean allocation of `0/1` goods, nobody values a good more than its holder does. -/
 lemma le_of_isClean (hw : ∀ i g, w i g ≤ 1) {b : G → A} (hb : IsClean w b) (i : A) (h : G) :
     w i h ≤ w (b h) h := by
   by_cases h0 : w (b h) h = 0
@@ -44,6 +45,8 @@ lemma le_of_isClean (hw : ∀ i g, w i g ≤ 1) {b : G → A} (hb : IsClean w b)
     omega
 
 omit [DecidableEq G] in
+/-- In a clean allocation of `0/1` goods, any agent `i` values any part `s` of agent `j`'s
+bundle at most as much as `j` values their whole bundle. -/
 lemma sum_le_ownCount (hw : ∀ i g, w i g ≤ 1) {b : G → A} (hb : IsClean w b) (i j : A)
     (s : Finset G) (hs : s ⊆ univ.filter (b · = j)) : ∑ h ∈ s, w i h ≤ ownCount w b j := by
   calc ∑ h ∈ s, w i h ≤ ∑ h ∈ s, w j h := sum_le_sum fun h hh => by
@@ -52,6 +55,8 @@ lemma sum_le_ownCount (hw : ∀ i g, w i g ≤ 1) {b : G → A} (hb : IsClean w 
         rwa [hbj] at this
     _ ≤ ownCount w b j := sum_le_sum_of_subset hs
 
+/-- Effect on agent `l`'s own value of moving the good `g` to agent `i`: the old holder loses
+`g` and the new holder gains it. -/
 lemma ownCount_update (b : G → A) (g : G) (i l : A) :
     ownCount w (update b g i) l + (if b g = l then w l g else 0)
       = ownCount w b l + (if i = l then w l g else 0) := by
@@ -64,13 +69,11 @@ lemma ownCount_update (b : G → A) (g : G) (i l : A) :
   rw [this]
   ring
 
-omit [DecidableEq G] [Fintype G] in
-lemma sum_split_two [Fintype A] (F : A → ℕ) {i j : A} (hij : i ≠ j) :
-    ∑ l, F l = F i + F j + ∑ l ∈ (univ.erase i).erase j, F l := by
-  rw [← add_sum_erase univ F (mem_univ i),
-    ← add_sum_erase (univ.erase i) F (mem_erase.2 ⟨hij.symm, mem_univ j⟩), add_assoc]
-
-/-- **EFX for binary valuations, natural-number form.** -/
+/-- **EFX for binary valuations, natural-number form.** If every agent values every good at
+`0` or `1` (`w i g ≤ 1` in `ℕ`), there is an allocation `a` such that for all agents `i`, `j`
+and every good `g` of `j`'s bundle, `i` values `j`'s bundle without `g` at most as much as
+their own bundle. The allocation is a clean one minimising the sum of squares of the agents'
+own values, with the goods nobody values moved to a poorest agent. -/
 theorem efx_exists_binary_nat [Fintype A] [Nonempty A] (hw : ∀ i g, w i g ≤ 1) :
     ∃ a : G → A, ∀ i j g, a g = j →
       ∑ h with a h = j ∧ h ≠ g, w i h ≤ ∑ h with a h = i, w i h := by
@@ -128,8 +131,7 @@ theorem efx_exists_binary_nat [Fintype A] [Nonempty A] (hw : ∀ i g, w i g ≤ 
       have := hw j g
       omega
     have hL : ∑ h with a' h = j ∧ h ≠ g, w i h + 1 ≤ ownCount w a' j := by
-      have e := sum_filter_eq_and_ne_add (w j) a' g
-      rw [hgj] at e
+      have e := sum_filter_eq_and_ne_add (w j) a' hgj
       have hle : ∑ h with a' h = j ∧ h ≠ g, w i h ≤ ∑ h with a' h = j ∧ h ≠ g, w j h :=
         sum_le_sum fun h hh => by
           have hbj : a' h = j := (mem_filter.1 hh).2.1
