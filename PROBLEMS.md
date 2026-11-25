@@ -41,7 +41,7 @@ States: **done** (all three points), **partial** (statement plus some proved con
 | 155 | Capacity of the relay channel | todo | Needs channel capacity definitions first |
 | 390 | Capacity region of 3-receiver broadcast channels | todo | Needs channel capacity definitions first |
 | 229 | Reliability function of the binary symmetric channel | todo | Needs channel capacity definitions first |
-| 325 | Computability of Shannon capacity of graphs | todo | |
+| 325 | Computability of Shannon capacity of graphs | partial | Shannon capacity defined; `Θ(C₅) ≥ √5`, `3 ≤ Θ(C₇) ≤ 7`; the value of `Θ(C₇)` stated as open. Computability itself not stated |
 | 226 | Constant-query locally decodable codes | todo | |
 | 204 | PAC learning of DNF in polynomial time | todo | Needs a usable formal model of polynomial-time computation first |
 | 131 | Planted clique conjecture | todo | Needs a usable formal model of polynomial-time computation first |
@@ -52,9 +52,15 @@ States: **done** (all three points), **partial** (statement plus some proved con
 | 233 | Quantum capacity of the depolarizing channel | todo | Needs channel capacity definitions first |
 | 315 | Good quantum locally testable codes | todo | |
 
-Seven of these are questions about polynomial-time algorithms and five about channel
-capacity. They cannot be stated faithfully until those foundations exist in Lean, so the
-foundations are the real next piece of work for this group.
+Seven of these are questions about polynomial-time algorithms; they cannot be stated
+faithfully until a usable model of polynomial-time computation exists in Lean.
+
+The channel-capacity foundations now exist for single-user channels with finite alphabets
+(entropy, mutual information, information capacity, capacity of the binary symmetric and
+erasure channels, data processing). Still needed before the five capacity problems can be
+stated: channels with memory or synchronisation errors (deletion channel), multi-terminal
+channels (relay, broadcast), block codes with error probability (reliability function), and
+quantum channels.
 
 ## C. First registry batch
 
@@ -98,6 +104,7 @@ foundations are the real next piece of work for this group.
 | Frank–Wolfe O(1/k) rate | done | Existence of the linear minimiser |
 | Approximate differential privacy: post-processing, adaptive composition | done | Advanced composition; Gaussian mechanism |
 | Projected online gradient descent; stochastic gradient descent in expectation | done | Decreasing step sizes; high-probability bounds |
+| Entropy, mutual information, channel capacity; binary symmetric and erasure channels; data processing | done | The channel coding theorem |
 | Remaining backlog entries (about 14) | todo | Not yet stated |
 
 ## After the tracker is worked through
