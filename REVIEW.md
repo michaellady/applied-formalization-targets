@@ -26,13 +26,16 @@ statements; every entry remains `statement-review: unreviewed`.
 | Second (16 re-audits after fixes, 16 new entries) | 32 | 23 | 9 |
 | Third (50 entries never audited; reviewer model Claude Opus 5.5) | 50 | 47 | 3 |
 | Fourth (re-audit of the 3 fixed, plus 1 with a non-blocking note) | 4 | 4 | 0 |
+| Fifth (re-audit of the 9 second-pass corrections, Opus) | 9 | 4 | 5 |
+| Sixth (re-audit of those 5 after fixes; EFX twice) | 5 | 5 | 0 |
 
 After the second pass 88 of 97 entries had passed their latest audit. The nine flagged in the
 second pass were corrected afterwards and have not been audited a third time. In the third
 pass, the 50 entries added since then were audited (three oversized prompts were sent with
 library proof bodies removed, keeping all statements and definitions); 47 passed, the three
-flagged ones were corrected and passed on re-audit. So 138 of 147 entries passed their latest
-audit, and the nine second-pass corrections remain un-re-audited.
+flagged ones were corrected and passed on re-audit. The nine second-pass corrections were then
+re-audited: four passed, five had further prose gaps (fixed below) and passed on re-audit.
+**All 147 entries now pass their latest audit.**
 
 ### Findings and what was done
 
@@ -56,6 +59,11 @@ audit, and the nine second-pass corrections remain un-re-audited.
 | `Statistics/SidakExact` | Prose claimed a strict inequality `< α` that fails at `α ∈ {0, 1}` and `H₀ = ∅`, and implied a theorem that is not stated | Wrong prose claim | Corrected to `≤ α` with the strict case qualified; marked as not stated in Lean |
 | `Statistics/BHOneFactor` | `√(1 - a²) = 0` for false nulls with `a > 1` not disclosed; unit-variance / correlation claim without a theorem | Disclosure | Convention disclosed; correlation claim marked informal |
 | `Statistics/ManyToOneControl` | (non-blocking) composite one-sided nulls not mentioned | Disclosure | Stated |
+| `Economics/EFX` | "Proved here for `n ≤ 2`" although this file has only definitions; conventions (real-valued, complete allocations, `0 < n`) not stated | Wording / disclosure | Points to the theorems in `EFXTwoAgents.lean` by name; conventions stated |
+| `InformationTheory/OperationalCapacity` | `[Nonempty X]` hypothesis not mentioned | Disclosure | Stated |
+| `Economics/LiLiRoutingSide` (library docstring) | "Bounded" region claimed with only an upper bound proved | Wrong prose claim | Reworded to "bounded above" |
+| `Statistics/ConcentrationIntervals` | i.i.d. Chebyshev corollaries assume independence and identical laws for the whole sequence | Disclosure | Stated |
+| `InformationTheory/BscReliabilityFunction` | For `R ≤ 0` the defined quantity is `0` (true exponent `+∞` at `R = 0`) | Vacuity / disclosure | Stated that the quantity is meaningful only for `R > 0` |
 
 ### Reviewer errors
 
@@ -66,6 +74,5 @@ audit, and the nine second-pass corrections remain un-re-audited.
 
 ### Not yet done
 
-- A third audit of the nine entries corrected after the second pass.
 - An audit with more than one reviewer model.
 - Human review of any statement against its source.
