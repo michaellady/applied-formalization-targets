@@ -708,6 +708,41 @@ theorem measure_simes_twoSided_oneFactor_two (P : Measure Ω) [IsProbabilityMeas
 
 end SimesTwo
 
+section Identical
+
+variable {Ω ι : Type*} [MeasurableSpace Ω] [Fintype ι]
+
+/-- If all p-values equal one valid p-value `p₀`, the Simes test rejects only when `p₀ ≤ α`. -/
+theorem measure_simes_le_of_forall_eq (P : Measure Ω) (p : ι → Ω → ℝ) (p₀ : Ω → ℝ)
+    (heq : ∀ j ω, p j ω = p₀ ω) (hvalid : IsValidPValue P p₀) {α : ℝ} (hα : 0 ≤ α) :
+    P {ω | 1 ≤ bhK α fun j => p j ω} ≤ ENNReal.ofReal α := by
+  refine (measure_mono fun ω hω => ?_).trans (hvalid α hα)
+  simp only [Set.mem_ofPred_eq] at hω ⊢
+  have hc := bhK_le_bhCount (α := α) fun j => p j ω
+  have hle := bhK_le (α := α) fun j => p j ω
+  unfold bhCount at hc
+  obtain ⟨j, hj⟩ := Finset.card_pos.mp (lt_of_lt_of_le hω hc)
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hj
+  have hcard : (0 : ℝ) < Fintype.card ι := by
+    exact_mod_cast Fintype.card_pos_iff.mpr ⟨j⟩
+  rw [heq] at hj
+  refine hj.trans ?_
+  rw [div_le_iff₀ hcard]
+  exact mul_le_mul_of_nonneg_left (by exact_mod_cast hle) hα
+
+/-- **Simes inequality for perfectly correlated two-sided z-tests.** If `|Z j| = |Z₀|` for every
+`j` (for example every `Z j` is `Z₀` or `-Z₀`, correlations `±1`) and `Z₀` is standard normal,
+the Simes test applied to the two-sided p-values `2 (1 - Φ(|Z j|))` rejects with probability at
+most `α`, for every `α ≥ 0`. -/
+theorem measure_simes_twoSided_abs_eq (P : Measure Ω) (Z : ι → Ω → ℝ) (Z₀ : Ω → ℝ)
+    (hZ₀ : Measurable Z₀) (hlaw : P.map Z₀ = gaussianReal 0 1) (habs : ∀ j ω, |Z j ω| = |Z₀ ω|)
+    {α : ℝ} (hα : 0 ≤ α) :
+    P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)} ≤ ENNReal.ofReal α :=
+  measure_simes_le_of_forall_eq P _ _ (fun j ω => by rw [habs])
+    (isValidPValue_zTest_twoSided P Z₀ hZ₀ hlaw) hα
+
+end Identical
+
 section BivariateGaussian
 
 variable {Ω : Type*} [MeasurableSpace Ω]
@@ -793,41 +828,83 @@ theorem twoSided_key_ineq_gaussianPair (P : Measure Ω) [IsProbabilityMeasure P]
   rw [hset D]
   exact twoSided_key_ineq_direct P hX hYm hind hlawY ρ hβpos.ne' hU₀ hU₁ hD hsub hU₁up hDup
 
+/-- **Simes inequality for two two-sided z-tests of a bivariate normal vector, any correlation.**
+Let `Z 0`, `Z 1` be measurable, jointly Gaussian (the law of `ω ↦ (Z 0 ω, Z 1 ω)` on
+`Fin 2 → ℝ` is Gaussian) and each standard normal; the correlation `ρ ∈ [-1, 1]` is arbitrary.
+For the two-sided p-values `p j = 2 (1 - Φ(|Z j|))` and every `α ≥ 0`, the Simes test
+(`p₍₁₎ ≤ α / 2` or `p₍₂₎ ≤ α`) rejects with probability at most `α`. -/
+theorem measure_simes_twoSided_bivariateGaussian (P : Measure Ω) [IsProbabilityMeasure P]
+    (Z : Fin 2 → Ω → ℝ) (hZ : ∀ i, Measurable (Z i)) (hG : IsGaussian (P.map fun ω i => Z i ω))
+    (hlaw : ∀ i, P.map (Z i) = gaussianReal 0 1) {α : ℝ} (hα : 0 ≤ α) :
+    P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)} ≤ ENNReal.ofReal α := by
+  have hvec : HasGaussianLaw (fun ω i => Z i ω) P :=
+    IsGaussian.hasGaussianLaw (measurable_pi_iff.mpr hZ).aemeasurable
+  have hpair : ∀ i k, HasGaussianLaw (fun ω => (Z i ω, Z k ω)) P := fun i k => hvec.prodMk i k
+  have hHL : ∀ i, HasLaw (Z i) (gaussianReal 0 1) P := fun i => ⟨(hZ i).aemeasurable, hlaw i⟩
+  have hmem : ∀ i, MemLp (Z i) 2 P := fun i => (hvec.eval i).memLp_two
+  have hE : ∀ i, P[Z i] = 0 := fun i => by rw [(hHL i).integral_eq, integral_id_gaussianReal]
+  have hc : ∀ i, cov[Z i, Z i; P] = 1 := fun i => by
+    rw [covariance_self (hZ i).aemeasurable, (hHL i).variance_eq, variance_id_gaussianReal]; simp
+  set ρ := cov[Z 0, Z 1; P] with hρdef
+  have hc10 : cov[Z 1, Z 0; P] = ρ := by rw [covariance_comm]
+  have hmρ : MemLp (fun ω => ρ * Z 0 ω) 2 P := (hmem 0).const_mul ρ
+  have hmD : MemLp (fun ω => Z 1 ω - ρ * Z 0 ω) 2 P := (hmem 1).sub hmρ
+  have hDm : Measurable fun ω => Z 1 ω - ρ * Z 0 ω := (hZ 1).sub ((hZ 0).const_mul ρ)
+  have hvarD : Var[fun ω => Z 1 ω - ρ * Z 0 ω; P] = 1 - ρ ^ 2 := by
+    rw [← covariance_self hDm.aemeasurable, covariance_fun_sub_left (hmem 1) hmρ hmD,
+      covariance_fun_sub_right (hmem 1) (hmem 1) hmρ, covariance_fun_sub_right hmρ (hmem 1) hmρ,
+      covariance_const_mul_left, covariance_const_mul_left, covariance_const_mul_right,
+      covariance_const_mul_right, hc 0, hc 1, hc10, ← hρdef]
+    ring
+  have hle : ρ ^ 2 ≤ 1 := by
+    have := variance_nonneg (fun ω => Z 1 ω - ρ * Z 0 ω) P
+    linarith
+  rcases hle.lt_or_eq with hlt | heq
+  · refine measure_simes_two_of_key P Z hZ hlaw hα ?_
+    intro i k hik
+    fin_cases i <;> fin_cases k
+    · exact absurd rfl hik
+    · exact twoSided_key_ineq_gaussianPair P (hZ 0) (hZ 1) (hpair 0 1) (hlaw 0) (hlaw 1) hlt
+        (measurableSet_twoSidedRegion α) (measurableSet_twoSidedRegion (α / 2))
+        (measurableSet_twoSidedRegion α) (twoSidedRegion_mono (by linarith))
+        (twoSidedRegion_up _) (twoSidedRegion_up _)
+    · exact twoSided_key_ineq_gaussianPair P (hZ 1) (hZ 0) (hpair 1 0) (hlaw 1) (hlaw 0)
+        (by rw [hc10]; exact hlt)
+        (measurableSet_twoSidedRegion α) (measurableSet_twoSidedRegion (α / 2))
+        (measurableSet_twoSidedRegion α) (twoSidedRegion_mono (by linarith))
+        (twoSidedRegion_up _) (twoSidedRegion_up _)
+    · exact absurd rfl hik
+  · -- `|ρ| = 1`: `Z 1 = ρ Z 0` almost surely
+    have hρabs : |ρ| = 1 := by
+      have h : |ρ| ^ 2 = 1 := by rw [sq_abs]; exact heq
+      exact (pow_eq_one_iff_of_nonneg (abs_nonneg ρ) two_ne_zero).mp h
+    have hED : P[fun ω => Z 1 ω - ρ * Z 0 ω] = 0 := by
+      rw [integral_sub ((hmem 1).integrable one_le_two) (hmρ.integrable one_le_two),
+        integral_const_mul, hE 0, hE 1]
+      ring
+    have hae0 := ae_eq_integral_of_variance_eq_zero hmD (by rw [hvarD, heq]; ring)
+    have hae : ∀ᵐ ω ∂P, ∀ j, |Z j ω| = |Z 0 ω| := by
+      filter_upwards [hae0] with ω hω
+      rw [hED] at hω
+      intro j
+      fin_cases j
+      · rfl
+      · have h1 : Z 1 ω = ρ * Z 0 ω := by linarith
+        change |Z 1 ω| = |Z 0 ω|
+        rw [h1, abs_mul, hρabs, one_mul]
+    calc P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)}
+        = P {ω | 1 ≤ bhK α fun _ : Fin 2 => 2 * (1 - cdf (gaussianReal 0 1) |Z 0 ω|)} := by
+          refine measure_congr ?_
+          filter_upwards [hae] with ω hω
+          have e : (fun j => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)) =
+              fun _ : Fin 2 => 2 * (1 - cdf (gaussianReal 0 1) |Z 0 ω|) := by
+            funext j; rw [hω j]
+          rw [e]
+      _ ≤ ENNReal.ofReal α :=
+          measure_simes_twoSided_abs_eq P (fun _ : Fin 2 => Z 0) (Z 0) (hZ 0) (hlaw 0)
+            (fun _ _ => rfl) hα
+
 end BivariateGaussian
 
-section Identical
-
-variable {Ω ι : Type*} [MeasurableSpace Ω] [Fintype ι]
-
-/-- If all p-values equal one valid p-value `p₀`, the Simes test rejects only when `p₀ ≤ α`. -/
-theorem measure_simes_le_of_forall_eq (P : Measure Ω) (p : ι → Ω → ℝ) (p₀ : Ω → ℝ)
-    (heq : ∀ j ω, p j ω = p₀ ω) (hvalid : IsValidPValue P p₀) {α : ℝ} (hα : 0 ≤ α) :
-    P {ω | 1 ≤ bhK α fun j => p j ω} ≤ ENNReal.ofReal α := by
-  refine (measure_mono fun ω hω => ?_).trans (hvalid α hα)
-  simp only [Set.mem_ofPred_eq] at hω ⊢
-  have hc := bhK_le_bhCount (α := α) fun j => p j ω
-  have hle := bhK_le (α := α) fun j => p j ω
-  unfold bhCount at hc
-  obtain ⟨j, hj⟩ := Finset.card_pos.mp (lt_of_lt_of_le hω hc)
-  simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hj
-  have hcard : (0 : ℝ) < Fintype.card ι := by
-    exact_mod_cast Fintype.card_pos_iff.mpr ⟨j⟩
-  rw [heq] at hj
-  refine hj.trans ?_
-  rw [div_le_iff₀ hcard]
-  exact mul_le_mul_of_nonneg_left (by exact_mod_cast hle) hα
-
-/-- **Simes inequality for perfectly correlated two-sided z-tests.** If `|Z j| = |Z₀|` for every
-`j` (for example every `Z j` is `Z₀` or `-Z₀`, correlations `±1`) and `Z₀` is standard normal,
-the Simes test applied to the two-sided p-values `2 (1 - Φ(|Z j|))` rejects with probability at
-most `α`, for every `α ≥ 0`. -/
-theorem measure_simes_twoSided_abs_eq (P : Measure Ω) (Z : ι → Ω → ℝ) (Z₀ : Ω → ℝ)
-    (hZ₀ : Measurable Z₀) (hlaw : P.map Z₀ = gaussianReal 0 1) (habs : ∀ j ω, |Z j ω| = |Z₀ ω|)
-    {α : ℝ} (hα : 0 ≤ α) :
-    P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)} ≤ ENNReal.ofReal α :=
-  measure_simes_le_of_forall_eq P _ _ (fun j ω => by rw [habs])
-    (isValidPValue_zTest_twoSided P Z₀ hZ₀ hlaw) hα
-
-end Identical
 
 end Applied.MultipleTesting
