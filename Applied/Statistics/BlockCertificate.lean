@@ -353,7 +353,34 @@ def certOK (bins : List Bin) : Bool :=
   paramsOK blk αinv ETA && bins.all (binOK tab imax blk αinv ETA) && sortedOK bins &&
     decide (D < (bins.map (binTerm tab imax blk ETA)).sum)
 
+/-- Check of a chunk of bins: every bin passes and the terms add up to at least `S`. -/
+def chunkOK (l : List Bin) (S : ℕ) : Bool :=
+  l.all (binOK tab imax blk αinv ETA) && decide (S ≤ (l.map (binTerm tab imax blk ETA)).sum)
+
 variable {tab imax blk αinv ETA}
+
+lemma chunks_key : ∀ (chunks : List (List Bin)) (Ss : List ℕ),
+    List.Forall₂ (fun l S => chunkOK tab imax blk αinv ETA l S = true) chunks Ss →
+    (chunks.flatten.all (binOK tab imax blk αinv ETA) = true) ∧
+      Ss.sum ≤ (chunks.flatten.map (binTerm tab imax blk ETA)).sum := by
+  intro chunks Ss hch
+  induction hch with
+  | nil => simp
+  | @cons l S ls Ss' h _ ih =>
+    simp only [chunkOK, Bool.and_eq_true, decide_eq_true_eq] at h
+    simp only [List.flatten_cons, List.all_append, Bool.and_eq_true, List.map_append,
+      List.sum_append, List.sum_cons]
+    exact ⟨⟨h.1, ih.1⟩, Nat.add_le_add h.2 ih.2⟩
+
+/-- The certificate check can be run chunk by chunk. -/
+theorem certOK_of_chunks (hpar : paramsOK blk αinv ETA = true) (chunks : List (List Bin))
+    (Ss : List ℕ)
+    (hch : List.Forall₂ (fun l S => chunkOK tab imax blk αinv ETA l S = true) chunks Ss)
+    (hsorted : sortedOK chunks.flatten = true) (hD : D < Ss.sum) :
+    certOK tab imax blk αinv ETA chunks.flatten = true := by
+  have key := chunks_key chunks Ss hch
+  simp only [certOK, Bool.and_eq_true, decide_eq_true_eq]
+  exact ⟨⟨⟨hpar, key.1⟩, hsorted⟩, lt_of_lt_of_le hD key.2⟩
 
 lemma cellsOK_spec {zl zh : ℤ} : ∀ {cs : List ℕ}, cellsOK tab imax blk αinv ETA zl zh cs = true →
     ∀ j, j + 1 < cs.length → 0 < cs.getD (j + 1) 0 ∧ cs.getD (j + 1) 0 ≤ imax ∧
