@@ -41,11 +41,19 @@ single-deletion-correcting code of length `n` has at most `(1 + ε) 2ⁿ / n` wo
 code is decoded without error whenever at most one bit is deleted, so its error probability is
 at most the probability of two or more deletions (`info-deletion-single-deletion-decoding`,
 `Targets/InformationTheory/DeletionSingleDecoding.lean`). That probability tends to `1` with the
-length for fixed `d > 0`, so these codes give no positive lower bound on `C(d)`.
+length for fixed `d > 0`, so these codes by themselves give no positive lower bound on `C(d)`.
 
-Known but NOT formalized here: `C(d) > 0` for every `d < 1`, with lower bounds of
-order `(1 - d)/9` (in bits; constant to be confirmed) for `d → 1`; `C(d) = 1 - (1 + o(1)) h(d)`
-bits as `d → 0` (to be confirmed); Dobrushin's theorem that `C(d) = lim (1/n) max I(Xⁿ; Y)`.
+Also proved, in separate registry files: the classical lower bound `log 2 - h(d) ≤ C(d)` for
+`0 ≤ d ≤ 1/2` (`1 - H(d)` bits), the count of supersequences behind it, and continuity of `C`
+at `d = 0` and `d = 1` (`Targets/InformationTheory/DeletionLowerBound.lean`); `C(d) > 0` for
+every `0 ≤ d < 1`, with an explicit but small rate from a run-length code, e.g.
+`C(1/2) ≥ log 2 / 528` (`Targets/InformationTheory/DeletionPositiveCapacity.lean`); and
+`C(d') ≤ C(d)` for `0 ≤ d ≤ d' ≤ 1` (`Targets/InformationTheory/DeletionCapacityMonotone.lean`).
+None of these determines `C(d)` for any `0 < d < 1`.
+
+Known but NOT formalized here: lower bounds linear in `1 - d`, of order `(1 - d)/9` (in bits;
+constant to be confirmed), for `d → 1`; `C(d) = 1 - (1 + o(1)) h(d)` bits as `d → 0` (to be
+confirmed); Dobrushin's theorem that `C(d) = lim (1/n) max I(Xⁿ; Y)`.
 
 Review notes (modelling choices to check).
 
@@ -61,9 +69,9 @@ Review notes (modelling choices to check).
 * No feedback; the decoder knows `n` (it is a function on `DelOut n`) but not the deletion
   pattern.
 
-Not covered: every non-trivial bound on `C(d)` other than the erasure upper bound (in
-particular every positive lower bound); insertion and substitution errors; non-binary
-alphabets.
+Not covered: the value of `C(d)` for `0 < d < 1`; any upper bound sharper than the erasure
+bound; any lower bound beyond those listed above; continuity at interior points; insertion and
+substitution errors; non-binary alphabets.
 -/
 
 open Applied.InformationTheory
