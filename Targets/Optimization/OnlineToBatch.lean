@@ -1,4 +1,4 @@
-import Applied.Optimization.OnlineToBatch
+import Applied.Optimization.OnlineToBatchOGD
 
 /-!
 # Online-to-batch conversion: excess risk of the average iterate ≤ expected regret / T
@@ -30,13 +30,16 @@ Differences from the textbook statement. Textbooks assume `Z 0, Z 1, …` i.i.d.
 function of `Z 0, …, Z (t-1)`; here only the consequence actually used is assumed: `Z t` has
 law `μZ` and `x t` is independent of `Z t` (no joint independence of the samples is needed).
 Integrability hypotheses are explicit. Convexity of `F` is assumed on all of `E` (not on a
-domain `K`). Combining with the OGD regret bounds (`Targets.Optimization.OnlineGradientAnytimeRegret`)
-is done by applying `online_to_batch_of_regret_le` with `R` the deterministic regret bound for
-the losses `y ↦ ℓ (y, Z t ω)`; that instantiation (which needs measurability of the OGD
-iterates, a property of the projection selection) is NOT stated as a separate Lean theorem.
+domain `K`). Combination with OGD (`projected_ogd_online_to_batch`): if, in addition, for every `ω` the
+losses `y ↦ ℓ (y, Z t ω)` are convex and differentiable on `E`, `K` is convex with diameter
+`≤ D`, `x 0 ω ∈ K`, `x (t+1) ω` is a nearest point of `K` to
+`x t ω - (c/√(t+1)) ∇ℓ(·, Z t ω)(x t ω)` (`c > 0`), the gradients along the iterates are
+bounded by `G` for `t < T`, and `u ∈ K`, then `E[F x̄] - F u ≤ (D²/(2c) + c G²)/√T`. The
+measurability of the iterates and their independence from `Z t` remain hypotheses (they are
+not derived from the recursion).
 
 Not covered: high-probability versions (Cesa-Bianchi et al. 2004 via martingale
-concentration); the explicit OGD + online-to-batch rate theorem; non-convex risks; the
+concentration); non-convex risks; the
 last-iterate guarantee.
 -/
 
@@ -45,5 +48,6 @@ namespace Targets.Optimization
 alias integral_loss_indep_eq_integral_risk := Applied.Optimization.integral_comp_indep
 alias online_to_batch_conversion := Applied.Optimization.online_to_batch
 alias online_to_batch_of_regret_bound := Applied.Optimization.online_to_batch_of_regret_le
+alias projected_ogd_online_to_batch := Applied.Optimization.projected_ogd_online_to_batch
 
 end Targets.Optimization

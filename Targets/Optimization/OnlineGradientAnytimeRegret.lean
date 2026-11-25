@@ -24,7 +24,8 @@ For a nonempty closed convex `K` such iterates exist from any starting point.
 Not covered: losses defined or convex only on `K`, subgradients of non-differentiable losses,
 and the cases `D = 0` or `G = 0` of the tuned bound. The generic online-to-batch conversion
 (excess risk of the average iterate ≤ regret bound / `T`) is in
-`Targets.Optimization.OnlineToBatch`; its explicit combination with these bounds is not stated.
+`Targets.Optimization.OnlineToBatch`, together with its combination with the `c/√(t+1)` bound
+(`projected_ogd_online_to_batch`).
 -/
 
 namespace Targets.Optimization
