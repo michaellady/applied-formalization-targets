@@ -590,4 +590,213 @@ lemma sum_half_pow_mexp_le {I : Finset E} (hI : ∀ A ∈ F, #(I ∩ A) ≤ c A)
 
 end CollisionSum
 
+/-! ### The algorithm and the main theorem -/
+
+section Main
+
+variable (F : Finset (Finset E)) (c : Finset E → ℕ) {m : ℕ}
+
+/-- The elements of `I` that are kept (`k e = 0`) and whose colour differs from the colours of
+all other kept elements of `I`. -/
+def isoSet (I : Finset E) (ω : (E → Fin m) × ColSeed E) : Finset E :=
+  I.filter fun e => (ω.1 e : ℕ) = 0 ∧
+    ∀ f ∈ I, f ≠ e → (ω.1 f : ℕ) = 0 → colHom F c f ω.2 ≠ colHom F c e ω.2
+
+lemma card_isoSet_ge {I : Finset E} {e : E} (he : e ∈ I) (hm : 1 ≤ m) :
+    (Fintype.card ((E → Fin m) × ColSeed E) : ℝ) * (1 / m - 1 / (m * m) *
+        ∑ f ∈ I.erase e, (1 / 2 : ℝ) ^ mexp F c (fun A => e ∈ A ∧ f ∈ A)) ≤
+      #(univ.filter fun ω : (E → Fin m) × ColSeed E => e ∈ isoSet F c I ω) := by
+  set A0 : Finset ((E → Fin m) × ColSeed E) := univ.filter fun ω => (ω.1 e : ℕ) = 0 with hA0
+  set B : E → Finset ((E → Fin m) × ColSeed E) := fun f => univ.filter fun ω =>
+    ((ω.1 e : ℕ) = 0 ∧ (ω.1 f : ℕ) = 0) ∧ colHom F c e ω.2 = colHom F c f ω.2 with hB
+  have hsub : A0 ⊆ (univ.filter fun ω : ((E → Fin m) × ColSeed E) => e ∈ isoSet F c I ω) ∪ (I.erase e).biUnion B := by
+    intro ω hω
+    rw [hA0, mem_filter] at hω
+    by_cases hiso : e ∈ isoSet F c I ω
+    · exact mem_union_left _ (mem_filter.2 ⟨mem_univ _, hiso⟩)
+    · refine mem_union_right _ ?_
+      simp only [isoSet, mem_filter, he, hω.2, true_and, not_forall, not_not] at hiso
+      obtain ⟨f, hfI, hfe, hf0, hcol⟩ := hiso
+      exact mem_biUnion.2 ⟨f, mem_erase.2 ⟨hfe, hfI⟩,
+        mem_filter.2 ⟨mem_univ _, ⟨hω.2, hf0⟩, hcol.symm⟩⟩
+  have h1 := (Finset.card_le_card hsub).trans (Finset.card_union_le _ _)
+  have h2 := Finset.card_biUnion_le (s := I.erase e) (t := B)
+  have hcardOm : (Fintype.card ((E → Fin m) × ColSeed E) : ℝ) =
+      (Fintype.card (E → Fin m) : ℝ) * Fintype.card (ColSeed E) := by
+    rw [Fintype.card_prod, Nat.cast_mul]
+  have hmR : (0 : ℝ) < m := by exact_mod_cast hm
+  have hA0card : (#A0 : ℝ) = Fintype.card ((E → Fin m) × ColSeed E) / m := by
+    have : A0 = (univ.filter fun k : E → Fin m => (k e : ℕ) = 0) ×ˢ (univ : Finset (ColSeed E)) := by
+      ext ⟨k, x⟩; simp [hA0, Finset.mem_product]
+    rw [this, Finset.card_product, Finset.card_univ, hcardOm, eq_div_iff hmR.ne']
+    have := card_keep_one hm e
+    have h' : ((#(univ.filter fun k : E → Fin m => (k e : ℕ) = 0) : ℕ) : ℝ) * m =
+        Fintype.card (E → Fin m) := by exact_mod_cast this
+    rw [Nat.cast_mul, ← h']
+    ring
+  have hBcard : ∀ f ∈ I.erase e, (#(B f) : ℝ) ≤
+      Fintype.card ((E → Fin m) × ColSeed E) / (m * m) * (1 / 2) ^ mexp F c (fun A => e ∈ A ∧ f ∈ A) := by
+    intro f hf
+    have hfe : f ≠ e := (mem_erase.1 hf).1
+    have : B f = (univ.filter fun k : E → Fin m => (k e : ℕ) = 0 ∧ (k f : ℕ) = 0) ×ˢ
+        (univ.filter fun ω : ColSeed E => colHom F c e ω = colHom F c f ω) := by
+      ext ⟨k, x⟩; simp [hB, and_assoc, Finset.mem_product]
+    rw [this, Finset.card_product, Nat.cast_mul]
+    have hk := card_keep_two hm hfe.symm
+    have hk' : ((#(univ.filter fun k : E → Fin m => (k e : ℕ) = 0 ∧ (k f : ℕ) = 0) : ℕ) : ℝ) =
+        Fintype.card (E → Fin m) / (m * m) := by
+      rw [eq_div_iff (by positivity)]
+      exact_mod_cast hk
+    have hc := card_col_eq_mul_le (F := F) c hfe.symm
+    have hc' : ((#(univ.filter fun ω : ColSeed E => colHom F c e ω = colHom F c f ω) : ℕ) : ℝ) ≤
+        Fintype.card (ColSeed E) * (1 / 2) ^ mexp F c (fun A => e ∈ A ∧ f ∈ A) := by
+      have h2pos : (0 : ℝ) < 2 ^ mexp F c (fun A => e ∈ A ∧ f ∈ A) := by positivity
+      rw [one_div_pow, mul_one_div, le_div_iff₀ h2pos]
+      exact_mod_cast hc
+    rw [hk', hcardOm]
+    calc (Fintype.card (E → Fin m) : ℝ) / (m * m) *
+          ((#(univ.filter fun ω : ColSeed E => colHom F c e ω = colHom F c f ω) : ℕ) : ℝ)
+        ≤ (Fintype.card (E → Fin m) : ℝ) / (m * m) *
+          (Fintype.card (ColSeed E) * (1 / 2) ^ mexp F c (fun A => e ∈ A ∧ f ∈ A)) := by
+          gcongr
+      _ = _ := by ring
+  have h3 : ((∑ f ∈ I.erase e, #(B f) : ℕ) : ℝ) ≤
+      ∑ f ∈ I.erase e, Fintype.card ((E → Fin m) × ColSeed E) / (m * m) * (1 / 2 : ℝ) ^
+        mexp F c (fun A => e ∈ A ∧ f ∈ A) := by
+    push_cast
+    exact Finset.sum_le_sum hBcard
+  have h1' : (#A0 : ℝ) ≤ #(univ.filter fun ω : ((E → Fin m) × ColSeed E) => e ∈ isoSet F c I ω) +
+      ((∑ f ∈ I.erase e, #(B f) : ℕ) : ℝ) := by
+    exact_mod_cast h1.trans (Nat.add_le_add_left h2 _)
+  rw [← Finset.mul_sum] at h3
+  rw [hA0card] at h1'
+  have : (Fintype.card ((E → Fin m) × ColSeed E) : ℝ) * (1 / m - 1 / (m * m) *
+      ∑ f ∈ I.erase e, (1 / 2 : ℝ) ^ mexp F c (fun A => e ∈ A ∧ f ∈ A)) =
+      Fintype.card ((E → Fin m) × ColSeed E) / m - Fintype.card ((E → Fin m) × ColSeed E) / (m * m) *
+        ∑ f ∈ I.erase e, (1 / 2 : ℝ) ^ mexp F c (fun A => e ∈ A ∧ f ∈ A) := by ring
+  rw [this]
+  linarith
+
+end Main
+
+/-- **Laminar matroids of bounded depth: an explicit constant.** Let `F` be a laminar family of
+subsets of the finite type `E` with capacities `c`, and suppose every element of `E` lies in at
+most `h` members of `F`. Then the laminar matroid has a feasible randomized online algorithm
+that is `1/(8e(h+1))`-competitive.
+
+The algorithm: draw independently, uniformly, `k : E → Fin (4(h+1))` and a colour seed; keep the
+elements `e` with `k e = 0` that are not loops; colour the elements by the XOR colouring
+`colHom` (at most `2^⌊log₂ c A⌋ ≤ c A` colours inside each `A ∈ F`); run the `⌊nᵢ/e⌋` rule
+independently in each colour class of the kept elements. -/
+theorem hasCompetitiveRandomized_laminar {E : Type} [Fintype E] (F : Finset (Finset E))
+    (hF : IsLaminar F) (c : Finset E → ℕ) (h : ℕ) (hh : ∀ e, #(F.filter (e ∈ ·)) ≤ h) :
+    HasCompetitiveRandomized (laminar F hF c) (1 / (8 * Real.exp 1 * (h + 1))) := by
+  set m := 4 * (h + 1) with hm
+  have hm1 : 1 ≤ m := by omega
+  set Ω := (E → Fin m) × ColSeed E
+  have hne : Nonempty Ω := ⟨(fun _ => ⟨0, by omega⟩, 0)⟩
+  obtain ⟨R, hR⟩ : ∃ R : Ω → Set E,
+      R = fun ω => {e | (ω.1 e : ℕ) = 0 ∧ ∀ A ∈ F, e ∈ A → 1 ≤ c A} := ⟨_, rfl⟩
+  set col : Ω → E → Fin (Nat.log 2 (Fintype.card E)) → ZMod 2 := fun ω e => colHom F c e ω.2
+    with hcol
+  set alg : Ω → OnlineAlg E := fun ω => restrictAlg (R ω) (partitionSecretaryRule (col ω))
+    with halg
+  have hw' : ∀ (ω : Ω) (w : E → ℝ), (∀ e, 0 ≤ w e) →
+      ∀ e, 0 ≤ (fun x => if x ∈ R ω then w x else 0) e :=
+    fun ω w hw e => by dsimp only; split_ifs <;> simp [hw e]
+  refine hasCompetitiveRandomized_of_sum alg (fun ω σ w hw => ?_) fun w hw I hI => ?_
+  · -- feasibility
+    have hsel : selected (alg ω) σ w =
+        (selected (partitionSecretaryRule (col ω)) σ
+          (fun x => if x ∈ R ω then w x else 0)).filter (· ∈ R ω) := by
+      ext x; simp [halg, accepts_restrictAlg, and_comm]
+    rw [hsel, laminar_indep_iff_finset]
+    intro A hA
+    set S := (selected (partitionSecretaryRule (col ω)) σ
+      (fun x => if x ∈ R ω then w x else 0)).filter (· ∈ R ω) with hS
+    have hinj : Set.InjOn (col ω) (S : Set E) :=
+      (partitionOne_indep_iff.1 (partitionSecretaryRule_isFeasible (col ω) σ _ (hw' ω w hw))).mono
+        (Finset.coe_subset.2 (Finset.filter_subset _ _))
+    by_cases hSA : (S ∩ A).Nonempty
+    · obtain ⟨e, he⟩ := hSA
+      have heR : e ∈ R ω := (mem_filter.1 (mem_inter.1 he).1).2
+      rw [hR] at heR
+      have hc1 : 1 ≤ c A := heR.2 A hA (mem_inter.1 he).2
+      calc #(S ∩ A) ≤ 2 ^ mexp F c (A ⊆ ·) :=
+            card_le_of_injOn_col c hF hA ω.2 inter_subset_right
+              (hinj.mono (by simp))
+        _ ≤ 2 ^ Nat.log 2 (c A) :=
+            Nat.pow_le_pow_right (by norm_num) (mexp_le F c hA (subset_refl A))
+        _ ≤ c A := Nat.pow_log_le_self 2 (by omega)
+    · rw [not_nonempty_iff_eq_empty.1 hSA]
+      simp
+  · -- competitiveness
+    rw [laminar_indep_iff_finset] at hI
+    have hnl : ∀ e ∈ I, ∀ A ∈ F, e ∈ A → 1 ≤ c A := fun e he A hA heA =>
+      le_trans (Finset.card_pos.2 ⟨e, mem_inter.2 ⟨he, heA⟩⟩) (hI A hA)
+    -- for every seed, the kept isolated elements are a partial transversal of the colours
+    have hstep : ∀ ω : Ω, 1 / Real.exp 1 * ∑ e ∈ isoSet F c I ω, w e ≤ expWeight (alg ω) w := by
+      intro ω
+      rw [halg, expWeight_restrictAlg]
+      have hJR : ∀ e ∈ isoSet F c I ω, e ∈ R ω := by
+        intro e he
+        simp only [isoSet, mem_filter] at he
+        rw [hR]
+        exact ⟨he.2.1, hnl e he.1⟩
+      have hinjJ : Set.InjOn (col ω) (isoSet F c I ω : Set E) := by
+        intro e he f hf hef
+        by_contra hne
+        simp only [isoSet, coe_filter, Set.mem_ofPred_eq] at he hf
+        exact he.2.2 f hf.1 (Ne.symm hne) hf.2.1 hef.symm
+      have := partitionSecretaryRule_isCompetitive (col ω) _ (hw' ω w hw) _
+        (partitionOne_indep_iff.2 hinjJ)
+      have hsum : ∑ e ∈ isoSet F c I ω, w e =
+          ∑ e ∈ isoSet F c I ω, (fun x => if x ∈ R ω then w x else 0) e :=
+        Finset.sum_congr rfl fun e he => by simp [hJR e he]
+      rw [hsum]
+      exact this
+    have hswap : ∑ ω : Ω, ∑ e ∈ isoSet F c I ω, w e =
+        ∑ e ∈ I, (#(univ.filter fun ω : Ω => e ∈ isoSet F c I ω) : ℝ) * w e := by
+      have : ∀ ω : Ω, ∑ e ∈ isoSet F c I ω, w e =
+          ∑ e ∈ I, if e ∈ isoSet F c I ω then w e else 0 := by
+        intro ω
+        rw [← Finset.sum_filter]
+        congr 1
+        ext e
+        simp only [isoSet, mem_filter]
+        tauto
+      simp only [this]
+      rw [Finset.sum_comm]
+      refine Finset.sum_congr rfl fun e _ => ?_
+      rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
+    have hmR : (m : ℝ) = 4 * (h + 1) := by rw [hm]; push_cast; ring
+    have hh1 : (0 : ℝ) < h + 1 := by positivity
+    have hcount : ∀ e ∈ I, (Fintype.card Ω : ℝ) * (1 / (8 * (h + 1))) ≤
+        #(univ.filter fun ω : Ω => e ∈ isoSet F c I ω) := by
+      intro e he
+      refine le_trans ?_ (card_isoSet_ge F c he hm1)
+      have hsumle := sum_half_pow_mexp_le (F := F) (c := c) hI he (hh e)
+      apply mul_le_mul_of_nonneg_left _ (Nat.cast_nonneg _)
+      rw [hmR]
+      have hmm : (0 : ℝ) ≤ 1 / (4 * (h + 1) * (4 * (h + 1))) := by positivity
+      have := mul_le_mul_of_nonneg_left hsumle hmm
+      have heq : 1 / (4 * ((h : ℝ) + 1)) - 1 / (4 * (h + 1) * (4 * (h + 1))) * (2 * (h + 1)) =
+          1 / (8 * (h + 1)) := by
+        field_simp
+        ring
+      linarith
+    have hexp : (0 : ℝ) < Real.exp 1 := Real.exp_pos 1
+    calc 1 / (8 * Real.exp 1 * (h + 1)) * (∑ e ∈ I, w e) * Fintype.card Ω
+        = 1 / Real.exp 1 * ∑ e ∈ I, (Fintype.card Ω : ℝ) * (1 / (8 * (h + 1))) * w e := by
+          rw [Finset.mul_sum, Finset.sum_mul, Finset.mul_sum]
+          refine Finset.sum_congr rfl fun e _ => ?_
+          field_simp
+      _ ≤ 1 / Real.exp 1 * ∑ e ∈ I, (#(univ.filter fun ω : Ω => e ∈ isoSet F c I ω) : ℝ) * w e := by
+          gcongr with e he
+          · exact hw e
+          · exact hcount e he
+      _ = ∑ ω : Ω, 1 / Real.exp 1 * ∑ e ∈ isoSet F c I ω, w e := by
+          rw [← Finset.mul_sum, hswap]
+      _ ≤ ∑ ω : Ω, expWeight (alg ω) w := Finset.sum_le_sum fun ω _ => hstep ω
+
 end Applied.Economics.MatroidSecretary
