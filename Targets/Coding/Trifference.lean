@@ -1,6 +1,4 @@
-import Applied.Coding.Trifference
-import Mathlib.Analysis.SpecialFunctions.Log.Base
-import Mathlib.Order.LiminfLimsup
+import Applied.Coding.TrifferenceLower
 
 /-!
 # Open: the trifference problem (rate of ternary perfect 3-hash codes)
@@ -13,41 +11,63 @@ import Mathlib.Order.LiminfLimsup
 - prerequisites: finite combinatorics only
 - statement-review: unreviewed
 
-Informal statement. Let `T(n)` (`trifferenceMax n` below) be the largest size of a code in `{0,1,2}ⁿ` in which any three
-distinct codewords take three different values in some coordinate. The open problem is to
-determine the growth rate `lim sup (log₂ T(n)) / n` (`trifferenceRate` below). It is a quantity
-whose value is unknown, so there is no proposition to assert.
+Informal statement. Let `T(n)` (`trifferenceMax n` below) be the largest size of a code in
+`{0,1,2}ⁿ` in which any three distinct codewords take three different values in some
+coordinate. The open problem is to determine the growth rate `lim sup (log₂ T(n)) / n`
+(`trifferenceRate` below). It is a quantity whose value is unknown, so there is no proposition
+to assert. (For `n = 0` the term `log₂ T(0) / 0` is `0` by Lean's division convention; this
+does not affect the `lim sup`.) A self-contained statement file with a specific open
+proposition is `Targets/Coding/TrifferenceOpen.lean`.
 
-What is proved: Körner's upper bound `T(n) ≤ 2 (3/2)ⁿ`, stated both for individual codes and for
-`trifferenceMax`. On paper this gives rate at most `log₂ (3/2) ≈ 0.585`; that consequence for
-`trifferenceRate` is not formalized. Exact values of `T(n)` for `n ≤ 4` are in
-`Targets/Coding/TrifferenceSmall.lean`; no lower bound growing with `n` is formalized.
+`trifferenceMax` and `trifferenceRate` are now defined in `Applied/Coding/TrifferenceRate.lean`;
+the names here are abbreviations of those.
+
+What is proved:
+* Körner's upper bound `T(n) ≤ 2 (3/2)ⁿ`, for individual codes and for `trifferenceMax`;
+* the rate sequence is bounded (between `0` and `1 + log₂ (3/2)`), and
+  `0 ≤ trifferenceRate ≤ log₂ (3/2) ≈ 0.585`;
+* a lower bound growing with `n`: `T(n) ≥ (1/4) (√(9/7))ⁿ` for every `n`, by random coding
+  with alteration, hence `trifferenceRate ≥ log₂ √(9/7) = (1/2) log₂ (9/7) ≈ 0.181`.
+
+Not covered: the better lower bounds in the literature (for example the Körner–Marton bound
+`T(n) ≥ (9/5)^{n/4}`, rate about `0.212`; to be confirmed) and the improvements of the upper
+bound below `log₂ (3/2)` (reported in recent work, to be confirmed).
 -/
 
 namespace Targets.Coding
 
 alias trifferent_card_le := Applied.Coding.IsTrifferent.card_le
 
-open Classical in
 /-- `T(n)`: the largest size of a trifferent code of length `n`. -/
-noncomputable def trifferenceMax (n : ℕ) : ℕ :=
-  ((Finset.univ : Finset (Finset (Fin n → Fin 3))).filter Applied.Coding.IsTrifferent).sup
-    Finset.card
+noncomputable abbrev trifferenceMax (n : ℕ) : ℕ := Applied.Coding.trifferenceMax n
 
 /-- **Open quantity.** The exponential growth rate of `T(n)`, in bits per symbol. -/
-noncomputable def trifferenceRate : ℝ :=
-  Filter.limsup (fun n : ℕ => Real.logb 2 (trifferenceMax n) / n) Filter.atTop
+noncomputable abbrev trifferenceRate : ℝ := Applied.Coding.trifferenceRate
 
 /-- Körner's bound for `T(n)`. -/
-theorem trifferenceMax_le (n : ℕ) : (trifferenceMax n : ℝ) ≤ 2 * (3 / 2 : ℝ) ^ n := by
-  classical
-  unfold trifferenceMax
-  by_cases h : ((Finset.univ : Finset (Finset (Fin n → Fin 3))).filter
-      Applied.Coding.IsTrifferent).Nonempty
-  · obtain ⟨C, hC, hsup⟩ := Finset.exists_mem_eq_sup _ h Finset.card
-    rw [hsup]
-    exact (Finset.mem_filter.mp hC).2.card_le
-  · rw [Finset.not_nonempty_iff_eq_empty.mp h]
-    simp; positivity
+theorem trifferenceMax_le (n : ℕ) : (trifferenceMax n : ℝ) ≤ 2 * (3 / 2 : ℝ) ^ n :=
+  Applied.Coding.trifferenceMax_le n
+
+/-- `T(n)` is attained by a trifferent code. -/
+theorem exists_trifferent_card_eq_trifferenceMax (n : ℕ) :
+    ∃ C : Finset (Fin n → Fin 3), Applied.Coding.IsTrifferent C ∧ C.card = trifferenceMax n :=
+  Applied.Coding.exists_isTrifferent_card_eq_trifferenceMax n
+
+/-- Körner's bound for the rate: `trifferenceRate ≤ log₂ (3/2)`. -/
+theorem trifferenceRate_le : trifferenceRate ≤ Real.logb 2 (3 / 2) :=
+  Applied.Coding.trifferenceRate_le
+
+/-- `0 ≤ trifferenceRate`. -/
+theorem trifferenceRate_nonneg : 0 ≤ trifferenceRate :=
+  Applied.Coding.trifferenceRate_nonneg
+
+/-- Exponential lower bound: `T(n) ≥ (1/4) (√(9/7))ⁿ`. -/
+theorem trifferenceMax_ge (n : ℕ) :
+    (1 / 4 : ℝ) * Real.sqrt (9 / 7) ^ n ≤ trifferenceMax n :=
+  Applied.Coding.trifferenceMax_ge n
+
+/-- Lower bound for the rate: `log₂ √(9/7) ≤ trifferenceRate`. -/
+theorem trifferenceRate_ge : Real.logb 2 (Real.sqrt (9 / 7)) ≤ trifferenceRate :=
+  Applied.Coding.trifferenceRate_ge
 
 end Targets.Coding
