@@ -4,12 +4,12 @@ import Mathlib.Probability.Distributions.Gaussian.Basic
 import Mathlib.Probability.CDF
 
 /-!
-# Open: Simes and Benjamini–Hochberg for two-sided tests of correlated normal statistics
+# Open (Simes) and refuted (Benjamini–Hochberg): two-sided tests of correlated normal statistics
 
 - id: stat-open-two-sided-gaussian
 - area: statistics
 - status: open
-- source: S. K. Sarkar, "On the Simes inequality and its generalization" (2008); S. K. Sarkar, arXiv:2304.05261 (2023); Y. Benjamini, "Discovering the false discovery rate", J. R. Statist. Soc. B 72 (2010)
+- source: S. K. Sarkar, "On the Simes inequality and its generalization" (2008); S. K. Sarkar, arXiv:2304.05261 (2023); Y. Benjamini, "Discovering the false discovery rate", J. R. Statist. Soc. B 72 (2010); A. Reiner-Benaim, Biometrical J. 49 (2007) 107–126. For the Benjamini–Hochberg half, two 2026 preprints give a refutation (the first is machine-checked in `BHTwoSidedCounterexample.lean`): E. Dobriban, "The Benjamini–Hochberg Procedure Can Fail to Control the FDR for Correlated Two-Sided Gaussian Tests", arXiv:2607.12208v1 (13 Jul 2026), Theorem 1; L. Lei, "How Much Can Gaussian Dependence Inflate the Benjamini-Hochberg Procedure's FDR?", arXiv:2607.14812v4 (9 Oct 2026), Theorem 2.1 with Proposition 2.3
 - used-in: any study applying Hochberg, Hommel or Benjamini–Hochberg to two-sided z- or t-tests with correlated statistics, which is the usual situation in practice
 - prerequisites: multivariate normal distribution; rungs 5, 9 and 10 of the roadmap
 - statement-review: unreviewed
@@ -20,12 +20,39 @@ correlation matrix, and let `p i = 2 (1 - Φ(|Z i|))` be the two-sided p-values.
 * `SimesTwoSidedGaussian`: under the global null, the Simes test rejects with probability at
   most `α`. Reported as a long-standing conjecture; no counterexample found in our search.
 * `BHTwoSidedGaussian`: Benjamini–Hochberg controls the false discovery rate at `α` when the
-  true nulls have mean zero. Long conjectured; a web search in November 2026 surfaced a
-  preprint attributed to E. Dobriban, titled "The Benjamini–Hochberg procedure can fail to
-  control the FDR for correlated two-sided Gaussian tests" (citation to be confirmed; we have
-  not read or verified it). Treat the truth value as unknown.
+  true nulls have mean zero. Conjectured for about twenty years (Reiner-Benaim 2007, Benjamini
+  2010, Sarkar 2023). Two preprints of July 2026, both read for this project on 25 Nov 2026,
+  claim it is false:
+  - Dobriban (arXiv:2607.12208v1, Theorem 1): in a one-factor model with `m = 100 N`
+    hypotheses (`96 N` true nulls `0.3 Z + √0.91 εᵢ`, `N` non-nulls `2.4 - 0.3 Z + √0.91 ηⱼ`,
+    `3 N` non-nulls `4.4 - 0.72 Z + (√301 / 25) ξₖ`, positive definite correlation matrix), at
+    `α = 0.01` the false discovery rate exceeds `0.0104` for all sufficiently large `N`. The
+    proof is asymptotic (conditioning on `Z`, Glivenko–Cantelli, Fatou) and ends with an
+    interval-arithmetic certificate over 1000 bins of `Z` and a grid of 7425 thresholds, run
+    with the Arb library; the preprint states the proof was produced by a language model and
+    checked by the author.
+  - Lei (arXiv:2607.14812v4, Theorem 2.1 and Propositions 2.2–2.3): for every `q ∈ (0, 1)` there
+    are finite Gaussian models with positive definite correlation matrix whose false discovery
+    rate is arbitrarily close to an explicit `ℓ₌(q) > q`, with
+    `ℓ₌(q) = q √(log(1/q)) / (2 √π) + 0.6492828… q + o(q)`; so no bound of the form `C q` holds.
+  We do not know of a peer-reviewed version of either preprint. The statement is now refuted
+  in Lean: `not_bhTwoSidedGaussian` in `Targets/Statistics/BHTwoSidedCounterexample.lean` proves
+  `¬ BHTwoSidedGaussian` from Dobriban's model at level `1/100` (false discovery rate above
+  `0.0104` for all sufficiently large `N`, as in the preprint's Theorem 1), with a
+  finite-sample argument and a certificate checked by the Lean kernel. This establishes the
+  statement of the preprint's Theorem 1 by a different argument and a different certificate; it
+  does not check the preprint's own proof or its Arb certificate. The threshold `N₀` is not
+  explicit and, from the proof, astronomically large (about `10⁵⁰`; the mechanism involves
+  p-value thresholds near `10⁻¹⁷`), so nothing is proved here for any practical number of
+  hypotheses, and positive definiteness of the correlation matrix of the Lean witness is not
+  proved (the statement does not require it). Dobriban's Theorem 1 was formalized in Lean 4
+  before us, following the preprint's asymptotic proof, by L. Ramirez
+  (github.com/Mnehmos/BHFormalization, July 2026, `GaussianBHCounterexample`; read, not built by
+  us); that project does not state the general conjecture or its negation. Lei's results are
+  not formalized. The `def` below is kept unchanged so that the refutation can refer to it.
 
-Both are written as propositions, not theorems, so nothing here asserts them.
+Both are written as propositions, not theorems, so nothing here asserts them. The first is
+open; the second is false (see above).
 
 What is proved: two-sided p-values of a standard normal statistic are valid
 (`isValidPValue_twoSidedP`); the Simes bound holds for independent statistics
@@ -53,15 +80,23 @@ with `0 ≤ ρ ≤ 1` (`simesTwoSidedGaussian_of_oneFactorCov`,
 after a change of signs, the condition of Karlin and Rinott (1981)
 (`simesTwoSidedGaussian_of_karlinRinott`, `Targets/Statistics/TwoSidedKarlinRinott.lean`).
 Hochberg and Hommel are proved under corresponding hypotheses on the true nulls. These are the
-cases covered by the literature (absolute values MTP2; Sarkar 1998). What remains open is
-`SimesTwoSidedGaussian` for correlation matrices outside these classes, already for three
-statistics (for example equicorrelated with negative correlation).
+classical cases (absolute values MTP2; Karlin–Rinott, Sarkar 1998). In this project
+`SimesTwoSidedGaussian` is unproved for correlation matrices outside these classes, already
+for three statistics (for example equicorrelated with negative correlation). Further partial
+results exist in the literature and are not formalized here: X. Zhang, "Exact Simes
+inequalities for two-sided Gaussian tests", arXiv:2611.02513 (2026; abstract checked
+2026-11-25), reports validity for every fixed number of statistics at all sufficiently small
+`α`, the case of three statistics at `α = 0.05` (computer-assisted), and structured cases with
+many statistics, and states that the general question remains open.
 
-`BHTwoSidedGaussian`: according to information given to us (E. Dobriban, arXiv:2607.12208; L.
-Lei, arXiv:2607.14812; not verified by us and not formalised in this file) the proposition is
-false, with a one-factor counterexample having mean-shifted false nulls. The false discovery
-rate bounds proved in `TwoSidedOneFactor.lean` and `TwoSidedKarlinRinott.lean` concern only false
-nulls that are centred or do not load on the factor, and do not contradict this.
+Results on the Benjamini–Hochberg half: `Targets/Statistics/BHTwoSidedCounterexample.lean`
+(the refutation); `Targets/Statistics/TwoSidedBHElementary.lean` (false discovery rate at most
+`α` when all true-null p-values coincide, in particular with a single true null; a
+two-hypothesis example above `α m₀ / m`); `Targets/Statistics/BHFactorModelLowerBound.lean`
+and `Targets/Statistics/NormalCdfTable.lean` (the tools).
+The false discovery rate bounds proved in `TwoSidedOneFactor.lean` and
+`TwoSidedKarlinRinott.lean` concern only false nulls that are centred or do not load on the
+factor, and do not contradict the refutation.
 -/
 
 open MeasureTheory ProbabilityTheory Finset
@@ -85,9 +120,10 @@ def SimesTwoSidedGaussian : Prop :=
     ∀ α : ℝ, 0 ≤ α → α ≤ 1 →
       P {ω | 1 ≤ bhK α fun i => twoSidedP (Z i ω)} ≤ ENNReal.ofReal α
 
-/-- **Open, disputed.** Benjamini–Hochberg controls the false discovery rate for two-sided
-tests of jointly normal statistics with unit variances and arbitrary correlation, the true
-nulls being the coordinates with mean zero. -/
+/-- **Refuted** (`Targets.Statistics.not_bhTwoSidedGaussian` in
+`Targets/Statistics/BHTwoSidedCounterexample.lean`); conjectured until 2026. Benjamini–Hochberg
+controls the false discovery rate for two-sided tests of jointly normal statistics with unit
+variances and arbitrary correlation, the true nulls being the coordinates with mean zero. -/
 def BHTwoSidedGaussian : Prop :=
   ∀ (n : ℕ) (Ω : Type) (_ : MeasurableSpace Ω) (P : Measure Ω) (_ : IsProbabilityMeasure P)
     (Z : Fin n → Ω → ℝ) (H₀ : Finset (Fin n)), (∀ i, Measurable (Z i)) →
