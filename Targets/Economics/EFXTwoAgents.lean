@@ -26,7 +26,7 @@ for arbitrary finite types of goods and agents with a definition `Applied.Econom
 that unfolds to the registry definition on `Fin` (`isEFX_iff_applied`).
 
 Not covered: non-additive (general monotone) valuations, which is the generality of the cited
-paper; three agents (`Targets.Economics.efx_exists_three`, still open here); chores. The proof
+paper; three agents are covered in `Targets/Economics/EFXThreeAgents.lean`; chores. The proof
 for identical valuations is a greedy argument specific to additive valuations (goods in
 decreasing order of value, each to a poorest agent), not the leximin++ argument of the paper.
 -/
