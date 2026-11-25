@@ -22,8 +22,15 @@ related but not identical, and the reviewer should decide which one the registry
 The bound is written `K * d + K` so that it is meaningful when `d = 0`.
 
 What is proved: the definition is satisfiable (keeping the whole sample is a scheme of size
-`|X|`). Known on paper and not formalized: schemes of size exponential in `d`
-(Moran–Yehudayoff).
+`|X|`). Partial results in separate entries: the library's VC dimension agrees with Mathlib's
+and satisfies Sauer–Shelah (`Targets/Learning/SauerShelahVC.lean`); every finite class has a
+scheme of size `⌊log₂ |𝒞|⌋` (`CompressionHalving.lean`); a scheme of size `k` forces
+`vcDim 𝒞 ≤ 5 k`, so the conjectured bound would be optimal up to the constant
+(`CompressionLowerBound.lean`); thresholds on a finite linear order have a scheme of size `1`
+(`CompressionThresholds.lean`); and a scheme of size `k` gives the Littlestone–Warmuth
+generalization bound (`CompressionGeneralization.lean`). None of these bounds the scheme size
+by a function of the VC dimension alone, so the conjecture is untouched. Known on paper and
+not formalized: schemes of size exponential in `d` (Moran–Yehudayoff).
 -/
 
 namespace Targets.Learning
