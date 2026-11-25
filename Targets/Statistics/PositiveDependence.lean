@@ -12,14 +12,26 @@ import Applied.Statistics.PRDS
 - statement-review: unreviewed
 
 Informal statement. Suppose the p-values are valid under their nulls and positively regression
-dependent on the true nulls: for a true null `i` and an increasing set `D` of p-value vectors,
+dependent on the true nulls in the following form: for a true null `i` and an increasing set `D` of p-value vectors,
 the conditional probability of `D` given `p i ≤ t` does not decrease in `t`. Then
 Benjamini–Hochberg at level `α` has false discovery rate at most `α m₀ / m`. Under the global
 null this gives the Simes inequality, hence family-wise error control for Hommel and Hochberg.
 
-The dependence condition is the "conditioning on `p i ≤ t`" form of Blanchard and Roquain,
-written without division. Not yet covered: that specific distributions (for example
-one-sided tests of positively correlated normals) satisfy it.
+The dependence condition, stated plainly. `Applied.MultipleTesting.IsPRDSOn` is the
+conditioning-on-`pᵢ ≤ t` form used by Blanchard and Roquain (sometimes called weak PRDS),
+cleared of denominators: `P(D, pᵢ ≤ s) · P(pᵢ ≤ t) ≤ P(D, pᵢ ≤ t) · P(pᵢ ≤ s)` for `s ≤ t`.
+It is not the definition of Benjamini and Yekutieli, whose PRDS conditions on `pᵢ = t`. The
+classical condition is believed to imply this form (standard in the literature), but that
+implication is not formalized here. Every theorem named "under PRDS" or "of_prds" in this
+project is proved under this form. So the first alias below is Benjamini–Yekutieli's Theorem 1.2 with their
+hypothesis replaced by this form, not with their hypothesis verbatim.
+
+Hochberg's procedure here is the textbook step-up rule, including its treatment of tied
+p-values (a block of ties uses the divisor of its last position); see
+`Targets/Statistics/Simes.lean`.
+
+Not yet covered: that specific distributions (for example one-sided tests of positively
+correlated normals) satisfy the condition.
 -/
 
 namespace Targets.Statistics
