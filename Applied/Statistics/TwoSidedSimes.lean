@@ -167,4 +167,135 @@ theorem foldedMeasure_mul_le {m m' : ℝ} (hm : |m'| ≤ |m|) {v : ℝ≥0} (hv 
 
 end FoldedNormal
 
+section Folding
+
+/-- The variance `b ^ 2` as a non-negative real. -/
+noncomputable def sqNN (b : ℝ) : ℝ≥0 := ⟨b ^ 2, sq_nonneg b⟩
+
+lemma sqNN_ne_zero {b : ℝ} (hb : b ≠ 0) : sqNN b ≠ 0 := by
+  intro h
+  have h' : b ^ 2 = 0 := congrArg NNReal.toReal h
+  exact hb (pow_eq_zero_iff (n := 2) (by norm_num) |>.mp h')
+
+lemma map_affine_gaussian (t b : ℝ) :
+    (gaussianReal 0 1).map (fun x => t + b * x) = gaussianReal t (sqNN b) := by
+  have : (fun x : ℝ => t + b * x) = (t + ·) ∘ (b * ·) := rfl
+  rw [this, ← Measure.map_map (measurable_const_add t) (measurable_const_mul b),
+    gaussianReal_map_const_mul, gaussianReal_map_const_add]
+  congr 1
+  · simp
+  · ext; simp [sqNN]; rfl
+
+lemma foldedMeasure_union (m : ℝ) (v : ℝ≥0) {A B : Set ℝ} (hd : Disjoint A B)
+    (hB : MeasurableSet B) :
+    foldedMeasure m v (A ∪ B) = foldedMeasure m v A + foldedMeasure m v B := by
+  simp only [foldedMeasure, measure_union hd hB]
+  ring
+
+/-- For `S ⊆ (0, ∞)`, `N(t, v)(|y| ∈ S) = N(t, v)(S) + N(-t, v)(S)`. -/
+lemma gaussianReal_abs_mem (t : ℝ) (v : ℝ≥0) {S : Set ℝ} (hS : MeasurableSet S)
+    (hpos : S ⊆ Set.Ioi 0) :
+    gaussianReal t v {y | |y| ∈ S} = foldedMeasure t v S := by
+  have hset : {y : ℝ | |y| ∈ S} = S ∪ (fun y => -y) ⁻¹' S := by
+    ext y
+    simp only [Set.mem_ofPred_eq, Set.mem_union, Set.mem_preimage]
+    rcases abs_cases y with ⟨h, _⟩ | ⟨h, _⟩ <;> rw [h]
+    · constructor
+      · exact Or.inl
+      · rintro (hy | hy)
+        · exact hy
+        · have := hpos hy; simp only [Set.mem_Ioi] at this; linarith
+    · constructor
+      · exact Or.inr
+      · rintro (hy | hy)
+        · have := hpos hy; simp only [Set.mem_Ioi] at this; linarith
+        · exact hy
+  have hd : Disjoint S ((fun y => -y) ⁻¹' S) := by
+    rw [Set.disjoint_left]
+    intro y hy hy'
+    have h1 := hpos hy
+    have h2 := hpos hy'
+    simp only [Set.mem_Ioi] at h1 h2
+    linarith
+  rw [hset, measure_union hd (measurable_neg hS), ← Measure.map_apply measurable_neg hS,
+    gaussianReal_map_neg, foldedMeasure]
+
+/-- The probability that `|t + b X| ∈ U`, `X` standard normal, `b ≠ 0`, through the folded
+normal law on `(0, ∞)`. -/
+lemma gaussianReal_abs_affine_mem (t : ℝ) {b : ℝ} (hb : b ≠ 0) {U : Set ℝ}
+    (hU : MeasurableSet U) :
+    gaussianReal 0 1 {x | |t + b * x| ∈ U} = foldedMeasure t (sqNN b) (U ∩ Set.Ioi 0) := by
+  have hmeas : Measurable fun x : ℝ => t + b * x := (measurable_const_mul b).const_add t
+  have hU' : MeasurableSet {y : ℝ | |y| ∈ U} := measurable_norm hU
+  have e : gaussianReal 0 1 {x | |t + b * x| ∈ U} = gaussianReal t (sqNN b) {y | |y| ∈ U} := by
+    rw [← map_affine_gaussian, Measure.map_apply hmeas hU']
+    rfl
+  rw [e, ← gaussianReal_abs_mem t _ (hU.inter measurableSet_Ioi) Set.inter_subset_right]
+  have := nullSingletonClass_gaussianReal (μ := t) (sqNN_ne_zero hb)
+  refine le_antisymm ?_ (measure_mono fun y hy => hy.1)
+  calc gaussianReal t (sqNN b) {y | |y| ∈ U}
+      ≤ gaussianReal t (sqNN b) ({y | |y| ∈ U ∩ Set.Ioi 0} ∪ {0}) := by
+        refine measure_mono fun y hy => ?_
+        by_cases h0 : y = 0
+        · exact Or.inr h0
+        · exact Or.inl ⟨hy, abs_pos.mpr h0⟩
+    _ ≤ gaussianReal t (sqNN b) {y | |y| ∈ U ∩ Set.Ioi 0} + gaussianReal t (sqNN b) {0} :=
+        measure_union_le _ _
+    _ = _ := by rw [measure_singleton, add_zero]
+
+end Folding
+
+section Mixture
+
+lemma lintegral_symm_sum (μ : Measure ℝ) {f g : ℝ → ℝ≥0∞} (hf : Measurable f)
+    (hg : Measurable g) :
+    ∫⁻ w, ∫⁻ v, (f w * g v + f v * g w) ∂μ ∂μ =
+      (∫⁻ w, f w ∂μ) * (∫⁻ w, g w ∂μ) + (∫⁻ w, f w ∂μ) * (∫⁻ w, g w ∂μ) := by
+  have inner : ∀ w, ∫⁻ v, (f w * g v + f v * g w) ∂μ =
+      f w * (∫⁻ v, g v ∂μ) + (∫⁻ v, f v ∂μ) * g w := by
+    intro w
+    rw [lintegral_add_left (hg.const_mul _), lintegral_const_mul _ hg, lintegral_mul_const _ hf]
+  simp_rw [inner]
+  rw [lintegral_add_left (hf.mul_const _), lintegral_mul_const _ hf, lintegral_const_mul _ hg]
+
+/-- **Symmetrisation over a mixing variable.** Let `g₀`, `g₁`, `h` be measurable functions of a
+real variable `w` such that `h` is non-decreasing in `|w|` and `g₁ / g₀` is non-decreasing in
+`|w|` (cleared of denominators). Then `∫ g₀ h * ∫ g₁ ≤ ∫ g₁ h * ∫ g₀`. -/
+theorem lintegral_mixture_mul_le (μ : Measure ℝ) {g₀ g₁ h : ℝ → ℝ≥0∞}
+    (hg₀ : Measurable g₀) (hg₁ : Measurable g₁) (hh : Measurable h)
+    (hmono : ∀ w v, |v| ≤ |w| → h v ≤ h w)
+    (hmlr : ∀ w v, |v| ≤ |w| → g₁ v * g₀ w ≤ g₁ w * g₀ v) :
+    (∫⁻ w, g₀ w * h w ∂μ) * ∫⁻ w, g₁ w ∂μ ≤ (∫⁻ w, g₁ w * h w ∂μ) * ∫⁻ w, g₀ w ∂μ := by
+  have key : ∀ w v, |v| ≤ |w| →
+      g₀ w * h w * g₁ v + g₀ v * h v * g₁ w ≤ g₁ w * h w * g₀ v + g₁ v * h v * g₀ w := by
+    intro w v hvw
+    obtain ⟨R, hR⟩ : ∃ R, g₁ w * g₀ v = g₁ v * g₀ w + R :=
+      ⟨_, (add_tsub_cancel_of_le (hmlr w v hvw)).symm⟩
+    have hh' := hmono w v hvw
+    calc g₀ w * h w * g₁ v + g₀ v * h v * g₁ w
+        = g₁ v * g₀ w * h w + (g₁ w * g₀ v) * h v := by ring
+      _ = g₁ v * g₀ w * h w + g₁ v * g₀ w * h v + R * h v := by rw [hR]; ring
+      _ ≤ g₁ v * g₀ w * h w + g₁ v * g₀ w * h v + R * h w := by gcongr
+      _ = (g₁ w * g₀ v) * h w + g₁ v * g₀ w * h v := by rw [hR]; ring
+      _ = _ := by ring
+  have hpt : ∀ w v,
+      g₀ w * h w * g₁ v + g₀ v * h v * g₁ w ≤ g₁ w * h w * g₀ v + g₁ v * h v * g₀ w := by
+    intro w v
+    rcases le_total |v| |w| with h1 | h1
+    · exact key w v h1
+    · calc g₀ w * h w * g₁ v + g₀ v * h v * g₁ w = g₀ v * h v * g₁ w + g₀ w * h w * g₁ v :=
+            add_comm _ _
+        _ ≤ g₁ v * h v * g₀ w + g₁ w * h w * g₀ v := key v w h1
+        _ = _ := add_comm _ _
+  have hint : ∫⁻ w, ∫⁻ v, (g₀ w * h w * g₁ v + g₀ v * h v * g₁ w) ∂μ ∂μ ≤
+      ∫⁻ w, ∫⁻ v, (g₁ w * h w * g₀ v + g₁ v * h v * g₀ w) ∂μ ∂μ :=
+    lintegral_mono fun w => lintegral_mono fun v => hpt w v
+  rw [lintegral_symm_sum μ (f := fun w => g₀ w * h w) (hg₀.mul hh) hg₁,
+    lintegral_symm_sum μ (f := fun w => g₁ w * h w) (hg₁.mul hh) hg₀] at hint
+  by_contra hlt
+  rw [not_le] at hlt
+  exact absurd hint (not_le.mpr (ENNReal.add_lt_add hlt hlt))
+
+end Mixture
+
 end Applied.MultipleTesting
