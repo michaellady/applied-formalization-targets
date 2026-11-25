@@ -40,6 +40,12 @@ Partial results in other files (none of them proves or refutes the conjecture).
   elements), every family has length at most `n * (d + 1) ^ ⌊log₂ n⌋ ≤ n ^ (1 + log₂ (d + 1))`
   (Kalai–Kleitman style argument). The link from polytope graphs to that setting is NOT
   formalized, so this gives no bound on polytope diameters here.
+* `Targets/Optimization/ZeroOnePolytopeDiameter.lean`: Naddef's theorem (1989): for a set `S`
+  of 0/1-points of `ℝ ^ d`, any two extreme points of `convexHull ℝ S` are joined by a walk of
+  at most `d` edges (`naddef_zeroOne_diameter`), even of at most `hammingDist u v` edges; the
+  bound `d` is attained by the cube. These polytopes are given as convex hulls, not as
+  `{x | A x ≤ b}`; the translation (Minkowski–Weyl) is not formalized, so this does not
+  formally instantiate `PolynomialHirsch` for that class.
 
 Review notes (modelling choices to check).
 * The polytope is given by `m` inequalities, not by its facets, and the bound is in the number
