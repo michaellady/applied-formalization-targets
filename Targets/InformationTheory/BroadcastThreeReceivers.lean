@@ -28,8 +28,16 @@ recorded as the set `broadcastCapacityRegion W`; no proposition is asserted.
 
 What is proved: error probabilities lie in `[0, 1]` for a row-stochastic `W`
 (`errorProb_nonneg`, `errorProb_le_one`); the zero rate triple is achievable and belongs to the
-region (`zero_mem_broadcastCapacityRegion`). Nothing else: in particular it is not proved here
-that the region is bounded or convex (both are standard).
+region (`zero_mem_broadcastCapacityRegion`). Nothing else in this file; convexity of the region
+(standard) is not proved anywhere in the library.
+
+Partial result elsewhere: an elementary outer bound is proved in
+`Targets/InformationTheory/BroadcastOuterBound.lean`. For a row-stochastic `W` with output
+alphabets in universe `Type`, every point of the region has `0 ≤ Rⱼ ≤ C(Wⱼ)` (`Wⱼ` the marginal
+channel to receiver `j`, `C` the information capacity) and `R₁ + R₂ + R₃ ≤ C(W)`
+(`broadcastCapacityRegion_subset`), so the region is bounded
+(`isBounded_broadcastCapacityRegion`). This outer bound is not tight in general and does not
+determine the region.
 
 Review notes (modelling choices and doubts to check).
 
