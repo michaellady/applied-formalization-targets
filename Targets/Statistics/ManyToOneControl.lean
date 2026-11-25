@@ -15,8 +15,8 @@ Informal statement. Throughout, `P` is a probability measure, the treatments are
 finite type, `Φ` is the standard normal distribution function, and "positively regression
 dependent" means `Applied.MultipleTesting.IsPRDSOn`: the conditioning-on-`pᵢ ≤ t` form of
 Blanchard and Roquain (weak PRDS), cleared of denominators, not the definition of Benjamini
-and Yekutieli, which conditions on `pᵢ = t`. That the classical condition implies this form is
-not formalized.
+and Yekutieli, which conditions on `pᵢ = t`. That the classical condition
+implies this form is proved separately, in `Applied/Statistics/ClassicalPRDS.lean`.
 
 Model. `X₀` (control) and `X j` (treatments) are measurable real random variables, the `X j`
 are mutually independent and `X₀` is independent of the vector `(X j)`. The comparison
