@@ -16,9 +16,10 @@ crossing the stopping boundary for the first time is at most the increment of a
 non-decreasing spending function, then the overall type-I error is at most the total amount
 spent. No assumption is made on the joint distribution of the interim statistics.
 
-Not yet covered: the joint normal distribution of interim statistics with independent
-increments, and the fact that boundaries computed from it achieve a given spending function.
-That is where the Brownian-motion foundations are needed.
+The marginal laws, covariances and independent normal increments of the interim statistics are
+in `Targets/Statistics/GroupSequentialCanonical.lean`. Not yet covered: that the vector of
+interim statistics is multivariate normal as a joint law, and that boundaries computed from
+it achieve a given spending function.
 -/
 
 namespace Targets.Statistics
