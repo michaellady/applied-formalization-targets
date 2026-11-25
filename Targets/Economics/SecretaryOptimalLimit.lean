@@ -9,7 +9,7 @@ import Applied.Economics.SecretaryArrivalOptimal
 - source: D. V. Lindley, "Dynamic programming and decision theory", Applied Statistics 10 (1961); textbook account: T. S. Ferguson, "Who solved the secretary problem?", Statistical Science 4 (1989), Section 2 (exact statements to be confirmed). The explicit two-sided bound `1/e ≤ M n ≤ 1/e + 1/n` is elementary; we have not located it in this exact form (to be confirmed)
 - used-in: online selection, optimal stopping
 - prerequisites: `Real.log`, `Real.exp`, harmonic-sum bounds
-- formalized-elsewhere: according to `PRIOR-ART-VERIFICATION.md` (row 8a), atlas-lean (`tendsto_winProb_optimalThreshold`) and cslib-frontier (`1/e ± 1/n`) formalize limit/bound results of this kind; their exact statements were not compared with this one
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/OptimalStopping/Secretary.lean` (`tendsto_winProb_optimalThreshold`); cslib-frontier `exp_neg_one_le_successProb_optimalCutoff` and the `1/e ± 1/n` bounds (equivalent limit and bound results according to the cross-check of 25 Nov 2026). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `M n = max_{0 ≤ r ≤ n} P(r)` with `P(0) = 1/n` and

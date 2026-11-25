@@ -9,6 +9,7 @@ import Applied.Statistics.EValues
 - source: R. Wang, A. Ramdas, "False discovery rate control with e-values", J. R. Statist. Soc. B 84 (2022) (the e-BH procedure and its FDR bound; theorem number to be confirmed); the e-to-p calibration `1 / e` is standard, see V. Vovk, R. Wang, "E-values: calibration, combination and applications", Ann. Statist. 49 (2021) (statement number to be confirmed)
 - used-in: multiple testing with dependent test statistics, sequential and anytime-valid inference, combining evidence across studies
 - prerequisites: Markov's inequality and linearity of the Lebesgue integral
+- formalized-elsewhere: lmlexplore `LMLExplore/EValues/MultipleTesting/EBH.lean` :: `lintegral_fdp_le_of_isEVar`, `IsCompoundEVar.lintegral_fdp_eBH_le` (more general: any self-consistent procedure, composite nulls, compound e-values; the statement here is the special case of e-BH with simple nulls). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. An e-value under `P` is a statistic `e` with values in `[0, ∞]` and

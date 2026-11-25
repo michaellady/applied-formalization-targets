@@ -9,6 +9,7 @@ import Applied.Economics.Finance
 - source: H. R. Stoll, "The relationship between put and call option prices", J. Finance 24 (1969)
 - used-in: option pricing; arbitrage checks
 - prerequisites: linearity of the integral
+- formalized-elsewhere: atlas-lean `Domains/Economics/Finance/PutCallParity.lean` :: `putCallParity` (abstract additive pricing functional; equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Under any pricing measure, the price of a European call minus the price of

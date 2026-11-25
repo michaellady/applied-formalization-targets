@@ -9,6 +9,7 @@ import Applied.Economics.SecondWelfare
 - source: K. J. Arrow, "An extension of the basic theorems of classical welfare economics" (1951); G. Debreu, "Theory of Value" (1959); textbook form: Mas-Colell, Whinston, Green, "Microeconomic Theory" (1995), Section 16.D (proposition numbering to be confirmed)
 - used-in: the case for lump-sum redistribution plus markets; decentralisation of efficient allocations; planning problems in macroeconomics
 - prerequisites: Mathlib's geometric Hahn–Banach theorem (`geometric_hahn_banach_open_point`), quasi-concave functions, Fréchet–Riesz representation, interiors of convex sets in finite dimension; Mathlib has no welfare theorems (searched for `Pareto`, `Walras`, `welfare`)
+- formalized-elsewhere: atlas-lean `Domains/Economics/SecondWelfareTheorem.lean` :: `exists_isQuasiEquilibriumWithTransfers`; cslib-frontier `Market/Welfare.lean` (different model: quasi-equilibrium with transfers on the non-negative orthant there). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Pure exchange, finitely many agents `i : ι`, commodity space a real inner

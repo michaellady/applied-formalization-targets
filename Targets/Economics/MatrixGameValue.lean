@@ -9,6 +9,7 @@ import Applied.Economics.MatrixValue
 - source: standard lemma in the theory of stochastic games, used in L. S. Shapley, "Stochastic games", PNAS 39 (1953) 1095–1100, to show that the Shapley operator is a contraction; textbook form e.g. in J. Filar, K. Vrieze, "Competitive Markov Decision Processes", Springer 1997 (section and lemma numbers to be confirmed)
 - used-in: Shapley operator of stochastic games, robustness of zero-sum games to payoff perturbations
 - prerequisites: von Neumann's minimax theorem (`Applied.Economics.exists_value`, from Mathlib's Sion theorem)
+- formalized-elsewhere: elazarg/GameTheory `GameTheory/Analysis/MatrixValue.lean` :: `value_le_of_entrywise_le`, `abs_value_sub_le_of_entrywise_abs_le` (equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `m`, `n` be finite nonempty types and `A`, `B : Matrix m n ℝ`.

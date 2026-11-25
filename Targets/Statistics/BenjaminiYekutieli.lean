@@ -9,6 +9,7 @@ import Applied.Statistics.BenjaminiYekutieli
 - source: Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Theorem 1.3
 - used-in: genomics and imaging studies where test statistics are correlated in unknown ways
 - prerequisites: Lebesgue integral of finite sums; no independence
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/MultipleTesting/BenjaminiHochberg.lean` :: `integral_falseDiscoveryProportion_bhRejections_le_of_arbitrary_dependence` (same theorem with the level rescaled by the harmonic number). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. With measurable p-values that are valid under their nulls and no

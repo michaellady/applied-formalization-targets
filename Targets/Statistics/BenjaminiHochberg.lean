@@ -9,7 +9,7 @@ import Applied.Statistics.BenjaminiHochberg
 - source: Y. Benjamini, Y. Hochberg, "Controlling the false discovery rate: a practical and powerful approach to multiple testing", J. R. Statist. Soc. B 57 (1995), Theorem 1
 - used-in: genomics, neuroimaging, large-scale A/B testing, screening studies; one of the most cited papers in statistics
 - prerequisites: independence, Lebesgue integral of finite sums
-- formalized-elsewhere: not checked
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/MultipleTesting/BenjaminiHochberg.lean` :: `integral_falseDiscoveryProportion_bhRejections_le_of_isValidPValue` (assumes all p-values mutually independent and level in `[0, 1]`; the sharp form here needs only leave-one-out independence of each true null and `α ≥ 0`). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Test `m` hypotheses with p-values that are measurable, valid under their

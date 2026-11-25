@@ -12,6 +12,11 @@ import Applied.Statistics.ClosedTesting
   block of ties uses the divisor of its last position); `hochberg_subset_hommel`,
   `fwer_hochberg_le`. `hochberg_firstPosition_subset`: it rejects at least what the more
   conservative first-position rule rejects.
+* `fwer_hommel_le_of_null_iIndepFun`, `fwer_hochberg_le_of_null_iIndepFun`,
+  `measure_simesLocal_le_of_null_iIndepFun`: the same bounds assuming independence only among
+  the p-values of the true nulls (the hypothesis used in the literature). `fwer_hommel_le` and
+  `fwer_hochberg_le` assume that all p-values are independent, which is more than needed. In
+  `measure_one_le_bhK_le` every hypothesis is a true null, so there the two hypotheses agree.
 -/
 
 open MeasureTheory ProbabilityTheory Finset
@@ -236,6 +241,44 @@ theorem fwer_hochberg_le (P : Measure Ω) [IsProbabilityMeasure P] (hα : 0 ≤ 
     (hvalid : ∀ i ∈ H₀, IsValidPValue P (p i)) :
     fwer P H₀ (hochberg α p) ≤ ENNReal.ofReal α := by
   refine (measure_mono ?_).trans (fwer_hommel_le P hα p hmeas hindep H₀ hvalid)
+  rintro ω ⟨i, hi, hrej⟩
+  exact ⟨i, hi, hochberg_subset_hommel hα p ω hrej⟩
+
+/-! ### Independence among the true nulls only
+
+The theorems above assume that *all* p-values are mutually independent. The literature needs
+independence only among the p-values of the true nulls; the p-values of the false nulls may
+be arbitrary (any joint law, any dependence on the null p-values). The versions below take
+`iIndepFun (fun j : H₀ => p j) P` and imply the versions above. -/
+
+omit [Fintype ι] in
+/-- The Simes test of the true intersection hypothesis has level `α`, when the p-values of the
+true nulls are mutually independent. Nothing is assumed about the other p-values. -/
+theorem measure_simesLocal_le_of_null_iIndepFun (P : Measure Ω) [IsProbabilityMeasure P]
+    (hα : 0 ≤ α) (p : ι → Ω → ℝ) (hmeas : ∀ i, Measurable (p i)) (H₀ : Finset ι)
+    (hindep : iIndepFun (fun j : H₀ => p j) P) (hvalid : ∀ i ∈ H₀, IsValidPValue P (p i)) :
+    P {ω | simesLocal α p H₀ ω} ≤ ENNReal.ofReal α :=
+  measure_one_le_bhK_le P hα (fun j : H₀ => p j) (fun j => hmeas j) hindep fun j => hvalid j j.2
+
+/-- **Hommel's procedure** controls the family-wise error rate when the p-values of the true
+nulls are mutually independent. Nothing is assumed about the dependence of the other p-values.
+`fwer_hommel_le` is the special case in which all p-values are independent. -/
+theorem fwer_hommel_le_of_null_iIndepFun (P : Measure Ω) [IsProbabilityMeasure P] (hα : 0 ≤ α)
+    (p : ι → Ω → ℝ) (hmeas : ∀ i, Measurable (p i)) (H₀ : Finset ι)
+    (hindep : iIndepFun (fun j : H₀ => p j) P) (hvalid : ∀ i ∈ H₀, IsValidPValue P (p i)) :
+    fwer P H₀ (hommel α p) ≤ ENNReal.ofReal α :=
+  fwer_closedTest_le P _ H₀ _
+    (measure_simesLocal_le_of_null_iIndepFun P hα p hmeas H₀ hindep hvalid)
+
+/-- **Hochberg's procedure** controls the family-wise error rate when the p-values of the true
+nulls are mutually independent. Nothing is assumed about the dependence of the other p-values.
+`fwer_hochberg_le` is the special case in which all p-values are independent. -/
+theorem fwer_hochberg_le_of_null_iIndepFun (P : Measure Ω) [IsProbabilityMeasure P]
+    (hα : 0 ≤ α) (p : ι → Ω → ℝ) (hmeas : ∀ i, Measurable (p i)) (H₀ : Finset ι)
+    (hindep : iIndepFun (fun j : H₀ => p j) P) (hvalid : ∀ i ∈ H₀, IsValidPValue P (p i)) :
+    fwer P H₀ (hochberg α p) ≤ ENNReal.ofReal α := by
+  refine (measure_mono ?_).trans
+    (fwer_hommel_le_of_null_iIndepFun P hα p hmeas H₀ hindep hvalid)
   rintro ω ⟨i, hi, hrej⟩
   exact ⟨i, hi, hochberg_subset_hommel hα p ω hrej⟩
 

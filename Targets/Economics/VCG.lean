@@ -9,6 +9,7 @@ import Applied.Economics.VCG
 - source: W. Vickrey, J. Finance 16 (1961); E. H. Clarke, "Multipart pricing of public goods", Public Choice 11 (1971); T. Groves, "Incentives in teams", Econometrica 41 (1973); textbook form: N. Nisan, T. Roughgarden, É. Tardos, V. Vazirani (eds.), "Algorithmic Game Theory" (2007), Chapter 9 (theorem numbers to be confirmed)
 - used-in: mechanism design, combinatorial auctions, public-project provision
 - prerequisites: finite sums and finite suprema only
+- formalized-elsewhere: econcslib-bei `EconCSLib/MechanismDesign/Auction/VCG.lean` :: `VCGMechanism_isDSIC`, `VCGMechanism_truthful_quasiLinearUtility_nonneg`; elazarg/GameTheory `Mechanism/Groves.lean` (equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. There are a finite nonempty set `A` of outcomes and finitely many agents.

@@ -9,6 +9,7 @@ import Applied.Economics.StableMatchingOpposition
 - source: D. E. Knuth, "Mariages stables" (1976); textbook form: A. E. Roth, M. Sotomayor, "Two-Sided Matching" (1990), Chapter 2 (theorem numbers to be confirmed)
 - used-in: structure theory of stable matchings (lattice, men-optimal = women-pessimal), market design
 - prerequisites: linear orders, bijections
+- formalized-elsewhere: cslib-frontier `CslibFrontier/Algorithms/Lean/StableMatching/Basic.lean` :: `recvRank_le_of_propRank_le` (equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Setting of `econ-stable-matching-existence`: sets `M`, `W`, strict

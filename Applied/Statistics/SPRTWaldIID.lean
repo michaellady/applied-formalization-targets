@@ -12,6 +12,10 @@ the likelihood ratio `Λ n = ∏ i < n, p₁ (X i) / p₀ (X i)` is the density 
 to `P₀` on `F n` (`wald_density_iid`), so the abstract hypotheses `WaldSetup` hold for every
 `F`-stopping time (`waldSetup_iid`), and Wald's bounds `α ≤ (1 - β) / A`, `β ≤ B (1 - α)` follow
 (`sprt_alpha_le_iid`, `sprt_beta_le_iid`).
+
+The assumption `p₀ > 0` everywhere is relaxed at the end of the file to
+`∀ᵐ x ∂ν, 0 < p₁ x → 0 < p₀ x` (`wald_density_iid_of_ac`, `waldSetup_iid_of_ac`,
+`sprt_alpha_le_iid_of_ac`, `sprt_beta_le_iid_of_ac`).
 -/
 
 open MeasureTheory ProbabilityTheory
@@ -178,5 +182,131 @@ theorem sprt_beta_le_iid (hX : ∀ i, Measurable (X i)) (hind₀ : iIndepFun X P
     P₁ (stoppedEvent τ (likelihoodRatioProcess p₀ p₁ X) (· ∈ Set.Iic B)) ≤
       ENNReal.ofReal B * (1 - P₀ Rej) :=
   wald_beta_le (waldSetup_iid hX hind₀ hind₁ h0 h1 hp₀ hp₁ hm₀ hm₁ hτ) B hRej hdisj
+
+/-! ### Null densities that may vanish
+
+The theorems above assume `0 < p₀ x` for every `x`. The versions below replace this by
+`∀ᵐ x ∂ν, 0 < p₁ x → 0 < p₀ x`: outside a `ν`-null set, the alternative density vanishes
+wherever the null density is not positive. This is absolute continuity of the alternative law
+of one observation with respect to the null law, expressed through the densities, and it is
+implied by `∀ x, 0 < p₀ x`. The likelihood ratio is still `p₁ x / p₀ x` with real division, so
+it is `0` where `p₀ x = 0`. -/
+
+omit [IsProbabilityMeasure P₀] in
+/-- `wald_density_iid` with `p₀ > 0` only `ν`-almost everywhere. -/
+theorem wald_density_iid_of_ae_pos (hX : ∀ i, Measurable (X i)) (hind₀ : iIndepFun X P₀)
+    (hind₁ : iIndepFun X P₁)
+    (h0 : ∀ i, P₀.map (X i) = ν.withDensity fun x => ENNReal.ofReal (p₀ x))
+    (h1 : ∀ i, P₁.map (X i) = ν.withDensity fun x => ENNReal.ofReal (p₁ x))
+    (hp₀ : ∀ᵐ x ∂ν, 0 < p₀ x) (hp₁ : ∀ x, 0 ≤ p₁ x) (hm₀ : Measurable p₀)
+    (hm₁ : Measurable p₁) (n : ℕ) (S : Set Ω) (hS : MeasurableSet[obsFiltration X n] S) :
+    P₁ S = ∫⁻ ω in S, ENNReal.ofReal (likelihoodRatioProcess p₀ p₁ X n ω) ∂P₀ := by
+  classical
+  set q : E → ℝ := fun x => if 0 < p₀ x then p₀ x else 1 with hq
+  have hqpos : ∀ x, 0 < q x := by
+    intro x
+    simp only [hq]
+    split_ifs with h
+    · exact h
+    · exact one_pos
+  have hqm : Measurable q :=
+    Measurable.ite (measurableSet_lt measurable_const hm₀) hm₀ measurable_const
+  have hqe : ∀ᵐ x ∂ν, q x = p₀ x := by
+    filter_upwards [hp₀] with x hx
+    simp [hq, hx]
+  have h0' : ∀ i, P₀.map (X i) = ν.withDensity fun x => ENNReal.ofReal (q x) := by
+    intro i
+    rw [h0 i]
+    exact withDensity_congr_ae (hqe.mono fun x hx => by
+      show ENNReal.ofReal (p₀ x) = ENNReal.ofReal (q x)
+      rw [hx])
+  rw [wald_density_iid hX hind₀ hind₁ h0' h1 hqpos hp₁ hqm hm₁ n S hS]
+  have hae : ∀ᵐ ω ∂P₀, ∀ i, q (X i ω) = p₀ (X i ω) := by
+    rw [ae_all_iff]
+    intro i
+    have h : ∀ᵐ x ∂(P₀.map (X i)), q x = p₀ x := by
+      rw [h0 i]
+      exact (withDensity_absolutelyContinuous _ _).ae_le hqe
+    exact ae_of_ae_map (hX i).aemeasurable h
+  refine lintegral_congr_ae (ae_restrict_of_ae ?_)
+  filter_upwards [hae] with ω hω
+  rw [likelihoodRatioProcess_apply, likelihoodRatioProcess_apply]
+  congr 1
+  exact Finset.prod_congr rfl fun i _ => by rw [hω i]
+
+omit [IsProbabilityMeasure P₀] in
+/-- **The likelihood ratio is the density of `P₁` with respect to `P₀` on `F n`**, for a null
+density that may vanish: it is enough that, `ν`-almost everywhere, `p₁ x > 0` implies
+`p₀ x > 0`. No sign condition on `p₀` is needed (`ENNReal.ofReal` truncates negative values). -/
+theorem wald_density_iid_of_ac (hX : ∀ i, Measurable (X i)) (hind₀ : iIndepFun X P₀)
+    (hind₁ : iIndepFun X P₁)
+    (h0 : ∀ i, P₀.map (X i) = ν.withDensity fun x => ENNReal.ofReal (p₀ x))
+    (h1 : ∀ i, P₁.map (X i) = ν.withDensity fun x => ENNReal.ofReal (p₁ x))
+    (hac : ∀ᵐ x ∂ν, 0 < p₁ x → 0 < p₀ x) (hp₁ : ∀ x, 0 ≤ p₁ x) (hm₀ : Measurable p₀)
+    (hm₁ : Measurable p₁) (n : ℕ) (S : Set Ω) (hS : MeasurableSet[obsFiltration X n] S) :
+    P₁ S = ∫⁻ ω in S, ENNReal.ofReal (likelihoodRatioProcess p₀ p₁ X n ω) ∂P₀ := by
+  have hs : MeasurableSet {x | 0 < p₀ x} := measurableSet_lt measurable_const hm₀
+  have hf₀ : Measurable fun x => ENNReal.ofReal (p₀ x) := hm₀.ennreal_ofReal
+  have hf₁ : Measurable fun x => ENNReal.ofReal (p₁ x) := hm₁.ennreal_ofReal
+  have e₀ : (ν.restrict {x | 0 < p₀ x}).withDensity (fun x => ENNReal.ofReal (p₀ x))
+      = ν.withDensity fun x => ENNReal.ofReal (p₀ x) := by
+    rw [← restrict_withDensity hs]
+    refine Measure.restrict_eq_self_of_ae_mem ?_
+    rw [ae_withDensity_iff hf₀]
+    exact Filter.Eventually.of_forall fun x hx => ENNReal.ofReal_pos.mp (pos_iff_ne_zero.mpr hx)
+  have e₁ : (ν.restrict {x | 0 < p₀ x}).withDensity (fun x => ENNReal.ofReal (p₁ x))
+      = ν.withDensity fun x => ENNReal.ofReal (p₁ x) := by
+    rw [← restrict_withDensity hs]
+    refine Measure.restrict_eq_self_of_ae_mem ?_
+    rw [ae_withDensity_iff hf₁]
+    filter_upwards [hac] with x hx hne
+    exact hx (ENNReal.ofReal_pos.mp (pos_iff_ne_zero.mpr hne))
+  exact wald_density_iid_of_ae_pos (ν := ν.restrict {x | 0 < p₀ x}) hX hind₀ hind₁
+    (fun i => (h0 i).trans e₀.symm) (fun i => (h1 i).trans e₁.symm) (ae_restrict_mem hs) hp₁
+    hm₀ hm₁ n S hS
+
+omit [IsProbabilityMeasure P₀] in
+/-- `waldSetup_iid` for a null density that may vanish. -/
+theorem waldSetup_iid_of_ac (hX : ∀ i, Measurable (X i)) (hind₀ : iIndepFun X P₀)
+    (hind₁ : iIndepFun X P₁)
+    (h0 : ∀ i, P₀.map (X i) = ν.withDensity fun x => ENNReal.ofReal (p₀ x))
+    (h1 : ∀ i, P₁.map (X i) = ν.withDensity fun x => ENNReal.ofReal (p₁ x))
+    (hac : ∀ᵐ x ∂ν, 0 < p₁ x → 0 < p₀ x) (hp₁ : ∀ x, 0 ≤ p₁ x) (hm₀ : Measurable p₀)
+    (hm₁ : Measurable p₁)
+    {τ : Ω → ℕ∞} (hτ : ∀ n, MeasurableSet[obsFiltration X n] {ω | τ ω = n}) :
+    WaldSetup P₀ P₁ (obsFiltration X) (likelihoodRatioProcess p₀ p₁ X) τ where
+  le := obsFiltration_le hX
+  stop := hτ
+  adapted := measurable_obsFiltration_likelihoodRatioProcess hm₀ hm₁
+  density := wald_density_iid_of_ac hX hind₀ hind₁ h0 h1 hac hp₁ hm₀ hm₁
+
+omit [IsProbabilityMeasure P₀] in
+/-- **Wald's `A α ≤ 1 - β` for i.i.d. observations**, for a null density that may vanish. -/
+theorem sprt_alpha_le_iid_of_ac (hX : ∀ i, Measurable (X i)) (hind₀ : iIndepFun X P₀)
+    (hind₁ : iIndepFun X P₁)
+    (h0 : ∀ i, P₀.map (X i) = ν.withDensity fun x => ENNReal.ofReal (p₀ x))
+    (h1 : ∀ i, P₁.map (X i) = ν.withDensity fun x => ENNReal.ofReal (p₁ x))
+    (hac : ∀ᵐ x ∂ν, 0 < p₁ x → 0 < p₀ x) (hp₁ : ∀ x, 0 ≤ p₁ x) (hm₀ : Measurable p₀)
+    (hm₁ : Measurable p₁)
+    {τ : Ω → ℕ∞} (hτ : ∀ n, MeasurableSet[obsFiltration X n] {ω | τ ω = n}) (A : ℝ)
+    {Acc : Set Ω} (hAcc : MeasurableSet Acc)
+    (hdisj : Disjoint Acc (stoppedEvent τ (likelihoodRatioProcess p₀ p₁ X) (· ∈ Set.Ici A))) :
+    ENNReal.ofReal A * P₀ (stoppedEvent τ (likelihoodRatioProcess p₀ p₁ X) (· ∈ Set.Ici A)) ≤
+      1 - P₁ Acc :=
+  wald_alpha_le (waldSetup_iid_of_ac hX hind₀ hind₁ h0 h1 hac hp₁ hm₀ hm₁ hτ) A hAcc hdisj
+
+/-- **Wald's `β ≤ B (1 - α)` for i.i.d. observations**, for a null density that may vanish. -/
+theorem sprt_beta_le_iid_of_ac (hX : ∀ i, Measurable (X i)) (hind₀ : iIndepFun X P₀)
+    (hind₁ : iIndepFun X P₁)
+    (h0 : ∀ i, P₀.map (X i) = ν.withDensity fun x => ENNReal.ofReal (p₀ x))
+    (h1 : ∀ i, P₁.map (X i) = ν.withDensity fun x => ENNReal.ofReal (p₁ x))
+    (hac : ∀ᵐ x ∂ν, 0 < p₁ x → 0 < p₀ x) (hp₁ : ∀ x, 0 ≤ p₁ x) (hm₀ : Measurable p₀)
+    (hm₁ : Measurable p₁)
+    {τ : Ω → ℕ∞} (hτ : ∀ n, MeasurableSet[obsFiltration X n] {ω | τ ω = n}) (B : ℝ)
+    {Rej : Set Ω} (hRej : MeasurableSet Rej)
+    (hdisj : Disjoint Rej (stoppedEvent τ (likelihoodRatioProcess p₀ p₁ X) (· ∈ Set.Iic B))) :
+    P₁ (stoppedEvent τ (likelihoodRatioProcess p₀ p₁ X) (· ∈ Set.Iic B)) ≤
+      ENNReal.ofReal B * (1 - P₀ Rej) :=
+  wald_beta_le (waldSetup_iid_of_ac hX hind₀ hind₁ h0 h1 hac hp₁ hm₀ hm₁ hτ) B hRej hdisj
 
 end Applied.Sequential

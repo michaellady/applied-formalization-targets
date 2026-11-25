@@ -10,6 +10,7 @@ import Targets.Economics.Myerson
 - source: R. Myerson, "Optimal auction design", Math. Oper. Res. 6 (1981) (single-bidder case); J. Riley, R. Zeckhauser, "Optimal selling strategies: when to haggle, when to hold firm", Quart. J. Econ. 98 (1983) (attribution and theorem numbering to be confirmed)
 - used-in: monopoly pricing, reserve prices in auctions, revenue benchmarks in mechanism design
 - prerequisites: Bochner integral, finite measures on `ℝ`; nothing on mechanism design in Mathlib
+- formalized-elsewhere: atlas-lean `MathlibExt/GameTheory/MechanismDesign/VirtualValuation.lean` :: `integral_payment_mul_density_le_postedPrice` (needs a continuous positive density and a sign change of the virtual value; the statement here needs neither). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. A seller has one item and faces one buyer whose value `v` is distributed

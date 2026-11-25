@@ -9,6 +9,7 @@ import Applied.Statistics.PRDS
 - source: Y. Benjamini, D. Yekutieli, Ann. Statist. 29 (2001), Theorem 1.2; S. K. Sarkar, Ann. Statist. 26 (1998); G. Blanchard, E. Roquain, "Two simple sufficient conditions for FDR control", Electron. J. Stat. 2 (2008)
 - used-in: the standard justification for using Benjamini–Hochberg and Hochberg with positively correlated test statistics
 - prerequisites: Benjamini–Hochberg cut-off, closed testing
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/MultipleTesting/BenjaminiHochberg.lean` :: `integral_falseDiscoveryProportion_bhRejections_le_of_isPRDSOn` (classical Benjamini–Yekutieli PRDS, conditioning on `p i = t`: a different dependence notion from the weak form used here); lmlexplore `LMLExplore/EValues/MultipleTesting/PRDS.lean` :: `IsPRDS` (the same weak definition as `IsPRDSOn`). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Suppose the p-values are valid under their nulls and positively regression

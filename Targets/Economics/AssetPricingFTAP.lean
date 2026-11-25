@@ -9,6 +9,7 @@ import Applied.Economics.AssetPricing
 - source: S. A. Ross, "A simple approach to the valuation of risky streams", J. Business 51 (1978); J. M. Harrison, D. M. Kreps, "Martingales and arbitrage in multiperiod securities markets", J. Econ. Theory 20 (1979); textbook form: D. Duffie, "Dynamic Asset Pricing Theory", Chapter 1 (theorem numbering to be confirmed)
 - used-in: arbitrage pricing, risk-neutral valuation, derivative pricing, linear-programming duality in finance
 - prerequisites: Mathlib's geometric Hahn–Banach theorem (`geometric_hahn_banach_compact_closed`), closedness of finite-dimensional subspaces; Mathlib has no Farkas, Gordan or Stiemke lemma in matrix form and no arbitrage theory (searched for `Farkas`, `Stiemke`, `arbitrage`)
+- formalized-elsewhere: formal-mathfin `MathFin/Pricing/FTAP/FTAPOnePeriodVector.lean` :: `ftap_one_period_vector` (equivalent martingale measure with a numeraire, general `Ω`) and `MathFin/Pricing/FTAP/FTAPDiscrete.lean` :: `ftap_discrete` (multi-period, finite `Ω`): a different formulation of the same theorem (state prices without a numeraire here). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. There are finitely many assets `i : ι` and finitely many states `s : S`.

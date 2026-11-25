@@ -9,6 +9,7 @@ import Applied.Statistics.SPRTWaldIID
 - source: A. Wald, "Sequential tests of statistical hypotheses", Ann. Math. Statist. 16 (1945); A. Wald, "Sequential Analysis" (1947), Section 3 (the inequalities `A ≤ (1-β)/α`, `B ≥ β/(1-α)`; exact section and equation numbers to be confirmed). The change-of-measure proof on the events `{τ = n, Λ n ≥ A}` is the standard textbook argument (e.g. Siegmund, "Sequential Analysis", 1985, Ch. 2; to be confirmed).
 - used-in: sequential clinical trials, quality control, sequential A/B testing
 - prerequisites: lower Lebesgue integral on sets, countable additivity
+- formalized-elsewhere: atlas-lean `WaldInequalities.lean` :: `sprt_acceptOne_ge`, `sprt_acceptZero_le` (the SPRT exit time on the canonical product space, mutual absolute continuity; different generality; read, not compiled here)
 - statement-review: unreviewed
 
 Informal statement.
@@ -44,12 +45,29 @@ of `Λ` from `(B, A)`", with `α, β` its error probabilities. Here any stopping
 the SPRT's is one instance (that it is a stopping time of `obsFiltration` is not proved
 separately). In (1)–(4) the density property (iii) is an explicit hypothesis; (5) derives it
 for the i.i.d. model under the extra assumption `p₀ > 0` everywhere (strict positivity of the
-null density; the textbook only needs `P₁ ≪ P₀`). The theorems apply to any stopping time, not only the SPRT one,
+null density; the textbook only needs `P₁ ≪ P₀`, which is what (6) assumes). The theorems apply to any stopping time, not only the SPRT one,
 and do not assume termination: the events include `τ < ∞` explicitly. For the SPRT, (3) with
 `Acc` = acceptance event gives `α ≤ (1-β)/A`, and (4) with `Rej` = rejection event gives
 `β ≤ B(1-α)`; `B < A` makes the events disjoint, but that bookkeeping is left to the user.
 
-Not covered: null densities vanishing somewhere (`p₀ ≥ 0` with `P₁ ≪ P₀`); a proof that the
+(6) Null densities that may vanish (`sprt_likelihoodRatio_density_iid_of_ac`,
+`sprt_waldSetup_iid_of_ac`, `sprt_wald_alpha_le_iid_of_ac`, `sprt_wald_beta_le_iid_of_ac`; also
+`sprt_likelihoodRatio_density_iid_of_ae_pos` for `p₀ > 0` `ν`-almost everywhere). Everything in
+(5) holds with the hypothesis `p₀ x > 0 for all x` replaced by
+`∀ᵐ x ∂ν, 0 < p₁ x → 0 < p₀ x`: outside a `ν`-null set the alternative density vanishes
+wherever the null density is not positive. This is the textbook `P₁ ≪ P₀` for the law of one
+observation, written with densities; no sign condition on `p₀` is needed (the law is
+`ν.withDensity (ofReal ∘ p₀)`, which truncates negative values), and `p₁ ≥ 0` is still assumed
+everywhere. `Λ n` is unchanged: real division, so a factor is `0` where `p₀ = 0`. This covers
+discrete families whose null distribution has zeros.
+
+Related formalization. atlas-lean `WaldInequalities.lean` :: `sprt_acceptOne_ge`,
+`sprt_acceptZero_le` proves the bounds for the SPRT exit time itself on the canonical product
+space under mutual absolute continuity, and atlas also has Wald–Wolfowitz optimality, which is
+not here (read, not compiled here). The statements here are for any stopping time and need
+`P₁ ≪ P₀` only.
+
+Not covered: a proof that the
 SPRT exit time is a stopping time and terminates almost surely; Wald's approximations
 `A ≈ (1-β)/α`, `B ≈ β/(1-α)`; almost sure termination; expected sample size; optimality.
 -/
@@ -64,5 +82,10 @@ alias sprt_likelihoodRatio_density_iid := Applied.Sequential.wald_density_iid
 alias sprt_waldSetup_iid := Applied.Sequential.waldSetup_iid
 alias sprt_wald_alpha_le_iid := Applied.Sequential.sprt_alpha_le_iid
 alias sprt_wald_beta_le_iid := Applied.Sequential.sprt_beta_le_iid
+alias sprt_likelihoodRatio_density_iid_of_ae_pos := Applied.Sequential.wald_density_iid_of_ae_pos
+alias sprt_likelihoodRatio_density_iid_of_ac := Applied.Sequential.wald_density_iid_of_ac
+alias sprt_waldSetup_iid_of_ac := Applied.Sequential.waldSetup_iid_of_ac
+alias sprt_wald_alpha_le_iid_of_ac := Applied.Sequential.sprt_alpha_le_iid_of_ac
+alias sprt_wald_beta_le_iid_of_ac := Applied.Sequential.sprt_beta_le_iid_of_ac
 
 end Targets.Statistics

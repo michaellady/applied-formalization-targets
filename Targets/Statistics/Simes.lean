@@ -33,6 +33,18 @@ The Simes inequality is an equality for independent, exactly uniform p-values
 (`Targets/Statistics/SimesIdentity.lean`). All three are proved here under mutual
 independence only. Their validity under positive
 dependence is a later rung of the ladder.
+
+Independence hypotheses. `hommel_controls_fwer` and `hochberg_controls_fwer` assume that
+**all** `m` p-values are mutually independent (`iIndepFun p P`). This is more than the
+literature needs: independence among the p-values of the true nulls suffices, and the false-null
+p-values may depend on anything. That stronger form is
+`hommel_controls_fwer_of_null_independent` and `hochberg_controls_fwer_of_null_independent`
+(hypothesis `iIndepFun (fun j : H₀ => p j) P`), with the Simes local test of the true
+intersection hypothesis in `simes_local_test_level_of_null_independent`. In `simes_inequality`
+every hypothesis is a true null (validity is assumed for all `i`), so there the hypothesis is
+already independence of the true nulls. What remains stronger than necessary: mutual
+independence of the null p-values is itself only a sufficient condition (weak PRDS among the
+nulls suffices, `Targets/Statistics/PositiveDependence.lean`).
 -/
 
 namespace Targets.Statistics
@@ -41,6 +53,12 @@ alias simes_inequality := Applied.MultipleTesting.measure_one_le_bhK_le
 alias hommel_controls_fwer := Applied.MultipleTesting.fwer_hommel_le
 alias hochberg_subset_hommel := Applied.MultipleTesting.hochberg_subset_hommel
 alias hochberg_controls_fwer := Applied.MultipleTesting.fwer_hochberg_le
+alias simes_local_test_level_of_null_independent :=
+  Applied.MultipleTesting.measure_simesLocal_le_of_null_iIndepFun
+alias hommel_controls_fwer_of_null_independent :=
+  Applied.MultipleTesting.fwer_hommel_le_of_null_iIndepFun
+alias hochberg_controls_fwer_of_null_independent :=
+  Applied.MultipleTesting.fwer_hochberg_le_of_null_iIndepFun
 alias hochberg_contains_first_position_rule :=
   Applied.MultipleTesting.hochberg_firstPosition_subset
 alias hochberg_rejects_all_of_equal := Applied.MultipleTesting.hochberg_eq_univ_of_forall_eq

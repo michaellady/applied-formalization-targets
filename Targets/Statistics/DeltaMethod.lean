@@ -12,10 +12,22 @@ import Mathlib.Analysis.SpecialFunctions.Sqrt
 - source: A. W. van der Vaart, "Asymptotic Statistics" (1998), Theorem 3.1
 - used-in: standard errors of transformed estimators in biostatistics, econometrics, A/B testing
 - prerequisites: Mathlib `TendstoInDistribution`; Slutsky-type lemmas
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/DeltaMethod.lean` :: `TendstoInDistribution.delta_method`, `TendstoInDistribution.delta_method_real` (strictly more general: any rate `r n → ∞`, Banach-valued, a.e.-measurability only; read, not compiled here)
 - statement-review: unreviewed
 
 Informal statement. If the `Xₙ` are measurable, `√n (Xₙ - θ)` converges in distribution to `Z`,
 and `g` is Borel measurable (everywhere) and differentiable at `θ` with derivative `g'`, then `√n (g Xₙ - g θ)` converges in distribution to `g' · Z`.
+
+Scope: this is a special case of a more general theorem that is already formalized elsewhere.
+Restrictions here: the rate is `√n` (sequences indexed by `ℕ`), not a general rate
+`r n → ∞`; `Xₙ`, `θ` and `Z` are real-valued (derivative `HasDerivAt`), not Banach-space-valued
+with a Fréchet derivative; `g` must be Borel measurable everywhere and each `Xₙ` measurable,
+where a.e.-measurability of `Xₙ` and of `g ∘ Xₙ` would suffice. The general statement is
+atlas-lean `MathlibExt/Probability/Statistics/DeltaMethod.lean` ::
+`TendstoInDistribution.delta_method` (any rate tending to infinity, normed-space-valued, Fréchet
+derivative), with the real-valued form `TendstoInDistribution.delta_method_real` and a
+strict-derivative form `delta_method_of_hasStrictFDerivAt` (statements read, not compiled here).
+The theorem below is implied by `delta_method_real` on paper; no formal bridge is given.
 -/
 
 open MeasureTheory Filter

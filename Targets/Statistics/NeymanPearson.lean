@@ -10,6 +10,7 @@ import Mathlib.MeasureTheory.Measure.Typeclasses.Probability
 - source: J. Neyman, E. S. Pearson, "On the problem of the most efficient tests of statistical hypotheses", Phil. Trans. R. Soc. A 231 (1933)
 - used-in: hypothesis testing, signal detection, ROC analysis, differential privacy (hypothesis-testing view)
 - prerequisites: Mathlib `withDensity`
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/NeymanPearson.lean` :: `neyman_pearson_dominated_two_simple` (randomized form, real integrable densities; equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `P₀`, `P₁` have densities `p₀`, `p₁` with respect to `μ`. A test that

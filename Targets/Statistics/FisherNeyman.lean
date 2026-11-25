@@ -9,6 +9,7 @@ import Applied.Statistics.FisherNeyman
 - source: R. A. Fisher, "On the mathematical foundations of theoretical statistics", Phil. Trans. R. Soc. A 222 (1922); J. Neyman (1935); general form due to P. R. Halmos and L. J. Savage, Ann. Math. Statist. 20 (1949). The discrete case is a standard textbook theorem (exact textbook reference and theorem number to be confirmed)
 - used-in: identifying sufficient statistics (exponential families); data reduction; Rao–Blackwell and Lehmann–Scheffé
 - prerequisites: finite sums
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/Sufficiency/Discrete.lean` :: `isSufficientPMF_iff_exists_factorization` (different generality: countable sample space and `PMF`s there; finite sample space and unnormalised weights here). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `X` be a finite sample space, `Θ` any parameter set, and `p θ x ≥ 0`

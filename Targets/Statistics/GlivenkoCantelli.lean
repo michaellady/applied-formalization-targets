@@ -9,6 +9,7 @@ import Applied.Statistics.GlivenkoCantelli
 - source: V. Glivenko, "Sulla determinazione empirica delle leggi di probabilità", Giorn. Ist. Ital. Attuari 4 (1933); F. P. Cantelli, same volume (1933) (page numbers to be confirmed)
 - used-in: consistency of the empirical distribution function; Kolmogorov–Smirnov statistics; quantile estimation; bootstrap
 - prerequisites: Mathlib strong law of large numbers (`ProbabilityTheory.strong_law_ae_real`), cumulative distribution functions (`ProbabilityTheory.cdf`), Stieltjes measures
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/GlivenkoCantelli.lean` :: `glivenko_cantelli` (under mutual independence `iIndepFun`; the statement here needs only pairwise independence). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `X₀, X₁, …` be real random variables on a probability space, pairwise

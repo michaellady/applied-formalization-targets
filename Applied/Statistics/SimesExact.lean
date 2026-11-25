@@ -266,6 +266,18 @@ theorem measure_simesLocal_eq (P : Measure Ω) [IsProbabilityMeasure P] (hα0 : 
   exact measure_one_le_bhK_eq P hα0 hα1 (fun j : H₀ => p j) (fun j => hmeas j)
     (hindep.precomp Subtype.val_injective) fun j => hunif j j.2
 
+omit [Fintype ι] in
+/-- **Simes identity for a set of true nulls, independence among the nulls only.** As
+`measure_simesLocal_eq`, but only the p-values of `H₀` are assumed mutually independent. -/
+theorem measure_simesLocal_eq_of_null_iIndepFun (P : Measure Ω) [IsProbabilityMeasure P]
+    (hα0 : 0 ≤ α) (hα1 : α ≤ 1) (p : ι → Ω → ℝ) (hmeas : ∀ i, Measurable (p i))
+    (H₀ : Finset ι) (hindep : iIndepFun (fun j : H₀ => p j) P) (hne : H₀.Nonempty)
+    (hunif : ∀ i ∈ H₀, IsUniformPValue P (p i)) :
+    P {ω | simesLocal α p H₀ ω} = ENNReal.ofReal α := by
+  have : Nonempty H₀ := hne.to_subtype
+  exact measure_one_le_bhK_eq P hα0 hα1 (fun j : H₀ => p j) (fun j => hmeas j)
+    hindep fun j => hunif j j.2
+
 end Probabilistic
 
 end Applied.MultipleTesting

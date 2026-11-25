@@ -9,6 +9,7 @@ import Applied.Economics.BlackScholes
 - source: F. Black, M. Scholes, "The pricing of options and corporate liabilities", J. Political Economy 81 (1973) (equation numbers to be confirmed)
 - used-in: option pricing and hedging; the Greeks delta, gamma and theta
 - prerequisites: Gaussian density and cdf, fundamental theorem of calculus, derivatives of log, exp and square root
+- formalized-elsewhere: formal-mathfin `MathFin/Models/BlackScholes/PDE.lean` :: `bs_pde_holds`, `hasDerivAt_deriv_bsV_S`; atlas-lean `Domains/Economics/Finance/BlackScholesGreeks.lean` :: `hasDerivAt_blackScholesCall_S0` (equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `Φ` be the cumulative distribution function of the standard normal law

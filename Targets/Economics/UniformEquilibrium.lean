@@ -51,8 +51,20 @@ Review notes (modelling choices to check).
   three or more players. `UniformEquilibriumConjectureAtLeastThree` restricts to that case.
 * All action sets are finite and nonempty (`[∀ i, Nonempty (A i)]`; with an empty action set
   there are no strategies); the state set is finite, possibly empty (then the statement is
-  vacuous); action sets do not depend on the state (no loss of generality for finite games by
-  duplicating actions). Types are in universe 0.
+  vacuous). Types are in universe 0.
+* Scope: the conjecture is stated for **state-independent action sets** (`A i` does not depend
+  on the state), as in elazarg/UniformEquilibrium
+  (`Conjecture/UniformExistenceConjecture.lean`). It follows from the textbook conjecture
+  (state-dependent action sets), since a game with state-independent action sets is a special
+  case; the converse is not known. The usual reduction, padding the smaller action sets with
+  duplicate labels, is not valid here: under perfect monitoring of raw actions, duplicate labels
+  act as a jointly controlled public coin. elazarg/UniformEquilibrium has a machine-checked
+  (sorry-free) counterexample to the padding reduction for uniform equilibrium *payoffs*:
+  `UniformEquilibrium/Diagnostics/Uniform/PaddedDuplicateLotterySeparation.lean` ::
+  `PaddedLotterySeparation.not_isLegalUniformEquilibriumPayoff_half` and
+  `isUniformEquilibriumPayoff_paddedGame_half` (read, not compiled here). That counterexample
+  concerns payoffs, not existence, so it does not refute the transfer of existence; it shows
+  that the padding argument cannot be used to obtain it.
 * Payoffs and probabilities are real numbers; for `n = 0` the average payoff is `0 / 0 = 0`.
 
 What is proved: the definitions are meaningful in a trivial case: with constant stage

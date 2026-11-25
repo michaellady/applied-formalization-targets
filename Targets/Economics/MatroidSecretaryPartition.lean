@@ -1,4 +1,5 @@
 import Applied.Economics.MatroidSecretaryDirectSum
+import Applied.Economics.MatroidSecretaryGraphic
 import Targets.Economics.MatroidSecretary
 
 /-!
@@ -9,6 +10,7 @@ import Targets.Economics.MatroidSecretary
 - status: formalized
 - source: folklore special case of the matroid secretary problem of M. Babaioff, N. Immorlica, R. Kleinberg, "Matroids, secretary problems, and online mechanisms", SODA 2007 (whether and where that paper states the partition-matroid case, and with which constant, to be confirmed); the per-block rule is the classical secretary rule (Lindley 1961, Dynkin 1963)
 - used-in: online selection with one slot per category; building block for reductions in the matroid secretary literature
+- formalized-elsewhere: cslib-frontier `MatroidSecretary.lean` :: `exp_neg_one_mul_sum_le_expectedPartitionSecretary` (unit-capacity partition matroids, constant `1/e`; read, not compiled here)
 - prerequisites: `Applied/Economics/MatroidSecretary.lean` (model, half rule); Mathlib's `IndepMatroid.ofFinite`; `Measure.pi` is not needed here (deterministic algorithm)
 - statement-review: unreviewed
 
@@ -48,7 +50,21 @@ What is proved.
 
 Partition matroids with capacities larger than one are covered, with the weaker constant
 `e⁻²`, in `Targets/Economics/MatroidSecretaryUniform.lean` (`hasCompetitiveRandomized_partitionCap`).
-Not covered: the optimal constant `1/e`; the
+
+The constant `1/e`. The same class is `1/e`-competitive: running the classical `⌊nᵢ/e⌋`
+secretary rule (ties broken by a fixed order) inside each block gives a feasible deterministic
+`1/e`-competitive algorithm (`exists_isCompetitive_partitionOne_inv_exp`,
+`hasCompetitiveRandomized_partitionOne_inv_exp`, `partitionOne_conclusion_inv_exp`). The proof
+is in `Applied/Economics/MatroidSecretaryGraphic.lean` (`partitionSecretaryRule_isCompetitive`,
+by the direct-sum theorem and the rank-one `1/e` rule) and is also listed in
+`Targets/Economics/MatroidSecretaryGraphic.lean`; it is re-exported here because this is the
+entry for the class. `1/e` is the constant of the corresponding result in cslib-frontier
+(`MatroidSecretary.lean` :: `exp_neg_one_mul_sum_le_expectedPartitionSecretary`; read, not
+compiled here; its model was not compared in detail). The `1/4` statements above are kept; they
+are weaker.
+
+Not covered: optimality of `1/e` for this class (it is optimal already for one block, the
+classical secretary problem, but that is not stated for this model here); the
 model where the algorithm does not know the blocks in advance.
 -/
 
@@ -70,5 +86,19 @@ theorem partitionOne_conclusion :
     ∃ c : ℝ, 0 < c ∧ ∀ (E : Type) [Fintype E] (ι : Type) (f : E → ι),
       (partitionOne f).E = Set.univ ∧ HasCompetitiveRandomized (partitionOne f) c :=
   ⟨1 / 4, by norm_num, fun _ _ _ f => ⟨rfl, hasCompetitiveRandomized_partitionOne f⟩⟩
+
+alias exists_isCompetitive_partitionOne_inv_exp :=
+  Applied.Economics.MatroidSecretary.exists_isCompetitive_partitionOne_inv_exp
+
+alias hasCompetitiveRandomized_partitionOne_inv_exp :=
+  Applied.Economics.MatroidSecretary.hasCompetitiveRandomized_partitionOne_inv_exp
+
+/-- The conclusion of the matroid secretary conjecture holds with `c = 1/e` for partition
+matroids with capacities one (ground set `E`, blocks the fibres of any map `f`). -/
+theorem partitionOne_conclusion_inv_exp :
+    ∀ (E : Type) [Fintype E] (ι : Type) (f : E → ι),
+      (partitionOne f).E = Set.univ ∧
+        HasCompetitiveRandomized (partitionOne f) (1 / Real.exp 1) :=
+  fun _ _ _ f => ⟨rfl, hasCompetitiveRandomized_partitionOne_inv_exp f⟩
 
 end Targets.Economics

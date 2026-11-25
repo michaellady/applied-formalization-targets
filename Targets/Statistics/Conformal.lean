@@ -9,6 +9,7 @@ import Applied.Statistics.Conformal
 - source: V. Vovk, A. Gammerman, G. Shafer, "Algorithmic Learning in a Random World" (2005); J. Lei et al., "Distribution-free predictive inference for regression", J. Amer. Statist. Assoc. 113 (2018)
 - used-in: uncertainty quantification for machine-learning predictions, including medical and other regulated applications
 - prerequisites: exchangeability; a counting lemma on ranks
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/SplitConformal.lean`, `SplitConformalExactCoverage.lean` :: `measure_coe_le_splitConformalThreshold_le`, `measure_coe_le_splitConformalThreshold_eq_of_ae_injective`, and `FullConformal.lean` (equivalent; phrased with order statistics where this file uses strict rank counts). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Take `n` calibration scores and one test score, exchangeable as a family,

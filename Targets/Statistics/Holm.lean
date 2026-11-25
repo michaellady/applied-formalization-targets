@@ -10,6 +10,7 @@ import Applied.Statistics.MultipleTesting
 - used-in: confirmatory clinical trials (multiple endpoints, doses, subgroups), genomics, A/B testing
 - relied-on-by: regulatory guidance on multiplicity in clinical trials names both procedures
 - prerequisites: union bound only
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/MultipleTesting/Holm.lean` :: `measure_holm_familywiseError_le` and `MultipleTesting/Bonferroni.lean` (equivalent statements, with the extra hypothesis `α ≤ 1`; weighted Bonferroni and fixed sequence are not stated there). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. For `m` hypotheses with p-values that are valid under their null (no
