@@ -13,8 +13,9 @@ themselves are certificates and need not be trusted).
 * `ten_le_indepNum_strongPow_two`: `10 ≤ α(C₇^{⊠2})`;
 * `thirtyThree_le_indepNum_strongPow_three`: `33 ≤ α(C₇^{⊠3})`;
 * `oneHundredEight_le_indepNum_strongPow_four`: `108 ≤ α(C₇^{⊠4})`;
-* the corresponding bounds `√10 ≤ Θ(C₇)`, `33^{1/3} ≤ Θ(C₇)`, `108^{1/4} ≤ Θ(C₇)`
-  (`108^{1/4} ≈ 3.2237`).
+* `threeHundredSixtySeven_le_indepNum_strongPow_five`: `367 ≤ α(C₇^{⊠5})`;
+* the corresponding bounds `√10 ≤ Θ(C₇)`, `33^{1/3} ≤ Θ(C₇)`, `108^{1/4} ≤ Θ(C₇)`,
+  `367^{1/5} ≤ Θ(C₇)` (`367^{1/5} ≈ 3.2578`), and `13/4 < Θ(C₇)`.
 -/
 
 open Finset
@@ -134,6 +135,39 @@ def c7Words4 : List ℕ :=
     1838, 1872, 1909, 1943, 1956, 1977, 1990, 2012, 2024, 2071, 2083, 2117, 2130, 2164, 2201,
     2235, 2248, 2269, 2274, 2282, 2304, 2309, 2379, 2387, 2392]
 
+/-- 367 pairwise non-confusable words of length 5 (found by computer search: tabu search in
+`C₇^{⊠5}` started from 361 words obtained, after deleting conflicts, by reducing the
+Polak–Schrijver independent set `{t (1, 7, 7², 7³, 7⁴) : t ∈ ℤ/382}` of the strong power of the
+circular graph `C_{108,382}` coordinatewise via `x ↦ ⌊(7x + 65)/382⌋`). -/
+def c7Words5 : List ℕ :=
+  [
+    0, 67, 141, 159, 219, 232, 251, 318, 383, 395, 475, 535, 560, 627, 646, 659, 711, 736,
+    803, 863, 895, 955, 987, 1039, 1119, 1131, 1204, 1272, 1283, 1296, 1370, 1380, 1447, 1507,
+    1539, 1599, 1624, 1698, 1757, 1775, 1848, 1867, 1927, 1940, 2008, 2026, 2060, 2073, 2091,
+    2183, 2201, 2317, 2342, 2436, 2455, 2515, 2528, 2596, 2607, 2687, 2706, 2771, 2831, 2856,
+    2923, 2948, 3015, 3082, 3099, 3159, 3172, 3191, 3251, 3325, 3343, 3423, 3475, 3500, 3567,
+    3579, 3592, 3659, 3720, 3758, 3803, 3835, 3895, 3920, 3987, 4061, 4086, 4144, 4212, 4223,
+    4236, 4303, 4315, 4395, 4414, 4479, 4496, 4588, 4613, 4680, 4705, 4811, 4824, 4891, 4903,
+    4983, 5044, 5068, 5142, 5152, 5219, 5244, 5311, 5371, 5385, 5403, 5470, 5535, 5547, 5627,
+    5639, 5712, 5780, 5798, 5811, 5863, 5888, 5955, 6015, 6047, 6107, 6139, 6191, 6265, 6283,
+    6356, 6375, 6435, 6448, 6474, 6519, 6532, 6599, 6660, 6691, 6751, 6776, 6850, 6884, 6909,
+    6976, 7050, 7068, 7128, 7141, 7247, 7279, 7339, 7364, 7431, 7456, 7530, 7588, 7607, 7667,
+    7680, 7699, 7759, 7833, 7858, 7923, 7983, 8008, 8075, 8100, 8167, 8186, 8251, 8311, 8343,
+    8403, 8428, 8495, 8527, 8579, 8652, 8720, 8731, 8744, 8811, 8823, 8910, 8955, 8987, 9047,
+    9072, 9139, 9164, 9238, 9272, 9345, 9364, 9424, 9437, 9505, 9516, 9603, 9635, 9660, 9727,
+    9752, 9819, 9879, 9893, 9918, 9963, 9976, 10043, 10055, 10135, 10147, 10220, 10246, 10304,
+    10371, 10396, 10463, 10488, 10523, 10555, 10622, 10639, 10699, 10773, 10791, 10864, 10883,
+    10950, 10963, 11015, 11027, 11040, 11107, 11168, 11199, 11259, 11291, 11343, 11368, 11435,
+    11509, 11527, 11587, 11626, 11708, 11720, 11733, 11800, 11812, 11892, 11953, 11984, 12023,
+    12096, 12115, 12175, 12188, 12207, 12267, 12341, 12351, 12431, 12516, 12583, 12608, 12682,
+    12692, 12759, 12819, 12833, 12851, 12911, 12936, 13010, 13075, 13087, 13160, 13228, 13252,
+    13319, 13338, 13403, 13463, 13495, 13555, 13580, 13582, 13647, 13679, 13731, 13804, 13823,
+    13896, 13964, 14057, 14062, 14096, 14156, 14188, 14248, 14273, 14340, 14365, 14426, 14484,
+    14486, 14511, 14578, 14603, 14670, 14737, 14754, 14814, 14894, 14906, 14986, 14998, 15128,
+    15130, 15155, 15222, 15247, 15314, 15374, 15413, 15458, 15490, 15550, 15624, 15642, 15715,
+    15741, 15799, 15866, 15878, 15891, 15958, 16019, 16050, 16117, 16134, 16194, 16219, 16286,
+    16360, 16378, 16445, 16510, 16571, 16602, 16663, 16694, 16786]
+
 /-- `10 ≤ α(C₇ ⊠ C₇)`. -/
 theorem ten_le_indepNum_strongPow_two :
     10 ≤ (strongPow (SimpleGraph.cycleGraph 7) 2).indepNum :=
@@ -148,6 +182,12 @@ theorem thirtyThree_le_indepNum_strongPow_three :
 theorem oneHundredEight_le_indepNum_strongPow_four :
     108 ≤ (strongPow (SimpleGraph.cycleGraph 7) 4).indepNum :=
   indepNum_ge_of_pairsSep (L := c7Words4) (by decide)
+
+set_option maxRecDepth 100000 in
+/-- `367 ≤ α(C₇^{⊠5})` (the value of Polak–Schrijver, 2019). -/
+theorem threeHundredSixtySeven_le_indepNum_strongPow_five :
+    367 ≤ (strongPow (SimpleGraph.cycleGraph 7) 5).indepNum :=
+  indepNum_ge_of_pairsSep (L := c7Words5) (by decide)
 
 /-- From `m ≤ α(G^{⊠(k+1)})` to `m^{1/(k+1)} ≤ Θ(G)`. -/
 theorem rpow_le_shannonCapacity_of_le {V : Type*} [Fintype V] (G : SimpleGraph V) (k m : ℕ)
@@ -174,6 +214,24 @@ theorem rpow_oneHundredEight_le_shannonCapacity_cycleGraph_seven :
     (108 : ℝ) ^ ((1 : ℝ) / 4) ≤ shannonCapacity (SimpleGraph.cycleGraph 7) := by
   have h := rpow_le_shannonCapacity_of_le _ 3 108 oneHundredEight_le_indepNum_strongPow_four
   convert h using 2; norm_num
+
+/-- `367^{1/5} ≤ Θ(C₇)` (`≈ 3.2578`; Polak–Schrijver 2019). -/
+theorem rpow_threeHundredSixtySeven_le_shannonCapacity_cycleGraph_seven :
+    (367 : ℝ) ^ ((1 : ℝ) / 5) ≤ shannonCapacity (SimpleGraph.cycleGraph 7) := by
+  have h := rpow_le_shannonCapacity_of_le _ 4 367
+    threeHundredSixtySeven_le_indepNum_strongPow_five
+  convert h using 2; norm_num
+
+/-- `3.25 < 367^{1/5}`, so `13/4 < Θ(C₇)`. -/
+theorem thirteen_fourths_lt_shannonCapacity_cycleGraph_seven :
+    (13 / 4 : ℝ) < shannonCapacity (SimpleGraph.cycleGraph 7) := by
+  refine lt_of_lt_of_le ?_ rpow_threeHundredSixtySeven_le_shannonCapacity_cycleGraph_seven
+  have h : ((13 / 4 : ℝ) ^ (5 : ℝ)) ^ ((1 : ℝ) / 5) = 13 / 4 := by
+    rw [← Real.rpow_mul (by norm_num)]; norm_num
+  rw [← h]
+  refine Real.rpow_lt_rpow (by positivity) ?_ (by norm_num)
+  rw [show (5 : ℝ) = ((5 : ℕ) : ℝ) by norm_num, Real.rpow_natCast]
+  norm_num
 
 /-- `3.2 < 108^{1/4}`, so `3.2 < Θ(C₇)`. -/
 theorem three_point_two_lt_shannonCapacity_cycleGraph_seven :
