@@ -19,8 +19,17 @@ relative distance `δ`, where `H` is the binary entropy. Whether one can do bett
 asymptotically for some `0 < δ < 1/2` is open; `GilbertVarshamovTight` says one cannot.
 
 What is proved: the finite Gilbert–Varshamov bound, `A(n, d) · V(n, d - 1) ≥ 2ⁿ`, where
-`V` is the size of a Hamming ball. Not yet proved: the entropy estimate of the ball size that
-turns it into the rate statement.
+`V` is the size of a Hamming ball (alias below); its rate form (`coding-gilbert-varshamov-rate`);
+Varshamov's linear version, a linear code of dimension at least `k` and minimum distance at
+least `d` when `V(n - 1, d - 2) < 2ⁿ⁻ᵏ` (`coding-varshamov-linear`). On the upper side: the
+Johnson bound in a ball (`coding-johnson-bound`) and the Elias–Bassalygo bound, finite and
+asymptotic (`coding-elias-bassalygo`). Together (`coding-binary-rate-sandwich`,
+`Targets.Coding.rate_sandwich`), for `0 < δ < 1/2`,
+`1 - H(δ) ≤ lim inf log₂ A(n, ⌊δn⌋) / n ≤ lim sup log₂ A(n, ⌊δn⌋) / n ≤ 1 - H((1 - √(1 - 2δ)) / 2)`,
+and the two outer bounds differ for every such `δ`. These are classical partial results; they
+do not decide `GilbertVarshamovTight`. The Delsarte linear programming bound is formalized in
+finite form with checked certificates (`coding-delsarte-lp`), but the best known asymptotic upper
+bound derived from it (McEliece–Rodemich–Rumsey–Welch) is not formalized.
 -/
 
 open Finset Filter Applied.Coding
