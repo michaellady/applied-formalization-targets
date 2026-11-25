@@ -33,7 +33,9 @@ null probability under `P`).
   any random time `τ : Ω → ℕ` (in particular the time at which the SPRT stops, when it
   stops), `P(Λ τ ≥ A) ≤ 1/A`: the SPRT with upper threshold `A` has type-I error at most
   `1/A`, whatever the lower threshold. This is weaker than Wald's bound `α ≤ (1-β)/A`, which
-  also involves the type-II error `β`; that sharper bound is not formalized here.
+  also involves the type-II error `β`; that sharper bound is not formalized here, but an
+  change-of-measure version is in `Targets/Statistics/SPRTWaldChangeOfMeasure.lean`
+  (abstractly, and for i.i.d. observations with null density `p₀ > 0`).
 * If `∫ p₁ dν = 1` and `p₁ = 0` `ν`-almost everywhere on `{p₀ = 0}`, then `Λ` is a
   martingale and `E[Λ n] = 1` for all `n`.
 
@@ -46,7 +48,8 @@ filtration of the observations). The textbook SPRT stops at the first exit of `�
 interval `(B, A)`; the statement here bounds the probability of ever reaching `A`, which
 contains the rejection event of every such test, including truncated ones.
 
-Not covered: the type-II error bound `β ≤ B` (it is the same statement with the roles of the
+Not covered (here; see `SPRTWaldChangeOfMeasure.lean` for the abstract change-of-measure forms of
+`α ≤ (1-β)/A` and `β ≤ B(1-α)`): the type-II error bound `β ≤ B` (it is the same statement with the roles of the
 two hypotheses exchanged, but is not stated separately); Wald's approximations
 `A ≈ (1-β)/α`, `B ≈ β/(1-α)`; almost sure termination; expected sample size (Wald's identity)
 and the optimality theorem of Wald and Wolfowitz; composite hypotheses.

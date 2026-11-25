@@ -51,7 +51,9 @@ Differences from the textbook statement.
   arrivals so far only.
 
 Not covered: optimality of the threshold rule among all online stopping rules (Lindley's and
-Dynkin's optimality theorem, that no rule beats `max_r` of the formula); the limit
+Dynkin's optimality theorem, that no rule beats `max_r` of the formula) in the arrival-order
+model of this file (a version for rules that see only relative ranks, stated in the
+relative-rank model, is in `Targets/Economics/SecretaryRankOptimal.lean`); the limit
 `max_r P(r) → 1/e`; the strict inequality `> 1/e`; the full-information and cardinal-payoff
 variants.
 -/

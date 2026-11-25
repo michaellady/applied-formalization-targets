@@ -29,9 +29,11 @@ What is proved:
 * a lower bound growing with `n`: `T(n) ≥ (1/4) (√(9/7))ⁿ` for every `n`, by random coding
   with alteration, hence `trifferenceRate ≥ log₂ √(9/7) = (1/2) log₂ (9/7) ≈ 0.181`.
 
-Not covered: the better lower bounds in the literature (for example the Körner–Marton bound
-`T(n) ≥ (9/5)^{n/4}`, rate about `0.212`; to be confirmed) and the improvements of the upper
-bound below `log₂ (3/2)` (reported in recent work, to be confirmed).
+The Körner–Marton bound `T(n) ≥ (1/4) (9/5)^⌊n/4⌋`, hence rate `≥ (1/4) log₂ (9/5) ≈ 0.212`,
+is proved in `Targets/Coding/TrifferenceKornerMarton.lean`.
+
+Not covered: the improvements of the upper bound below `log₂ (3/2)` (reported in recent work,
+to be confirmed).
 -/
 
 namespace Targets.Coding

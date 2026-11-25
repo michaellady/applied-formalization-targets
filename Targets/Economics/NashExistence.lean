@@ -25,7 +25,11 @@ The statement below is not proved (`sorry`). What is proved in this project abou
 definitions: a pure profile is a mixed Nash equilibrium iff it is a pure Nash equilibrium
 (`Applied.Economics.isMixedNash_pure_iff`), so the statement holds for games with a generalized
 ordinal potential (`Targets/Economics/PotentialGames.lean`); and, for a separately defined
-two-player notion, existence in zero-sum games (`Targets/Economics/NashZeroSum.lean`).
+two-player notion, existence in zero-sum games (`Targets/Economics/NashZeroSum.lean`). For
+this very definition `IsMixedNash`, the statement is proved when `ι = Fin 2` and
+`u 1 = -u 0` (two-player zero-sum games, via the minimax theorem), and when `ι = Fin 2` and
+every `S i = Fin 2` (general-sum `2 × 2` games, by case analysis):
+`Targets/Economics/NashTwoPlayerZeroSum.lean`.
 Only the one-dimensional case of Brouwer's fixed point theorem is proved in this project
 (`Targets/Topology/BrouwerOneDim.lean`: continuous self-maps of `[a, b]` and of
 `stdSimplex ℝ (Fin 2)` have fixed points); this does not suffice for Nash's theorem, which needs
