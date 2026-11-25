@@ -25,7 +25,10 @@ The statement below is not proved (`sorry`). What is proved in this project abou
 definitions: a pure profile is a mixed Nash equilibrium iff it is a pure Nash equilibrium
 (`Applied.Economics.isMixedNash_pure_iff`), so the statement holds for games with a generalized
 ordinal potential (`Targets/Economics/PotentialGames.lean`); and, for a separately defined
-two-player notion, existence in zero-sum games (`Targets/Economics/NashZeroSum.lean`).
+two-player notion, existence in zero-sum games (`Targets/Economics/NashZeroSum.lean`). For
+this very definition `IsMixedNash`, the statement is proved when `ι = Fin 2` and
+`u 1 = -u 0` (two-player zero-sum games, via the minimax theorem):
+`Targets/Economics/NashTwoPlayerZeroSum.lean`.
 
 Edge case: with no players the empty profile is trivially an equilibrium, so `ι` is not
 required to be non-empty.
