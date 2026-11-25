@@ -238,6 +238,154 @@ theorem exists_reset_le_pairMerging (hM : IsSynchronizing M) :
   · exact Finset.mem_image.mpr ⟨p, Finset.mem_univ _, rfl⟩
   · exact Finset.mem_image.mpr ⟨q, Finset.mem_univ _, rfl⟩
 
+/-! ### A refinement: merging some pair inside a given set -/
+
+/-- If the recursion stalls at some `k ≤ J`, then everything mergeable is mergeable within `J`. -/
+lemma mergeable_subset_of_stall {k J : ℕ} (hkJ : k ≤ J)
+    (hsub : mergeable M (k + 1) ⊆ mergeable M k) (m : ℕ) :
+    mergeable M m ⊆ mergeable M J := by
+  rcases le_total m k with hmk | hkm
+  · exact (mergeable_mono M hmk).trans (mergeable_mono M hkJ)
+  · obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le hkm
+    exact (mergeable_stable M hsub j).trans (mergeable_mono M hkJ)
+
+/-- If the recursion does not stall before `J`, at least `n + J` pairs are mergeable within `J`. -/
+lemma card_mergeable_ge_of_no_stall {J : ℕ}
+    (h : ∀ k < J, ¬ mergeable M (k + 1) ⊆ mergeable M k) :
+    Fintype.card σ + J ≤ (mergeable M J).card := by
+  induction J with
+  | zero => simpa using card_le_card_mergeable_zero M
+  | succ J ih =>
+    have hlt : (mergeable M J).card < (mergeable M (J + 1)).card :=
+      Finset.card_lt_card (Finset.ssubset_iff_subset_ne.mpr
+        ⟨mergeable_mono M (Nat.le_succ J), fun heq => h J (by omega) (heq ▸ le_rfl)⟩)
+    have := ih (fun k hk => h k (by omega))
+    omega
+
+/-- Let `T` be a set of `t` non-diagonal unordered pairs, one of which can be merged. Then some
+pair of `T` can be merged by a word of length at most `n.choose 2 - t + 1`. -/
+lemma exists_mem_mergeable_of_offDiag (T : Finset (Sym2 σ)) (hT : ∀ s ∈ T, ¬ s.IsDiag)
+    {s₀ : Sym2 σ} (hs₀ : s₀ ∈ T) {m : ℕ} (hm : s₀ ∈ mergeable M m) :
+    T.card ≤ (Fintype.card σ).choose 2 ∧
+      ∃ s ∈ T, s ∈ mergeable M ((Fintype.card σ).choose 2 - T.card + 1) := by
+  classical
+  set N := (Fintype.card σ).choose 2
+  have hdisj : Disjoint (Finset.univ.image (Sym2.diag : σ → Sym2 σ)) T := by
+    rw [Finset.disjoint_left]
+    intro s hs hsT
+    obtain ⟨p, -, rfl⟩ := Finset.mem_image.mp hs
+    exact hT _ hsT (Sym2.diag_isDiag p)
+  have hsym : Fintype.card (Sym2 σ) = Fintype.card σ + N := by
+    rw [Sym2.card, Nat.choose_succ_succ, Nat.choose_one_right]
+  have htN : T.card ≤ N := by
+    have := Finset.card_union_of_disjoint hdisj
+    have h2 := Finset.card_le_univ (Finset.univ.image (Sym2.diag : σ → Sym2 σ) ∪ T)
+    rw [Finset.card_image_of_injective _ Sym2.diag_injective, Finset.card_univ] at this
+    omega
+  refine ⟨htN, ?_⟩
+  set J := N - T.card + 1
+  by_contra hcon
+  push Not at hcon
+  by_cases hstall : ∃ k < J, mergeable M (k + 1) ⊆ mergeable M k
+  · obtain ⟨k, hk, hsub⟩ := hstall
+    exact hcon s₀ hs₀ (mergeable_subset_of_stall M hk.le hsub m hm)
+  · push Not at hstall
+    have hgrow := card_mergeable_ge_of_no_stall M hstall
+    have hdisj' : Disjoint (mergeable M J) T := by
+      rw [Finset.disjoint_left]
+      intro s hs hsT
+      exact hcon s hsT hs
+    have := Finset.card_union_of_disjoint hdisj'
+    have h2 := Finset.card_le_univ (mergeable M J ∪ T)
+    omega
+
+/-- In a synchronizing automaton with `n` states, any set `S` of `k ≥ 2` states contains two
+distinct states that are merged by a word of length at most `n.choose 2 - k.choose 2 + 1`. -/
+theorem exists_merge_in_set (hM : IsSynchronizing M) (S : Finset σ) (hS : 2 ≤ S.card) :
+    ∃ p ∈ S, ∃ q ∈ S, p ≠ q ∧ ∃ w : List α,
+      w.length + S.card.choose 2 ≤ (Fintype.card σ).choose 2 + 1 ∧ Merges M w p q := by
+  classical
+  obtain ⟨w₀, hw₀⟩ := hM
+  set T := S.offDiag.image Sym2.mk.uncurry
+  have hT : ∀ s ∈ T, ¬ s.IsDiag := by
+    intro s hs
+    obtain ⟨⟨p, q⟩, hpq, rfl⟩ := Finset.mem_image.mp hs
+    rw [Finset.mem_offDiag] at hpq
+    simpa [Function.uncurry] using hpq.2.2
+  obtain ⟨p₀, hp₀, q₀, hq₀, hpq₀⟩ := Finset.one_lt_card.mp (by omega : 1 < S.card)
+  have hs₀ : s(p₀, q₀) ∈ T :=
+    Finset.mem_image.mpr ⟨(p₀, q₀), Finset.mem_offDiag.mpr ⟨hp₀, hq₀, hpq₀⟩, rfl⟩
+  have hm : s(p₀, q₀) ∈ mergeable M w₀.length :=
+    (mem_mergeable M).mpr ⟨w₀, le_rfl, hw₀ p₀ q₀⟩
+  obtain ⟨htN, s, hsT, hs⟩ := exists_mem_mergeable_of_offDiag M T hT hs₀ hm
+  have hTcard : T.card = S.card.choose 2 := Sym2.card_image_offDiag S
+  obtain ⟨⟨p, q⟩, hpq, rfl⟩ := Finset.mem_image.mp hsT
+  rw [Finset.mem_offDiag] at hpq
+  obtain ⟨w, hw, hmerge⟩ := (mem_mergeable M).mp hs
+  exact ⟨p, hpq.1, q, hpq.2.1, hpq.2.2, w, by omega, hmerge⟩
+
+/-- Refined merging of a finite set: a set of at most `k ≤ n` states is sent to at most one state
+by a word `w` with `|w| + (k + 1).choose 3 ≤ (k - 1) * (n.choose 2 + 1)`. -/
+lemma exists_image_card_le_one_refined [DecidableEq σ] (hM : IsSynchronizing M) :
+    ∀ k ≤ Fintype.card σ, ∀ S : Finset σ, S.card ≤ k →
+      ∃ w : List α, w.length + (k + 1).choose 3 ≤ (k - 1) * ((Fintype.card σ).choose 2 + 1) ∧
+        (S.image (fun q => M.evalFrom q w)).card ≤ 1 := by
+  intro k
+  induction k with
+  | zero =>
+    intro _ S hS
+    exact ⟨[], by simp [Nat.choose_eq_zero_of_lt], by simp only [_root_.DFA.evalFrom_nil, Finset.image_id']; omega⟩
+  | succ k ih =>
+    intro hk S hS
+    rcases Nat.eq_zero_or_pos k with rfl | hk0
+    · exact ⟨[], by simp, by simp only [_root_.DFA.evalFrom_nil, Finset.image_id']; omega⟩
+    have hchoose : (k + 1).choose 2 ≤ (Fintype.card σ).choose 2 := Nat.choose_le_choose 2 hk
+    have hpascal : (k + 1 + 1).choose 3 = (k + 1).choose 2 + (k + 1).choose 3 :=
+      Nat.choose_succ_succ (k + 1) 2
+    have hk1 : k + 1 - 1 = (k - 1) + 1 := by omega
+    by_cases hSk : S.card ≤ k
+    · obtain ⟨v, hv, himg⟩ := ih (by omega) S hSk
+      refine ⟨v, ?_, himg⟩
+      rw [hpascal, hk1, Nat.add_mul, one_mul]
+      omega
+    · have hSeq : S.card = k + 1 := by omega
+      obtain ⟨p, hp, q, hq, hpq, u, hu, hmerge⟩ := exists_merge_in_set M hM S (by omega)
+      rw [hSeq] at hu
+      set S' := S.image (fun x => M.evalFrom x u) with hS'
+      have hlt : S'.card < S.card := by
+        apply lt_of_le_of_ne Finset.card_image_le
+        intro heq
+        rw [Finset.card_image_iff] at heq
+        exact hpq (heq hp hq hmerge)
+      obtain ⟨v, hv, himg⟩ := ih (by omega) S' (by omega)
+      refine ⟨u ++ v, ?_, ?_⟩
+      · simp only [List.length_append]
+        rw [hpascal, hk1, Nat.add_mul, one_mul]
+        omega
+      · have : S.image (fun x => M.evalFrom x (u ++ v)) =
+            S'.image (fun y => M.evalFrom y v) := by
+          rw [hS', Finset.image_image]
+          congr 1
+          funext x
+          exact M.evalFrom_of_append x u v
+        rw [this]
+        exact himg
+
+/-- **Refined pair-merging bound.** Every synchronizing automaton with `n` states has a reset word
+`w` with `|w| + (n + 1).choose 3 ≤ (n - 1) * (n.choose 2 + 1)`, i.e.
+`|w| ≤ (n - 1)(n² - 2n + 3) / 3`. -/
+theorem exists_reset_refined (hM : IsSynchronizing M) :
+    ∃ w : List α, IsResetWord M w ∧
+      w.length + (Fintype.card σ + 1).choose 3 ≤
+        (Fintype.card σ - 1) * ((Fintype.card σ).choose 2 + 1) := by
+  classical
+  obtain ⟨w, hw, himg⟩ := exists_image_card_le_one_refined M hM (Fintype.card σ) le_rfl
+    Finset.univ (by simp)
+  refine ⟨w, fun p q => ?_, hw⟩
+  apply Finset.card_le_one.mp himg
+  · exact Finset.mem_image.mpr ⟨p, Finset.mem_univ _, rfl⟩
+  · exact Finset.mem_image.mpr ⟨q, Finset.mem_univ _, rfl⟩
+
 end PairBound
 
 end DFA
