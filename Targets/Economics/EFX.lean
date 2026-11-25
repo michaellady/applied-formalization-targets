@@ -16,8 +16,11 @@ import Mathlib.Data.Fintype.Basic
 Informal statement. `n` agents with additive non-negative valuations divide `m` indivisible
 goods. An allocation is EFX if no agent envies another after removing any single good from the
 other's bundle. Existence is proved in the separate entry `EFXTwoAgents.lean` (not in this file) for `n = 2`,
-and for every `n` under identical valuations (which covers `n = 1`); it is reported on paper for `n = 3`
-(not checked against this strong form), and open for `n ≥ 4`.
+and for every `n` under identical valuations (which covers `n = 1`); for `n = 3` it is proved
+for this strong form in the separate entry `EFXThreeAgents.lean` (theorem `efx_exists_three`,
+a proof of the proposition `EFXExistsThree` below, following Chaudhury–Garg–Mehlhorn 2020 and
+the simpler proof of Akrami et al. 2022); it is open for `n ≥ 4`. The docstring of
+`EFXExistsThree` below ("not proved here") refers to this file only and predates that proof.
 
 The two-agent case and the identical-valuations case are proved for this strong form in
 `Targets/Economics/EFXTwoAgents.lean` (theorems `efx_exists_two` and `efx_exists_identical`).
