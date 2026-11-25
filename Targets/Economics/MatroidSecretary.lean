@@ -90,6 +90,9 @@ Further results in separate registry entries.
   each colour class) and, via direct sums, for partition matroids with arbitrary capacities
   (finite index type). The known constant for uniform matroids is better (`1/e`, and
   `1 - O(1/√k)` for large `k`).
+* `Targets/Economics/MatroidSecretaryUniformTop.lean`: a sharper analysis of the same
+  random-colouring algorithm gives `c = (1 - 1/e)/e ≈ 0.2325` (> `e⁻²`) for uniform matroids of
+  every rank and for partition matroids with arbitrary capacities.
 * `Targets/Economics/MatroidSecretaryGraphic.lean`: the conclusion holds with `c = 1/(2e)` for
   graphic matroids of finite multigraphs and simple graphs (Korula–Pál reduction: random vertex
   order, at most one edge entering each vertex, `1/e` rule per vertex). The graphic matroid is
