@@ -52,6 +52,13 @@ What is proved (in `Applied/Economics/MatroidSecretaryUniformTop.lean`).
 * `conclusion_uniform_top`: the conclusion of `MatroidSecretaryConjecture` restricted to
   uniform matroids with `c = (1 - 1/e)/e`.
 
+Model and status (common to all matroid secretary entries of this project). The matroid is
+known to the algorithm in advance, and the algorithm sees the identity as well as the weight
+of each arriving element; models in which the matroid is revealed online are not treated. The
+constants proved in this project are weaker than the best constants in the literature for the
+same classes. Partition matroids with capacities one (constant `1/e`) are already formalized
+in cslib-frontier (`MatroidSecretary.lean`); no novelty is claimed for that case.
+
 Not covered: the constant `1/e` for uniform matroids; the `1 - O(1/√k)` regime; optimality.
 -/
 

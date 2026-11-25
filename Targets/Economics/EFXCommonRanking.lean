@@ -7,7 +7,7 @@ import Targets.Economics.EFX
 - id: econ-efx-common-ranking
 - area: economics
 - status: formalized
-- source: B. Plaut, T. Roughgarden, "Almost envy-freeness with general valuations", SODA 2018 / SIAM J. Discrete Math. 34 (2020) (EFX for additive valuations with identical ordinal rankings of the goods, via a modified envy-cycle procedure; theorem number and the exact form of EFX used there to be confirmed)
+- source: B. Plaut, T. Roughgarden, "Almost envy-freeness with general valuations", SODA 2018 / SIAM J. Discrete Math. 34 (2020) (EFX for additive valuations with identical ordinal rankings of the goods, via a modified envy-cycle procedure); arXiv:1707.04769, Theorem B.1 (Appendix B, Algorithm 4), with EFX in the strong form of their Definition 2.3 (read at source)
 - used-in: fair division of indivisible goods; partial result towards `Targets.Economics.EFXExists`
 - prerequisites: finite sums, finite maxima
 - statement-review: unreviewed

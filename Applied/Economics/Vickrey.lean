@@ -45,9 +45,11 @@ lemma maxOtherBid_update (b : ι → ℝ) (i : ι) (x : ℝ) :
   unfold maxOtherBid
   exact sup'_congr _ rfl (fun j hj => update_of_ne (mem_erase.1 hj).1 _ _)
 
+/-- Every bid of another bidder is at most the highest competing bid. -/
 lemma le_maxOtherBid (b : ι → ℝ) {i j : ι} (hji : j ≠ i) : b j ≤ maxOtherBid b i :=
   le_sup' b (mem_erase.2 ⟨hji, mem_univ j⟩)
 
+/-- The highest competing bid is at most any bound valid for all other bidders' bids. -/
 lemma maxOtherBid_le (b : ι → ℝ) (i : ι) {c : ℝ} (h : ∀ j, j ≠ i → b j ≤ c) :
     maxOtherBid b i ≤ c :=
   sup'_le _ _ (fun j hj => h j (mem_erase.1 hj).1)

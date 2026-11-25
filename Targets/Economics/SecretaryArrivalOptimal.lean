@@ -48,8 +48,19 @@ rules are mixtures of deterministic ones; not formalized). The rule may use the 
 pattern (equivalently all relative ranks), not only the "best so far" indicators. Probabilities
 are counts divided by `n!`. Times are 0-based.
 
-Not covered: rules that use the actual values (full-information problem, where threshold
-rules are not optimal) or randomization; the identification of the optimal `r` (≈ `n/e`); the
+Scope of the optimality statement. Optimality is among ORDINAL (rank-based) rules only: rules
+whose decisions depend on the arrivals so far only through the order pattern of their keys.
+It is not optimality among all online algorithms of this model. An `OnlineAlg` sees the
+identities and the actual weights, and for a fixed weight function a non-ordinal rule can do
+strictly better: "accept the arrival iff it is `b`" is a legitimate `OnlineAlg` and succeeds
+with probability `1`, while `M 3 0 = 1/2`. The classical justification for restricting to
+rank-based rules (against adversarially chosen values, value-observing rules cannot beat
+them; this needs a Ramsey-type argument) is not formalized. This should not be confused with
+the full-information problem with i.i.d. values from a known distribution, which is a
+different model and is not treated.
+
+Not covered: optimality among rules that use the actual values or identities (see above); the
+full-information (i.i.d., known distribution) problem; randomization; the identification of the optimal `r` (≈ `n/e`); the
 asymptotics are in `Targets/Economics/SecretaryOptimalLimit.lean`.
 -/
 

@@ -39,8 +39,7 @@ theorem efx_exists_all_but_one_identical [Finite A] (v : A → G → ℝ) (α : 
   by_cases hi : i = α
   · subst hi
     have h1 : ∑ h with (σ ∘ a) h = j ∧ h ≠ g, v i h ≤ ∑ h with (σ ∘ a) h = j, v i h :=
-      sum_le_sum_of_subset_of_nonneg (fun h hh => by simp at hh ⊢; exact hh.1)
-        (fun h _ _ => hv h)
+      sum_filter_and_ne_le hv (σ ∘ a) j g
     have h2 : ∑ h with (σ ∘ a) h = j, v i h = ∑ h with a h = σ j, v i h := by
       have := hbundle j (fun _ => True)
       simp only [and_true] at this

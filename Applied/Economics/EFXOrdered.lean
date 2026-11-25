@@ -31,22 +31,13 @@ def bundleValOn (v : A → G → ℝ) (S : Finset G) (a : G → A) (i j : A) : �
 def IsEFXOn (v : A → G → ℝ) (S : Finset G) (a : G → A) : Prop :=
   ∀ i j : A, ∀ g ∈ S, a g = j → bundleValOn v S a i j - v i g ≤ bundleValOn v S a i i
 
-/-- Removing one good `g` from the bundle of the agent who holds it. -/
-lemma sum_filter_eq_and_ne_add [Fintype G] {M : Type*} [AddCommMonoid M] (u : G → M)
-    (a : G → A) (g : G) :
-    ∑ h with a h = a g ∧ h ≠ g, u h + u g = ∑ h with a h = a g, u h := by
-  have : (univ.filter fun h => a h = a g ∧ h ≠ g) = (univ.filter fun h => a h = a g).erase g := by
-    ext h
-    simp [and_comm]
-  rw [this, sum_erase_add _ _ (by simp)]
-
 /-- EFX on all goods is EFX. -/
 lemma isEFX_of_isEFXOn_univ [Fintype G] {v : A → G → ℝ} {a : G → A}
     (h : IsEFXOn v univ a) : IsEFX v a := by
   intro i j g hg
   subst hg
   have h1 := h i (a g) g (mem_univ g) rfl
-  have h2 := sum_filter_eq_and_ne_add (v i) a g
+  have h2 := sum_filter_eq_and_ne_add (v i) a (rfl : a g = a g)
   unfold bundleValOn at h1
   linarith
 

@@ -51,6 +51,7 @@ noncomputable def postedX (r : ℝ) (v : ℝ) : ℝ := if r ≤ v then 1 else 0
 /-- Payment rule of the posted price `r`: pay `r` iff the value is at least `r`. -/
 noncomputable def postedP (r : ℝ) (v : ℝ) : ℝ := if r ≤ v then r else 0
 
+/-- The tail weight `tail s w r` is non-negative when all weights are. -/
 lemma tail_nonneg {s : Finset ℝ} {w : ℝ → ℝ} (hw : ∀ v ∈ s, 0 ≤ w v) (r : ℝ) :
     0 ≤ tail s w r :=
   Finset.sum_nonneg fun v hv => hw v (Finset.mem_filter.mp hv).1

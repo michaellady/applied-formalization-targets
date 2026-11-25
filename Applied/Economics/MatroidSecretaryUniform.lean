@@ -5,7 +5,7 @@ import Mathlib.MeasureTheory.Integral.Bochner.SumMeasure
 /-!
 # The matroid secretary problem for uniform matroids of rank `k`
 
-Everything uses the model of `Applied/Economics/MatroidSecretary.lean` unchanged.
+Everything uses the model of `Applied/Economics/MatroidSecretaryModel.lean` unchanged.
 
 * `uniform E k`: the uniform matroid of rank `k` on the finite type `E` (a set is independent
   iff it has at most `k` elements), ground set `univ`.
@@ -57,8 +57,10 @@ def uniform (E : Type*) [Fintype E] (k : ℕ) : Matroid E :=
       omega)
     (fun _ _ => Set.subset_univ _)).matroid
 
+/-- The ground set of `uniform E k` is all of `E`. -/
 @[simp] lemma uniform_ground (k : ℕ) : (uniform E k).E = Set.univ := rfl
 
+/-- A set is independent in the uniform matroid of rank `k` iff it has at most `k` elements. -/
 @[simp] lemma uniform_indep_iff {k : ℕ} {I : Set E} : (uniform E k).Indep I ↔ I.ncard ≤ k := by
   simp [uniform]
 
@@ -227,6 +229,7 @@ lemma pow_ge_inv_exp {k m : ℕ} (hk : 1 ≤ k) (hm : m ≤ k - 1) :
 def colouringMeasure (E : Type*) [Fintype E] (k : ℕ) : MeasureTheory.Measure (E → Fin k) :=
   ((Fintype.card (E → Fin k) : ENNReal)⁻¹) • MeasureTheory.Measure.count
 
+/-- For `k ≥ 1` the uniform measure on colourings `E → Fin k` is a probability measure. -/
 lemma colouringMeasure_isProbability {k : ℕ} (hk : 1 ≤ k) :
     MeasureTheory.IsProbabilityMeasure (colouringMeasure E k) := by
   have hne : Nonempty (E → Fin k) := ⟨fun _ => ⟨0, hk⟩⟩
@@ -238,6 +241,8 @@ lemma colouringMeasure_isProbability {k : ℕ} (hk : 1 ≤ k) :
   simp only [ENat.toENNReal_coe]
   exact ENNReal.inv_mul_cancel hpos (ENNReal.natCast_ne_top _)
 
+/-- Integration against the uniform measure on colourings is the average over all `k ^ |E|`
+colourings. -/
 lemma integral_colouringMeasure {k : ℕ} (F : (E → Fin k) → ℝ) :
     ∫ g, F g ∂(colouringMeasure E k) = (∑ g, F g) / (k : ℝ) ^ Fintype.card E := by
   rw [colouringMeasure, MeasureTheory.integral_smul_measure, MeasureTheory.integral_count,
@@ -356,9 +361,12 @@ def partitionCap (f : E → ι) (cap : ι → ℕ) : Matroid E :=
         exact hI j)
     (fun _ _ => Set.subset_univ _)).matroid
 
+/-- The ground set of `partitionCap f cap` is all of `E`. -/
 @[simp] lemma partitionCap_ground (f : E → ι) (cap : ι → ℕ) :
     (partitionCap f cap).E = Set.univ := rfl
 
+/-- A set is independent in the partition matroid with capacities iff it contains at most
+`cap i` elements of each block `{e | f e = i}`. -/
 @[simp] lemma partitionCap_indep_iff {f : E → ι} {cap : ι → ℕ} {I : Set E} :
     (partitionCap f cap).Indep I ↔ ∀ i, (I ∩ {e | f e = i}).ncard ≤ cap i := by
   simp [partitionCap]

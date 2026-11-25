@@ -51,6 +51,8 @@ noncomputable def vcgUtility (f : (ι → A → ℝ) → A) (v b : ι → A → 
   v i (f b) - clarkePayment f b i
 
 omit [Fintype A] [Nonempty A] in
+/-- Reported social welfare of an outcome is agent `i`'s reported value plus the reported
+welfare of the others. -/
 lemma socialWelfare_eq_add_othersWelfare (b : ι → A → ℝ) (i : ι) (a : A) :
     socialWelfare b a = b i a + othersWelfare b i a := by
   unfold socialWelfare othersWelfare
@@ -63,15 +65,18 @@ lemma othersWelfare_update (b : ι → A → ℝ) (i : ι) (x : A → ℝ) (a : 
   unfold othersWelfare
   exact sum_congr rfl (fun j hj => by rw [update_of_ne (mem_erase.1 hj).1])
 
+/-- The largest reported welfare of the agents other than `i` does not depend on `i`'s report. -/
 lemma maxOthersWelfare_update (b : ι → A → ℝ) (i : ι) (x : A → ℝ) :
     maxOthersWelfare (update b i x) i = maxOthersWelfare b i := by
   unfold maxOthersWelfare
   exact sup'_congr _ rfl (fun a _ => othersWelfare_update b i x a)
 
+/-- The others' welfare at any outcome is at most its maximum over all outcomes. -/
 lemma othersWelfare_le_max (b : ι → A → ℝ) (i : ι) (a : A) :
     othersWelfare b i a ≤ maxOthersWelfare b i :=
   le_sup' (othersWelfare b i) (mem_univ a)
 
+/-- The maximum of the others' welfare is attained at some outcome. -/
 lemma exists_othersWelfare_eq_max (b : ι → A → ℝ) (i : ι) :
     ∃ a, othersWelfare b i a = maxOthersWelfare b i := by
   obtain ⟨a, -, ha⟩ := exists_mem_eq_sup' univ_nonempty (othersWelfare b i)

@@ -111,6 +111,13 @@ any constant for general matroids or for other classes (transversal, co-graphic,
 depth-independent constant for laminar matroids;
 the known constants for uniform matroids; the known `O(log log rank)`-competitive
 algorithms.
+
+Model and status (common to all matroid secretary entries of this project). The matroid is
+known to the algorithm in advance, and the algorithm sees the identity as well as the weight
+of each arriving element; models in which the matroid is revealed online are not treated. The
+constants proved in this project are weaker than the best constants in the literature for the
+same classes. Partition matroids with capacities one (constant `1/e`) are already formalized
+in cslib-frontier (`MatroidSecretary.lean`); no novelty is claimed for that case.
 -/
 
 namespace Targets.Economics

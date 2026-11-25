@@ -1,4 +1,4 @@
-import Applied.Economics.EFXTwoTypes
+import Applied.Economics.FairDivisionBasic
 
 /-!
 # EFX allocations for three agents with additive valuations
@@ -25,7 +25,27 @@ additive valuations, with the algorithms replaced by extremal arguments.
   differently.
 * `efx3_nondegenerate`: a partition satisfying the invariant with the largest potential gives
   an EFX allocation.
-* The general case follows by the perturbation of `EFXTwoTypes.lean`.
+* The general case (`efx_exists_three`) follows by the perturbation
+  `exists_pos_nondegenerate` of `FairDivisionBasic.lean`.
+
+## How to read the proof
+
+1. *Strong envy* (`NoSE`, `IsPart3`, `EFX3`, `Inv` and their symmetries).
+2. *The Plaut–Roughgarden lemma* `exists_pr` and its forms for three bundles (`exists_pr3`)
+   and for two bundles next to a fixed third one (`exists_pr2`).
+3. *Re-establishing the invariant*: `exists_inv_of_part` turns any partition into one
+   satisfying `Inv` without lowering `min (a X1) (a X2)` below a given bound;
+   `exists_inv_shrink` is the common core of the cases in which a bundle is shrunk.
+4. *The case analysis* of Section 4.1 of Akrami et al.: `exists_inv_caseA`,
+   `efx_or_inv_caseB`, assembled in `step_wlog` (the case `a X1 < a X2`, the second agent
+   finds `X3` EFX-feasible) and `step` (all cases, by symmetry).
+5. *Conclusion*: `efx3_nondegenerate`, `efx_exists_three`, `efx_exists_card_three`.
+
+## Not in this file
+
+Four or more agents; non-additive valuations (the paper allows general monotone valuations
+for two of the agents; here all three are additive); any algorithm or running time. This file
+does not depend on `EFXTwoTypes.lean`; the two files only share `FairDivisionBasic.lean`.
 -/
 
 open Finset Function
@@ -33,6 +53,8 @@ open Finset Function
 namespace Applied.Economics
 
 variable {G : Type*} [DecidableEq G]
+
+/-! ### Strong envy, partitions into three bundles, and the invariant -/
 
 /-- An agent with valuation `u` who holds the bundle `B` does not strongly envy the bundle `T`:
 `T` with any one good removed is worth at most `B`. -/
@@ -60,23 +82,33 @@ section basic
 variable {u : G → ℝ} {B B' T T' : Finset G}
 
 omit [DecidableEq G] in
+/-- Exchanging the first two bundles of a partition. -/
 lemma IsPart3.swap12 {X1 X2 X3 : Finset G} (h : IsPart3 X1 X2 X3) : IsPart3 X2 X1 X3 :=
   fun x => by have := h x; tauto
 
 omit [DecidableEq G] in
+/-- Exchanging the last two bundles of a partition. -/
 lemma IsPart3.swap23 {X1 X2 X3 : Finset G} (h : IsPart3 X1 X2 X3) : IsPart3 X1 X3 X2 :=
   fun x => by have := h x; tauto
 
+/-- No envy implies no strong envy: if `T` is worth at most `B` (for a non-negative valuation),
+the holder of `B` does not strongly envy `T`. -/
 lemma NoSE.of_le (hu : ∀ g, 0 ≤ u g) (h : ∑ x ∈ T, u x ≤ ∑ x ∈ B, u x) : NoSE u B T :=
   fun g _ => (sum_le_sum_of_subset_of_nonneg (erase_subset g T) (fun x _ _ => hu x)).trans h
 
+/-- Absence of strong envy is preserved when the envious agent's own bundle is replaced by one
+of at least the same value. -/
 lemma NoSE.mono (h : NoSE u B T) (hB : ∑ x ∈ B, u x ≤ ∑ x ∈ B', u x) : NoSE u B' T :=
   fun g hg => (h g hg).trans hB
 
+/-- Absence of strong envy is preserved when the envied bundle shrinks (non-negative
+valuation). -/
 lemma NoSE.subset (hu : ∀ g, 0 ≤ u g) (h : NoSE u B T) (hT : T' ⊆ T) : NoSE u B T' :=
   fun g hg => (sum_le_sum_of_subset_of_nonneg (erase_subset_erase g hT)
     (fun x _ _ => hu x)).trans (h g (hT hg))
 
+/-- Strong envy implies envy: if the holder of `B` strongly envies `T`, then `T` is worth more
+than `B`. -/
 lemma lt_of_not_noSE (hu : ∀ g, 0 ≤ u g) (h : ¬ NoSE u B T) :
     ∑ x ∈ B, u x < ∑ x ∈ T, u x := by
   by_contra h'
@@ -116,6 +148,8 @@ lemma exists_good_of_not_feasible (hu : ∀ g, 0 ≤ u g) {X1 X2 X3 : Finset G}
     exact absurd (hno g hg h') (not_le.2 (lt_of_le_of_lt h h'))
 
 end basic
+
+/-! ### The Plaut–Roughgarden lemma -/
 
 /-- **Plaut–Roughgarden lemma for one valuation.** Let `u` be positive and let `p` assign the
 goods in `S` to bundles indexed by `K`, each bundle worth at least `μ`. Then there is an
@@ -242,6 +276,8 @@ lemma exists_pr2 [Fintype G] (u : G → ℝ) (hu : ∀ g, 0 < u g) {P Q : Finset
     simp only [mem_union, mem_filter]
     cases q x <;> simp
 
+/-! ### Re-establishing the invariant -/
+
 /-- From any partition into three bundles, each worth at least `m` to the first agent, one
 obtains a partition satisfying the invariant whose first two bundles are worth at least `m` to
 the first agent: the first agent re-divides (`exists_pr3`), and the second agent's favourite
@@ -311,7 +347,10 @@ lemma exists_inv_shrink [Fintype G] (a b c i : G → ℝ) (ha : ∀ g, 0 < a g) 
       lt_min hp0U (lt_of_le_of_lt hp0t hP't)
     exact ⟨Y1, Y2, Y3, hY, lt_of_lt_of_le hlt hY1, lt_of_lt_of_le hlt hY2⟩
 
+/-! ### The case analysis of the step -/
+
 omit [DecidableEq G] in
+/-- The first two bundles of a partition are disjoint. -/
 lemma IsPart3.disjoint12 {X1 X2 X3 : Finset G} (h : IsPart3 X1 X2 X3) : Disjoint X1 X2 :=
   disjoint_left.2 (fun x h1 h2 => by have := h x; tauto)
 
@@ -453,6 +492,7 @@ lemma step_wlog [Fintype G] (a b c : G → ℝ) (ha : ∀ g, 0 < a g) (hb : ∀ 
   have := sum_erase_eq_sub (f := c) hgc
   linarith
 
+/-- Exchanging the second and the third agent together with their bundles. -/
 lemma EFX3.swap {a b c : G → ℝ} {A B C : Finset G} (h : EFX3 a c b A B C) :
     EFX3 a b c A C B :=
   ⟨h.1.swap23, h.2.2.1, h.2.1, h.2.2.2.2.2.1, h.2.2.2.2.2.2, h.2.2.2.1, h.2.2.2.2.1⟩
@@ -493,6 +533,8 @@ lemma step [Fintype G] (a b c : G → ℝ) (ha : ∀ g, 0 < a g) (hb : ∀ g, 0 
       exact Or.inr ⟨Y1, Y2, Y3, ⟨hY.1, hY.2.1, hY.2.2.1, hY.2.2.2.1, hY.2.2.2.2.1,
         hY.2.2.2.2.2.symm⟩, hlt⟩
 
+/-! ### Conclusion -/
+
 /-- **EFX for three agents, non-degenerate case.** If the three valuations are positive and
 the first agent values different sets of goods differently, the goods can be divided into
 three bundles `A`, `B`, `C` for the three agents such that the allocation is EFX. -/
@@ -514,36 +556,6 @@ theorem efx3_nondegenerate [Fintype G] (a b c : G → ℝ) (ha : ∀ g, 0 < a g)
   · obtain ⟨Y1, Y2, Y3, hY, hlt⟩ := h
     exact absurd (hmax ⟨(Y1, Y2, Y3), hY⟩) (not_le.2 hlt)
 
-omit [DecidableEq G] in
-/-- Perturbation to a non-degenerate instance: for non-negative valuations `v` there are
-positive valuations `v'` under which every agent values different sets of goods differently,
-and such that every weak comparison of two sets under `v' i` also holds under `v i`. -/
-lemma exists_pos_nondegenerate {A : Type*} [Fintype A] [Fintype G] (v : A → G → ℝ)
-    (hv : ∀ i g, 0 ≤ v i g) :
-    ∃ v' : A → G → ℝ, (∀ i g, 0 < v' i g) ∧
-      (∀ i (S T : Finset G), S ≠ T → ∑ g ∈ S, v' i g ≠ ∑ g ∈ T, v' i g) ∧
-      ∀ i (S T : Finset G), ∑ g ∈ S, v' i g ≤ ∑ g ∈ T, v' i g →
-        ∑ g ∈ S, v i g ≤ ∑ g ∈ T, v i g := by
-  obtain ⟨w, hwpos, hwinj, hwlt⟩ := exists_perturbation v
-  have hsum' : ∀ i (S : Finset G), ∑ g ∈ S, (v i g + w g) = ∑ g ∈ S, v i g + ∑ g ∈ S, w g :=
-    fun i S => sum_add_distrib
-  refine ⟨fun i g => v i g + w g, fun i g => by linarith [hv i g, hwpos g],
-    fun i S T hST h => ?_, fun i S T h => ?_⟩
-  · rw [hsum', hsum'] at h
-    by_cases hvST : ∑ g ∈ S, v i g = ∑ g ∈ T, v i g
-    · exact hST (hwinj S T (by linarith))
-    · have := hwlt i S T hvST
-      rw [show ∑ g ∈ S, w g - ∑ g ∈ T, w g = -(∑ g ∈ S, v i g - ∑ g ∈ T, v i g) by linarith,
-        abs_neg] at this
-      exact lt_irrefl _ this
-  · by_contra hlt
-    push Not at hlt
-    have h1 := hwlt i T S hlt.ne
-    rw [hsum', hsum'] at h
-    rw [abs_of_neg (sub_neg.2 hlt)] at h1
-    have h2 := le_abs_self (∑ g ∈ T, w g - ∑ g ∈ S, w g)
-    linarith
-
 /-- **EFX for three agents** (Chaudhury–Garg–Mehlhorn). Three agents with additive
 non-negative valuations over a finite set of goods have an EFX allocation (strong form,
 `IsEFX`). -/
@@ -556,8 +568,8 @@ theorem efx_exists_three [Fintype G] (v : Fin 3 → G → ℝ) (hv : ∀ i g, 0 
   obtain ⟨X, hX0, hX1, hX2⟩ : ∃ X : Fin 3 → Finset G, X 0 = A ∧ X 1 = B ∧ X 2 = C :=
     ⟨![A, B, C], rfl, rfl, rfl⟩
   set al : G → Fin 3 := fun x => if x ∈ A then 0 else if x ∈ B then 1 else 2 with hal
-  have hfil : ∀ j x, al x = j ↔ x ∈ X j := by
-    intro j x
+  have hfil : ∀ x j, al x = j ↔ x ∈ X j := by
+    intro x j
     have := hP x
     rcases hall j with rfl | rfl | rfl <;> by_cases h1 : x ∈ A <;> by_cases h2 : x ∈ B <;>
       simp [hal, hX0, hX1, hX2, h1, h2] <;> tauto
@@ -568,15 +580,7 @@ theorem efx_exists_three [Fintype G] (v : Fin 3 → G → ℝ) (hv : ∀ i g, 0 
       first
         | assumption
         | exact NoSE.of_le (fun g => (hpos _ g).le) le_rfl
-  refine ⟨al, fun i j g hg => ?_⟩
-  have h1 : (univ.filter fun h => al h = j ∧ h ≠ g) = (X j).erase g := by
-    ext h
-    simp [hfil, and_comm]
-  have h2 : (univ.filter fun h => al h = i) = X i := by
-    ext h
-    simp [hfil]
-  rw [h1, h2]
-  exact htrans i _ _ (hno i j g ((hfil j g).1 hg))
+  exact ⟨al, isEFX_of_bundles hfil (fun i j g hg => htrans i _ _ (hno i j g hg))⟩
 
 /-- EFX for three agents, for any type of agents with exactly three elements. -/
 theorem efx_exists_card_three {A : Type*} [DecidableEq A] [Fintype A] [Fintype G]

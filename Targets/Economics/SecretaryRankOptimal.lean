@@ -48,8 +48,11 @@ cannot do better, but this is not formalized). The rule may use the full relativ
 only the "best so far" indicators.
 
 Not covered here: the bijection between arrival orders and relative-rank sequences (see
-`Targets/Economics/SecretaryArrivalOptimal.lean`); rules that use the actual values
-(full-information problem) or randomization; that a threshold rule in the relative-rank model
+`Targets/Economics/SecretaryArrivalOptimal.lean`); rules that use the actual values rather
+than relative ranks (the bound here is for rank-based rules only; a rule that sees the values
+can do better against a fixed value function, and the worst-case statement for such rules is
+not formalized; the i.i.d. full-information problem is a different model, also not treated);
+randomization; that a threshold rule in the relative-rank model
 attains the bound (it does in the arrival-order model, `secretary_optimal`); identification of
 the optimal `r` (≈ `n/e`). The limit `max_r P(r) → 1/e` is in
 `Targets/Economics/SecretaryOptimalLimit.lean`.

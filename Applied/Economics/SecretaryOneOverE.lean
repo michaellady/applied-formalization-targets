@@ -511,6 +511,7 @@ def secretaryRuleLex (E : Type*) [Fintype E] : OnlineAlg E :=
   thresholdRule (α := ℝ ×ₗ Fin (Fintype.card E)) ⌊(Fintype.card E : ℝ) / Real.exp 1⌋₊
     fun p => toLex (p.2, Fintype.equivFin E p.1)
 
+/-- The `⌊n/e⌋` rule accepts at most one element, so it is feasible for the rank-one matroid. -/
 theorem secretaryRuleLex_isFeasible : IsFeasible (rankOne E) (secretaryRuleLex E) :=
   fun σ w _ => rankOne_indep_iff.2 (selected_thresholdRule_subsingleton _ _ σ w)
 
