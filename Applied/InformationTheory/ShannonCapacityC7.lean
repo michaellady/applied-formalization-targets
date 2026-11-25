@@ -15,7 +15,7 @@ themselves are certificates and need not be trusted).
 * `oneHundredEight_le_indepNum_strongPow_four`: `108 ≤ α(C₇^{⊠4})`;
 * `threeHundredSixtySeven_le_indepNum_strongPow_five`: `367 ≤ α(C₇^{⊠5})`;
 * the corresponding bounds `√10 ≤ Θ(C₇)`, `33^{1/3} ≤ Θ(C₇)`, `108^{1/4} ≤ Θ(C₇)`,
-  `367^{1/5} ≤ Θ(C₇)` (`367^{1/5} ≈ 3.2578`), and `13/4 < Θ(C₇)`.
+  `367^{1/5} ≤ Θ(C₇)` (`367^{1/5} > 3.2578`), and `13/4 < Θ(C₇)`.
 -/
 
 open Finset
@@ -215,7 +215,7 @@ theorem rpow_oneHundredEight_le_shannonCapacity_cycleGraph_seven :
   have h := rpow_le_shannonCapacity_of_le _ 3 108 oneHundredEight_le_indepNum_strongPow_four
   convert h using 2; norm_num
 
-/-- `367^{1/5} ≤ Θ(C₇)` (`≈ 3.2578`; Polak–Schrijver 2019). -/
+/-- `367^{1/5} ≤ Θ(C₇)` (`> 3.2578`; Polak–Schrijver 2019). -/
 theorem rpow_threeHundredSixtySeven_le_shannonCapacity_cycleGraph_seven :
     (367 : ℝ) ^ ((1 : ℝ) / 5) ≤ shannonCapacity (SimpleGraph.cycleGraph 7) := by
   have h := rpow_le_shannonCapacity_of_le _ 4 367

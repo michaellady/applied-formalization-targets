@@ -30,7 +30,10 @@ library's real-valued supremum over `k ≥ 1`, with no logarithm; the zero-error
 is `log₂ √5`.
 
 Not covered: the Lovász theta function as such; `Θ` of other graphs; the fact that
-`α(C₅^{⊠k})` equals `5^{k/2}` for even `k` (only `k = 2` is used).
+`α(C₅^{⊠k})` equals `5^{k/2}` for even `k` (only `k = 2` is used); that the supremum defining
+`Θ` is a limit (Fekete's lemma). Here `Θ` is defined as a supremum and `Θ(C₅) = √5` is proved in
+that form, whereas atlas-lean's `shannon_capacity_pentagon` is in limit form
+(`α(C₅^{⊠k})^{1/k} → √5`), which our statement does not imply.
 -/
 
 namespace Targets.InformationTheory
