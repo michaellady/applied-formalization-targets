@@ -1863,10 +1863,13 @@ theorem sorted_ok : sortedOK chunks.flatten = true := by decide +kernel
 
 theorem sum_ok : D < sums.sum := by decide +kernel
 
-/-- The certificate passes the check. -/
-theorem cert_ok : certOK tab imax blk αinv ETA bins = true :=
-  certOK_of_chunks params_ok chunks sums
-    (List.Forall₂.cons chunk0_ok
+/-- The chunk sums add up to more than `1.04 * 10^40`. -/
+theorem sum_gt : 104 * D < 100 * sums.sum := by decide +kernel
+
+/-- Every chunk passes its check. -/
+theorem chunks_ok :
+    List.Forall₂ (fun l S => chunkOK tab imax blk αinv ETA l S = true) chunks sums :=
+  (List.Forall₂.cons chunk0_ok
     (List.Forall₂.cons chunk1_ok
     (List.Forall₂.cons chunk2_ok
     (List.Forall₂.cons chunk3_ok
@@ -1911,6 +1914,13 @@ theorem cert_ok : certOK tab imax blk αinv ETA bins = true :=
     (List.Forall₂.cons chunk42_ok
     (List.Forall₂.cons chunk43_ok
     List.Forall₂.nil))))))))))))))))))))))))))))))))))))))))))))
-    sorted_ok sum_ok
+
+/-- The chunk sums are lower bounds for the sum of all bin terms. -/
+theorem sum_le : sums.sum ≤ (bins.map (binTerm tab imax blk ETA)).sum :=
+  (chunks_key chunks sums chunks_ok).2
+
+/-- The certificate passes the check. -/
+theorem cert_ok : certOK tab imax blk αinv ETA bins = true :=
+  certOK_of_chunks params_ok chunks sums chunks_ok sorted_ok sum_ok
 
 end Applied.MultipleTesting.DobribanCert

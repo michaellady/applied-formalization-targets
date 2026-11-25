@@ -38,8 +38,8 @@ correlation matrix, and let `p i = 2 (1 - Φ(|Z i|))` be the two-sided p-values.
   We do not know of a peer-reviewed version of either preprint. The statement is now refuted
   in Lean: `not_bhTwoSidedGaussian` in `Targets/Statistics/BHTwoSidedCounterexample.lean` proves
   `¬ BHTwoSidedGaussian` from Dobriban's model at level `1/100` (false discovery rate above
-  `1/100` for all sufficiently large `N`; the preprint's constant `0.0104` is not proved), with
-  a finite-sample argument and a certificate checked by the Lean kernel. Lei's results are not
+  `0.0104` for all sufficiently large `N`, as in the preprint's Theorem 1), with a
+  finite-sample argument and a certificate checked by the Lean kernel. Lei's results are not
   formalized. The `def` below is kept unchanged so that the refutation can refer to it.
 
 Both are written as propositions, not theorems, so nothing here asserts them. The first is

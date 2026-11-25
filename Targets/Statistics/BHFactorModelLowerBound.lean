@@ -55,8 +55,8 @@ are the conditional mean fractions of all statistics, respectively of the null s
 exceeding the cut-off in absolute value. `fdr_block_ge` asks for them at every factor value of
 the bin; `fdr_block_ge_endpoints` asks for finite statements about values of `Φ` at the bin end
 points (using only monotonicity of `Φ`); `fdr_block_gt` (which also assumes `zl k ≤ zh k`)
-concludes `FDR > α` when `S = ∑_k f k / u(c k (n k)) (Φ(zh k) - Φ(zl k)) > 1`,
-`n k + 2 ≤ nmax` and `nmax S < (S - 1) η² M N`. `exists_gaussian_fdr_gt_of_block`: a block
+concludes `FDR > α κ` when `S = ∑_k f k / u(c k (n k)) (Φ(zh k) - Φ(zl k)) > κ ≥ 0`,
+`n k + 2 ≤ nmax` and `nmax S < (S - κ) η² M N` (so `FDR > α` when `S > 1`, taking `κ = 1`). `exists_gaussian_fdr_gt_of_block`: a block
 model (blocks indexed by a type in `Type`) with `b g² + s g² = 1`, mean zero on the null
 blocks and `FDR > α` yields a jointly Gaussian vector indexed by `Fin n` with unit variances and
 `FDR > α` for the two-sided Benjamini–Hochberg procedure.
@@ -66,7 +66,9 @@ blocks and `FDR > α` yields a jointly Gaussian vector indexed by `Fin n` with u
 `Applied.Statistics.NormalTable` up to `imax ≤ 1024²`, residual standard deviations `s g > 0`
 with `b g² + s g² = 1`, and a list of bins: if the Boolean function `certOK` (integer
 arithmetic only) returns `true`, then for all sufficiently large `N` the false discovery rate
-at level `1/αinv` exceeds `1/αinv`. `certOK_of_chunks` lets the check run chunk by chunk.
+at level `1/αinv` exceeds `1/αinv`; more generally (`exists_fdr_gt_of_certOK'`) it exceeds
+`κ/αinv` for any `κ ≥ 0` with `κ · 10⁴⁰` below the sum of the integer bin terms.
+`certOK_of_chunks` lets the check run chunk by chunk.
 
 Differences from the textbook statement. The preprint's Lemmas 2–3 assume uniform convergence
 of empirical distribution functions to continuous limits and conclude bounds for `liminf`/
@@ -98,6 +100,7 @@ alias fdr_block_ge_endpoints := Applied.MultipleTesting.fdr_block_ge_endpoints
 alias fdr_block_gt := Applied.MultipleTesting.fdr_block_gt
 alias exists_gaussian_fdr_gt_of_block := Applied.MultipleTesting.exists_gaussian_fdr_gt_of_block
 alias exists_fdr_gt_of_certOK := Applied.MultipleTesting.BlockCert.exists_fdr_gt_of_certOK
+alias exists_fdr_gt_of_certOK' := Applied.MultipleTesting.BlockCert.exists_fdr_gt_of_certOK'
 alias certOK_of_chunks := Applied.MultipleTesting.BlockCert.certOK_of_chunks
 
 end Targets.Statistics

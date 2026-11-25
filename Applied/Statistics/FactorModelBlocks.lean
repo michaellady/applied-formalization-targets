@@ -12,8 +12,9 @@ nulls are the statistics of the blocks in `β₀`.
   (hypotheses quantified over the factor value in each bin).
 * `fdr_block_ge_endpoints`: the same with the hypotheses evaluated at the bin end points only
   (monotonicity of `Φ`), so that every hypothesis is a finite statement about values of `Φ`.
-* `fdr_block_gt`: if the finite sum `∑ k, f k / u(a k) * (Φ(zh k) - Φ(zl k))` exceeds one, the
-  false discovery rate exceeds `α` for every sufficiently large replication number `N`.
+* `fdr_block_gt`: if the finite sum `∑ k, f k / u(a k) * (Φ(zh k) - Φ(zl k))` exceeds `κ ≥ 0`,
+  the false discovery rate exceeds `α κ` for every sufficiently large replication number `N`
+  (`κ = 1`: the level is violated).
 * `exists_gaussian_fdr_gt_of_block`: the resulting instance in the form used by the open
   proposition `Targets.Statistics.BHTwoSidedGaussian` (indices `Fin n`).
 -/
@@ -316,11 +317,12 @@ theorem fdr_block_ge_endpoints {α : ℝ} (hα : 0 < α) (hs : ∀ g, 0 < s g) (
     (fun k z hz => (hL k).trans (blockG_ge_lower mult θ b s hs univ hz _))
     (fun k z hz => (hNull k).trans (blockG_ge_lower mult θ b s hs β₀ hz _))
 
-/-- **The certificate sum exceeding one forces a violation of the level.** In the setting of
-`fdr_block_ge_endpoints`, with at most `nmax - 2` cells per bin, if
-`S = ∑ k, f k / u(c k (n k)) * (Φ(zh k) - Φ(zl k)) > 1`, then for every replication number `N`
-with `1 ≤ η M N` and `nmax S < (S - 1) η² M N` (`M` the total multiplicity) the false discovery
-rate of Benjamini–Hochberg at level `α` is strictly larger than `α`. -/
+/-- **The certificate sum bounds the false discovery rate from below, for large `N`.** In the
+setting of `fdr_block_ge_endpoints`, with at most `nmax - 2` cells per bin, let
+`S = ∑ k, f k / u(c k (n k)) * (Φ(zh k) - Φ(zl k))` and `0 ≤ κ < S`. Then for every replication
+number `N` with `1 ≤ η M N` and `nmax S < (S - κ) η² M N` (`M` the total multiplicity) the false
+discovery rate of Benjamini–Hochberg at level `α` is strictly larger than `α κ`. With `κ = 1`:
+if `S > 1` the level is violated. -/
 theorem fdr_block_gt {α : ℝ} (hα : 0 < α) (hs : ∀ g, 0 < s g) (β₀ : Finset β) (N : ℕ)
     {𝒦 : Type*} [Fintype 𝒦] (zl zh : 𝒦 → ℝ) (hzz : ∀ k, zl k ≤ zh k)
     (hdisj : Pairwise (Function.onFun Disjoint fun k => Set.Ioc (zl k) (zh k)))
@@ -332,12 +334,12 @@ theorem fdr_block_gt {α : ℝ} (hα : 0 < α) (hs : ∀ g, 0 < s g) (β₀ : Fi
       blockGUpper mult θ b s univ (zl k) (zh k) (c k j) + η ≤ uTail (c k (j + 1)) / α)
     (hL : ∀ k, uTail (bc k) / α + 2 * η ≤ blockGLower mult θ b s univ (zl k) (zh k) (bc k))
     (hNull : ∀ k, f k + η ≤ blockGLower mult θ b s β₀ (zl k) (zh k) (bc k))
-    (nmax : ℕ) (hnmax : ∀ k, n k + 2 ≤ nmax)
-    (hS : 1 < ∑ k, f k / uTail (c k (n k)) * (Φ (zh k) - Φ (zl k)))
+    (nmax : ℕ) (hnmax : ∀ k, n k + 2 ≤ nmax) {κ : ℝ} (hκ : 0 ≤ κ)
+    (hS : κ < ∑ k, f k / uTail (c k (n k)) * (Φ (zh k) - Φ (zl k)))
     (hN2 : nmax * (∑ k, f k / uTail (c k (n k)) * (Φ (zh k) - Φ (zl k)))
-      < ((∑ k, f k / uTail (c k (n k)) * (Φ (zh k) - Φ (zl k))) - 1)
+      < ((∑ k, f k / uTail (c k (n k)) * (Φ (zh k) - Φ (zl k))) - κ)
         * (η ^ 2 * ((∑ g, mult g : ℕ) * N))) :
-    ENNReal.ofReal α < fdr (factorMeasure (blockIndex mult N)) (blockNulls mult β₀ N)
+    ENNReal.ofReal (α * κ) < fdr (factorMeasure (blockIndex mult N)) (blockNulls mult β₀ N)
       (fun ω => bhReject α (factorP (fun i : blockIndex mult N => θ i.1.1)
         (fun i => b i.1.1) (fun i => s i.1.1) ω)) := by
   set S := ∑ k, f k / uTail (c k (n k)) * (Φ (zh k) - Φ (zl k)) with hSdef
@@ -349,16 +351,18 @@ theorem fdr_block_gt {α : ℝ} (hα : 0 < α) (hs : ∀ g, 0 < s g) (β₀ : Fi
   set x : ℝ := 1 / (η ^ 2 * ((Mtot : ℝ) * N)) with hx
   have hden : 0 < η ^ 2 * ((Mtot : ℝ) * N) := mul_pos (pow_pos hη 2) hmpos
   have hx0 : 0 < x := by rw [hx]; positivity
-  have hkey : 1 < S * (1 - nmax * x) := by
-    have h1 : (nmax : ℝ) * S * x < S - 1 := by
+  have hS0 : 0 < S := lt_of_le_of_lt hκ hS
+  have hkey : κ < S * (1 - nmax * x) := by
+    have h1 : (nmax : ℝ) * S * x < S - κ := by
       rw [hx, mul_one_div, div_lt_iff₀ hden]
       exact hN2
-    nlinarith
+    have e : S * (1 - nmax * x) = S - nmax * S * x := by ring
+    rw [e]; linarith
   have hpos1 : 0 < 1 - (nmax : ℝ) * x := by
     by_contra h
     have h0 : 1 - (nmax : ℝ) * x ≤ 0 := not_lt.mp h
-    have hS0 : 0 < S := by linarith
-    nlinarith
+    have := mul_nonpos_of_nonneg_of_nonpos hS0.le h0
+    linarith
   have hbound := fdr_block_ge_endpoints mult θ b s hα hs β₀ N zl zh hdisj n c bc f hη hN hc hc0
     hbc hbα hf hU hL hNull
   refine lt_of_lt_of_le ?_ hbound
@@ -393,9 +397,10 @@ theorem fdr_block_gt {α : ℝ} (hα : 0 < α) (hs : ∀ g, 0 < s g) (β₀ : Fi
       _ ≤ _ := by
           rw [gaussianReal_Ioc]
           gcongr
-  calc ENNReal.ofReal α < ENNReal.ofReal (α * (S * (1 - nmax * x))) := by
-        rw [ENNReal.ofReal_lt_ofReal_iff (by positivity)]
-        nlinarith
+  calc ENNReal.ofReal (α * κ) < ENNReal.ofReal (α * (S * (1 - nmax * x))) := by
+        have hpos : 0 < α * (S * (1 - nmax * x)) := mul_pos hα (mul_pos hS0 hpos1)
+        rw [ENNReal.ofReal_lt_ofReal_iff hpos]
+        exact mul_lt_mul_of_pos_left hkey hα
     _ = ENNReal.ofReal (∑ k, α * (f k / uTail (c k (n k)) * (Φ (zh k) - Φ (zl k)))
           * (1 - nmax * x)) := by
         congr 1

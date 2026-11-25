@@ -735,11 +735,13 @@ variable {tab : ℕ → Entry} {imax : ℕ} {blk : Fin 3 → BlockQ} {αinv ETA 
 then in the three-block model described by `blk` (residual standard deviations `s g > 0` with
 `b g ^ 2 + s g ^ 2 = 1`; block `0` is the null block) the Benjamini–Hochberg procedure at level
 `1 / αinv` applied to the two-sided p-values has false discovery rate strictly above
-`1 / αinv`, for every sufficiently large replication number `N`. -/
-theorem exists_fdr_gt_of_certOK (hv : ∀ i ≤ imax, (tab i).Valid i) (himax : imax ≤ H * H)
+`κ / αinv`, for every sufficiently large replication number `N`, where `κ ≥ 0` is any number
+with `κ D` below the sum of the bin terms. (`certOK` checks this for `κ = 1`.) -/
+theorem exists_fdr_gt_of_certOK' (hv : ∀ i ≤ imax, (tab i).Valid i) (himax : imax ≤ H * H)
     (hs : ∀ g, 0 < s g) (hbs : ∀ g, (blk g).b ^ 2 + s g ^ 2 = 1) (bins : List Bin)
-    (hcert : certOK tab imax blk αinv ETA bins = true) :
-    ∃ N₀ : ℕ, ∀ N ≥ N₀, ENNReal.ofReal (1 / (αinv : ℝ))
+    (hcert : certOK tab imax blk αinv ETA bins = true) {κ : ℝ} (hκ0 : 0 ≤ κ)
+    (hκ : κ * D < ((bins.map (binTerm tab imax blk ETA)).sum : ℕ)) :
+    ∃ N₀ : ℕ, ∀ N ≥ N₀, ENNReal.ofReal (1 / (αinv : ℝ) * κ)
       < fdr (factorMeasure (blockIndex (fun g => (blk g).mult) N))
           (blockNulls (fun g => (blk g).mult) {0} N)
           (fun ω => bhReject (1 / (αinv : ℝ))
@@ -767,7 +769,7 @@ theorem exists_fdr_gt_of_certOK (hv : ∀ i ≤ imax, (tab i).Valid i) (himax : 
   set S : ℝ := ∑ k, binF tab imax blk ETA (Bk k)
       / uTail (binC (Bk k) ((Bk k).cs.length - 1)) * (Φ (binZh (Bk k)) - Φ (binZl (Bk k)))
     with hSdef
-  have hS : 1 < S := by
+  have hS : κ < S := by
     have h1 : ∑ k : Fin bins.length, (binTerm tab imax blk ETA (Bk k) : ℝ) / D ≤ S :=
       Finset.sum_le_sum fun k _ => (spec k).2.2.2.2.2.2.2.2.2
     have h2 : ∑ k : Fin bins.length, (binTerm tab imax blk ETA (Bk k) : ℝ) / D
@@ -777,13 +779,13 @@ theorem exists_fdr_gt_of_certOK (hv : ∀ i ≤ imax, (tab i).Valid i) (himax : 
       rw [sum_fin_getD bins (fun B => (binTerm tab imax blk ETA B : ℝ)) default,
         Nat.cast_list_sum, List.map_map]
       rfl
-    have h3 : (1 : ℝ) < ((bins.map (binTerm tab imax blk ETA)).sum : ℝ) / D := by
-      rw [one_lt_div hD]; exact_mod_cast hsum
+    have h3 : κ < ((bins.map (binTerm tab imax blk ETA)).sum : ℝ) / D := by
+      rw [lt_div_iff₀ hD]; exact hκ
     linarith
   set nmax : ℕ := Finset.sup univ fun k : Fin bins.length => (Bk k).cs.length - 1 + 2 with hnmax
   have hMsum : ((∑ g : Fin 3, (blk g).mult : ℕ) : ℝ) = Mtot blk := by rw [sum_mult]
   obtain ⟨N₁, hN₁⟩ := exists_nat_gt (1 / (η * Mtot blk))
-  obtain ⟨N₂, hN₂⟩ := exists_nat_gt (nmax * S / ((S - 1) * (η ^ 2 * Mtot blk)))
+  obtain ⟨N₂, hN₂⟩ := exists_nat_gt (nmax * S / ((S - κ) * (η ^ 2 * Mtot blk)))
   refine ⟨max N₁ N₂, fun N hN => ?_⟩
   have hNN₁ : (N₁ : ℝ) ≤ N := by exact_mod_cast (le_max_left _ _).trans hN
   have hNN₂ : (N₂ : ℝ) ≤ N := by exact_mod_cast (le_max_right _ _).trans hN
@@ -814,7 +816,7 @@ theorem exists_fdr_gt_of_certOK (hv : ∀ i ≤ imax, (tab i).Valid i) (himax : 
     (fun k j hj => (spec k).2.2.2.2.2.2.1 j hj) (fun k => (spec k).2.2.2.2.2.2.2.1)
     (fun k => (spec k).2.2.2.2.2.2.2.2.1) nmax
     (fun k => Finset.le_sup (f := fun k : Fin bins.length => (Bk k).cs.length - 1 + 2)
-      (Finset.mem_univ k)) hS ?_
+      (Finset.mem_univ k)) hκ0 hS ?_
   · rw [hMsum]
     have h1 : 1 < η * Mtot blk * N₁ := by
       have hpos : 0 < η * Mtot blk := mul_pos hη0 hM'
@@ -822,13 +824,33 @@ theorem exists_fdr_gt_of_certOK (hv : ∀ i ≤ imax, (tab i).Valid i) (himax : 
       linarith
     nlinarith [mul_pos hη0 hM']
   · rw [hMsum]
-    have hpos : 0 < (S - 1) * (η ^ 2 * Mtot blk) :=
+    have hpos : 0 < (S - κ) * (η ^ 2 * Mtot blk) :=
       mul_pos (by linarith) (mul_pos (pow_pos hη0 2) hM')
     rw [div_lt_iff₀ hpos] at hN₂
-    have : (S - 1) * (η ^ 2 * Mtot blk) * N₂ ≤ (S - 1) * (η ^ 2 * Mtot blk) * N :=
+    have : (S - κ) * (η ^ 2 * Mtot blk) * N₂ ≤ (S - κ) * (η ^ 2 * Mtot blk) * N :=
       mul_le_mul_of_nonneg_left hNN₂ hpos.le
-    calc (nmax : ℝ) * S < N₂ * ((S - 1) * (η ^ 2 * Mtot blk)) := hN₂
-      _ ≤ (S - 1) * (η ^ 2 * (Mtot blk * N)) := by nlinarith
+    calc (nmax : ℝ) * S < N₂ * ((S - κ) * (η ^ 2 * Mtot blk)) := hN₂
+      _ ≤ (S - κ) * (η ^ 2 * (Mtot blk * N)) := by nlinarith
+
+/-- **Soundness of the certificate check, at the level itself.** If the table is valid and
+`certOK` returns `true`, the false discovery rate of Benjamini–Hochberg at level `1 / αinv` is
+strictly above `1 / αinv` in the block model, for every sufficiently large `N`. -/
+theorem exists_fdr_gt_of_certOK (hv : ∀ i ≤ imax, (tab i).Valid i) (himax : imax ≤ H * H)
+    (hs : ∀ g, 0 < s g) (hbs : ∀ g, (blk g).b ^ 2 + s g ^ 2 = 1) (bins : List Bin)
+    (hcert : certOK tab imax blk αinv ETA bins = true) :
+    ∃ N₀ : ℕ, ∀ N ≥ N₀, ENNReal.ofReal (1 / (αinv : ℝ))
+      < fdr (factorMeasure (blockIndex (fun g => (blk g).mult) N))
+          (blockNulls (fun g => (blk g).mult) {0} N)
+          (fun ω => bhReject (1 / (αinv : ℝ))
+            (factorP (fun i : blockIndex (fun g => (blk g).mult) N => (blk i.1.1).θ)
+              (fun i => (blk i.1.1).b) (fun i => s i.1.1) ω)) := by
+  have hsum : (1 : ℝ) * D < ((bins.map (binTerm tab imax blk ETA)).sum : ℕ) := by
+    have hc := hcert
+    simp only [certOK, Bool.and_eq_true, decide_eq_true_eq] at hc
+    rw [one_mul]
+    exact_mod_cast hc.2
+  have h := exists_fdr_gt_of_certOK' hv himax hs hbs bins hcert zero_le_one hsum
+  simpa using h
 
 end Final
 
