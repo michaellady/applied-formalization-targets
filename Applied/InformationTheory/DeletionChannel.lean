@@ -17,8 +17,8 @@ surviving bits in their original order, without the positions of the deletions.
 * `deletionCapacity_nonneg`, `deletionCapacity_le_log_two`: `0 ≤ C(d) ≤ log 2`.
 * `deletionCapacity_zero`: `C(0) = log 2`; `deletionCapacity_one`: `C(1) = 0`.
 
-The value of `C(d)` for `0 < d < 1` is an open problem. The known bound `C(d) ≤ (1 - d) log 2`
-(the capacity of the erasure channel) is not formalized.
+The value of `C(d)` for `0 < d < 1` is an open problem. The bound `C(d) ≤ (1 - d) log 2` (the
+capacity of the erasure channel) is proved in `Applied/InformationTheory/DeletionUpperBound.lean`.
 -/
 
 open Finset Real

@@ -40,12 +40,13 @@ is zero: this is the null distribution. Looks are indexed by `ℕ`; a design wit
 obtained by restricting to the first `K` indices. Look times are only required to be
 non-decreasing, so repeated looks give increments equal to zero.
 
-Not covered: the statement that the vector `(Z n₁, …, Z n_K)` is multivariate normal as a law
-on `ℝ^K` (here: normal marginals, the covariances, and independent normal increments, from
-which it follows, but the joint-law statement is not formalised); non-zero drift
-`E[Z n] = θ √n`; information levels that are not integers; the recursive numerical integration
-that yields boundaries; the fact that such boundaries attain a given alpha-spending function
-(see `Targets/Statistics/GroupSequential.lean` for the spending principle itself).
+Not covered here: the statement that the vector `(Z n₁, …, Z n_K)` is multivariate normal as a
+law on `ℝ^K`, and that its law depends only on the look times (both in
+`Targets/Statistics/GroupSequentialJointLaw.lean`); existence of boundaries attaining a given
+alpha-spending function exactly (in `Targets/Statistics/GroupSequentialBoundaries.lean`; see
+`Targets/Statistics/GroupSequential.lean` for the spending principle itself). Not covered
+anywhere: non-zero drift `E[Z n] = θ √n`; information levels that are not integers; the
+recursive numerical integration that yields boundaries.
 -/
 
 namespace Targets.Statistics

@@ -17,9 +17,10 @@ non-decreasing spending function, then the overall type-I error is at most the t
 spent. No assumption is made on the joint distribution of the interim statistics.
 
 The marginal laws, covariances and independent normal increments of the interim statistics are
-in `Targets/Statistics/GroupSequentialCanonical.lean`. Not yet covered: that the vector of
-interim statistics is multivariate normal as a joint law, and that boundaries computed from
-it achieve a given spending function.
+in `Targets/Statistics/GroupSequentialCanonical.lean`; their joint normality as a law on
+`ℝ^K` is in `Targets/Statistics/GroupSequentialJointLaw.lean`. The existence of boundaries
+whose first-crossing probabilities equal the spending increments exactly, so that the type-I
+error equals the total amount spent, is in `Targets/Statistics/GroupSequentialBoundaries.lean`.
 -/
 
 namespace Targets.Statistics

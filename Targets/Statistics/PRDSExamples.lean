@@ -36,7 +36,9 @@ project is proved under this form. In particular the facts above are about this 
 not claimed for the classical definition.
 
 The one-factor (equicorrelated) normal model with any correlation in `[0, 1]` is covered in
-`Targets/Statistics/PRDSCommonFactor.lean`. Not covered: a general jointly normal vector with
+`Targets/Statistics/PRDSCommonFactor.lean`; independent groups of hypotheses with one normal
+common factor per group, combining that model with (2), in
+`Targets/Statistics/PRDSGroupFactor.lean`. Not covered: a general jointly normal vector with
 non-negative correlations that is not of one-factor form.
 -/
 

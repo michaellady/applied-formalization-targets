@@ -23,8 +23,8 @@ an error. If moreover the predictions are in `{-1, 1}`, each weighted error
 at most `exp (-2 ∑_{t<T} (1/2 - ε t)²)`.
 
 Not covered: generalisation bounds (VC or margin based), confidence-rated predictions with
-optimised votes, the case `ε t ∈ {0, 1}`, the multiclass variants, and the statement that the
-choice of `α t` minimises `Z t`.
+optimised votes, the case `ε t ∈ {0, 1}`, and the multiclass variants. The margin version and
+the statement that the choice of `α t` minimises `Z t` are in `Targets.Learning.AdaBoostMargin`.
 -/
 
 namespace Targets.Learning
