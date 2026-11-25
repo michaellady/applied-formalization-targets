@@ -23,6 +23,8 @@ namespace Applied.Optimization
 
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [CompleteSpace E]
 
+/-- Derivative of a differentiable function along a line: `s ↦ f (x + s • d)` has derivative
+`⟪∇f (x + t • d), d⟫` at `t`. -/
 theorem hasDerivAt_comp_line (f : E → ℝ) (hdiff : Differentiable ℝ f) (x d : E) (t : ℝ) :
     HasDerivAt (fun s : ℝ => f (x + s • d)) ⟪gradient f (x + t • d), d⟫ t := by
   have h1 : HasFDerivAt f (toDual ℝ E (gradient f (x + t • d))) (x + t • d) :=

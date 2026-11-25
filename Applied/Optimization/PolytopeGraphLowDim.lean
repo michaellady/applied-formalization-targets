@@ -29,16 +29,19 @@ theorem convex_polyhedron {m d : ℕ} (A : Matrix (Fin m) (Fin d) ℝ) (b : Fin 
   have h3 : s * b i + r * b i = b i := by rw [← add_mul, hsr, one_mul]
   linarith
 
+/-- Two points of `ℝ^1` with the same coordinate are equal. -/
 private theorem eq_of_apply_zero {p q : Fin 1 → ℝ} (h : p 0 = q 0) : p = q := by
   funext i
   fin_cases i
   exact h
 
+/-- Membership in an open segment of `ℝ^1` can be checked on the coordinate. -/
 private theorem mem_openSegment_fin_one {p q r : Fin 1 → ℝ}
     (h : r 0 ∈ openSegment ℝ (p 0) (q 0)) : r ∈ openSegment ℝ p q := by
   obtain ⟨a, c, ha, hc, hac, h⟩ := h
   exact ⟨a, c, ha, hc, hac, eq_of_apply_zero (by simpa using h)⟩
 
+/-- Membership in a segment of `ℝ^1` can be checked on the coordinate. -/
 private theorem mem_segment_fin_one {p q r : Fin 1 → ℝ}
     (h : r 0 ∈ segment ℝ (p 0) (q 0)) : r ∈ segment ℝ p q := by
   obtain ⟨a, c, ha, hc, hac, h⟩ := h

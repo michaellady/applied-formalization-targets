@@ -146,10 +146,12 @@ theorem length_eq_zero_of_card_eq_zero (h : IsConnectedLayerFamily d U F t) (hd 
 def usedPrefix (F : ℕ → Finset (Finset α)) (k : ℕ) : Finset α :=
   (Finset.range k).biUnion fun i => (F i).biUnion id
 
+/-- A symbol is in `usedPrefix F k` iff it occurs in some set of one of the first `k` layers. -/
 theorem mem_usedPrefix {k : ℕ} {x : α} :
     x ∈ usedPrefix F k ↔ ∃ i < k, ∃ S ∈ F i, x ∈ S := by
   simp [usedPrefix]
 
+/-- The symbols used by the first `k ≤ t` layers of a connected layer family on `U` lie in `U`. -/
 theorem usedPrefix_subset (h : IsConnectedLayerFamily d U F t) {k : ℕ} (hk : k ≤ t) :
     usedPrefix F k ⊆ U := by
   intro x hx

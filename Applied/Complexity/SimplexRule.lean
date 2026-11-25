@@ -23,6 +23,7 @@ namespace Applied.Complexity
 /-- The single bit `b` as a one-letter code word. -/
 def encBit (b : Bool) : List Bool := [b]
 
+/-- A single bit is a prefix-free code. -/
 theorem prefixFree_encBit : PrefixFree encBit := by
   intro a a' r r' h
   simpa [encBit] using h
@@ -42,6 +43,7 @@ structure RuleInput where
 /-- A set of column indices as its vector of membership bits. -/
 def memVec {n : ℕ} (B : Finset (Fin n)) : Fin n → Bool := fun j => decide (j ∈ B)
 
+/-- A set of column indices is determined by its vector of membership bits. -/
 theorem memVec_injective {n : ℕ} : Function.Injective (memVec : Finset (Fin n) → Fin n → Bool) :=
   by
   intro B B' h
@@ -61,6 +63,7 @@ def RuleInput.encode (I : RuleInput) : List Bool :=
     (encVec encRat I.P.b ++ (encVec encRat I.P.c ++
       encList (encVec encBit) (I.hist.map memVec)))))
 
+/-- Distinct inputs (program and history) have distinct encodings. -/
 theorem RuleInput.encode_injective : Function.Injective RuleInput.encode := by
   rintro ⟨m, n, ⟨A, b, c⟩, h⟩ ⟨m', n', ⟨A', b', c'⟩, h'⟩ heq
   simp only [RuleInput.encode] at heq
@@ -77,6 +80,7 @@ theorem RuleInput.encode_injective : Function.Injective RuleInput.encode := by
   subst h7 hA'
   rfl
 
+/-- An encoded list is longer than the number of its entries. -/
 theorem length_encList_ge {α : Type*} (e : α → List Bool) (l : List α) :
     l.length + 1 ≤ (encList e l).length := by
   induction l with
