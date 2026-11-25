@@ -30,6 +30,12 @@ positions `a` and `a + eᵢ`, add the answers); consequently two-query LDCs of l
 (`exists_isLDC_two_pow`); the definition is monotone in `δ` and `ε` and invariant under
 renaming positions (`IsLDC.mono`, `IsLDC.reindex`). Zero-query codes do not exist for
 `k ≥ 1`, `δ ≥ 0`, `ε > 0`, so `PolyLengthLDC 0` is false (`Targets/Coding/LocallyDecodableZeroQuery.lean`).
+For *linear* two-query codes in the combinatorial matching model (vectors `a_j ∈ 𝔽₂ᵏ`, and for
+each `i` a matching of `≥ δ m` position pairs with `a_u + a_v = eᵢ`), the length satisfies
+`m ≥ 4 ^ (δ k)`, attained by the Hadamard code at `δ = 1/2`
+(`Targets/Coding/LinearTwoQueryLDCLowerBound.lean`), and such codes are `IsLDC` codes
+(`Targets/Coding/LinearTwoQueryLDCDecoder.lean`); the reduction from `IsLDC` decoders of linear
+codes to matchings is not formalized, so this does not refute `PolyLengthLDC 2`.
 
 Known but NOT formalized here: for `q = 2` every LDC has `n ≥ exp(Ω(k))` (Kerenidis–de Wolf),
 so `PolyLengthLDC 2` is false, and `PolyLengthLDC 1` is false (Katz–Trevisan; the
