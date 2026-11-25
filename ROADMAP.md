@@ -19,10 +19,10 @@ assumptions hold in practice, so every target states its assumptions in plain la
 | 3 | Closed testing principle; Holm is the closed Bonferroni test | 1 | done |
 | 4 | Weighted Bonferroni; fixed-sequence testing | 1 | done |
 | 5 | False discovery rate (FDR); Benjamini–Hochberg under independence | 1, independence | done |
-| 6 | Benjamini–Yekutieli (arbitrary dependence) | 5 | todo |
-| 7 | Šidák correction (independent p-values) | 1, independence | todo |
+| 6 | Benjamini–Yekutieli (arbitrary dependence) | 5 | done |
+| 7 | Šidák correction (independent p-values) | 1, independence | done |
 | 8 | Fallback and graphical procedures (Bretz et al. 2009) | 3, 4 | todo |
-| 9 | Simes inequality (independence), then Hochberg and Hommel | 3 | todo |
+| 9 | Simes inequality (independence), then Hochberg and Hommel | 3, 5 | done |
 | 10 | Simes and Benjamini–Hochberg under positive dependence (PRDS) | 5, 9 | todo |
 | 11 | Group-sequential designs: alpha-spending controls type-I error | filtrations | todo |
 | 12 | Split conformal prediction: finite-sample coverage under exchangeability | exchangeability | todo |
