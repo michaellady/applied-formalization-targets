@@ -14,14 +14,28 @@ into a simultaneous one, whatever the dependence between the sets.
   most `α / m`, all of them cover simultaneously except with probability at most `α`.
 * `measure_exists_notMem_le_weighted`: the same with miscoverage budgets `α wᵢ` for
   non-negative weights with `∑ wᵢ ≤ 1`.
-* `one_sub_le_measure_forall_mem`, `one_sub_le_measure_forall_mem_bonferroni`: the same
-  guarantees stated as simultaneous coverage probability at least `1 - α`.
+* `measure_exists_mem_notMem_le_sum`: the union bound over a finite subset `s` of a possibly
+  infinite index type.
+* `one_sub_le_measure_forall_mem_of_le`: the passage from "some set misses with probability at
+  most `ε`" to "all sets cover with probability at least `1 - ε`".
+* `one_sub_le_measure_forall_mem`, `one_sub_le_measure_forall_mem_bonferroni`,
+  `one_sub_le_measure_forall_mem_weighted`: the same guarantees stated as simultaneous
+  coverage probability at least `1 - α`.
 
 ## Conventions
 
 The parameter spaces may differ between indices (`Θ i`), and `C i ω` is any set, not
 necessarily an interval. No measurability is assumed: statements are about the (outer)
 measure of the events. The parameters `θ i` are deterministic.
+
+## Relation to other files
+
+This is the confidence-set counterpart of the Bonferroni test in `MultipleTesting.lean`.
+Bounds that exploit the dependence structure are elsewhere: `Dunnett.lean`
+(`measure_dunnett_lowerBounds`, exact simultaneous bounds for comparisons with a control),
+`CompatibleBounds.lean` (bounds compatible with stepwise tests) and
+`GroupSequentialGraphical.lean` (repeated confidence sets over the looks of a trial). Not here:
+Šidák-type product bounds under independence, Scheffé or Tukey intervals.
 -/
 
 open MeasureTheory Finset
@@ -79,11 +93,15 @@ theorem measure_exists_notMem_le_bonferroni (P : Measure Ω) (θ : ∀ i, Θ i)
     · rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul, mul_one_div_cancel hm.ne']
     · rw [mul_one_div]; exact hC i
 
-/-- Simultaneous coverage from individual miscoverage bounds: under a probability measure,
-all sets cover at once with probability at least `1 - ∑ δ i`. -/
-theorem one_sub_le_measure_forall_mem (P : Measure Ω) [IsProbabilityMeasure P] (θ : ∀ i, Θ i)
-    (C : ∀ i, Ω → Set (Θ i)) (δ : ι → ℝ≥0∞) (hC : ∀ i, P {ω | θ i ∉ C i ω} ≤ δ i) :
-    1 - ∑ i, δ i ≤ P {ω | ∀ i, θ i ∈ C i ω} := by
+omit [Fintype ι] in
+/-- **From miscoverage to coverage.** Under a probability measure, if the event that some set
+misses its parameter has probability at most `ε`, then all sets cover simultaneously with
+probability at least `1 - ε`. (No measurability is needed: the two events cover the whole
+space and outer measure is subadditive. The index type may be infinite.) -/
+theorem one_sub_le_measure_forall_mem_of_le (P : Measure Ω) [IsProbabilityMeasure P]
+    (θ : ∀ i, Θ i) (C : ∀ i, Ω → Set (Θ i)) {ε : ℝ≥0∞}
+    (h : P {ω | ∃ i, θ i ∉ C i ω} ≤ ε) :
+    1 - ε ≤ P {ω | ∀ i, θ i ∈ C i ω} := by
   rw [tsub_le_iff_right]
   have hcover : (Set.univ : Set Ω) ⊆ {ω | ∀ i, θ i ∈ C i ω} ∪ {ω | ∃ i, θ i ∉ C i ω} := by
     intro ω _
@@ -93,8 +111,25 @@ theorem one_sub_le_measure_forall_mem (P : Measure Ω) [IsProbabilityMeasure P] 
   calc (1 : ℝ≥0∞) = P Set.univ := measure_univ.symm
     _ ≤ P ({ω | ∀ i, θ i ∈ C i ω} ∪ {ω | ∃ i, θ i ∉ C i ω}) := measure_mono hcover
     _ ≤ P {ω | ∀ i, θ i ∈ C i ω} + P {ω | ∃ i, θ i ∉ C i ω} := measure_union_le _ _
-    _ ≤ P {ω | ∀ i, θ i ∈ C i ω} + ∑ i, δ i := by
-        gcongr; exact measure_exists_notMem_le_sum P θ C δ hC
+    _ ≤ P {ω | ∀ i, θ i ∈ C i ω} + ε := by gcongr
+
+/-- Simultaneous coverage from individual miscoverage bounds: under a probability measure,
+all sets cover at once with probability at least `1 - ∑ δ i`. -/
+theorem one_sub_le_measure_forall_mem (P : Measure Ω) [IsProbabilityMeasure P] (θ : ∀ i, Θ i)
+    (C : ∀ i, Ω → Set (Θ i)) (δ : ι → ℝ≥0∞) (hC : ∀ i, P {ω | θ i ∉ C i ω} ≤ δ i) :
+    1 - ∑ i, δ i ≤ P {ω | ∀ i, θ i ∈ C i ω} :=
+  one_sub_le_measure_forall_mem_of_le P θ C (measure_exists_notMem_le_sum P θ C δ hC)
+
+/-- **Weighted Bonferroni simultaneous confidence sets, coverage form.** With miscoverage
+budgets `α (w i)` for non-negative weights summing to at most one, all sets cover their
+parameters at once with probability at least `1 - α`. -/
+theorem one_sub_le_measure_forall_mem_weighted (P : Measure Ω) [IsProbabilityMeasure P]
+    (θ : ∀ i, Θ i) (C : ∀ i, Ω → Set (Θ i)) (α : ℝ) (hα : 0 ≤ α) (w : ι → ℝ)
+    (hw : ∀ i, 0 ≤ w i) (hsum : ∑ i, w i ≤ 1)
+    (hC : ∀ i, P {ω | θ i ∉ C i ω} ≤ ENNReal.ofReal (α * w i)) :
+    1 - ENNReal.ofReal α ≤ P {ω | ∀ i, θ i ∈ C i ω} :=
+  one_sub_le_measure_forall_mem_of_le P θ C
+    (measure_exists_notMem_le_weighted P θ C α hα w hw hsum hC)
 
 /-- **Bonferroni simultaneous confidence sets, coverage form.** If each of the `m` sets misses
 its parameter with probability at most `α / m`, then all `m` sets cover their parameters at
@@ -102,17 +137,8 @@ once with probability at least `1 - α`. -/
 theorem one_sub_le_measure_forall_mem_bonferroni (P : Measure Ω) [IsProbabilityMeasure P]
     (θ : ∀ i, Θ i) (C : ∀ i, Ω → Set (Θ i)) (α : ℝ) (hα : 0 ≤ α)
     (hC : ∀ i, P {ω | θ i ∉ C i ω} ≤ ENNReal.ofReal (α / Fintype.card ι)) :
-    1 - ENNReal.ofReal α ≤ P {ω | ∀ i, θ i ∈ C i ω} := by
-  rw [tsub_le_iff_right]
-  have hcover : (Set.univ : Set Ω) ⊆ {ω | ∀ i, θ i ∈ C i ω} ∪ {ω | ∃ i, θ i ∉ C i ω} := by
-    intro ω _
-    by_cases h : ∀ i, θ i ∈ C i ω
-    · exact Or.inl h
-    · exact Or.inr (not_forall.mp h)
-  calc (1 : ℝ≥0∞) = P Set.univ := measure_univ.symm
-    _ ≤ P ({ω | ∀ i, θ i ∈ C i ω} ∪ {ω | ∃ i, θ i ∉ C i ω}) := measure_mono hcover
-    _ ≤ P {ω | ∀ i, θ i ∈ C i ω} + P {ω | ∃ i, θ i ∉ C i ω} := measure_union_le _ _
-    _ ≤ P {ω | ∀ i, θ i ∈ C i ω} + ENNReal.ofReal α := by
-        gcongr; exact measure_exists_notMem_le_bonferroni P θ C α hα hC
+    1 - ENNReal.ofReal α ≤ P {ω | ∀ i, θ i ∈ C i ω} :=
+  one_sub_le_measure_forall_mem_of_le P θ C
+    (measure_exists_notMem_le_bonferroni P θ C α hα hC)
 
 end Applied.SimultaneousInference
