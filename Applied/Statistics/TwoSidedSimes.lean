@@ -906,5 +906,104 @@ theorem measure_simes_twoSided_bivariateGaussian (P : Measure Ω) [IsProbability
 
 end BivariateGaussian
 
+section AtMostTwoNulls
+
+variable {Ω ι : Type*} [MeasurableSpace Ω] [Fintype ι] [DecidableEq ι]
+
+omit [DecidableEq ι] in
+/-- The Benjamini–Hochberg cut-off does not depend on how the hypotheses are indexed. -/
+lemma bhK_comp_equiv {κ : Type*} [Fintype κ] {α : ℝ} (e : κ ≃ ι) (q : ι → ℝ) :
+    bhK α (q ∘ e) = bhK α q := by
+  unfold bhK bhCount
+  rw [Fintype.card_congr e]
+  congr 1
+  funext k
+  congr 2
+  exact Finset.card_equiv e (by simp)
+
+omit [DecidableEq ι] in
+/-- **Simes local test for at most two true nulls with jointly normal two-sided statistics.**
+If the statistics `Z i`, `i ∈ H₀`, are jointly Gaussian and each standard normal, and `H₀` has at
+most two elements, the Simes test of the intersection hypothesis `H₀` based on the two-sided
+p-values `2 (1 - Φ(|Z i|))` rejects with probability at most `α` (`α ≥ 0`). -/
+theorem measure_simesLocal_twoSided_le_of_card_le_two (P : Measure Ω) [IsProbabilityMeasure P]
+    (Z : ι → Ω → ℝ) (hZ : ∀ i, Measurable (Z i)) (H₀ : Finset ι) (hcard : H₀.card ≤ 2)
+    (hG : IsGaussian (P.map fun ω (j : H₀) => Z j ω))
+    (hlaw : ∀ i ∈ H₀, P.map (Z i) = gaussianReal 0 1) {α : ℝ} (hα : 0 ≤ α) :
+    P {ω | simesLocal α (fun j ω => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)) H₀ ω}
+      ≤ ENNReal.ofReal α := by
+  unfold simesLocal
+  interval_cases hc : H₀.card
+  · -- no true null: the local test never rejects
+    have hempty : {ω | 1 ≤ bhK α fun j : H₀ => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)} = ∅ := by
+      ext ω
+      simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, not_le, Nat.lt_one_iff]
+      have := bhK_le (α := α) fun j : H₀ => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)
+      rw [Fintype.card_coe, hc] at this
+      omega
+    rw [hempty, measure_empty]
+    exact zero_le
+  · -- one true null
+    obtain ⟨i, hi⟩ := Finset.card_eq_one.mp hc
+    have hiH : i ∈ H₀ := by rw [hi]; exact Finset.mem_singleton_self i
+    refine measure_simes_le_of_forall_eq P (fun (j : H₀) ω =>
+      2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)) (fun ω => 2 * (1 - cdf (gaussianReal 0 1) |Z i ω|))
+      (fun j ω => ?_) (isValidPValue_zTest_twoSided P (Z i) (hZ i) (hlaw i hiH)) hα
+    have hj : (j : ι) = i := by
+      have h := j.2
+      simp only [hi, Finset.mem_singleton] at h
+      exact h
+    simp only [hj]
+  · -- two true nulls: reindex by `Fin 2`
+    have hcardT : Fintype.card H₀ = Fintype.card (Fin 2) := by
+      rw [Fintype.card_coe, hc, Fintype.card_fin]
+    let e : Fin 2 ≃ H₀ := Fintype.equivOfCardEq hcardT.symm
+    have hset : {ω | 1 ≤ bhK α fun j : H₀ => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|)} =
+        {ω | 1 ≤ bhK α fun j : Fin 2 => 2 * (1 - cdf (gaussianReal 0 1) |Z (e j) ω|)} := by
+      ext ω
+      simp only [Set.mem_ofPred_eq]
+      rw [← bhK_comp_equiv e]
+      rfl
+    rw [hset]
+    let R : (H₀ → ℝ) →L[ℝ] (Fin 2 → ℝ) :=
+      ContinuousLinearMap.pi fun j => ContinuousLinearMap.proj (e j)
+    have hmap : P.map (fun ω (j : Fin 2) => Z (e j) ω) =
+        (P.map fun ω (j : H₀) => Z j ω).map R := by
+      rw [Measure.map_map R.continuous.measurable
+        (measurable_pi_iff.mpr fun j => hZ j)]
+      rfl
+    have hG' : IsGaussian (P.map fun ω (j : Fin 2) => Z (e j) ω) := by
+      rw [hmap]; infer_instance
+    exact measure_simes_twoSided_bivariateGaussian P (fun j => Z (e j)) (fun j => hZ _) hG'
+      (fun j => hlaw _ (e j).2) hα
+
+/-- **Hommel's procedure for two-sided z-tests with at most two true nulls.** If the true-null
+statistics (at most two) are jointly Gaussian and standard normal, Hommel's procedure based on
+the two-sided p-values controls the family-wise error rate at `α ≥ 0`; the false-null
+statistics are arbitrary measurable functions. -/
+theorem fwer_hommel_twoSided_le_of_card_le_two (P : Measure Ω) [IsProbabilityMeasure P]
+    (Z : ι → Ω → ℝ) (hZ : ∀ i, Measurable (Z i)) (H₀ : Finset ι) (hcard : H₀.card ≤ 2)
+    (hG : IsGaussian (P.map fun ω (j : H₀) => Z j ω))
+    (hlaw : ∀ i ∈ H₀, P.map (Z i) = gaussianReal 0 1) {α : ℝ} (hα : 0 ≤ α) :
+    fwer P H₀ (hommel α fun j ω => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|))
+      ≤ ENNReal.ofReal α :=
+  fwer_closedTest_le P _ H₀ _
+    (measure_simesLocal_twoSided_le_of_card_le_two P Z hZ H₀ hcard hG hlaw hα)
+
+/-- **Hochberg's procedure for two-sided z-tests with at most two true nulls** (in particular
+for any two hypotheses): same hypotheses as `fwer_hommel_twoSided_le_of_card_le_two`. -/
+theorem fwer_hochberg_twoSided_le_of_card_le_two (P : Measure Ω) [IsProbabilityMeasure P]
+    (Z : ι → Ω → ℝ) (hZ : ∀ i, Measurable (Z i)) (H₀ : Finset ι) (hcard : H₀.card ≤ 2)
+    (hG : IsGaussian (P.map fun ω (j : H₀) => Z j ω))
+    (hlaw : ∀ i ∈ H₀, P.map (Z i) = gaussianReal 0 1) {α : ℝ} (hα : 0 ≤ α) :
+    fwer P H₀ (hochberg α fun j ω => 2 * (1 - cdf (gaussianReal 0 1) |Z j ω|))
+      ≤ ENNReal.ofReal α := by
+  refine (measure_mono ?_).trans (fwer_hommel_twoSided_le_of_card_le_two P Z hZ H₀ hcard hG
+    hlaw hα)
+  rintro ω ⟨i, hi, hrej⟩
+  exact ⟨i, hi, hochberg_subset_hommel hα _ ω hrej⟩
+
+end AtMostTwoNulls
+
 
 end Applied.MultipleTesting
