@@ -1,4 +1,4 @@
-import Applied.Learning.SampleCompressionBounds
+import Applied.Learning.SampleCompression
 
 /-!
 # Intervals and axis-parallel rectangles: compression schemes of size two and four
@@ -85,12 +85,11 @@ lemma exists_le_keepMax {f : X → α} {S : Finset (X × Bool)} {y : X} (hy : (y
   exact mem_singleton_self _
 
 /-- A finite set of more than `k` points, from which at most `k` points have been chosen, has a
-point that was not chosen. -/
+point that was not chosen. (This is Mathlib's `Finset.exists_mem_notMem_of_card_lt_card`; the
+local name is kept for the two uses below.) -/
 lemma exists_mem_notMem_of_card_lt {A U : Finset X} (h : U.card < A.card) :
-    ∃ y ∈ A, y ∉ U := by
-  by_contra hc
-  push Not at hc
-  exact absurd (card_le_card hc) (not_le.2 h)
+    ∃ y ∈ A, y ∉ U :=
+  Finset.exists_mem_notMem_of_card_lt_card h
 
 end Extreme
 
@@ -155,11 +154,7 @@ noncomputable def CompressionScheme.interval : CompressionScheme (intervalClass 
 
 /-- The class of intervals has VC dimension at most `2`. -/
 lemma vcDim_intervalClass_le_two : vcDim (intervalClass X) ≤ 2 := by
-  classical
-  unfold Applied.Learning.vcDim
-  apply Finset.sup_le
-  intro A hA
-  have hsh := (mem_filter.1 hA).2
+  refine vcDim_le_iff.2 fun A hsh => ?_
   by_contra hcon
   push Not at hcon
   have hne : A.Nonempty := card_pos.1 (by omega)
@@ -261,11 +256,7 @@ noncomputable def CompressionScheme.rect : CompressionScheme (rectClass A B) 4 w
 
 /-- The class of axis-parallel rectangles has VC dimension at most `4`. -/
 lemma vcDim_rectClass_le_four : vcDim (rectClass A B) ≤ 4 := by
-  classical
-  unfold Applied.Learning.vcDim
-  apply Finset.sup_le
-  intro P hP
-  have hsh := (mem_filter.1 hP).2
+  refine vcDim_le_iff.2 fun P hsh => ?_
   by_contra hcon
   push Not at hcon
   have hne : P.Nonempty := card_pos.1 (by omega)

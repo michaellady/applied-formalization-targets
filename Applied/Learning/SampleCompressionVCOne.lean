@@ -1,4 +1,5 @@
-import Applied.Learning.SampleCompressionBounds
+import Applied.Learning.SampleCompressionVC
+import Applied.Learning.SampleCompressionHalving
 
 /-!
 # Classes of VC dimension at most one have compression schemes of size one
@@ -12,7 +13,6 @@ finite class, labelled schemes without side information).
   exactly `vcDim 𝒞`.
 * `sampleCompression_of_vcDim_le_one`: the bound of the sample compression conjecture, in the
   form `K * vcDim 𝒞 + K` with `K = 1`, holds for every class of VC dimension at most one.
-* `CompressionScheme.mono`: a scheme of size `k` is a scheme of any size `k' ≥ k`.
 
 The scheme. Fix a base concept `c₀ ∈ 𝒞`. Call an example `(x, b)` of a sample *deviating* if
 `b ≠ c₀ x`, and write `𝒞[e]` for the concepts of `𝒞` that agree with the example `e`. For two
@@ -191,15 +191,6 @@ theorem nonempty_compressionScheme_vcDim_of_le_one {𝒞 : Finset (X → Bool)}
   rcases Nat.le_one_iff_eq_zero_or_eq_one.1 hvc with h | h
   · rw [h]; exact ⟨CompressionScheme.ofVCDimEqZero 𝒞 h⟩
   · rw [h]; exact ⟨CompressionScheme.ofVCDimLeOne 𝒞 hvc⟩
-
-/-- A scheme of size `k` is also a scheme of any larger size. -/
-def CompressionScheme.mono {𝒞 : Finset (X → Bool)} {k k' : ℕ} (κ : CompressionScheme 𝒞 k)
-    (h : k ≤ k') : CompressionScheme 𝒞 k' where
-  compress := κ.compress
-  reconstruct := κ.reconstruct
-  compress_subset := κ.compress_subset
-  card_compress_le S hS := (κ.card_compress_le S hS).trans h
-  consistent := κ.consistent
 
 /-- **The conjectured bound for `d ≤ 1`.** Every class of VC dimension at most one, over any
 finite domain, has a scheme of size `K * vcDim 𝒞 + K` with `K = 1`. -/
