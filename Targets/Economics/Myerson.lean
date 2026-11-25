@@ -131,6 +131,29 @@ theorem myerson_exists_payment (x : ℝ → ℝ) (hx : Monotone x) :
       linarith
   linarith
 
+/-- Converse of Myerson's lemma: a monotone allocation rule with payments given by the payment
+identity is truthful. -/
+theorem myerson_truthful_of_payment_identity (x p : ℝ → ℝ) (hx : Monotone x)
+    (hp : ∀ v, p v - p 0 = v * x v - ∫ z in (0 : ℝ)..v, x z) : IsTruthful x p := by
+  have hint : ∀ a b : ℝ, IntervalIntegrable x MeasureTheory.volume a b :=
+    fun a b => hx.intervalIntegrable
+  intro v b
+  have hsub : (∫ z in (0 : ℝ)..v, x z) - ∫ z in (0 : ℝ)..b, x z = ∫ z in b..v, x z :=
+    intervalIntegral.integral_interval_sub_left (hint 0 v) (hint 0 b)
+  have key : (v - b) * x b ≤ ∫ z in b..v, x z := by
+    rcases le_total b v with hbv | hvb
+    · have := intervalIntegral.integral_mono_on hbv (intervalIntegrable_const (c := x b)) (hint b v)
+        (fun z hz => hx hz.1)
+      simpa using this
+    · have := intervalIntegral.integral_mono_on hvb (hint v b) (intervalIntegrable_const (c := x b))
+        (fun z hz => hx hz.2)
+      rw [intervalIntegral.integral_symm v b]
+      simp at this
+      linarith
+  have h1 := hp v
+  have h2 := hp b
+  linarith
+
 /-- **Revenue equivalence** (single bidder form): two truthful mechanisms with the same
 allocation rule and the same payment at value zero charge the same payment at every value. -/
 theorem revenue_equivalence (x p p' : ℝ → ℝ) (h : IsTruthful x p) (h' : IsTruthful x p')
