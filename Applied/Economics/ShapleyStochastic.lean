@@ -80,6 +80,7 @@ noncomputable def stageSum (β : ℝ) (σ : Strategy (History S m n) S m)
       β * ∑ s', G.trans s a b s' * stageSum β σ τ k (h ++ [(s, a, b)]) s')
       (σ.prob h s) (τ.prob h s)
 
+/-- The discounted payoff over zero stages is `0`. -/
 lemma stageSum_zero (β : ℝ) (σ : Strategy (History S m n) S m)
     (τ : Strategy (History S m n) S n) (h : History S m n) (s : S) :
     G.stageSum β σ τ 0 h s = 0 := rfl
@@ -229,6 +230,7 @@ theorem abs_stageSum_succ_sub_le {β : ℝ} (hβ : 0 ≤ β) {R : ℝ}
         simp only [hM₀, hM₁, pow_succ]; nlinarith) (σ.mem h s) (τ.mem h s)
       linarith
 
+/-- Stage payoffs are bounded (finitely many states and actions). -/
 lemma exists_payoff_bound : ∃ R, ∀ s a b, |G.payoff s a b| ≤ R := by
   obtain ⟨R, hR⟩ := (Set.finite_range fun x : S × m × n => |G.payoff x.1 x.2.1 x.2.2|).bddAbove
   exact ⟨R, fun s a b => hR ⟨(s, a, b), rfl⟩⟩

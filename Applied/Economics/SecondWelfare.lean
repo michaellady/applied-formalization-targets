@@ -78,11 +78,14 @@ def LocallyNonSatiatedOn (X : Set E) (u : E → ℝ) : Prop :=
   ∀ y ∈ X, ∀ ε > 0, ∃ y' ∈ X, ‖y' - y‖ < ε ∧ u y < u y'
 
 omit [Fintype ι] [InnerProductSpace ℝ E] in
+/-- Local non-satiation on the whole space is local non-satiation. -/
 lemma locallyNonSatiatedOn_univ {u : E → ℝ} :
     LocallyNonSatiatedOn Set.univ u ↔ LocallyNonSatiated u := by
   simp [LocallyNonSatiatedOn, LocallyNonSatiated]
 
 omit [InnerProductSpace ℝ E] in
+/-- Weak Pareto efficiency with all consumption sets equal to the whole space is weak Pareto
+efficiency. -/
 lemma weaklyParetoEfficientOn_univ {u : ι → E → ℝ} {x : ι → E} :
     WeaklyParetoEfficientOn (fun _ => Set.univ) u x ↔ WeaklyParetoEfficient u x := by
   simp [WeaklyParetoEfficientOn, WeaklyParetoEfficient]

@@ -5,7 +5,8 @@ import Applied.Statistics.PValues
 # Positive dependence in factor models: unequal loadings, blocks, comparisons with a control
 
 `IsPRDSOn` (see `Applied/Statistics/PRDS.lean`) is the conditioning-on-`p i ≤ t` form of
-positive regression dependence (Blanchard and Roquain; sometimes called weak PRDS), not the
+positive regression dependence (the definition of Ramdas et al. 2019; sometimes called weak
+PRDS), not the
 definition of Benjamini and Yekutieli, which conditions on `p i = t`. Everything below is
 about this form.
 
@@ -50,16 +51,6 @@ namespace Applied.MultipleTesting
 variable {Ω : Type*} [MeasurableSpace Ω]
 
 section Normal
-
-lemma measurable_one_sub_cdf_gaussian :
-    Measurable fun z : ℝ => 1 - cdf (gaussianReal 0 1) z :=
-  measurable_const.sub (monotone_cdf _).measurable
-
-lemma antitone_one_sub_cdf_gaussian_add (m : ℝ) :
-    Antitone fun z : ℝ => 1 - cdf (gaussianReal 0 1) (z + m) := fun x y hxy => by
-  have : cdf (gaussianReal 0 1) (x + m) ≤ cdf (gaussianReal 0 1) (y + m) :=
-    monotone_cdf _ (by linarith)
-  linarith
 
 /-- If `W` and `e` are independent standard normal variables and `a ^ 2 + b ^ 2 = 1`, then
 `a * W + b * e` is standard normal. -/
@@ -112,12 +103,15 @@ theorem covariance_oneFactor (P : Measure Ω) [IsProbabilityMeasure P] (W e₁ e
     he.covariance_eq_zero he₁ he₂]
   ring
 
+/-- Loadings `a` and `√(1 - a²)` have squares summing to one (unit variance). -/
 lemma sq_add_sq_sqrt_one_sub {a : ℝ} (ha : a ^ 2 ≤ 1) : a ^ 2 + √(1 - a ^ 2) ^ 2 = 1 := by
   rw [Real.sq_sqrt (by linarith)]; ring
 
+/-- For `0 ≤ a < 1` the idiosyncratic loading `√(1 - a²)` is non-zero. -/
 lemma sqrt_one_sub_sq_ne_zero {a : ℝ} (ha0 : 0 ≤ a) (ha1 : a < 1) : √(1 - a ^ 2) ≠ 0 :=
   (Real.sqrt_pos.mpr (by nlinarith)).ne'
 
+/-- `a² ≤ 1` for `0 ≤ a < 1`. -/
 lemma sq_le_one_of_lt_one {a : ℝ} (ha0 : 0 ≤ a) (ha1 : a < 1) : a ^ 2 ≤ 1 := by nlinarith
 
 end Normal
@@ -159,6 +153,7 @@ theorem isPRDSOn_oneFactor_zTests_restrict (P : Measure Ω) [IsProbabilityMeasur
     (fun j => a j) (fun j => b j) (fun j => μ j) (fun j => ha j) univ
     (fun j _ => hb j j.2) (fun j _ => hlaw j j.2)
 
+/-- The one-sided z-test p-value in the one-factor model is measurable. -/
 lemma measurable_oneFactor_zTest {W e : Ω → ℝ} (hW : Measurable W) (he : Measurable e)
     (a b m : ℝ) :
     Measurable fun ω => 1 - cdf (gaussianReal 0 1) (a * W ω + b * e ω + m) :=
@@ -424,12 +419,16 @@ section ManyToOne
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- The comparison statistic `(x - x₀) / √2 + m` in one-factor form, with factor `-x₀` and
+loadings `1 / √2`. -/
 lemma manyToOne_eq (x₀ x m : ℝ) : (x - x₀) / √2 + m = (√2)⁻¹ * (-x₀) + (√2)⁻¹ * x + m := by
   ring
 
+/-- The loadings `1 / √2`, `1 / √2` have squares summing to one. -/
 lemma inv_sqrt_two_sq_add_sq : ((√2)⁻¹) ^ 2 + ((√2)⁻¹) ^ 2 = 1 := by
   rw [inv_pow, Real.sq_sqrt (by norm_num)]; norm_num
 
+/-- The negative of a standard normal variable is standard normal. -/
 lemma map_neg_gaussian (P : Measure Ω) {X₀ : Ω → ℝ} (h0 : Measurable X₀)
     (hlaw0 : P.map X₀ = gaussianReal 0 1) : P.map (fun ω => -X₀ ω) = gaussianReal 0 1 := by
   have : P.map (fun ω => -X₀ ω) = (P.map X₀).map (fun x => -x) :=
@@ -471,6 +470,7 @@ theorem isPRDSOn_manyToOne_restrict (P : Measure Ω) [IsProbabilityMeasure P] (X
     (h0X.comp measurable_neg measurable_id) hindep (fun _ => (√2)⁻¹) (fun _ => (√2)⁻¹) μ
     (fun _ => by positivity) S (fun _ _ => by positivity) hlaw
 
+/-- The one-sided z-test p-value of a comparison with the control is measurable. -/
 lemma measurable_manyToOne {X₀ Xj : Ω → ℝ} (h0 : Measurable X₀) (hj : Measurable Xj) (m : ℝ) :
     Measurable fun ω => 1 - cdf (gaussianReal 0 1) ((Xj ω - X₀ ω) / √2 + m) :=
   measurable_one_sub_cdf_gaussian.comp (((hj.sub h0).div_const _).add measurable_const)

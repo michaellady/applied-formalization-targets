@@ -22,15 +22,18 @@ def exampleLP : StdLP ℚ 1 2 where
 
 namespace exampleLP
 
+/-- The single constraint row of the example is `z 0 + z 1`. -/
 theorem mulVec_apply (z : Fin 2 → ℚ) : exampleLP.A *ᵥ z = ![z 0 + z 1] := by
   funext i
   fin_cases i
   simp [exampleLP, Matrix.mulVec, dotProduct, Fin.sum_univ_two]
 
+/-- A solution of the constraint of the example satisfies `x 0 + x 1 = 1`. -/
 theorem sum_eq_one {x : Fin 2 → ℚ} (h : exampleLP.A *ᵥ x = exampleLP.b) : x 0 + x 1 = 1 := by
   rw [mulVec_apply] at h
   simpa [exampleLP] using congrFun h 0
 
+/-- Each of the two columns of the example is a basis. -/
 theorem isBasis_singleton (a : Fin 2) : exampleLP.IsBasis {a} := by
   refine ⟨rfl, (exampleLP.linearIndependent_col_iff _).2 fun z hAz hz => ?_⟩
   rw [mulVec_apply] at hAz
@@ -38,28 +41,35 @@ theorem isBasis_singleton (a : Fin 2) : exampleLP.IsBasis {a} := by
   funext k
   fin_cases a <;> fin_cases k <;> simp at hz ⊢ <;> linarith [hz]
 
+/-- `(1, 0)` is the basic solution of the basis `{0}`. -/
 theorem isBasicSolution_zero : exampleLP.IsBasicSolution {0} ![1, 0] := by
   refine ⟨by rw [mulVec_apply]; simp [exampleLP], fun j hj => ?_⟩
   fin_cases j <;> simp at hj ⊢
 
+/-- `(0, 1)` is the basic solution of the basis `{1}`. -/
 theorem isBasicSolution_one : exampleLP.IsBasicSolution {1} ![0, 1] := by
   refine ⟨by rw [mulVec_apply]; simp [exampleLP], fun j hj => ?_⟩
   fin_cases j <;> simp at hj ⊢
 
+/-- `{0}` is a feasible basis of the example. -/
 theorem isFeasibleBasis_zero : exampleLP.IsFeasibleBasis {0} :=
   ⟨isBasis_singleton 0, _, isBasicSolution_zero, fun j => by fin_cases j <;> simp⟩
 
+/-- `{1}` is a feasible basis of the example. -/
 theorem isFeasibleBasis_one : exampleLP.IsFeasibleBasis {1} :=
   ⟨isBasis_singleton 1, _, isBasicSolution_one, fun j => by fin_cases j <;> simp⟩
 
+/-- The objective of the example is `x 1`. -/
 theorem objective_apply (x : Fin 2 → ℚ) : exampleLP.objective x = x 1 := by
   simp [StdLP.objective, exampleLP, dotProduct, Fin.sum_univ_two]
 
+/-- The example is bounded (the objective is at most `1` on the feasible region). -/
 theorem isBounded : exampleLP.IsBounded := by
   refine ⟨1, fun x hx => ?_⟩
   rw [objective_apply]
   linarith [sum_eq_one hx.1, hx.2 0]
 
+/-- The example is nondegenerate. -/
 theorem nondegenerate : exampleLP.Nondegenerate := by
   intro B x hB hx _ j hj
   obtain ⟨a, rfl⟩ := Finset.card_eq_one.1 hB.1
@@ -74,6 +84,7 @@ theorem nondegenerate : exampleLP.Nondegenerate := by
     simp only [Fin.mk_one]
     linarith
 
+/-- `{0} → {1}` is a simplex pivot of the example. -/
 theorem isSimplexPivot : exampleLP.IsSimplexPivot {0} {1} := by
   refine ⟨isFeasibleBasis_zero, isFeasibleBasis_one, 0, by simp, 1, by simp, by decide,
     ![-1, 1], ⟨?_, by simp, fun k hk hk1 => ?_⟩, ?_, by simp⟩
@@ -81,6 +92,7 @@ theorem isSimplexPivot : exampleLP.IsSimplexPivot {0} {1} := by
   · fin_cases k <;> simp at hk hk1
   · simp [exampleLP, dotProduct, Fin.sum_univ_two]
 
+/-- `{1}` is an optimal basis of the example. -/
 theorem isOptimalBasis_one : exampleLP.IsOptimalBasis {1} := by
   refine ⟨isBasis_singleton 1, _, isBasicSolution_one,
     ⟨isBasicSolution_one.1, fun j => by fin_cases j <;> simp⟩, fun y hy => ?_⟩

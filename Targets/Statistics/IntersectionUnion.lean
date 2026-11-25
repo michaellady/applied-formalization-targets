@@ -62,7 +62,12 @@ most `α` for every set of true nulls whose p-values are valid.
 Differences from the textbook statements. Berger's size theorem is stated with the condition
 on the other regions in complement form (the measurable form is the second version). The TOST
 is for a known standard error (z-tests); the level is parametrized by the critical value, not
-by `α`. The size statement needs `c ≥ 0`, that is `α ≤ 1/2`. The margins are symmetric
+by `α`. The size statements (`tost_prob_le_margin`, `tost_size`, `tost_size_lt`) assume `c ≥ 0`, that is
+`α ≤ 1/2`, for convenience of the proof (it makes the rejection interval lie to the left of
+`δ`); this is not needed mathematically when `δ ≥ 0`: the rejection region is the interval
+`(-δ + c s, δ - c s)`, symmetric about `0` for every real `c`, and the same formula holds. The
+version for `c < 0`, `δ ≥ 0` is not formalized. (Some sign condition is needed: for `δ < 0`
+and `c < 0` the null is every `θ` and the maximum is at `θ = 0`, not at the margin.) The margins are symmetric
 (`-δ, δ`); `δ > 0` is not needed for any statement (for `δ ≤ 0` the null is every `θ`).
 Schuirmann's paper treats the t-test version; the exact size formula here is the known-variance
 analogue (location in the literature to be confirmed). The Morikawa-Yoshida result is given in

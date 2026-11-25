@@ -16,6 +16,11 @@ For a finite family of p-values `p i`, with `m = |ι|` and no assumption on thei
 * `isValidPValue_iSup`: in particular the maximum is valid when all nulls are true.
 
 No measurability of the p-values is assumed (outer measure of the events).
+
+Related: `PValues`, `LowerTailPValue` (p-values of single tests);
+`Applied.Statistics.IntersectionUnion` (intersection–union tests).
+Not in this file: combinations that need independence (Fisher, Stouffer) and sharper
+dependence-free combinations (Simes under positive dependence is in `PRDS`; Rüger's rule).
 -/
 
 open MeasureTheory

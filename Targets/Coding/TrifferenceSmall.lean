@@ -28,9 +28,13 @@ and `T(n) ≥ 9` for `n ≥ 4`. Lower bounds for lengths 5 and 6 are proved by e
 checked by `decide` (`Applied/Coding/TrifferenceLower.lean`): `T(5) ≥ 10` and `T(6) ≥ 13`, so
 `T(n) ≥ 13` for `n ≥ 6`.
 
-Not covered: the matching upper bounds `T(5) ≤ 10` and `T(6) ≤ 13` (the values `T(5) = 10`,
-`T(6) = 13` are reported from computer search in the literature; reference and values to be
-confirmed). The recursion only gives `T(5) ≤ 13` and `T(6) ≤ 19`. A lower bound growing
+Not covered: the matching upper bounds `T(5) ≤ 10` and `T(6) ≤ 13`. The values `T(5) = 10` and
+`T(6) = 13` were determined by computer search by S. Della Fiore, A. Gnutti and S. Polak, "The
+maximum cardinality of trifferent codes with lengths 5 and 6", Examples and Counterexamples 2
+(2022), arXiv:2201.06846; only the lower bounds are formalized here. S. Kurz, "Trifferent codes
+with small lengths", arXiv:2310.13563, reports `T(7) = 16`, `T(8) = 20` and `T(9) = 27` (reported,
+to be confirmed; nothing about these lengths is formalized here beyond `T(n) ≥ 13`). The recursion only gives `T(5) ≤ 13` and
+`T(6) ≤ 19`. A lower bound growing
 exponentially with `n` is in `Targets/Coding/Trifference.lean`.
 -/
 

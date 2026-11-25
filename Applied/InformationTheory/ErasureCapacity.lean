@@ -14,7 +14,8 @@ All logarithms are natural, so rates are in nats per channel use.
 * `sum_patAgree_le`: `∑_{x'} g_k(x, x') ≤ 2 ^ k`.
 * `exists_codebook_rows_le`: greedy choice plus expurgation: for a symmetric nonnegative
   `f` with all row sums `≤ B`, there are `K` codewords with every row sum
-  `∑_{m' ≠ m} f(c m, c m') ≤ 4 K B / 2 ^ n`.
+  `∑_{m' ≠ m} f(c m, c m') ≤ 4 K B / 2 ^ n` (a special case of
+  `exists_codebook_rows_le_of_symm` in `CodebookSelection`).
 * `tail_le_exp`: Chernoff bound for the number of erasures.
 * `achievable_memoryless_bec`: every `R < (1 - e) log 2` is achievable (maximal error).
 * `opCapacity_memoryless_bec`: `opCapacity (memoryless (bec e)) = (1 - e) log 2
@@ -245,123 +246,23 @@ theorem tail_le_exp {e : ℝ} (h0 : 0 ≤ e) (h1 : e ≤ 1) (k : ℕ) {t r : ℝ
     nlinarith
   · exact hpos
 
-/-! ### Greedy choice with expurgation -/
+/-! ### Greedy choice with expurgation
 
-section Greedy
-
-variable (f : (Fin n → Bool) → (Fin n → Bool) → ℝ)
-
-/-- The total off-diagonal sum of `f` over a codebook. -/
-noncomputable def fSum {K : ℕ} (c : Fin K → (Fin n → Bool)) : ℝ :=
-  ∑ m, ∑ m', if m = m' then 0 else f (c m) (c m')
-
-variable {f}
-
-lemma fSum_cons (hsymm : ∀ x x', f x x' = f x' x) {K : ℕ} (x : Fin n → Bool)
-    (c : Fin K → (Fin n → Bool)) :
-    fSum f (Fin.cons x c : Fin (K + 1) → (Fin n → Bool)) =
-      2 * ∑ j, f x (c j) + fSum f c := by
-  unfold fSum
-  simp only [Fin.sum_univ_succ, Fin.cons_zero, Fin.cons_succ, Fin.succ_inj,
-    (Fin.succ_ne_zero _).symm, Fin.succ_ne_zero, ite_true, ite_false, zero_add,
-    Finset.sum_add_distrib]
-  simp only [hsymm _ x]
-  ring
-
-theorem exists_codebook_fSum_le (hf0 : ∀ x x', 0 ≤ f x x') (hsymm : ∀ x x', f x x' = f x' x)
-    {B : ℝ} (hB : ∀ x, ∑ x', f x x' ≤ B) (K : ℕ) :
-    ∃ c : Fin K → (Fin n → Bool), fSum f c ≤ (K : ℝ) ^ 2 * (B / 2 ^ n) := by
-  have hB0 : 0 ≤ B := by
-    have h := hB (fun _ => true)
-    have : (0 : ℝ) ≤ ∑ x', f (fun _ => true) x' := Finset.sum_nonneg fun x' _ => hf0 _ x'
-    linarith
-  have hBn : 0 ≤ B / 2 ^ n := by positivity
-  induction K with
-  | zero => exact ⟨Fin.elim0, by simp [fSum]⟩
-  | succ K ih =>
-    obtain ⟨c, hc⟩ := ih
-    have havg : ∑ x : Fin n → Bool, ∑ j, f x (c j) ≤
-        ∑ _x : Fin n → Bool, (K : ℝ) * (B / 2 ^ n) := by
-      rw [Finset.sum_comm]
-      have hcol : ∀ j, ∑ x : Fin n → Bool, f x (c j) ≤ B := fun j => by
-        simp only [hsymm _ (c j)]; exact hB (c j)
-      calc ∑ j, ∑ x : Fin n → Bool, f x (c j) ≤ ∑ _j : Fin K, B :=
-            Finset.sum_le_sum fun j _ => hcol j
-        _ = ∑ _x : Fin n → Bool, (K : ℝ) * (B / 2 ^ n) := by
-          simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fun, Fintype.card_bool,
-            Fintype.card_fin, nsmul_eq_mul]
-          field_simp
-          push_cast
-          ring
-    obtain ⟨x, -, hx⟩ := Finset.exists_le_of_sum_le univ_nonempty havg
-    refine ⟨Fin.cons x c, ?_⟩
-    rw [fSum_cons hsymm]
-    push_cast
-    nlinarith
+The general statements (any finite type of candidate words) are in `CodebookSelection`; this is
+the specialisation to the `2 ^ n` binary words of length `n`. -/
 
 /-- **Greedy choice with expurgation.** For a symmetric nonnegative `f` whose row sums are at
 most `B`, for every `K` there are `K` codewords all of whose off-diagonal row sums are at most
-`4 K B / 2 ^ n`. -/
-theorem exists_codebook_rows_le (hf0 : ∀ x x', 0 ≤ f x x') (hsymm : ∀ x x', f x x' = f x' x)
+`4 K B / 2 ^ n`.  This is `exists_codebook_rows_le_of_symm` for the type `Fin n → Bool` of binary
+words of length `n`. -/
+theorem exists_codebook_rows_le {f : (Fin n → Bool) → (Fin n → Bool) → ℝ}
+    (hf0 : ∀ x x', 0 ≤ f x x') (hsymm : ∀ x x', f x x' = f x' x)
     {B : ℝ} (hB : ∀ x, ∑ x', f x x' ≤ B) (K : ℕ) :
     ∃ c : Fin K → (Fin n → Bool), ∀ m,
       ∑ m', (if m = m' then 0 else f (c m) (c m')) ≤ 4 * K * (B / 2 ^ n) := by
-  classical
-  rcases Nat.eq_zero_or_pos K with rfl | hK
-  · exact ⟨Fin.elim0, fun m => m.elim0⟩
-  obtain ⟨c, hc⟩ := exists_codebook_fSum_le hf0 hsymm hB (2 * K)
-  set r : Fin (2 * K) → ℝ := fun m => ∑ m', if m = m' then 0 else f (c m) (c m') with hr
-  have hr0 : ∀ m, 0 ≤ r m := fun m =>
-    Finset.sum_nonneg fun m' _ => by split_ifs; exacts [le_rfl, hf0 _ _]
-  set S := fSum f c with hS
-  have hSr : S = ∑ m, r m := rfl
-  have hS0 : 0 ≤ S := by rw [hSr]; exact Finset.sum_nonneg fun m _ => hr0 m
-  have hKr : (0 : ℝ) < K := by exact_mod_cast hK
-  set G := univ.filter fun m => r m ≤ S / K with hG
-  have hbad : (univ.filter fun m => ¬ r m ≤ S / K).card ≤ K := by
-    by_contra hlt
-    rw [not_le] at hlt
-    set Bd := univ.filter fun m => ¬ r m ≤ S / K
-    have hne : Bd.Nonempty := Finset.card_pos.mp (by omega)
-    have h1 : ∑ m ∈ Bd, r m ≤ S := by
-      rw [hSr]
-      exact Finset.sum_le_sum_of_subset_of_nonneg (subset_univ _) fun m _ _ => hr0 m
-    have h2 : ∑ m ∈ Bd, S / K < ∑ m ∈ Bd, r m :=
-      Finset.sum_lt_sum_of_nonempty hne fun m hm => by
-        simpa using (Finset.mem_filter.mp hm).2
-    rw [Finset.sum_const, nsmul_eq_mul] at h2
-    have h3 : ((K : ℝ) + 1) ≤ Bd.card := by exact_mod_cast hlt
-    have h4 : ((K : ℝ) + 1) * (S / K) ≤ Bd.card * (S / K) :=
-      mul_le_mul_of_nonneg_right h3 (by positivity)
-    have h5 : ((K : ℝ) + 1) * (S / K) = S + S / K := by field_simp
-    have h6 : 0 ≤ S / K := by positivity
-    linarith
-  have hGcard : K ≤ G.card := by
-    have := Finset.card_filter_add_card_filter_not (s := (univ : Finset (Fin (2 * K))))
-      (fun m => r m ≤ S / K)
-    rw [Finset.card_univ, Fintype.card_fin] at this
-    rw [hG]; omega
-  obtain ⟨T, hTG, hT⟩ := Finset.exists_subset_card_eq hGcard
-  let φ := T.orderEmbOfFin hT
-  refine ⟨c ∘ φ, fun j => ?_⟩
-  have hφT : ∀ j, φ j ∈ T := fun j => T.orderEmbOfFin_mem hT j
-  have hsub : ∑ j', (if j = j' then 0 else f ((c ∘ φ) j) ((c ∘ φ) j')) ≤ r (φ j) := by
-    have : ∑ j', (if j = j' then 0 else f ((c ∘ φ) j) ((c ∘ φ) j')) =
-        ∑ m' ∈ univ.map φ.toEmbedding, (if φ j = m' then 0 else f (c (φ j)) (c m')) := by
-      rw [Finset.sum_map]
-      refine Finset.sum_congr rfl fun j' _ => ?_
-      simp [φ.injective.eq_iff]
-    rw [this]
-    exact Finset.sum_le_sum_of_subset_of_nonneg (subset_univ _) fun m' _ _ => by
-      split_ifs; exacts [le_rfl, hf0 _ _]
-  have hgood : r (φ j) ≤ S / K := (Finset.mem_filter.mp (hTG (hφT j))).2
-  have hSle : S / K ≤ 4 * K * (B / 2 ^ n) := by
-    rw [div_le_iff₀ hKr]
-    calc S ≤ ((2 * K : ℕ) : ℝ) ^ 2 * (B / 2 ^ n) := hc
-      _ = 4 * K * (B / 2 ^ n) * K := by push_cast; ring
-  linarith
-
-end Greedy
+  have h := exists_codebook_rows_le_of_symm hf0 hsymm hB K
+  simpa only [Fintype.card_fun, Fintype.card_bool, Fintype.card_fin, Nat.cast_pow,
+    Nat.cast_ofNat] using h
 
 /-! ### Achievability -/
 

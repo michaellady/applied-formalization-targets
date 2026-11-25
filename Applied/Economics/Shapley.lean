@@ -51,6 +51,7 @@ def Interchangeable (v : Finset N → ℝ) (i j : N) : Prop :=
   ∀ S : Finset N, i ∉ S → j ∉ S → v (insert i S) = v (insert j S)
 
 omit [DecidableEq N] in
+/-- A player is not among their own predecessors in an ordering. -/
 lemma notMem_predecessors (σ : N ≃ Fin (Fintype.card N)) (i : N) : i ∉ predecessors σ i := by
   simp [predecessors]
 
@@ -118,6 +119,7 @@ theorem shapley_smul (c : ℝ) (v : Finset N → ℝ) (i : N) :
   exact Finset.sum_congr rfl fun σ _ => by ring
 
 omit [Fintype N] in
+/-- Membership in the image of a coalition under the transposition of two players. -/
 lemma mem_image_swap (i j k : N) (S : Finset N) :
     k ∈ S.image (Equiv.swap i j) ↔ Equiv.swap i j k ∈ S := by
   constructor
@@ -218,6 +220,7 @@ theorem shapley_isShapleyValue : IsShapleyValue (shapley (N := N)) where
 def unanimity (T : Finset N) : Finset N → ℝ := fun S => if T ⊆ S then 1 else 0
 
 omit [Fintype N] in
+/-- The unanimity game of a non-empty coalition gives the empty coalition worth `0`. -/
 lemma unanimity_empty {T : Finset N} (hT : T.Nonempty) : unanimity T ∅ = 0 := by
   simp [unanimity, Finset.subset_empty, hT.ne_empty]
 

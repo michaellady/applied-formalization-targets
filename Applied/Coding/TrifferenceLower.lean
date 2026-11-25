@@ -1,4 +1,5 @@
 import Applied.Coding.TrifferenceRate
+import Applied.Coding.TripleAveraging
 
 /-!
 # Lower bounds for the trifference problem
@@ -95,81 +96,6 @@ def IsBadTriple {n : ℕ} (x y z : Fin n → Fin 3) : Prop :=
 instance {n : ℕ} (x y z : Fin n → Fin 3) : Decidable (IsBadTriple x y z) := by
   unfold IsBadTriple; infer_instance
 
-/-- The number of maps `Fin M → α` with prescribed values at three distinct points, times
-`|α|³`, is `|α|^M`. -/
-private lemma card_filter_eval3 {α : Type*} [Fintype α] [DecidableEq α] {M : ℕ} {i j k : Fin M}
-    (hij : i ≠ j) (hjk : j ≠ k) (hik : i ≠ k) (a b c : α) :
-    (univ.filter fun f : Fin M → α => f i = a ∧ f j = b ∧ f k = c).card * Fintype.card α ^ 3
-      = Fintype.card α ^ M := by
-  classical
-  set t : Fin M → Finset α := fun l =>
-    if l = i then {a} else if l = j then {b} else if l = k then {c} else univ with ht
-  have hset : (univ.filter fun f : Fin M → α => f i = a ∧ f j = b ∧ f k = c) =
-      Fintype.piFinset t := by
-    ext f
-    simp only [mem_filter, mem_univ, true_and, Fintype.mem_piFinset, ht]
-    constructor
-    · rintro ⟨rfl, rfl, rfl⟩ l
-      split_ifs with h1 h2 h3
-      · subst h1; simp
-      · subst h2; simp
-      · subst h3; simp
-      · simp
-    · intro h
-      have hi := h i
-      have hj := h j
-      have hk := h k
-      simp [Ne.symm hij, Ne.symm hik, Ne.symm hjk] at hi hj hk
-      exact ⟨hi, hj, hk⟩
-  set s : Finset (Fin M) := {i, j, k} with hs
-  have hprod : ∏ l, (t l).card = ∏ l, if l ∈ s then 1 else Fintype.card α := by
-    refine prod_congr rfl fun l _ => ?_
-    simp only [ht, hs, mem_insert, mem_singleton]
-    by_cases h1 : l = i
-    · simp [h1]
-    by_cases h2 : l = j
-    · simp [h2, Ne.symm hij]
-    by_cases h3 : l = k
-    · simp [h3, Ne.symm hik, Ne.symm hjk]
-    simp [h1, h2, h3]
-  rw [hset, Fintype.card_piFinset, hprod, prod_ite, prod_const_one, one_mul, prod_const,
-    ← pow_add]
-  congr 1
-  have h3 : s.card = 3 := by
-    rw [hs, card_insert_of_notMem (by simp [hij, hik]), card_pair hjk]
-  have hsum := card_filter_add_card_filter_not (s := (univ : Finset (Fin M))) (fun l => l ∈ s)
-  have hfs : (univ.filter fun l => l ∈ s) = s := by ext; simp
-  rw [hfs, h3, card_univ, Fintype.card_fin] at hsum
-  omega
-
-/-- The number of maps `f : Fin M → α` whose values at three distinct points satisfy `P`, times
-`|α|³`, is the number of triples satisfying `P` times `|α|^M`. -/
-private lemma card_filter_triple {α : Type*} [Fintype α] [DecidableEq α] {M : ℕ}
-    {i j k : Fin M} (hij : i ≠ j) (hjk : j ≠ k) (hik : i ≠ k) (P : α → α → α → Prop)
-    [∀ a b c, Decidable (P a b c)] :
-    (univ.filter fun f : Fin M → α => P (f i) (f j) (f k)).card * Fintype.card α ^ 3
-      = (univ.filter fun t : α × α × α => P t.1 t.2.1 t.2.2).card * Fintype.card α ^ M := by
-  classical
-  rw [card_eq_sum_card_fiberwise (f := fun f : Fin M → α => (f i, f j, f k))
-    (t := univ.filter fun t : α × α × α => P t.1 t.2.1 t.2.2)
-    (fun f hf => by simpa using hf), sum_mul]
-  rw [show (univ.filter fun t : α × α × α => P t.1 t.2.1 t.2.2).card * Fintype.card α ^ M
-      = ∑ _t ∈ univ.filter fun t : α × α × α => P t.1 t.2.1 t.2.2, Fintype.card α ^ M by
-    rw [sum_const, smul_eq_mul]]
-  refine sum_congr rfl fun t ht => ?_
-  have hP : P t.1 t.2.1 t.2.2 := (mem_filter.mp ht).2
-  rw [← card_filter_eval3 hij hjk hik t.1 t.2.1 t.2.2]
-  congr 2
-  ext f
-  simp only [mem_filter, mem_univ, true_and]
-  constructor
-  · rintro ⟨-, rfl⟩; exact ⟨rfl, rfl, rfl⟩
-  · rintro ⟨h1, h2, h3⟩
-    obtain ⟨a, b, c⟩ := t
-    simp only at h1 h2 h3 hP
-    subst h1 h2 h3
-    exact ⟨hP, rfl⟩
-
 /-- Exactly `21` of the `27` triples of ternary symbols are not pairwise distinct. -/
 private lemma card_bad_symbols :
     Fintype.card {s : Fin 3 × Fin 3 × Fin 3 // ¬(s.1 ≠ s.2.1 ∧ s.2.1 ≠ s.2.2 ∧ s.1 ≠ s.2.2)}
@@ -200,43 +126,19 @@ noncomputable def badIndexTriples {n M : ℕ} (f : Fin M → Fin n → Fin 3) :
     IsBadTriple (f t.1) (f t.2.1) (f t.2.2)
 
 /-- **Averaging step.** Some `M`-tuple of words of length `n` has at most `M³ (21/27)ⁿ` ordered
-bad triples of distinct indices. -/
+bad triples of distinct indices.  This is the general averaging lemma
+`KornerMarton.exists_card_badTriples_le` for the alphabet `{0,1,2}ⁿ` of all words, in which
+exactly `21ⁿ` of the `27ⁿ` triples are bad. -/
 theorem exists_card_badIndexTriples_le (n M : ℕ) :
     ∃ f : Fin M → Fin n → Fin 3, (badIndexTriples f).card * 27 ^ n ≤ M ^ 3 * 21 ^ n := by
-  classical
-  set D : Finset (Fin M × Fin M × Fin M) :=
-    univ.filter fun t => t.1 ≠ t.2.1 ∧ t.2.1 ≠ t.2.2 ∧ t.1 ≠ t.2.2 with hD
+  obtain ⟨f, hf⟩ := KornerMarton.exists_card_badTriples_le (α := Fin n → Fin 3) IsBadTriple M
+  refine ⟨f, ?_⟩
+  have hbad : badIndexTriples f = KornerMarton.badTriples IsBadTriple f := by
+    ext t; simp [badIndexTriples, KornerMarton.badTriples]
   have hW : Fintype.card (Fin n → Fin 3) = 3 ^ n := by simp
-  -- the badness count of `f`, as a filter of `D`
-  have hbad : ∀ f : Fin M → Fin n → Fin 3, badIndexTriples f =
-      D.filter fun t => IsBadTriple (f t.1) (f t.2.1) (f t.2.2) := by
-    intro f; ext t; simp [badIndexTriples, hD, and_assoc]
-  -- the total badness, summed over all tuples
-  have htotal : ∑ f : Fin M → Fin n → Fin 3, (badIndexTriples f).card * 27 ^ n
-      = D.card * 21 ^ n * (3 ^ n) ^ M := by
-    simp_rw [hbad, card_filter, sum_mul]
-    rw [sum_comm]
-    rw [show D.card * 21 ^ n * (3 ^ n) ^ M = ∑ _t ∈ D, 21 ^ n * (3 ^ n) ^ M by
-      rw [sum_const, smul_eq_mul, mul_assoc]]
-    refine sum_congr rfl fun t ht => ?_
-    obtain ⟨h1, h2, h3⟩ := (mem_filter.mp ht).2
-    rw [← sum_mul, ← card_filter]
-    have := card_filter_triple (α := Fin n → Fin 3) h1 h2 h3 IsBadTriple
-    rw [hW, card_isBadTriple n] at this
-    rw [show (27 : ℕ) ^ n = (3 ^ n) ^ 3 by rw [← pow_mul, mul_comm, pow_mul]; norm_num]
-    exact this
-  by_contra hcon
-  push Not at hcon
-  have hlt : ∑ _f : Fin M → Fin n → Fin 3, M ^ 3 * 21 ^ n
-      < ∑ f : Fin M → Fin n → Fin 3, (badIndexTriples f).card * 27 ^ n :=
-    sum_lt_sum_of_nonempty univ_nonempty fun f _ => hcon f
-  rw [htotal, sum_const, card_univ, Fintype.card_fun, hW, Fintype.card_fin, smul_eq_mul] at hlt
-  have hDc : D.card ≤ M ^ 3 := by
-    calc D.card ≤ (univ : Finset (Fin M × Fin M × Fin M)).card := card_le_univ _
-      _ = M ^ 3 := by simp [card_univ]; ring
-  have : D.card * 21 ^ n * (3 ^ n) ^ M ≤ (3 ^ n) ^ M * (M ^ 3 * 21 ^ n) := by
-    rw [mul_comm]; exact Nat.mul_le_mul_left _ (Nat.mul_le_mul_right _ hDc)
-  exact absurd hlt (not_lt.mpr this)
+  rw [hW, card_isBadTriple n] at hf
+  rw [hbad, show (27 : ℕ) ^ n = (3 ^ n) ^ 3 by rw [← pow_mul, mul_comm, pow_mul]; norm_num]
+  exact hf
 
 /-- **Alteration step.** Deleting the first index of every bad triple leaves a trifferent code:
 `M ≤ T(n) + #(bad ordered triples)` for `n ≥ 1`. -/

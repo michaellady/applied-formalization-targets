@@ -50,8 +50,13 @@ Lean hypotheses and conventions disclosed.
 
 Differences from the textbook statement. The textbook result (Im–Wang; Jaillet–Soto–Zenklusen)
 gives a constant independent of the laminar family; here the constant degrades linearly with the
-depth `h`. The constant `1/(8e(h+1))` is far from the known constants even for small `h` (for
-`h = 1`, i.e. partition matroids with capacities, the library already has `(1 - 1/e)/e`). The
+depth `h`. The constant `1/(8e(h+1))` is far from the known constants even for small `h`: for
+`h = 1`, i.e. partition matroids with capacities, the library already has the constant `e⁻²`
+(`hasCompetitiveRandomized_partitionCap` in `Applied/Economics/MatroidSecretaryUniform.lean`,
+which this file imports through the library file) and the better constant `(1 - 1/e)/e`
+(`hasCompetitiveRandomized_partitionCap_top` in
+`Applied/Economics/MatroidSecretaryUniformTop.lean`, registry entry
+`Targets/Economics/MatroidSecretaryUniformTop.lean`; that file is not imported here). The
 laminar matroid is defined directly by capacities, as in the literature.
 
 What is proved (all in `Applied/Economics/MatroidSecretaryLaminar.lean`).
@@ -71,6 +76,13 @@ What is proved (all in `Applied/Economics/MatroidSecretaryLaminar.lean`).
 * `conclusion_laminar_bounded_depth`: for every `h`, the conclusion of
   `MatroidSecretaryConjecture` restricted to laminar matroids in which every element lies in at
   most `h` members, with `c = 1/(8e(h+1))`.
+
+Model and status (common to all matroid secretary entries of this project). The matroid is
+known to the algorithm in advance, and the algorithm sees the identity as well as the weight
+of each arriving element; models in which the matroid is revealed online are not treated. The
+constants proved in this project are weaker than the best constants in the literature for the
+same classes. Partition matroids with capacities one (constant `1/e`) are already formalized
+in cslib-frontier (`MatroidSecretary.lean`); no novelty is claimed for that case.
 
 Not covered: a constant independent of the depth for all laminar matroids (the Im–Wang /
 Jaillet–Soto–Zenklusen theorem); this file does not decide whether weight-oblivious colourings

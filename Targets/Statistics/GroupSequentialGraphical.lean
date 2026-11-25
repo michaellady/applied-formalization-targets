@@ -9,8 +9,21 @@ import Applied.Statistics.GroupSequentialGraphical
 - source: W. Maurer, F. Bretz, "Multiple testing in group sequential trials using graphical approaches", Stat. Biopharm. Res. 5 (2013) 311-320 (the main result of the paper; section and page numbers to be confirmed); C. Jennison, B. W. Turnbull, "Interim analyses: the repeated confidence interval approach", J. Roy. Statist. Soc. B 51 (1989) 305-361 (to be confirmed); repeated p-values: C. Jennison, B. W. Turnbull, "Group Sequential Methods with Applications to Clinical Trials" (2000), Chapter 9 (to be confirmed); related: D.-I. Tang, N. L. Geller, Biometrics 55 (1999); E. Glimm, W. Maurer, F. Bretz, Stat. Med. 29 (2010)
 - used-in: confirmatory trials with interim analyses and several endpoints or doses (graph plus spending function designs); monitoring by repeated confidence intervals
 - prerequisites: the project's graphical approach (`fwer_graphical_le`, `graphical_eq_closedTest`), closed weighted Bonferroni tests, alpha-spending principle
-- formalized-elsewhere: not found in the Lean repositories searched (NEXT-TARGETS.md, 25 Nov 2026)
+- formalized-elsewhere: the general result was not found in the Lean repositories searched (NEXT-TARGETS.md, 25 Nov 2026); a special case exists: atlas-lean's `measure_exists_look_endpoint_bonferroni_le` (fixed-weight Bonferroni over looks and endpoints with a spending function) corresponds to the `ofPValues` family with fixed weights and no graph update
 - statement-review: unreviewed
+
+What is and is not proved, in one paragraph. The theorems are for ABSTRACT families of nested
+rejection events that are monotone and right-continuous in the level (`GSFamily`), each
+assumed to have level (`HasLevel`). The only family for which the level is PROVED
+unconditionally is the Bonferroni split of the level over the looks (`ofPValues`, (4c)).
+Level-monotone normal spending boundaries (O'Brien–Fleming, Pocock, Lan–DeMets for the
+canonical joint normal law) are ASSUMED, not constructed: `ofBoundaries` takes monotonicity
+and right-continuity in the level, and the spending bound, as hypotheses, and nothing in the
+library shows that the boundaries of `exists_alphaSpending_boundaries_gaussian` can be chosen
+monotone in the level. So the Maurer–Bretz theorem cannot at present be instantiated inside
+Lean with normal-theory spending boundaries. The fixed-weight special case (Bonferroni over
+looks and endpoints, no graph update) is formalized elsewhere: atlas-lean,
+`measure_exists_look_endpoint_bonferroni_le`.
 
 Informal statement. These are known results (Maurer-Bretz 2013; Jennison-Turnbull); nothing
 here is new. Looks are indexed `0, 1, …, K`, so `K` is the index of the last look.
@@ -47,8 +60,12 @@ all looks so far.
   the repeated p-values of look `k`. It grows with `k`; it contains every set reachable at
   look `k` (monotone non-negative weights, `α ≥ 0`); it equals a reachable set `R` from which
   no further rejection is possible (`0 ≤ α < 1`, monotone weights in `[0, 1]`); and the
-  probability that it contains a true null at some look `k ≤ K` is at most `α` (weights of
-  `H₀` non-negative with sum at most one).
+  probability that it contains a hypothesis of `H₀` at some look `k ≤ K` is at most `α`
+  (`measure_gsClosedTest_any_look_le`; hypotheses, all of them: `P` is a probability measure;
+  every family `F i` with `i ∈ H₀` has level up to look `K`, `(F i).HasLevel P K`; `α ≥ 0`;
+  the weights of the set `H₀` itself satisfy `w H₀ i ≥ 0` for `i ∈ H₀` and
+  `∑ i ∈ H₀, w H₀ i ≤ 1`. No monotonicity of the weights and no condition on the weights of
+  other sets or on the families outside `H₀` is needed for this clause).
 
 (3) Repeated confidence sets. Given a family `F θ` for every parameter value `θ` (any type),
 `RCI k = {θ | E_θ k α has not occurred}`. These sets shrink with `k`; for `0 ≤ α < 1`,
@@ -70,7 +87,8 @@ boundaries from spending functions and normal statistics; here the tests are abs
 events, and the condition that the rejection events grow with the level at every look (a
 condition on the spending-function family that the paper also imposes; its exact wording
 there is to be confirmed) is part of the definition of `GSFamily`. Monotonicity and right-continuity in the level of actual
-alpha-spending boundaries (for instance those of `exists_alphaSpending_boundaries_gaussian`)
+alpha-spending boundaries (for instance those of `exists_alphaSpending_boundaries_gaussian`, which lives in
+`Applied/Statistics/GroupSequentialJointLaw.lean`, a file this entry does not import)
 are NOT proved: in `ofBoundaries` they are hypotheses. The only family shown to exist
 unconditionally is the Bonferroni split (c). The repeated p-value is capped at one, so the
 duality in (1) is for `γ < 1`. Repeated confidence sets are arbitrary sets of parameter

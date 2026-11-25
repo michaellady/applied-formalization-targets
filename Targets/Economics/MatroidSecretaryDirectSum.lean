@@ -50,6 +50,13 @@ Lean hypotheses and conventions disclosed.
 * `integrable_of_competitive` (library): for `c > 0` the integrand is integrable, so the
   junk value `0` of the Bochner integral never helps.
 
+Model and status (common to all matroid secretary entries of this project). The matroid is
+known to the algorithm in advance, and the algorithm sees the identity as well as the weight
+of each arriving element; models in which the matroid is revealed online are not treated. The
+constants proved in this project are weaker than the best constants in the literature for the
+same classes. Partition matroids with capacities one (constant `1/e`) are already formalized
+in cslib-frontier (`MatroidSecretary.lean`); no novelty is claimed for that case.
+
 Not covered: truncation; contraction; matroid isomorphism invariance; general reductions
 (e.g. to connected or simple matroids) beyond direct sums and deletion.
 -/

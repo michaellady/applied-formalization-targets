@@ -1,5 +1,6 @@
 import Applied.Statistics.CombinedPValues
 import Applied.Statistics.ClosedTesting
+import Applied.Statistics.StandardNormal
 import Mathlib.Probability.Distributions.Gaussian.Real
 import Mathlib.Probability.CDF
 
@@ -39,6 +40,13 @@ Normal mean with known standard error `s` (the estimate has law `N(θ, s²)` on 
 
 The p-value form of `iut_level` is `Applied.MultipleTesting.isValidPValue_iSup_of_isValidPValue`
 (the maximum p-value).
+
+## Relation to other files and scope
+
+`CombinedPValues.lean` has the maximum p-value; `ClosedTesting.lean` the fixed-sequence test;
+`StandardNormal.lean` the facts about `Φ` (re-exported here under their old names). Not here:
+the t-test (unknown variance) TOST, ratio-scale bioequivalence limits (80–125%), asymmetric
+margins, and more powerful equivalence tests (Berger–Hsu).
 -/
 
 open MeasureTheory ProbabilityTheory Set Filter
@@ -204,108 +212,44 @@ end General
 
 local notation "Φ" => cdf (gaussianReal 0 1)
 
-/-- The standard normal cdf is positive everywhere. -/
-lemma cdf_stdNormal_pos (x : ℝ) : 0 < Φ x := by
-  rw [cdf_eq_real, measureReal_def]
-  have h : gaussianReal 0 1 (Iic x) ≠ 0 := fun h0 => by
-    have := gaussianReal_absolutelyContinuous' 0 (one_ne_zero) h0
-    simp at this
-  exact ENNReal.toReal_pos h (measure_ne_top _ _)
+/-! The facts about `Φ` and about `N(θ, s²)` used below are proved once in
+`Applied/Statistics/StandardNormal.lean` (namespace `Applied.StdNormal`). The names that this
+file used to define are kept as aliases. -/
 
-/-- Symmetry of the standard normal cdf. -/
-lemma cdf_stdNormal_neg (x : ℝ) : Φ (-x) = 1 - Φ x := by
-  have := nullSingletonClass_gaussianReal (μ := 0) (v := 1) one_ne_zero
-  have h1 : gaussianReal 0 1 (Iic (-x)) = gaussianReal 0 1 (Ici x) := by
-    have hmap := gaussianReal_map_neg (μ := 0) (v := 1)
-    rw [neg_zero] at hmap
-    conv_lhs => rw [← hmap, Measure.map_apply measurable_neg measurableSet_Iic]
-    congr 1
-    ext y
-    simp
-  have h2 : gaussianReal 0 1 (Ici x) = 1 - gaussianReal 0 1 (Iic x) := by
-    rw [← compl_Iio, prob_compl_eq_one_sub measurableSet_Iio, measure_congr Iio_ae_eq_Iic]
-  rw [cdf_eq_real, cdf_eq_real, measureReal_def, measureReal_def, h1, h2,
-    ENNReal.toReal_sub_of_le prob_le_one ENNReal.one_ne_top, ENNReal.toReal_one]
+/-- The standard normal cdf is positive everywhere. Alias of `Applied.StdNormal.cdf_pos`. -/
+alias cdf_stdNormal_pos := StdNormal.cdf_pos
 
-lemma cdf_stdNormal_lt_one (x : ℝ) : Φ x < 1 := by
-  have := cdf_stdNormal_pos (-x)
-  rw [cdf_stdNormal_neg] at this
-  linarith
+/-- Symmetry of the standard normal cdf: `Φ (-x) = 1 - Φ x`. Alias of
+`Applied.StdNormal.cdf_neg`. -/
+alias cdf_stdNormal_neg := StdNormal.cdf_neg
 
-/-- `N(θ, s²)` is the law of `θ + s Z` for standard normal `Z`. -/
-lemma gaussianReal_eq_map_stdNormal (θ : ℝ) (s : ℝ≥0) :
-    gaussianReal θ (s ^ 2) = (gaussianReal 0 1).map (fun z => θ + s * z) := by
-  have h1 : (gaussianReal 0 1).map (fun z => (s : ℝ) * z) = gaussianReal 0 (s ^ 2) := by
-    rw [gaussianReal_map_const_mul]
-    congr 1
-    · simp
-    · ext
-      simp
-  have h2 : (gaussianReal 0 (s ^ 2)).map (fun z => θ + z) = gaussianReal θ (s ^ 2) := by
-    rw [gaussianReal_map_const_add]
-    simp
-  rw [← h2, ← h1, Measure.map_map (by fun_prop) (by fun_prop)]
-  rfl
+/-- The standard normal cdf is below one everywhere. Alias of `Applied.StdNormal.cdf_lt_one`. -/
+alias cdf_stdNormal_lt_one := StdNormal.cdf_lt_one
 
-variable {θ δ c : ℝ} {s : ℝ≥0}
+/-- `N(θ, s²)` is the law of `θ + s Z` for standard normal `Z`. Alias of
+`Applied.StdNormal.gaussianReal_eq_map_stdNormal`. -/
+alias gaussianReal_eq_map_stdNormal := StdNormal.gaussianReal_eq_map_stdNormal
 
-/-- Lower tail of `N(θ, s²)`, `s ≠ 0`. -/
-lemma gaussianReal_Iic (θ x : ℝ) (hs : s ≠ 0) :
-    gaussianReal θ (s ^ 2) (Iic x) = ENNReal.ofReal (Φ ((x - θ) / s)) := by
-  have hs' : (0 : ℝ) < s := by positivity
-  rw [gaussianReal_eq_map_stdNormal, Measure.map_apply (by fun_prop) measurableSet_Iic,
-    ofReal_cdf]
-  congr 1
-  ext z
-  simp only [mem_preimage, mem_Iic]
-  rw [le_div_iff₀ hs']
-  constructor <;> intro h <;> linarith
+/-- Lower tail of `N(θ, s²)`, `s ≠ 0`: `Φ((x - θ)/s)`. Alias of
+`Applied.StdNormal.gaussianReal_Iic`. -/
+alias gaussianReal_Iic := StdNormal.gaussianReal_Iic
 
-/-- Upper tail of `N(θ, s²)`, `s ≠ 0`. -/
-lemma gaussianReal_Ioi (θ x : ℝ) (hs : s ≠ 0) :
-    gaussianReal θ (s ^ 2) (Ioi x) = ENNReal.ofReal (1 - Φ ((x - θ) / s)) := by
-  rw [← compl_Iic, prob_compl_eq_one_sub measurableSet_Iic, gaussianReal_Iic θ x hs,
-    ENNReal.ofReal_sub _ (cdf_nonneg _ _), ENNReal.ofReal_one]
+/-- Upper tail of `N(θ, s²)`, `s ≠ 0`: `1 - Φ((x - θ)/s)`. Alias of
+`Applied.StdNormal.gaussianReal_Ioi`. -/
+alias gaussianReal_Ioi := StdNormal.gaussianReal_Ioi
 
-/-- Open intervals under `N(θ, s²)`, `s ≠ 0`. For `b < a` both sides are zero. -/
-lemma gaussianReal_Ioo (θ a b : ℝ) (hs : s ≠ 0) :
-    gaussianReal θ (s ^ 2) (Ioo a b)
-      = ENNReal.ofReal (Φ ((b - θ) / s) - Φ ((a - θ) / s)) := by
-  have := nullSingletonClass_gaussianReal (μ := θ) (v := s ^ 2) (pow_ne_zero 2 hs)
-  rcases le_or_gt a b with hab | hab
-  · have hIoc : Ioc a b = Iic b \ Iic a := by
-      ext x
-      simp [and_comm]
-    rw [measure_congr Ioo_ae_eq_Ioc, hIoc,
-      measure_sdiff (Iic_subset_Iic.mpr hab) measurableSet_Iic.nullMeasurableSet
-        (measure_ne_top _ _),
-      gaussianReal_Iic θ b hs, gaussianReal_Iic θ a hs, ENNReal.ofReal_sub _ (cdf_nonneg _ _)]
-  · rw [Ioo_eq_empty (not_lt.mpr hab.le), measure_empty, ENNReal.ofReal_of_nonpos]
-    have : (b - θ) / s ≤ (a - θ) / s := by gcongr
-    linarith [monotone_cdf (gaussianReal 0 1) this]
+/-- Open intervals under `N(θ, s²)`, `s ≠ 0`. For `b < a` both sides are zero. Alias of
+`Applied.StdNormal.gaussianReal_Ioo`. -/
+alias gaussianReal_Ioo := StdNormal.gaussianReal_Ioo
 
-/-- Closed intervals under `N(θ, s²)`, `s ≠ 0`. -/
-lemma gaussianReal_Icc (θ a b : ℝ) (hs : s ≠ 0) :
-    gaussianReal θ (s ^ 2) (Icc a b)
-      = ENNReal.ofReal (Φ ((b - θ) / s) - Φ ((a - θ) / s)) := by
-  have := nullSingletonClass_gaussianReal (μ := θ) (v := s ^ 2) (pow_ne_zero 2 hs)
-  rw [← measure_congr Ioo_ae_eq_Icc, gaussianReal_Ioo θ a b hs]
+/-- Closed intervals under `N(θ, s²)`, `s ≠ 0`. Alias of `Applied.StdNormal.gaussianReal_Icc`. -/
+alias gaussianReal_Icc := StdNormal.gaussianReal_Icc
 
 /-- Moving the mean of a normal law away from a set lying below it decreases the set's
-probability: if `S ⊆ (-∞, m]` and `m ≤ m'` then `N(m', v)(S) ≤ N(m, v)(S)`. -/
-lemma gaussianReal_anti_of_subset_Iic {m m' : ℝ} (hm : m ≤ m') {v : ℝ≥0} (hv : v ≠ 0)
-    {S : Set ℝ} (hS : MeasurableSet S) (hSm : S ⊆ Iic m) :
-    gaussianReal m' v S ≤ gaussianReal m v S := by
-  rw [gaussianReal_apply _ hv, gaussianReal_apply _ hv]
-  refine setLIntegral_mono' hS fun x hx => ?_
-  have hx' : x ≤ m := hSm hx
-  simp only [gaussianPDF]
-  apply ENNReal.ofReal_le_ofReal
-  simp only [gaussianPDFReal]
-  have hv' : (0 : ℝ) < v := by positivity
-  have hsq : (x - m) ^ 2 ≤ (x - m') ^ 2 := by nlinarith
-  have : -(x - m') ^ 2 / (2 * v) ≤ -(x - m) ^ 2 / (2 * v) := by gcongr
-  gcongr
+probability. Alias of `Applied.StdNormal.gaussianReal_anti_of_subset_Iic`. -/
+alias gaussianReal_anti_of_subset_Iic := StdNormal.gaussianReal_anti_of_subset_Iic
+
+variable {θ δ c : ℝ} {s : ℝ≥0}
 
 /-! ### One-sided z-tests -/
 
@@ -351,6 +295,8 @@ standard error `s` and critical value `c`: the z-test of `θ ≤ -δ` and the z-
 both reject. -/
 def tostRegion (δ s c : ℝ) : Set ℝ := {x | c < (x - -δ) / s ∧ (x - δ) / s < -c}
 
+/-- For standard error `s > 0` the TOST rejection region is the open interval
+`(-δ + c s, δ - c s)` of estimates (empty when `c s ≥ δ`). -/
 lemma tostRegion_eq_Ioo {δ s c : ℝ} (hs : 0 < s) :
     tostRegion δ s c = Ioo (-δ + c * s) (δ - c * s) := by
   ext x
@@ -434,7 +380,9 @@ theorem tost_level (hs : s ≠ 0) (hθ : δ ≤ |θ|) :
     exact (measure_mono hsub).trans (zTest_upper_level hs (by linarith))
 
 /-- For `c ≥ 0` the TOST rejection probability on the null `|θ| ≥ δ` is largest at the
-margin. -/
+margin. The hypothesis `c ≥ 0` is a convenience of the proof (the rejection interval then lies
+to the left of `δ`); for `δ ≥ 0` the statement is true for every real `c`, because the
+interval is symmetric about `0`, but that version is not proved here. -/
 theorem tost_prob_le_margin (hs : s ≠ 0) (hc : 0 ≤ c) (hθ : δ ≤ |θ|) :
     gaussianReal θ (s ^ 2) (tostRegion δ s c)
       ≤ ENNReal.ofReal ((1 - Φ c) - Φ (c - 2 * δ / s)) := by
@@ -456,7 +404,8 @@ theorem tost_prob_le_margin (hs : s ≠ 0) (hc : 0 ≤ c) (hθ : δ ≤ |θ|) :
     exact key (-θ) h
 
 /-- **Size of TOST.** For `s ≠ 0` and `c ≥ 0`, the supremum of the rejection probability over
-the null `|θ| ≥ δ` equals `(1 - Φ c) - Φ (c - 2 δ / s)` (zero when this is negative). -/
+the null `|θ| ≥ δ` equals `(1 - Φ c) - Φ (c - 2 δ / s)` (zero when this is negative). As in
+`tost_prob_le_margin`, `c ≥ 0` is assumed for convenience and could be replaced by `δ ≥ 0`. -/
 theorem tost_size (hs : s ≠ 0) (hc : 0 ≤ c) (δ : ℝ) :
     ⨆ θ : ℝ, ⨆ _ : δ ≤ |θ|, gaussianReal θ (s ^ 2) (tostRegion δ s c)
       = ENNReal.ofReal ((1 - Φ c) - Φ (c - 2 * δ / s)) := by

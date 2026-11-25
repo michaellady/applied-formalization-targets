@@ -1,5 +1,4 @@
 import Applied.Economics.EFXOrdered
-import Mathlib.Combinatorics.Colex
 
 /-!
 # EFX allocations when every agent has one of two additive valuations
@@ -11,10 +10,11 @@ that is EFX in the strong sense of `Applied.Economics.IsEFX` exists
 with simplifications.
 
 * Partial allocations are maps `X : A → Finset G` with pairwise disjoint bundles
-  (`IsPartialAlloc`); `IsPEFX` is EFX for the allocated goods.
-* After a perturbation (`exists_perturbation`) all values are positive and different sets of
-  goods have different values for every agent (non-degeneracy); EFX for the perturbed
-  valuations implies EFX for the original ones.
+  (`IsPartialAlloc`); `IsPEFX` is EFX for the allocated goods (both defined in
+  `FairDivisionBasic.lean`).
+* After a perturbation (`exists_pos_perturbation`, in `FairDivisionBasic.lean`) all values are
+  positive and different sets of goods have different values for every agent
+  (non-degeneracy); EFX for the perturbed valuations implies EFX for the original ones.
 * A partial EFX allocation of maximal welfare `∑ i, v i (X i)` is complete
   (`two_types_contra`). Otherwise, with `g` unallocated:
   - a *champion* of a set `S` is an agent `i` with a set `P ⊆ S` that `i` prefers to their
@@ -34,14 +34,6 @@ open Finset Function
 namespace Applied.Economics
 
 variable {A G : Type*} [DecidableEq A] [DecidableEq G]
-
-/-- A partial allocation: bundles of different agents are disjoint. -/
-def IsPartialAlloc (X : A → Finset G) : Prop :=
-  ∀ i j, i ≠ j → Disjoint (X i) (X j)
-
-/-- EFX (strong form) for a partial allocation given by bundles. -/
-def IsPEFX (v : A → G → ℝ) (X : A → Finset G) : Prop :=
-  ∀ i j, ∀ h ∈ X j, ∑ x ∈ (X j).erase h, v i x ≤ ∑ x ∈ X i, v i x
 
 /-- Utilitarian welfare of a partial allocation. -/
 def welfare [Fintype A] (v : A → G → ℝ) (X : A → Finset G) : ℝ :=
@@ -469,64 +461,6 @@ theorem two_types_contra [Fintype A] [Fintype G] (v : A → G → ℝ) (hpos : �
   rw [hYa]
   exact hZa2
 
-omit [DecidableEq A] [DecidableEq G] in
-/-- Perturbation: there are positive weights `w` on the goods whose subset sums are pairwise
-different, and whose subset-sum differences are smaller than every non-zero difference of
-subset sums of any `v i`. -/
-lemma exists_perturbation [Fintype A] [Fintype G] (v : A → G → ℝ) :
-    ∃ w : G → ℝ, (∀ g, 0 < w g) ∧ (∀ S T : Finset G, ∑ g ∈ S, w g = ∑ g ∈ T, w g → S = T) ∧
-      ∀ i (S T : Finset G), ∑ g ∈ S, v i g ≠ ∑ g ∈ T, v i g →
-        |∑ g ∈ S, w g - ∑ g ∈ T, w g| < |∑ g ∈ S, v i g - ∑ g ∈ T, v i g| := by
-  classical
-  set e := Fintype.equivFin G
-  set emb : G ↪ ℕ := e.toEmbedding.trans Fin.valEmbedding with hemb
-  set b : G → ℝ := fun g => (2 : ℝ) ^ (e g : ℕ) with hb
-  have hbsum : ∀ S : Finset G, ∑ g ∈ S, b g = ((∑ k ∈ S.map emb, 2 ^ k : ℕ) : ℝ) := by
-    intro S
-    rw [sum_map]
-    push_cast
-    rfl
-  have hbinj : ∀ S T : Finset G, ∑ g ∈ S, b g = ∑ g ∈ T, b g → S = T := by
-    intro S T h
-    rw [hbsum, hbsum] at h
-    exact map_injective emb (geomSum_injective le_rfl (Nat.cast_injective h))
-  have hb0 : ∀ g, 0 < b g := fun g => pow_pos two_pos _
-  set W := ∑ g, b g with hW
-  have hW0 : 0 ≤ W := sum_nonneg (fun g _ => (hb0 g).le)
-  obtain ⟨δ, hδ, hδle⟩ : ∃ δ > 0, ∀ i (S T : Finset G), ∑ g ∈ S, v i g ≠ ∑ g ∈ T, v i g →
-      δ ≤ |∑ g ∈ S, v i g - ∑ g ∈ T, v i g| := by
-    obtain ⟨D, hD⟩ : ∃ D : Finset (A × Finset G × Finset G), D = univ.filter
-        (fun p => ∑ g ∈ p.2.1, v p.1 g ≠ ∑ g ∈ p.2.2, v p.1 g) := ⟨_, rfl⟩
-    have hmemD : ∀ i (S T : Finset G), ∑ g ∈ S, v i g ≠ ∑ g ∈ T, v i g → (i, S, T) ∈ D :=
-      fun i S T h => by rw [hD]; exact mem_filter.2 ⟨mem_univ _, h⟩
-    by_cases hDne : D.Nonempty
-    · obtain ⟨p, hp, hpmin⟩ := D.exists_min_image
-        (fun p => |∑ g ∈ p.2.1, v p.1 g - ∑ g ∈ p.2.2, v p.1 g|) hDne
-      have hp' : ∑ g ∈ p.2.1, v p.1 g ≠ ∑ g ∈ p.2.2, v p.1 g := by
-        rw [hD] at hp
-        exact (mem_filter.1 hp).2
-      exact ⟨_, abs_pos.2 (sub_ne_zero.2 hp'), fun i S T h => hpmin _ (hmemD i S T h)⟩
-    · exact ⟨1, one_pos, fun i S T h => absurd ⟨_, hmemD i S T h⟩ hDne⟩
-  set ε := δ / (W + 1) with hε
-  have hε0 : 0 < ε := div_pos hδ (by linarith)
-  have hεW : ε * W < δ := by
-    rw [hε, div_mul_eq_mul_div, div_lt_iff₀ (by linarith)]
-    nlinarith
-  refine ⟨fun g => ε * b g, fun g => mul_pos hε0 (hb0 g), fun S T h => ?_, fun i S T h => ?_⟩
-  · rw [← mul_sum, ← mul_sum] at h
-    exact hbinj S T (mul_left_cancel₀ hε0.ne' h)
-  · have hle : ∀ S : Finset G, 0 ≤ ∑ g ∈ S, ε * b g ∧ ∑ g ∈ S, ε * b g ≤ ε * W := by
-      intro S
-      rw [← mul_sum]
-      refine ⟨mul_nonneg hε0.le (sum_nonneg (fun g _ => (hb0 g).le)), ?_⟩
-      exact mul_le_mul_of_nonneg_left (sum_le_sum_of_subset_of_nonneg (subset_univ S)
-        (fun g _ _ => (hb0 g).le)) hε0.le
-    have h1 := hle S
-    have h2 := hle T
-    refine lt_of_lt_of_le ?_ (hδle i S T h)
-    rw [abs_lt]
-    constructor <;> linarith
-
 /-- **EFX for two types of agents.** If all agents (at least one) have additive non-negative
 valuations and each agent's valuation is one of two functions `va`, `vb`, an EFX allocation
 (strong form, `IsEFX`) exists. -/
@@ -552,32 +486,15 @@ theorem efx_exists_two_types [Fintype A] [Nonempty A] [Fintype G] (v : A → G �
   obtain ⟨iA, hiA⟩ := hallB
   obtain ⟨iB, hiB⟩ := hallA
   set τ : A → Bool := fun i => decide (v i = va) with hτ
-  obtain ⟨w, hwpos, hwinj, hwlt⟩ := exists_perturbation v
+  -- perturb all valuations by the same positive weights `w`
+  obtain ⟨w, hwpos, hnd, htrans⟩ := exists_pos_perturbation v
   set v' : A → G → ℝ := fun i g => v i g + w g with hv'
-  have hsum' : ∀ i (S : Finset G), ∑ g ∈ S, v' i g = ∑ g ∈ S, v i g + ∑ g ∈ S, w g :=
-    fun i S => sum_add_distrib
   have hpos' : ∀ i g, 0 < v' i g := fun i g => by
     simp only [hv']
     linarith [hv i g, hwpos g]
-  have hnd' : ∀ i (S T : Finset G), S ≠ T → ∑ g ∈ S, v' i g ≠ ∑ g ∈ T, v' i g := by
-    intro i S T hST h
-    rw [hsum', hsum'] at h
-    by_cases hvST : ∑ g ∈ S, v i g = ∑ g ∈ T, v i g
-    · exact hST (hwinj S T (by linarith))
-    · have := hwlt i S T hvST
-      rw [show ∑ g ∈ S, w g - ∑ g ∈ T, w g = -(∑ g ∈ S, v i g - ∑ g ∈ T, v i g) by linarith,
-        abs_neg] at this
-      exact lt_irrefl _ this
-  have htrans : ∀ i (S T : Finset G), ∑ g ∈ S, v' i g ≤ ∑ g ∈ T, v' i g →
-      ∑ g ∈ S, v i g ≤ ∑ g ∈ T, v i g := by
-    intro i S T h
-    by_contra hlt
-    push Not at hlt
-    have h1 := hwlt i T S hlt.ne
-    rw [hsum', hsum'] at h
-    rw [abs_of_neg (sub_neg.2 hlt)] at h1
-    have h2 := le_abs_self (∑ g ∈ T, w g - ∑ g ∈ S, w g)
-    linarith
+  have hnd' : ∀ i (S T : Finset G), S ≠ T → ∑ g ∈ S, v' i g ≠ ∑ g ∈ T, v' i g := hnd
+  have htrans' : ∀ i (S T : Finset G), ∑ g ∈ S, v' i g ≤ ∑ g ∈ T, v' i g →
+      ∑ g ∈ S, v i g ≤ ∑ g ∈ T, v i g := htrans
   have hA : ∀ i, τ i = true → v' i = fun g => va g + w g := by
     intro i hi
     simp only [hτ, decide_eq_true_eq] at hi
@@ -605,19 +522,8 @@ theorem efx_exists_two_types [Fintype A] [Nonempty A] [Fintype G] (v : A → G �
     push Not at hg
     exact two_types_contra v' hpos' hnd' τ _ _ hA hB iA iB hτA hτB X hX hE
       (fun Y hY hYE => hmax ⟨Y, hY, hYE⟩) g hg
-  choose a ha using hcomplete
-  have hiff : ∀ h j, a h = j ↔ h ∈ X j := fun h j =>
-    ⟨by rintro rfl; exact ha h, fun hh => by
-      by_contra hne
-      exact disjoint_left.1 (hX _ _ hne) (ha h) hh⟩
-  refine ⟨a, fun i j g hg => ?_⟩
-  have h1 : (univ.filter fun h => a h = j ∧ h ≠ g) = (X j).erase g := by
-    ext h
-    simp [hiff, and_comm]
-  have h2 : (univ.filter fun h => a h = i) = X i := by
-    ext h
-    simp [hiff]
-  rw [h1, h2]
-  exact htrans i _ _ (hE i j g ((hiff g j).1 hg))
+  -- a complete partial EFX allocation for `v'` is an EFX allocation for `v`
+  exact exists_isEFX_of_isPEFX hX hcomplete
+    (fun i j g hg => htrans' i _ _ (hE i j g hg))
 
 end Applied.Economics

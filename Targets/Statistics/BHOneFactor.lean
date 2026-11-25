@@ -14,7 +14,9 @@ import Applied.Statistics.PRDSFactorModels
 Informal statement. Throughout, `P` is a probability measure, the hypotheses are indexed by a
 finite type, `Φ` is the standard normal distribution function (Mathlib's
 `cdf (gaussianReal 0 1)`), and "positively regression dependent" means
-`Applied.MultipleTesting.IsPRDSOn`: the conditioning-on-`pᵢ ≤ t` form of Blanchard and Roquain
+`Applied.MultipleTesting.IsPRDSOn`: the conditioning-on-`pᵢ ≤ t` consequence of PRDS used in the
+proofs of Benjamini–Yekutieli and Blanchard–Roquain (their condition (7), proof of Prop. 3.6),
+which is the definition of PRDS in Ramdas et al. 2019, Def. 1
 (weak PRDS), cleared of denominators, not the definition of Benjamini and Yekutieli, which
 conditions on `pᵢ = t`. That the classical condition
 implies this form is proved separately, in `Applied/Statistics/ClassicalPRDS.lean`.

@@ -26,6 +26,8 @@ open Applied.Probability
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- Integrating a product function `x ↦ ∏ i, f i (x i)` over the coordinates in `s` integrates
+the factors with index in `s` and leaves the others. -/
 lemma lmarginal_prod (μ : ι → Measure ℝ) [∀ i, SigmaFinite (μ i)] (f : ι → ℝ → ℝ≥0∞)
     (hf : ∀ i, Measurable (f i)) (s : Finset ι) (x : ι → ℝ) :
     (∫⋯∫⁻_s, (fun x => ∏ i, f i (x i)) ∂μ) x =
@@ -110,6 +112,7 @@ lemma inv_mul_transpose_apply (M : Matrix ι ι ℝ) (i j : ι) :
   rw [Matrix.mul_inv_rev, ← Matrix.transpose_nonsing_inv, Matrix.mul_apply]
   rfl
 
+/-- The standard normal density, written out. -/
 lemma gaussianPDFReal_std (y : ℝ) :
     gaussianPDFReal 0 1 y = (√(2 * Real.pi))⁻¹ * Real.exp (-(y ^ 2) / 2) := by
   simp [gaussianPDFReal]

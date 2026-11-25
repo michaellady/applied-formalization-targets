@@ -51,6 +51,7 @@ def IsBimatrixNash (A B : Matrix m n ℝ) (p : m → ℝ) (q : n → ℝ) : Prop
     (∀ p' ∈ mixedStrategies m, gamePayoff A p' q ≤ gamePayoff A p q) ∧
     (∀ q' ∈ mixedStrategies n, gamePayoff B p q' ≤ gamePayoff B p q)
 
+/-- Negating the payoff matrix negates the expected payoff. -/
 lemma gamePayoff_neg (A : Matrix m n ℝ) (p : m → ℝ) (q : n → ℝ) :
     gamePayoff (-A) p q = -gamePayoff A p q := by
   simp [gamePayoff, neg_mulVec]
@@ -162,6 +163,8 @@ def IsExactPotential [DecidableEq ι] (u : ι → (∀ j, S j) → ℝ) (Φ : (�
   ∀ i (s : ∀ j, S j) (a : S i),
     u i (Function.update s i a) - u i s = Φ (Function.update s i a) - Φ s
 
+/-- An exact potential is a generalized ordinal potential: a unilateral deviation that strictly
+improves the deviator's payoff strictly increases the potential. -/
 lemma IsExactPotential.isGeneralizedOrdinalPotential [DecidableEq ι] {u : ι → (∀ j, S j) → ℝ}
     {Φ : (∀ j, S j) → ℝ} (h : IsExactPotential u Φ) : IsGeneralizedOrdinalPotential u Φ := by
   intro i s a hlt

@@ -36,11 +36,26 @@ the first stage):
   fact about `m ↦ (c √(n1+m) - z1 √n1) / √m`.
 * `critValue_sub_trend_nonpos_iff`: the zone `z1 ≥ c √(n1 / (n1 + n2))` is "conditional power
   under the current trend at least one half".
-* `measure_conventional_adaptive_le`: **sample-size increase in the promising zone with the
-  conventional test** (Chen–DeMets–Lan 2004): type I error at most `N(0,1) [c, ∞)`.
+* `measure_conventional_adaptive_le`: **sample-size increase with the conventional test when
+  conditional power under the current trend is at least 50%** (Chen–DeMets–Lan 2004): type I
+  error at most `N(0,1) [c, ∞)`. This is only the upper part of the "promising zone" of
+  Mehta–Pocock (2011), whose lower end lies below 50% conditional power and is not treated;
+  docstrings below that say "promising zone" mean the region `z1 ≥ c √(n1 / (n1 + n2))`.
 * `measure_weighted_adaptive_eq`: the test with the pre-planned weights (Cui–Hung–Wang 1999,
   Lehmacher–Wassmer 1999) has type I error exactly `N(0,1) [c, ∞)` for every first-stage
   measurable second-stage size.
+
+## Relation to other files and scope
+
+Uses the partial sums and z-statistics of `GroupSequentialCanonical.lean`. The p-value based
+route to adaptive designs is in `CombinationTests.lean` (Fisher's product, general conditional
+error functions of the first-stage p-value) and `InverseNormalCombination.lean` (weighted
+z-statistic); `measure_weighted_adaptive_eq` here is the model-based counterpart of the latter.
+Not here: unknown variance, early stopping at the interim, sample-size decreases, the
+Mehta–Pocock zone below 50% conditional power, any statement that the level is inflated when
+the sample size is increased outside the region (only the critical value is shown to drop),
+non-null drift (power), and the Müller–Schäfer principle phrased with conditional expectations of test
+functions.
 -/
 
 open MeasureTheory ProbabilityTheory Finset Set
@@ -174,7 +189,8 @@ lemma critValue_sub (n1 : ℕ) (c z : ℝ) {n2 m : ℝ} (hn2 : 0 < n2) (hm : 0 <
   field_simp
   ring
 
-/-- **Monotonicity in the promising zone.** For `c ≥ 0`, real second-stage sizes
+/-- **Monotonicity in the zone `z ≥ c √(n1 / (n1 + n2))` (conditional power under the current
+trend at least 50%; called the promising zone in this file).** For `c ≥ 0`, real second-stage sizes
 `0 < n2 ≤ m` and a first-stage z-statistic `z ≥ c √(n1 / (n1 + n2))`, increasing the
 second-stage size from `n2` to `m` does not lower the second-stage critical value. -/
 theorem critValue_le_critValue (n1 : ℕ) {c z n2 m : ℝ} (hc : 0 ≤ c) (hn2 : 0 < n2)
@@ -203,7 +219,8 @@ theorem critValue_le_critValue (n1 : ℕ) {c z n2 m : ℝ} (hc : 0 ≤ c) (hn2 :
   rw [div_le_div_iff₀ (by positivity) h4]
   nlinarith [mul_le_mul hs hs' h4.le h1.le, mul_pos h2 h4, mul_pos h1 h4]
 
-/-- **Outside the promising zone the critical value drops.** For `c ≥ 0`, real sizes
+/-- **Outside the zone `z ≥ c √(n1 / (n1 + n2))` the critical value drops** (this does not by
+itself show that the type I error is inflated). For `c ≥ 0`, real sizes
 `0 < n2 < m` and `z < c √(n1 / (n1 + m))`, the second-stage critical value at `m` is strictly
 below the one at `n2`. -/
 theorem critValue_lt_critValue {n1 : ℕ} (hn1' : 0 < n1) {c z n2 m : ℝ} (hc : 0 ≤ c) (hn2 : 0 < n2)
@@ -256,7 +273,8 @@ theorem critValue_monotoneOn_iff {n1 : ℕ} (hn1 : 0 < n1) {c z n2 : ℝ} (hc : 
     refine mul_le_mul_of_nonneg_left (Real.sqrt_le_sqrt ?_) hc
     exact div_le_div_of_nonneg_left hn1r.le (by positivity) (by linarith)
 
-/-- **The promising zone is "conditional power under the current trend at least one half".**
+/-- **The zone `z ≥ c √(n1 / (n1 + n2))` is "conditional power under the current trend at least
+one half"** (the Chen–DeMets–Lan condition; the Mehta–Pocock promising zone extends lower).
 Under the drift estimated at the interim, `z / √n1` per observation, the second-stage z-statistic
 of `n2` observations has mean `(z / √n1) √n2`, so the conditional power is
 `1 - Φ(critValue n1 c z n2 - (z / √n1) √n2)`. It is at least one half exactly when the argument
@@ -307,9 +325,11 @@ def firstStage (ξ : ℕ → Ω → ℝ) (n : ℕ) : MeasurableSpace Ω :=
 def laterStages (ξ : ℕ → Ω → ℝ) (n : ℕ) : MeasurableSpace Ω :=
   ⨆ i ∈ {i : ℕ | n ≤ i}, MeasurableSpace.comap (ξ i) inferInstance
 
+/-- The interim information is a sub-σ-algebra of the ambient one. -/
 lemma firstStage_le (hξ : ∀ i, Measurable (ξ i)) (n : ℕ) : firstStage ξ n ≤ mΩ :=
   iSup₂_le fun i _ => (hξ i).comap_le
 
+/-- The first-stage sum `S n` is known at the interim: it is `firstStage ξ n`-measurable. -/
 lemma measurable_firstStage_partialSum (ξ : ℕ → Ω → ℝ) (n : ℕ) :
     Measurable[firstStage ξ n] (partialSum ξ n) :=
   Finset.measurable_fun_sum _ fun i hi =>
@@ -317,6 +337,7 @@ lemma measurable_firstStage_partialSum (ξ : ℕ → Ω → ℝ) (n : ℕ) :
       (le_biSup (fun j => MeasurableSpace.comap (ξ j) inferInstance)
         (show i ∈ {i : ℕ | i < n} from Finset.mem_range.mp hi)) le_rfl
 
+/-- The first-stage z-statistic `Z n = S n / √n` is known at the interim. -/
 lemma measurable_firstStage_zStat (ξ : ℕ → Ω → ℝ) (n : ℕ) :
     Measurable[firstStage ξ n] (zStat ξ n) :=
   (measurable_firstStage_partialSum ξ n).div_const _
@@ -325,10 +346,12 @@ lemma measurable_firstStage_zStat (ξ : ℕ → Ω → ℝ) (n : ℕ) :
 def stageTwoSum (ξ : ℕ → Ω → ℝ) (n1 d : ℕ) (ω : Ω) : ℝ :=
   partialSum ξ (n1 + d) ω - partialSum ξ n1 ω
 
+/-- The second-stage sum is measurable. -/
 lemma measurable_stageTwoSum (hξ : ∀ i, Measurable (ξ i)) (n1 d : ℕ) :
     Measurable (stageTwoSum ξ n1 d) :=
   (measurable_partialSum hξ _).sub (measurable_partialSum hξ _)
 
+/-- The second-stage sum depends only on the observations after the first stage. -/
 lemma measurable_laterStages_stageTwoSum (ξ : ℕ → Ω → ℝ) (n1 d : ℕ) :
     Measurable[laterStages ξ n1] (stageTwoSum ξ n1 d) := by
   have h : stageTwoSum ξ n1 d = fun ω => ∑ i ∈ Finset.Ico n1 (n1 + d), ξ i ω := by

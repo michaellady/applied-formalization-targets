@@ -22,6 +22,8 @@ section NashExistence
 variable {ι : Type*} [Fintype ι] [DecidableEq ι] {S : ι → Type*} [∀ i, Fintype (S i)]
 
 omit [∀ i, Fintype (S i)] in
+/-- The probability of the pure profile `s` under a product of mixed strategies in which player
+`i`'s strategy is replaced by `τ`: the factor of player `i` is `τ (s i)`. -/
 lemma prod_update_eq (σ : ∀ j, S j → ℝ) (i : ι) (τ : S i → ℝ) (s : ∀ j, S j) :
     ∏ j, Function.update σ i τ j (s j) = τ (s i) * ∏ j ∈ univ.erase i, σ j (s j) := by
   rw [← Finset.mul_prod_erase univ _ (mem_univ i)]
@@ -48,6 +50,7 @@ lemma mixedPayoff_update_eq_sum [∀ i, DecidableEq (S i)] (u : ι → (∀ j, S
           (∏ j ∈ univ.erase i, σ j (s j)) * u k s) := by
         rw [Finset.sum_mul]; exact Finset.sum_congr rfl fun a _ => by ring
 
+/-- The expected payoff of player `k` is continuous in the profile of mixed strategies. -/
 lemma continuous_mixedPayoff (u : ι → (∀ j, S j) → ℝ) (k : ι) :
     Continuous fun σ : (∀ j, S j → ℝ) => mixedPayoff u σ k := by
   unfold mixedPayoff
@@ -61,19 +64,25 @@ variable [∀ i, DecidableEq (S i)] (u : ι → (∀ j, S j) → ℝ)
 noncomputable def pureGain (σ : ∀ j, S j → ℝ) (i : ι) (a : S i) : ℝ :=
   max 0 (mixedPayoff u (Function.update σ i (Pi.single a 1)) i - mixedPayoff u σ i)
 
-/-- Nash's map. -/
+/-- Nash's map: every player shifts probability towards the pure strategies that would improve
+their payoff, `σ i a ↦ (σ i a + gain i a) / (1 + ∑ b, gain i b)`. Its fixed points are exactly
+the Nash equilibria. -/
 noncomputable def nashMap (σ : ∀ j, S j → ℝ) : ∀ j, S j → ℝ :=
   fun i a => (σ i a + pureGain u σ i a) / (1 + ∑ b, pureGain u σ i b)
 
+/-- The gain `pureGain u σ i a` (positive part of the improvement of player `i` from deviating to
+the pure strategy `a`) is non-negative. -/
 lemma pureGain_nonneg (σ : ∀ j, S j → ℝ) (i : ι) (a : S i) : 0 ≤ pureGain u σ i a :=
   le_max_left _ _
 
+/-- The gain from a pure deviation is continuous in the profile of mixed strategies. -/
 lemma continuous_pureGain (i : ι) (a : S i) : Continuous fun σ => pureGain u σ i a := by
   unfold pureGain
   exact continuous_const.max
     (((continuous_mixedPayoff u i).comp (continuous_id.update i continuous_const)).sub
       (continuous_mixedPayoff u i))
 
+/-- Nash's map sends profiles of mixed strategies to profiles of mixed strategies. -/
 lemma nashMap_mem (σ : ∀ j, S j → ℝ) (hσ : ∀ i, σ i ∈ mixedStrategies (S i)) (i : ι) :
     nashMap u σ i ∈ mixedStrategies (S i) := by
   have hG : 0 < 1 + ∑ b, pureGain u σ i b :=

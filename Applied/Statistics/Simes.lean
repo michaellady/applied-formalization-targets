@@ -4,6 +4,12 @@ import Applied.Statistics.ClosedTesting
 /-!
 # Simes inequality, Hommel and Hochberg procedures
 
+The Simes test of an intersection hypothesis rejects when `p₍ₖ₎ ≤ α k / m` for some `k`, i.e.
+when the Benjamini–Hochberg procedure rejects something; in Lean this is the event
+`1 ≤ bhK α q`. It is more powerful than the Bonferroni test `p₍₁₎ ≤ α / m` but needs a
+dependence assumption: independence in this file, positive dependence in
+`Applied.Statistics.PRDS`.
+
 * `measure_one_le_bhK_le`: the **Simes inequality**. For independent valid p-values, the chance
   that `p₍ₖ₎ ≤ α k / m` for some `k` is at most `α`. It is the Benjamini–Hochberg theorem with
   every hypothesis a true null.
@@ -12,11 +18,27 @@ import Applied.Statistics.ClosedTesting
   block of ties uses the divisor of its last position); `hochberg_subset_hommel`,
   `fwer_hochberg_le`. `hochberg_firstPosition_subset`: it rejects at least what the more
   conservative first-position rule rejects.
-* `fwer_hommel_le_of_null_iIndepFun`, `fwer_hochberg_le_of_null_iIndepFun`,
-  `measure_simesLocal_le_of_null_iIndepFun`: the same bounds assuming independence only among
-  the p-values of the true nulls (the hypothesis used in the literature). `fwer_hommel_le` and
+* `fwer_hommel_le_of_null_measurable`, `fwer_hochberg_le_of_null_measurable`,
+  `measure_simesLocal_le_of_null_measurable`: the same bounds assuming measurability, validity
+  and independence only of the p-values of the true nulls (the hypothesis used in the
+  literature); nothing is assumed about the others. The `_of_null_iIndepFun` versions
+  additionally assume all p-values measurable. `fwer_hommel_le` and
   `fwer_hochberg_le` assume that all p-values are independent, which is more than needed. In
   `measure_one_le_bhK_le` every hypothesis is a true null, so there the two hypotheses agree.
+
+## Related files
+
+* `PRDS`: the same three results under positive regression dependence.
+* `SimesExact`: equality for independent uniform p-values. `SimesSharp`: without a dependence
+  assumption the level can be as large as `α (1 + 1/2 + ⋯ + 1/m)`.
+* `HommelAdjusted`, `StepUpAdjusted`: adjusted p-values. `SortedProcedures`: sorted form of
+  `hochberg`.
+* `WeightedSimes`: weighted Simes tests.
+
+## Not in this file
+
+The equivalence of the closed Simes test `hommel` with Hommel's 1988 stagewise rule; Rom's
+procedure.
 -/
 
 open MeasureTheory ProbabilityTheory Finset
@@ -31,6 +53,7 @@ section Simes
 variable [Fintype ι] [DecidableEq ι] {α : ℝ}
 
 omit [MeasurableSpace Ω] [DecidableEq ι] in
+/-- If the cut-off index is at least one, the Benjamini–Hochberg procedure rejects something. -/
 lemma bhReject_nonempty_of_one_le_bhK (q : ι → ℝ) (h : 1 ≤ bhK α q) :
     (bhReject α q).Nonempty :=
   Finset.card_pos.mp (lt_of_lt_of_le h (bhK_le_card_bhReject q))
@@ -85,7 +108,9 @@ theorem measure_simesLocal_le (P : Measure Ω) [IsProbabilityMeasure P] (hα : 0
   measure_one_le_bhK_le P hα (fun j : H₀ => p j) (fun j => hmeas j)
     (hindep.precomp Subtype.val_injective) fun j => hvalid j j.2
 
-/-- Hommel's procedure: the closed test built from Simes local tests. -/
+/-- Hommel's procedure, defined as the closed test built from Simes local tests: `i` is rejected
+when the Simes test rejects every intersection hypothesis containing `i` (the standard
+description). The equivalence with Hommel's 1988 stagewise rule is not formalized here. -/
 noncomputable def hommel (α : ℝ) (p : ι → Ω → ℝ) (ω : Ω) : Finset ι :=
   closedTest (simesLocal α p) ω
 
@@ -120,6 +145,8 @@ noncomputable def hochberg (α : ℝ) (p : ι → Ω → ℝ) (ω : Ω) : Finset
     p j ω ≤ α / (((univ.filter fun l => p j ω < p l ω).card : ℝ) + 1)}
 
 omit [MeasurableSpace Ω] [DecidableEq ι] in
+/-- Membership in `hochberg`, unfolded: `i` is rejected iff some `j` with `p i ≤ p j` has
+`p j ≤ α / (#{l | p j < p l} + 1)`. -/
 lemma mem_hochberg {p : ι → Ω → ℝ} {ω : Ω} {i : ι} :
     i ∈ hochberg α p ω ↔ ∃ j, p i ω ≤ p j ω ∧
       p j ω ≤ α / (((univ.filter fun l => p j ω < p l ω).card : ℝ) + 1) := by
@@ -249,38 +276,75 @@ theorem fwer_hochberg_le (P : Measure Ω) [IsProbabilityMeasure P] (hα : 0 ≤ 
 The theorems above assume that *all* p-values are mutually independent. The literature needs
 independence only among the p-values of the true nulls; the p-values of the false nulls may
 be arbitrary (any joint law, any dependence on the null p-values). The versions below take
-`iIndepFun (fun j : H₀ => p j) P` and imply the versions above. -/
+`iIndepFun (fun j : H₀ => p j) P` and imply the versions above. The `_of_null_measurable`
+versions also ask for measurability of the true-null p-values only, so that literally nothing
+is assumed about the others; the `_of_null_iIndepFun` versions (kept for compatibility) assume
+all p-values measurable. -/
 
 omit [Fintype ι] in
 /-- The Simes test of the true intersection hypothesis has level `α`, when the p-values of the
-true nulls are mutually independent. Nothing is assumed about the other p-values. -/
+true nulls are measurable, valid and mutually independent. Nothing at all is assumed about the
+other p-values (not even measurability). -/
+theorem measure_simesLocal_le_of_null_measurable (P : Measure Ω) [IsProbabilityMeasure P]
+    (hα : 0 ≤ α) (p : ι → Ω → ℝ) (H₀ : Finset ι) (hmeas : ∀ i ∈ H₀, Measurable (p i))
+    (hindep : iIndepFun (fun j : H₀ => p j) P) (hvalid : ∀ i ∈ H₀, IsValidPValue P (p i)) :
+    P {ω | simesLocal α p H₀ ω} ≤ ENNReal.ofReal α :=
+  measure_one_le_bhK_le P hα (fun j : H₀ => p j) (fun j => hmeas j j.2) hindep
+    fun j => hvalid j j.2
+
+/-- **Hommel's procedure (the closed Simes test), strongest form.** It controls the family-wise
+error rate when the p-values of the true nulls are measurable, valid and mutually independent.
+Nothing at all is assumed about the other p-values (not even measurability). -/
+theorem fwer_hommel_le_of_null_measurable (P : Measure Ω) [IsProbabilityMeasure P] (hα : 0 ≤ α)
+    (p : ι → Ω → ℝ) (H₀ : Finset ι) (hmeas : ∀ i ∈ H₀, Measurable (p i))
+    (hindep : iIndepFun (fun j : H₀ => p j) P) (hvalid : ∀ i ∈ H₀, IsValidPValue P (p i)) :
+    fwer P H₀ (hommel α p) ≤ ENNReal.ofReal α :=
+  fwer_closedTest_le P _ H₀ _
+    (measure_simesLocal_le_of_null_measurable P hα p H₀ hmeas hindep hvalid)
+
+/-- **Hochberg's procedure, strongest form.** It controls the family-wise error rate when the
+p-values of the true nulls are measurable, valid and mutually independent. Nothing at all is
+assumed about the other p-values (not even measurability). -/
+theorem fwer_hochberg_le_of_null_measurable (P : Measure Ω) [IsProbabilityMeasure P]
+    (hα : 0 ≤ α) (p : ι → Ω → ℝ) (H₀ : Finset ι) (hmeas : ∀ i ∈ H₀, Measurable (p i))
+    (hindep : iIndepFun (fun j : H₀ => p j) P) (hvalid : ∀ i ∈ H₀, IsValidPValue P (p i)) :
+    fwer P H₀ (hochberg α p) ≤ ENNReal.ofReal α := by
+  refine (measure_mono ?_).trans
+    (fwer_hommel_le_of_null_measurable P hα p H₀ hmeas hindep hvalid)
+  rintro ω ⟨i, hi, hrej⟩
+  exact ⟨i, hi, hochberg_subset_hommel hα p ω hrej⟩
+
+omit [Fintype ι] in
+/-- The Simes test of the true intersection hypothesis has level `α`, when the p-values of the
+true nulls are mutually independent. Nothing is assumed about the dependence of the other
+p-values; they are assumed measurable here, which
+`measure_simesLocal_le_of_null_measurable` shows is not needed. -/
 theorem measure_simesLocal_le_of_null_iIndepFun (P : Measure Ω) [IsProbabilityMeasure P]
     (hα : 0 ≤ α) (p : ι → Ω → ℝ) (hmeas : ∀ i, Measurable (p i)) (H₀ : Finset ι)
     (hindep : iIndepFun (fun j : H₀ => p j) P) (hvalid : ∀ i ∈ H₀, IsValidPValue P (p i)) :
     P {ω | simesLocal α p H₀ ω} ≤ ENNReal.ofReal α :=
-  measure_one_le_bhK_le P hα (fun j : H₀ => p j) (fun j => hmeas j) hindep fun j => hvalid j j.2
+  measure_simesLocal_le_of_null_measurable P hα p H₀ (fun i _ => hmeas i) hindep hvalid
 
-/-- **Hommel's procedure** controls the family-wise error rate when the p-values of the true
-nulls are mutually independent. Nothing is assumed about the dependence of the other p-values.
-`fwer_hommel_le` is the special case in which all p-values are independent. -/
+/-- **Hommel's procedure** (the closed Simes test) controls the family-wise error rate when the
+p-values of the true nulls are mutually independent. Nothing is assumed about the dependence of
+the other p-values; they are assumed measurable here, which `fwer_hommel_le_of_null_measurable`
+shows is not needed. `fwer_hommel_le` is the special case in which all p-values are
+independent. -/
 theorem fwer_hommel_le_of_null_iIndepFun (P : Measure Ω) [IsProbabilityMeasure P] (hα : 0 ≤ α)
     (p : ι → Ω → ℝ) (hmeas : ∀ i, Measurable (p i)) (H₀ : Finset ι)
     (hindep : iIndepFun (fun j : H₀ => p j) P) (hvalid : ∀ i ∈ H₀, IsValidPValue P (p i)) :
     fwer P H₀ (hommel α p) ≤ ENNReal.ofReal α :=
-  fwer_closedTest_le P _ H₀ _
-    (measure_simesLocal_le_of_null_iIndepFun P hα p hmeas H₀ hindep hvalid)
+  fwer_hommel_le_of_null_measurable P hα p H₀ (fun i _ => hmeas i) hindep hvalid
 
 /-- **Hochberg's procedure** controls the family-wise error rate when the p-values of the true
-nulls are mutually independent. Nothing is assumed about the dependence of the other p-values.
-`fwer_hochberg_le` is the special case in which all p-values are independent. -/
+nulls are mutually independent. Nothing is assumed about the dependence of the other p-values;
+they are assumed measurable here, which `fwer_hochberg_le_of_null_measurable` shows is not
+needed. `fwer_hochberg_le` is the special case in which all p-values are independent. -/
 theorem fwer_hochberg_le_of_null_iIndepFun (P : Measure Ω) [IsProbabilityMeasure P]
     (hα : 0 ≤ α) (p : ι → Ω → ℝ) (hmeas : ∀ i, Measurable (p i)) (H₀ : Finset ι)
     (hindep : iIndepFun (fun j : H₀ => p j) P) (hvalid : ∀ i ∈ H₀, IsValidPValue P (p i)) :
-    fwer P H₀ (hochberg α p) ≤ ENNReal.ofReal α := by
-  refine (measure_mono ?_).trans
-    (fwer_hommel_le_of_null_iIndepFun P hα p hmeas H₀ hindep hvalid)
-  rintro ω ⟨i, hi, hrej⟩
-  exact ⟨i, hi, hochberg_subset_hommel hα p ω hrej⟩
+    fwer P H₀ (hochberg α p) ≤ ENNReal.ofReal α :=
+  fwer_hochberg_le_of_null_measurable P hα p H₀ (fun i _ => hmeas i) hindep hvalid
 
 end Simes
 

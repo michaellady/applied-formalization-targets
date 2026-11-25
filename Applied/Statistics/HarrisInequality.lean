@@ -25,11 +25,13 @@ open MeasureTheory ProbabilityTheory
 
 namespace Applied.Probability
 
+/-- A bounded measurable real function is integrable for a finite measure. -/
 lemma integrable_of_abs_le {α : Type*} [MeasurableSpace α] (μ : Measure α) [IsFiniteMeasure μ]
     {F : α → ℝ} (hFm : Measurable F) {C : ℝ} (hFb : ∀ x, |F x| ≤ C) : Integrable F μ :=
   Integrable.of_bound hFm.aestronglyMeasurable C (ae_of_all _ fun x => by
     simpa [Real.norm_eq_abs] using hFb x)
 
+/-- A product of two bounded reals is bounded by the product of the bounds. -/
 lemma abs_mul_le_of_abs_le {a b C D : ℝ} (ha : |a| ≤ C) (hb : |b| ≤ D) : |a * b| ≤ C * D := by
   rw [abs_mul]
   exact mul_le_mul ha hb (abs_nonneg _) ((abs_nonneg _).trans ha)
@@ -77,6 +79,8 @@ theorem integral_mul_integral_le_integral_mul {α : Type*} [MeasurableSpace α] 
   rw [hcalc] at hint
   linarith
 
+/-- Two non-decreasing real functions are similarly ordered:
+`(F x - F y) (G x - G y) ≥ 0` for all `x`, `y`. -/
 lemma similarlyOrdered_of_monotone {F G : ℝ → ℝ} (hF : Monotone F) (hG : Monotone G)
     (x y : ℝ) : 0 ≤ (F x - F y) * (G x - G y) := by
   rcases le_total x y with h | h
@@ -92,6 +96,7 @@ theorem integral_mul_integral_le_of_monotone (μ : Measure ℝ) [IsProbabilityMe
   integral_mul_integral_le_integral_mul μ hF.measurable hG.measurable hFb hGb
     (similarlyOrdered_of_monotone hF hG)
 
+/-- The mean of a function bounded by `C` is bounded by `C` (probability measure). -/
 lemma abs_integral_le_of_abs_le {α : Type*} [MeasurableSpace α] (μ : Measure α)
     [IsProbabilityMeasure μ] {F : α → ℝ} {C : ℝ} (hFb : ∀ x, |F x| ≤ C) :
     |∫ x, F x ∂μ| ≤ C := by

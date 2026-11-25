@@ -19,6 +19,9 @@ and the rank of the test score among all `N` scores is then exactly uniform.
 
 "Almost surely pairwise distinct" is stated as
 `∀ᵐ ω ∂P, Function.Injective fun i => S i ω`.
+
+Not here: randomised tie-breaking (which gives exact uniformity with ties), and the same
+scope limits as `Conformal.lean`.
 -/
 
 open MeasureTheory Finset

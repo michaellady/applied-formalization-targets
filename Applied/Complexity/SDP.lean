@@ -48,6 +48,7 @@ def encode (I : SDPInstance) : List Bool :=
   encNat I.n ++ (encNat I.k ++ (encVec (encVec (encVec encRat)) (fun i r c => I.A i r c) ++
     encVec encRat I.b))
 
+/-- Distinct instances have distinct encodings. -/
 theorem encode_injective : Function.Injective encode := by
   rintro ⟨n, k, A, b⟩ ⟨n', k', A', b'⟩ heq
   simp only [encode] at heq

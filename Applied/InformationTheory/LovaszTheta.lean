@@ -229,6 +229,7 @@ lemma umbrellaAngle_sub (i j : Fin 5) (hij : i ≠ j)
   · rw [show 2 * π * 3 / 5 = π / 5 + π by ring, cos_add_pi]
   · rw [show 2 * π * (-3) / 5 = -(π / 5 + π) by ring, cos_neg, cos_add_pi]
 
+/-- **Lovász's umbrella** is an orthonormal representation of the pentagon `C₅` in `ℝ³`. -/
 theorem isOrthonormalRep_umbrella5 :
     IsOrthonormalRep (SimpleGraph.cycleGraph 5) umbrella5 := by
   have hk := cos_pi_div_five_pos
@@ -239,6 +240,8 @@ theorem isOrthonormalRep_umbrella5 :
 /-- The handle of the umbrella. -/
 noncomputable def umbrellaHandle : EuclideanSpace ℝ (Fin 3) := !₂[0, 0, 1]
 
+/-- Every rib of the umbrella makes the same angle with the handle:
+`⟪handle, umbrella5 i⟫² = cos (π/5) / (1 + cos (π/5))` (which equals `1/√5`). -/
 theorem inner_umbrellaHandle (i : Fin 5) :
     ⟪umbrellaHandle, umbrella5 i⟫ ^ 2 = cos (π / 5) / (1 + cos (π / 5)) := by
   have hk := cos_pi_div_five_pos
@@ -246,6 +249,7 @@ theorem inner_umbrellaHandle (i : Fin 5) :
   simp [umbrellaHandle, umbrella5]
   rw [Real.sq_sqrt (by positivity)]
 
+/-- The handle of the umbrella is a unit vector. -/
 theorem norm_umbrellaHandle : ‖umbrellaHandle‖ = 1 := by
   refine norm_eq_one_of_inner_self ?_
   rw [inner_euclidean, Fin.sum_univ_three]
@@ -343,6 +347,7 @@ lemma cycleGraph_seven_far (i j : Fin 7) (hij : i ≠ j)
   rw [SimpleGraph.cycleGraph_adj] at hadj
   revert i j; decide
 
+/-- `c7Rep` is an orthonormal representation of the heptagon `C₇` in `ℝ⁷`. -/
 theorem isOrthonormalRep_c7Rep : IsOrthonormalRep (SimpleGraph.cycleGraph 7) c7Rep := by
   refine ⟨fun i => norm_eq_one_of_inner_self ?_, fun i j hij hadj => ?_⟩
   · rw [c7Rep, inner_sqrtScaled c7d_nonneg, c7_gram_diag]; simp

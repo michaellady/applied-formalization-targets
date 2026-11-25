@@ -39,8 +39,10 @@ the output when the positions in `s` are kept is `deleteBits x s`, a word of len
 Differences from the textbook statement: Levenshtein's theorem is combinatorial; the channel
 formulation (decoder on `DelOut`, error probability under i.i.d. deletions) is ours. The decoder
 is obtained by choice and is not Levenshtein's efficient algorithm. The error bound is
-`P(at least two deletions)`, which tends to `1` as the length grows for any fixed `d > 0`, so
-these block codes have vanishing rate and give **no** lower bound on the capacity `C(d)`.
+`P(at least two deletions)`, which tends to `1` as the length grows for any fixed `d > 0`. So
+although the rate of these block codes tends to `log 2` (`(m + 2) M ≥ 2^(m+1)`), their error
+bound does not vanish: they do not show that any positive rate is achievable and give **no**
+lower bound on the capacity `C(d)`.
 
 Not covered: any positive lower bound on the deletion-channel capacity; codes correcting a
 constant fraction of deletions; maximum-likelihood decoding; multiple deletions.

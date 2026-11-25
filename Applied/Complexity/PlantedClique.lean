@@ -48,9 +48,11 @@ noncomputable def acceptProb (A : RandAlg) (x : List Bool) : ℝ :=
   ((univ.filter fun ρ : Fin (A.coins.eval x.length) → Bool =>
       A.run x (List.ofFn ρ) = true).card : ℝ) / 2 ^ A.coins.eval x.length
 
+/-- The acceptance probability is non-negative. -/
 theorem acceptProb_nonneg (A : RandAlg) (x : List Bool) : 0 ≤ A.acceptProb x := by
   unfold acceptProb; positivity
 
+/-- The acceptance probability is at most `1`. -/
 theorem acceptProb_le_one (A : RandAlg) (x : List Bool) : A.acceptProb x ≤ 1 := by
   unfold acceptProb
   rw [div_le_one (by positivity)]
@@ -63,6 +65,8 @@ theorem acceptProb_le_one (A : RandAlg) (x : List Bool) : A.acceptProb x ≤ 1 :
 /-- The algorithm that ignores its input and coins and outputs `c`. -/
 noncomputable def const (c : Bool) : RandAlg := ⟨fun _ _ => c, 0⟩
 
+/-- The algorithm that ignores its input and coins and outputs `c` is polynomial-time
+(non-vacuity of `RandAlg.IsPolyTime`). -/
 theorem isPolyTime_const (c : Bool) : (const c).IsPolyTime :=
   polyTimeComputable_const _ c
 
@@ -99,14 +103,17 @@ noncomputable def probPlanted (A : RandAlg) (n k : ℕ) : ℝ :=
 noncomputable def advantage (A : RandAlg) (n k : ℕ) : ℝ :=
   |probPlanted A n k - probNull A n|
 
+/-- The sampled graph is undirected. -/
 theorem sampleAdj_symm {n : ℕ} (w : Fin n → Fin n → Bool) (i j : Fin n) :
     sampleAdj w i j = sampleAdj w j i := by
   simp [sampleAdj, Bool.or_comm]
 
+/-- The sampled graph has no loops. -/
 theorem sampleAdj_self {n : ℕ} (w : Fin n → Fin n → Bool) (i : Fin n) :
     sampleAdj w i i = false := by
   simp [sampleAdj]
 
+/-- The graph with a planted clique is undirected. -/
 theorem plantedAdj_symm {n : ℕ} (w : Fin n → Fin n → Bool) (S : Finset (Fin n)) (i j : Fin n) :
     plantedAdj w S i j = plantedAdj w S j i := by
   simp only [plantedAdj, sampleAdj_symm w i j, ne_comm (a := i), Bool.and_comm (decide (i ∈ S))]

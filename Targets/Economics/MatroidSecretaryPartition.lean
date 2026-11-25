@@ -63,6 +63,13 @@ entry for the class. `1/e` is the constant of the corresponding result in cslib-
 compiled here; its model was not compared in detail). The `1/4` statements above are kept; they
 are weaker.
 
+Model and status (common to all matroid secretary entries of this project). The matroid is
+known to the algorithm in advance, and the algorithm sees the identity as well as the weight
+of each arriving element; models in which the matroid is revealed online are not treated. The
+constants proved in this project are weaker than the best constants in the literature for the
+same classes. Partition matroids with capacities one (constant `1/e`) are already formalized
+in cslib-frontier (`MatroidSecretary.lean`); no novelty is claimed for that case.
+
 Not covered: optimality of `1/e` for this class (it is optimal already for one block, the
 classical secretary problem, but that is not stated for this model here); the
 model where the algorithm does not know the blocks in advance.

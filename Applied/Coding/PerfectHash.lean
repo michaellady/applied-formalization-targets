@@ -13,7 +13,7 @@ are the trifferent codes.
   `n + 1`, either `(k - 1) |C| ≤ k (k - 1)` (so `|C| ≤ k`) or there is a perfect `k`-hash code
   `C'` of length `n` with `(k - 1) |C| ≤ k |C'|`.
 * `IsPerfectHashCode.card_le`: the elementary bound `|C| ≤ (k - 1) (k / (k - 1))ⁿ` for `k ≥ 2`
-  (for `k = 3` this is Körner's bound `2 (3/2)ⁿ`).
+  (for `k = 3` this is the elementary bound `2 (3/2)ⁿ` for trifferent codes).
 -/
 
 open Finset
@@ -144,7 +144,7 @@ theorem IsPerfectHashCode.exists_shorter {k n : ℕ} (hk2 : 2 ≤ k)
   · rw [card_image_of_injOn hinj]; exact hkD
 
 /-- **Elementary bound for perfect `k`-hash codes** (`k ≥ 2`): `|C| ≤ (k - 1) (k / (k - 1))ⁿ`.
-For `k = 3` this is Körner's bound `2 (3/2)ⁿ`. -/
+For `k = 3` this is the elementary bound `2 (3/2)ⁿ` for trifferent codes. -/
 theorem IsPerfectHashCode.card_le {k : ℕ} (hk : 2 ≤ k) : ∀ {n : ℕ}
     {C : Finset (Fin n → Fin k)}, IsPerfectHashCode k C →
     (C.card : ℝ) ≤ (k - 1) * ((k : ℝ) / (k - 1)) ^ n

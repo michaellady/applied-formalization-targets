@@ -1,23 +1,18 @@
 import Applied.Statistics.PRDSFactorModels
 import Applied.Statistics.ClosedTesting
+import Applied.Statistics.MaxStatisticClosedTest
+import Applied.Statistics.StandardNormal
 
 /-!
 # Dunnett's many-to-one procedure (known variance), single-step and step-down
 
-## Generic part: closed max-statistic tests and their step-down shortcut
+## Generic part (in `MaxStatisticClosedTest.lean`)
 
-For statistics `T i` and critical values `c I` indexed by sets of hypotheses, the
-max-statistic local test of the intersection hypothesis `I` rejects when `T i > c I` for some
-`i ∈ I` (`maxLocal`). If the critical values are monotone on non-empty sets
-(`MonotoneCrit`: `c J ≤ c I` for `∅ ≠ J ⊆ I`), the closed test equals
-
-* the step-down rule written without sorting (`stepDownMax`,
-  `closedTest_maxLocal_eq_stepDownMax`): `i` is rejected when every `j` with `T j ≥ T i` has
-  `T j > c {l | T l ≤ T j}`;
-* the outcome of any run of the sequential procedure that rejects one hypothesis `i` with
-  `T i > c (not yet rejected)` at a time until none is left
-  (`closedTest_maxLocal_eq_of_stepDownRejectable_of_maxStuck`,
-  `exists_stepDownRejectable_maxStuck`).
+The closed max-statistic test, whose local test of the intersection hypothesis `I` rejects
+when `T i > c I` for some `i ∈ I` (`maxLocal`), and its step-down shortcut under monotone
+critical values (`MonotoneCrit`, `closedTest_maxLocal_eq_stepDownMax`) are in
+`Applied/Statistics/MaxStatisticClosedTest.lean`, which this file imports. They used to be the
+first section of this file; all names are unchanged.
 
 ## Dunnett's critical values
 
@@ -40,7 +35,18 @@ mutually independent, `X₀` is standard normal, and the comparison statistics a
   `dunnettSingleStep_subset_dunnettStepDown`: step-down Dunnett.
 * `measure_dunnett_lowerBounds`: simultaneous lower confidence bounds, exact coverage.
 
-Known variance, balanced design, one-sided comparisons only.
+## Scope and neighbours
+
+Known variance (the infinite-degrees-of-freedom, ∞-df, case), balanced design, one-sided
+comparisons only. No numerical critical value is proved. Not here: estimated variance
+(the multivariate `t` critical values of Dunnett 1955), unbalanced allocation, two-sided
+comparisons, step-up (Dunnett–Tamhane 1992) procedures, and numerical values of the critical
+points.
+
+The elementary facts about `Φ` come from `StandardNormal.lean`; the many-to-one model is that
+of `PRDSFactorModels.lean`; `ManyToOneGaussian.lean` and the registry entry
+`Targets/Statistics/ManyToOneControl.lean` treat p-value based procedures (Simes, Hochberg,
+Hommel) in the same model.
 -/
 
 open MeasureTheory Finset ProbabilityTheory Real
@@ -48,182 +54,17 @@ open scoped ENNReal NNReal
 
 namespace Applied.MultipleTesting
 
-/-! ### Closed max-statistic tests -/
-
-section Generic
-
-variable {Ω ι : Type*} [MeasurableSpace Ω] [Fintype ι] [DecidableEq ι]
-
-/-- Max-statistic local test of the intersection hypothesis `I`: reject when some statistic
-in `I` exceeds the critical value `c I`. -/
-def maxLocal (T : ι → Ω → ℝ) (c : Finset ι → ℝ) (I : Finset ι) (ω : Ω) : Prop :=
-  ∃ i ∈ I, c I < T i ω
-
-/-- Critical values that do not increase when hypotheses are removed, as long as some remain. -/
-def MonotoneCrit (c : Finset ι → ℝ) : Prop :=
-  ∀ J I : Finset ι, J.Nonempty → J ⊆ I → c J ≤ c I
-
-/-- The closed max-statistic test controls the family-wise error rate as soon as the local
-test of the true intersection hypothesis has level `α`. -/
-theorem fwer_closedTest_maxLocal_le (P : Measure Ω) (T : ι → Ω → ℝ) (c : Finset ι → ℝ)
-    (H₀ : Finset ι) (α : ℝ≥0∞) (h : P {ω | maxLocal T c H₀ ω} ≤ α) :
-    fwer P H₀ (closedTest (maxLocal T c)) ≤ α :=
-  fwer_closedTest_le P _ H₀ α h
-
-open Classical in
-/-- Step-down max-statistic procedure, written without sorting: `i` is rejected when every
-`j` whose statistic is at least `T i` exceeds the critical value of the set of hypotheses
-whose statistics are at most `T j`. Tied statistics are treated alike. -/
-noncomputable def stepDownMax (T : ι → Ω → ℝ) (c : Finset ι → ℝ) (ω : Ω) : Finset ι :=
-  {i | ∀ j, T i ω ≤ T j ω → c {l | T l ω ≤ T j ω} < T j ω}
-
-omit [MeasurableSpace Ω] in
-/-- **Step-down shortcut.** With monotone critical values the closed max-statistic test is
-the step-down procedure. -/
-theorem closedTest_maxLocal_eq_stepDownMax {c : Finset ι → ℝ} (hc : MonotoneCrit c)
-    (T : ι → Ω → ℝ) (ω : Ω) :
-    closedTest (maxLocal T c) ω = stepDownMax T c ω := by
-  classical
-  ext i
-  simp only [closedTest, stepDownMax, mem_filter, mem_univ, true_and]
-  constructor
-  · intro h j hij
-    obtain ⟨l, hl, hlt⟩ := h {l | T l ω ≤ T j ω} (by simp [hij])
-    exact hlt.trans_le (by simpa using hl)
-  · intro h I hiI
-    obtain ⟨j, hj, hjmax⟩ := Finset.exists_max_image I (fun j => T j ω) ⟨i, hiI⟩
-    refine ⟨j, hj, lt_of_le_of_lt (hc I _ ⟨i, hiI⟩ fun l hl => ?_) (h j (hjmax i hiI))⟩
-    simpa using hjmax l hl
-
-omit [MeasurableSpace Ω] in
-/-- With monotone critical values, the single-step procedure with the critical value of the
-whole family rejects no more than the closed test. -/
-theorem singleStep_subset_closedTest_maxLocal {c : Finset ι → ℝ} (hc : MonotoneCrit c)
-    (T : ι → Ω → ℝ) (ω : Ω) {i : ι} (hi : c univ < T i ω) :
-    i ∈ closedTest (maxLocal T c) ω := by
-  classical
-  simp only [closedTest, mem_filter, mem_univ, true_and]
-  exact fun I hiI => ⟨i, hiI, lt_of_le_of_lt (hc I univ ⟨i, hiI⟩ (subset_univ _)) hi⟩
-
-/-- Sets of hypotheses that the step-down procedure can reach: start with nothing rejected and
-repeatedly reject some `i` whose statistic exceeds the critical value of the set of
-hypotheses not yet rejected. -/
-inductive StepDownRejectable (c : Finset ι → ℝ) (t : ι → ℝ) : Finset ι → Prop
-  | empty : StepDownRejectable c t ∅
-  | step {R : Finset ι} {i : ι} : StepDownRejectable c t R → i ∉ R →
-      c (univ \ R) < t i → StepDownRejectable c t (insert i R)
-
-/-- A set in which no hypothesis can be rejected. -/
-def MaxStuck (c : Finset ι → ℝ) (t : ι → ℝ) (J : Finset ι) : Prop :=
-  ∀ i ∈ J, t i ≤ c J
-
-omit [MeasurableSpace Ω] in
-/-- The closed max-statistic test rejects exactly the hypotheses that lie in no stuck set. -/
-theorem mem_closedTest_maxLocal_iff (T : ι → Ω → ℝ) (c : Finset ι → ℝ) (ω : Ω) (i : ι) :
-    i ∈ closedTest (maxLocal T c) ω ↔
-      ∀ J : Finset ι, MaxStuck c (fun j => T j ω) J → i ∉ J := by
-  classical
-  simp only [closedTest, mem_filter, mem_univ, true_and]
-  constructor
-  · rintro h J hJ hiJ
-    obtain ⟨l, hl, hlt⟩ := h J hiJ
-    exact absurd hlt (not_lt.mpr (hJ l hl))
-  · intro h I hiI
-    by_contra hcon
-    refine h I (fun l hl => ?_) hiI
-    by_contra hl'
-    exact hcon ⟨l, hl, not_le.mp hl'⟩
-
-/-- With monotone critical values, a stuck set never meets a set rejected step-down. -/
-theorem StepDownRejectable.disjoint_maxStuck {c : Finset ι → ℝ} (hc : MonotoneCrit c)
-    {t : ι → ℝ} {R : Finset ι} (hR : StepDownRejectable c t R) {J : Finset ι}
-    (hJ : MaxStuck c t J) : Disjoint R J := by
-  induction hR with
-  | empty => exact Finset.disjoint_empty_left _
-  | @step R i _ hiR hlt ih =>
-    rw [Finset.disjoint_insert_left]
-    refine ⟨fun hiJ => ?_, ih⟩
-    have hsub : J ⊆ univ \ R := fun l hl =>
-      mem_sdiff.mpr ⟨mem_univ _, fun hlR => (Finset.disjoint_left.mp ih hlR) hl⟩
-    exact absurd (hlt.trans_le (hJ i hiJ)) (not_lt.mpr (hc J _ ⟨i, hiJ⟩ hsub))
-
-omit [MeasurableSpace Ω] in
-/-- Soundness of the sequential form: everything it rejects is rejected by the closed test. -/
-theorem StepDownRejectable.subset_closedTest {c : Finset ι → ℝ} (hc : MonotoneCrit c)
-    (T : ι → Ω → ℝ) (ω : Ω) {R : Finset ι} (hR : StepDownRejectable c (fun j => T j ω) R) :
-    R ⊆ closedTest (maxLocal T c) ω := by
-  intro i hi
-  rw [mem_closedTest_maxLocal_iff]
-  intro J hJ hiJ
-  exact Finset.disjoint_left.mp (hR.disjoint_maxStuck hc hJ) hi hiJ
-
-omit [MeasurableSpace Ω] in
-/-- Completeness of the sequential form: once it can reject nothing more, it has rejected
-exactly what the closed test rejects, whatever order it proceeded in. -/
-theorem closedTest_maxLocal_eq_of_stepDownRejectable_of_maxStuck {c : Finset ι → ℝ}
-    (hc : MonotoneCrit c) (T : ι → Ω → ℝ) (ω : Ω) {R : Finset ι}
-    (hR : StepDownRejectable c (fun j => T j ω) R)
-    (hstuck : MaxStuck c (fun j => T j ω) (univ \ R)) :
-    closedTest (maxLocal T c) ω = R := by
-  refine Finset.Subset.antisymm (fun i hi => ?_) (hR.subset_closedTest hc T ω)
-  by_contra hiR
-  exact (mem_closedTest_maxLocal_iff T c ω i).mp hi _ hstuck (mem_sdiff.mpr ⟨mem_univ _, hiR⟩)
-
-/-- The sequential procedure always terminates: some reachable set has a stuck complement. -/
-theorem exists_stepDownRejectable_maxStuck (c : Finset ι → ℝ) (t : ι → ℝ) :
-    ∃ R, StepDownRejectable c t R ∧ MaxStuck c t (univ \ R) := by
-  suffices h : ∀ n : ℕ, ∀ R, StepDownRejectable c t R → (univ \ R).card = n →
-      ∃ R', StepDownRejectable c t R' ∧ MaxStuck c t (univ \ R') from
-    h _ ∅ .empty rfl
-  intro n
-  induction n with
-  | zero =>
-    intro R hR hn
-    refine ⟨R, hR, fun i hi => ?_⟩
-    rw [Finset.card_eq_zero] at hn
-    simp [hn] at hi
-  | succ n ih =>
-    intro R hR hn
-    by_cases hs : MaxStuck c t (univ \ R)
-    · exact ⟨R, hR, hs⟩
-    · simp only [MaxStuck, not_forall, not_le] at hs
-      obtain ⟨i, hi, hlt⟩ := hs
-      have hiR : i ∉ R := (mem_sdiff.mp hi).2
-      refine ih (insert i R) (hR.step hiR hlt) ?_
-      have : univ \ insert i R = (univ \ R).erase i := by
-        ext l; simp only [mem_sdiff, mem_univ, mem_insert, true_and, mem_erase]; tauto
-      rw [this, card_erase_of_mem hi, hn]; rfl
-
-end Generic
-
 /-! ### The standard normal distribution function -/
 
 section NormalCDF
 
-/-- The standard normal distribution function is continuous. -/
-lemma continuous_cdf_gaussian : Continuous (cdf (gaussianReal 0 1)) := by
-  rw [continuous_iff_continuousAt]
-  intro a
-  rw [continuousAt_iff_continuous_left_right]
-  refine ⟨?_, (cdf (gaussianReal 0 1)).right_continuous a⟩
-  rw [← continuousWithinAt_Iio_iff_Iic, (monotone_cdf _).continuousWithinAt_Iio_iff_leftLim_eq]
-  have h := (cdf (gaussianReal 0 1)).measure_singleton a
-  rw [measure_cdf, gaussianReal_singleton, eq_comm, ENNReal.ofReal_eq_zero] at h
-  exact le_antisymm ((monotone_cdf _).leftLim_le le_rfl) (by linarith)
+/-- The standard normal distribution function is continuous. Alias of
+`Applied.StdNormal.continuous_cdf`. -/
+alias continuous_cdf_gaussian := StdNormal.continuous_cdf
 
-/-- The standard normal distribution function is strictly increasing. -/
-lemma strictMono_cdf_gaussian : StrictMono (cdf (gaussianReal 0 1)) := by
-  intro a b hab
-  have h : gaussianReal 0 1 (Set.Ioc a b)
-      = ENNReal.ofReal (cdf (gaussianReal 0 1) b - cdf (gaussianReal 0 1) a) := by
-    have := (cdf (gaussianReal 0 1)).measure_Ioc a b
-    rwa [measure_cdf] at this
-  by_contra hcon
-  have h0 : gaussianReal 0 1 (Set.Ioc a b) = 0 := by
-    rw [h, ENNReal.ofReal_eq_zero]; linarith
-  have h1 := gaussianReal_absolutelyContinuous' 0 one_ne_zero h0
-  rw [Real.volume_Ioc, ENNReal.ofReal_eq_zero] at h1
-  linarith
+/-- The standard normal distribution function is strictly increasing. Alias of
+`Applied.StdNormal.strictMono_cdf`. -/
+alias strictMono_cdf_gaussian := StdNormal.strictMono_cdf
 
 end NormalCDF
 
@@ -237,18 +78,23 @@ maximum of `k` comparison statistics `(X j - X₀) / √2` with a shared control
 noncomputable def dunnettCDF (k : ℕ) (d : ℝ) : ℝ :=
   ∫ x, cdf (gaussianReal 0 1) (√2 * d + x) ^ k ∂(gaussianReal 0 1)
 
+/-- The integrand `x ↦ Φ(√2 d + x) ^ k` of Dunnett's integral is measurable. -/
 lemma measurable_dunnett_integrand (k : ℕ) (d : ℝ) :
     Measurable fun x : ℝ => cdf (gaussianReal 0 1) (√2 * d + x) ^ k :=
   ((monotone_cdf _).measurable.comp (measurable_const.add measurable_id)).pow_const k
 
+/-- The integrand of Dunnett's integral is non-negative. -/
 lemma dunnett_integrand_nonneg (k : ℕ) (d x : ℝ) :
     0 ≤ cdf (gaussianReal 0 1) (√2 * d + x) ^ k :=
   pow_nonneg (cdf_nonneg _ _) _
 
+/-- The integrand of Dunnett's integral is at most one. -/
 lemma dunnett_integrand_le_one (k : ℕ) (d x : ℝ) :
     cdf (gaussianReal 0 1) (√2 * d + x) ^ k ≤ 1 :=
   pow_le_one₀ (cdf_nonneg _ _) (cdf_le_one _ _)
 
+/-- The integrand of Dunnett's integral is integrable against the standard normal law (it is
+bounded by one). -/
 lemma integrable_dunnett_integrand (k : ℕ) (d : ℝ) :
     Integrable (fun x : ℝ => cdf (gaussianReal 0 1) (√2 * d + x) ^ k) (gaussianReal 0 1) :=
   Integrable.of_bound (measurable_dunnett_integrand k d).aestronglyMeasurable 1
@@ -256,9 +102,11 @@ lemma integrable_dunnett_integrand (k : ℕ) (d : ℝ) :
       rw [Real.norm_eq_abs, abs_of_nonneg (dunnett_integrand_nonneg k d x)]
       exact dunnett_integrand_le_one k d x)
 
+/-- Dunnett's integral is non-negative. -/
 lemma dunnettCDF_nonneg (k : ℕ) (d : ℝ) : 0 ≤ dunnettCDF k d :=
   integral_nonneg fun x => dunnett_integrand_nonneg k d x
 
+/-- Dunnett's integral is at most one. -/
 lemma dunnettCDF_le_one (k : ℕ) (d : ℝ) : dunnettCDF k d ≤ 1 := by
   have h := integral_mono (integrable_dunnett_integrand k d)
     (integrable_const (μ := gaussianReal 0 1) (1 : ℝ)) fun x => dunnett_integrand_le_one k d x

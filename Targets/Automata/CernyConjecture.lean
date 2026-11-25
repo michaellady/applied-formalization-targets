@@ -39,9 +39,9 @@ word of length at most `(n - 1) · n(n - 1)/2` and, refined, at most `(n - 1)(n�
 synchronizing iff every pair of states can be merged by some word (same file).
 
 Not proved here: the Pin–Frankl bound `(n³ - n)/6` (J.-E. Pin 1983, using P. Frankl 1982);
-the improvements of M. Szykuła (STACS 2018) and Y. Shitov (Commun. Algebra 2019, about
-`0.1654 n³`); the conjecture for special classes (e.g. Eppstein's and Kari's results for
-monotonic/Eulerian automata, Dubuc's for circular automata, Trahtman's for aperiodic ones); the
+the improvements of M. Szykuła (STACS 2018) and Y. Shitov (2019, about `0.1654 n³`;
+J. Autom. Lang. Comb. 24, venue to be confirmed); the conjecture for special classes (e.g.
+Eppstein's and Kari's results for monotonic/Eulerian automata, Dubuc's for circular automata, Trahtman's for aperiodic ones); the
 conjecture itself.
 -/
 

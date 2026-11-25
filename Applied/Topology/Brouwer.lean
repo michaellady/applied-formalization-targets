@@ -3,9 +3,35 @@ import Applied.Topology.SpernerCube
 /-!
 # Brouwer's fixed point theorem
 
+## Main results
+
 * `brouwer_cube`: a continuous map `g : (Fin m → ℝ) → (Fin m → ℝ)` with values in the cube
-  `[0, 1]^m` has a fixed point. Proof: Sperner's lemma for the Kuhn triangulation of the cube
-  (`Applied.Topology.Kuhn.exists_full`), uniform continuity and compactness.
+  `[0, 1]^m` has a fixed point.
+* `brouwer_cube_of_continuousOn`: the usual self-map form: a map that is continuous on the cube
+  and maps the cube into itself has a fixed point in the cube.
+* `IsCubeRetract X`: `X` is a retract of some cube `[0,1]^M`.
+  `IsCubeRetract.exists_fixedPoint`: every continuous self-map of such an `X` has a fixed
+  point. `IsCubeRetract.of_retract`, `IsCubeRetract.pi`: closure under retracts and finite
+  products.
+* `probSimplex α`: the probability simplex on a finite type (equal to Mathlib's `stdSimplex`,
+  `probSimplex_eq_stdSimplex`). `isCubeRetract_probSimplex`.
+* `brouwer_probSimplex`, `brouwer_stdSimplex`, `brouwer_pi_probSimplex`: Brouwer's theorem for
+  the simplex and for finite products of simplices (the form used for Nash equilibria).
+
+## Proof outline
+
+`brouwer_cube`: suppose there is no fixed point; then `dist (g y) y ≥ δ > 0` on the cube.
+Choose a grid of mesh `1 / N` fine enough for uniform continuity, label a grid point `x` by a
+coordinate `i` with `x i > 0` that `g` does not increase (or by `m` if there is none), check
+that the labelling is admissible, and apply Sperner's lemma for the Kuhn triangulation
+(`Applied.Topology.Kuhn.exists_full`) to get a small simplex carrying all labels, which
+contradicts uniform continuity. No homology or degree theory is used.
+
+## Not in this file
+
+Brouwer's theorem for general compact convex sets (only cubes, simplices, their finite
+products and retracts of these); Kakutani's and Schauder's theorems; uniqueness or computation
+of fixed points. The one-dimensional case has a direct proof in `BrouwerOneDim`.
 -/
 
 -- `stdSimplex` (a `Set`) is deprecated in this Mathlib in favour of `Convexity.StdSimplex`;

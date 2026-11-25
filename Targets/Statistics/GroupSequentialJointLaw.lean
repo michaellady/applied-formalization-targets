@@ -9,6 +9,7 @@ import Applied.Statistics.GroupSequentialJointLaw
 - source: C. Jennison, B. W. Turnbull, "Group Sequential Methods with Applications to Clinical Trials", Chapman & Hall/CRC (2000), the "canonical joint distribution" of Chapter 3 (section and equation numbers to be confirmed)
 - used-in: computation of group-sequential stopping boundaries from the canonical joint distribution, once for all models with the same information levels
 - prerequisites: Mathlib's `HasGaussianLaw`/`IsGaussian`, independent Gaussians are jointly Gaussian (`iIndepFun.hasGaussianLaw`), linear images of Gaussian vectors, independence as the product law on `ℝ^ℕ` (`Measure.infinitePi`)
+- formalized-elsewhere: none found in the Lean repositories searched; atlas-lean (`Adaptive/AlphaSpending.lean`) explicitly disclaims joint-law boundaries ("no joint-law boundary, first-crossing spending constraint … is formalized here")
 - statement-review: unreviewed
 
 Informal statement. Let `P` be a probability measure and `ξ 0, ξ 1, …` real random variables

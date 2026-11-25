@@ -1,7 +1,7 @@
 import Applied.Coding.TrifferenceLower
 
 /-!
-# Open: is Körner's bound for trifferent codes tight?
+# Open: is the elementary bound for trifferent codes tight?
 
 - id: coding-trifference-rate-open
 - area: coding
@@ -22,16 +22,16 @@ Everything is defined in this file from scratch (`IsTrifferentCode`, `maxTriffer
 `trifferentRate`) and shown equal to the library definitions in `Applied/Coding/`.
 
 Proved here (as theorems, from the library):
-* `trifferentRate_le`: `R ≤ log₂ (3/2) ≈ 0.585` (Körner's bound);
+* `trifferentRate_le`: `R ≤ log₂ (3/2) ≈ 0.585` (the elementary bound (Körner 1973; see Körner–Marton 1988, Elias 1988; attribution varies));
 * `trifferentRate_ge`: `log₂ √(9/7) ≈ 0.181 ≤ R` (random coding with alteration); the
   Körner–Marton bound `(1/4) log₂ (9/5) ≈ 0.212 ≤ R` is proved in
   `Targets/Coding/TrifferenceKornerMarton.lean`.
 
 The Fredman–Komlós bound (`Targets/Coding/FredmanKomlos.lean`) gives `R ≤ 2/3` for `k = 3`,
-which is weaker than Körner's bound; it does not bear on `RateLtKorner`.
+which is weaker than the elementary bound; it does not bear on `RateLtKorner`.
 
-Open, stated as a `Prop` and not asserted: `RateLtKorner`, i.e. `R < log₂ (3/2)`: can Körner's
-upper bound on the rate be improved at all? (Believed open for general codes; for linear codes
+Open, stated as a `Prop` and not asserted: `RateLtKorner`, i.e. `R < log₂ (3/2)`: can the
+elementary upper bound on the rate be improved at all? (Believed open for general codes; for linear codes
 an exponential improvement is known, see the source line; to be confirmed.)
 
 Not covered: the exact value of `R`; whether `(log₂ T(n)) / n` converges. For perfect
@@ -63,7 +63,7 @@ theorem maxTrifferentSize_eq (n : ℕ) :
 
 theorem trifferentRate_eq : trifferentRate = Applied.Coding.trifferenceRate := rfl
 
-/-- **Proved upper bound** (Körner): `R ≤ log₂ (3/2)`. -/
+/-- **Proved upper bound** (the elementary bound): `R ≤ log₂ (3/2)`. -/
 theorem trifferentRate_le : trifferentRate ≤ Real.logb 2 (3 / 2) :=
   Applied.Coding.trifferenceRate_le
 
@@ -71,7 +71,7 @@ theorem trifferentRate_le : trifferentRate ≤ Real.logb 2 (3 / 2) :=
 theorem trifferentRate_ge : Real.logb 2 (Real.sqrt (9 / 7)) ≤ trifferentRate :=
   Applied.Coding.trifferenceRate_ge
 
-/-- **Open.** Körner's bound is not tight: `R < log₂ (3/2)`. Not asserted. -/
+/-- **Open.** The elementary bound is not tight: `R < log₂ (3/2)`. Not asserted. -/
 def RateLtKorner : Prop := trifferentRate < Real.logb 2 (3 / 2)
 
 end Targets.Coding.TrifferenceOpen

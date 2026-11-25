@@ -32,11 +32,14 @@ section GaussianUnique
 variable {ι : Type*} [Fintype ι] {Ω₀ : Type*} [MeasurableSpace Ω₀] {Q : Measure Ω₀}
   {Y : ι → Ω₀ → ℝ}
 
+/-- The mean of a linear combination of the coordinates of a Gaussian vector. -/
 lemma integral_sum_mul_of_hasGaussianLaw (hY : HasGaussianLaw (fun ω i => Y i ω) Q)
     (c : ι → ℝ) : ∫ ω, ∑ i, c i * Y i ω ∂Q = ∑ i, c i * Q[Y i] := by
   rw [integral_finsetSum _ fun i _ => ((hY.eval i).integrable.const_mul (c i))]
   simp_rw [integral_const_mul]
 
+/-- The variance of a linear combination of the coordinates of a Gaussian vector, in terms of
+the covariances. -/
 lemma variance_sum_mul_of_hasGaussianLaw (hY : HasGaussianLaw (fun ω i => Y i ω) Q)
     (c : ι → ℝ) :
     Var[fun ω => ∑ i, c i * Y i ω; Q] = ∑ i, ∑ j, c i * (c j * cov[Y i, Y j; Q]) := by

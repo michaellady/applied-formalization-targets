@@ -7,7 +7,7 @@ import Targets.Economics.EFX
 - id: econ-efx-two-agents
 - area: economics
 - status: formalized
-- source: B. Plaut, T. Roughgarden, "Almost envy-freeness with general valuations", SODA 2018 (identical valuations and two agents, for general valuations; theorem numbers to be confirmed)
+- source: B. Plaut, T. Roughgarden, "Almost envy-freeness with general valuations", SODA 2018 (identical valuations and two agents, for general valuations); arXiv:1707.04769, Theorem 4.2 (identical valuations) and Theorem 4.3 (two agents), EFX in the strong form of their Definition 2.3 (read at source)
 - used-in: fair division of indivisible goods
 - prerequisites: finite sums only
 - formalized-elsewhere: two agents: econcslib-bei `EconCSLib/SocialChoice/FairDivision/Indivisible/EFX.lean` :: `efx_exists_two_agents` (same strong form of EFX; equivalent); elazarg/GameTheory `FairDivision/TwoAgentEFX.lean` :: `exists_efx_two_agents` (removal of positively valued goods only: weaker). The identical-valuations case: no precedent found. Statements read and compared, not compiled here.

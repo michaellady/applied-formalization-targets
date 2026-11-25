@@ -93,6 +93,8 @@ lemma sum_prod_prob (σ : Profile S A) (h : History S A) (s : S) :
   rw [← this]
   simp [BehaviourStrategy.prob_sum]
 
+/-- If player `i`'s stage payoff is the constant `c`, then the expected `n`-stage total payoff of
+player `i` is `n * c`, for every strategy profile, history and state. -/
 lemma nStageSum_of_const (G : StochasticGame I S A) (σ : Profile S A) (i : I) (c : ℝ)
     (hc : ∀ s a, G.payoff s a i = c) (n : ℕ) (h : History S A) (s : S) :
     nStageSum G σ n h s i = n * c := by

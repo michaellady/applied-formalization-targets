@@ -34,7 +34,7 @@ coordinate maps form a perfect `k`-hash family of functions from the `N = |C|` c
 * **The case `k = 3`** (trifferent codes): `perfectHashMax 3 n = trifferenceMax n` and
   `perfectHashRate 3 = trifferenceRate` (`perfectHashMax_three`, `perfectHashRate_three`).
   Fredman–Komlós gives `trifferenceRate ≤ 3!/3² = 2/3` (`trifferenceRate_le_fredmanKomlos`),
-  which is weaker than Körner's `log₂ (3/2) ≈ 0.585` (`logb_three_halves_lt_fredmanKomlos_three`
+  which is weaker than the elementary `log₂ (3/2) ≈ 0.585` (`logb_three_halves_lt_fredmanKomlos_three`
   proves `log₂ (3/2) < 2/3`). So for `k = 3` this file adds no new upper bound.
 * **The case `k = 4`**: `4!/4³ = 3/8 < log₂ (4/3) ≈ 0.415`
   (`fredmanKomlos_four_lt_logb_four_thirds`), so for `k = 4` Fredman–Komlós improves the

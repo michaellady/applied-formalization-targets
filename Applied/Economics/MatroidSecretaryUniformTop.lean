@@ -4,7 +4,7 @@ import Mathlib.Algebra.Order.Chebyshev
 /-!
 # Uniform matroids: the random-colouring algorithm is `(1 - 1/e)/e`-competitive
 
-Everything uses the model of `Applied/Economics/MatroidSecretary.lean` and the algorithm of
+Everything uses the model of `Applied/Economics/MatroidSecretaryModel.lean` and the algorithm of
 `Applied/Economics/MatroidSecretaryUniform.lean` unchanged: draw a uniformly random colouring
 `g : E → Fin k` and run the `⌊n/e⌋` rule inside each colour class (`colourRule`). There the
 algorithm was shown `e⁻²`-competitive by comparing it, for each colouring, with the elements of

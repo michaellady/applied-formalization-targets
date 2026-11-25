@@ -41,10 +41,12 @@ lemma single_mem_mixedStrategies [DecidableEq m] (i : m) :
     Pi.single i (1 : ℝ) ∈ mixedStrategies m :=
   ⟨fun j => by by_cases h : j = i <;> simp [h], by simp⟩
 
+/-- The simplex of mixed strategies over a non-empty set of pure strategies is non-empty. -/
 lemma mixedStrategies_nonempty [Nonempty m] : (mixedStrategies m).Nonempty := by
   classical
   exact ⟨_, single_mem_mixedStrategies (Classical.arbitrary m)⟩
 
+/-- The set of mixed strategies (the standard simplex) is convex. -/
 lemma convex_mixedStrategies : Convex ℝ (mixedStrategies m) := by
   rintro f ⟨hf0, hf1⟩ g ⟨hg0, hg1⟩ a b ha hb hab
   refine ⟨fun i => ?_, ?_⟩
@@ -53,6 +55,7 @@ lemma convex_mixedStrategies : Convex ℝ (mixedStrategies m) := by
   · simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Finset.sum_add_distrib,
       ← Finset.mul_sum, hf1, hg1, mul_one, hab]
 
+/-- The set of mixed strategies (the standard simplex) is compact. -/
 lemma isCompact_mixedStrategies : IsCompact (mixedStrategies m) := by
   have hcl : IsClosed (mixedStrategies m) := by
     have : mixedStrategies m = (⋂ i, {p : m → ℝ | 0 ≤ p i}) ∩ {p | ∑ i, p i = 1} := by
@@ -72,24 +75,29 @@ lemma isCompact_mixedStrategies : IsCompact (mixedStrategies m) := by
 with `q`. -/
 def gamePayoff (A : Matrix m n ℝ) (p : m → ℝ) (q : n → ℝ) : ℝ := p ⬝ᵥ A *ᵥ q
 
+/-- The expected payoff `pᵀ A q` written as a double sum `∑ i j, p i * A i j * q j`. -/
 lemma gamePayoff_eq_sum (A : Matrix m n ℝ) (p : m → ℝ) (q : n → ℝ) :
     gamePayoff A p q = ∑ i, ∑ j, p i * A i j * q j := by
   simp only [gamePayoff, dotProduct, mulVec, Finset.mul_sum, mul_assoc]
 
+/-- The expected payoff is continuous in the row player's mixed strategy. -/
 lemma continuous_gamePayoff_left (A : Matrix m n ℝ) (q : n → ℝ) :
     Continuous fun p : m → ℝ => gamePayoff A p q := by
   simp only [gamePayoff_eq_sum]
   fun_prop
 
+/-- The expected payoff is continuous in the column player's mixed strategy. -/
 lemma continuous_gamePayoff_right (A : Matrix m n ℝ) (p : m → ℝ) :
     Continuous fun q : n → ℝ => gamePayoff A p q := by
   simp only [gamePayoff_eq_sum]
   fun_prop
 
+/-- The expected payoff is linear in the row player's strategy. -/
 lemma gamePayoff_combo_left (A : Matrix m n ℝ) (p p' : m → ℝ) (q : n → ℝ) (a b : ℝ) :
     gamePayoff A (a • p + b • p') q = a * gamePayoff A p q + b * gamePayoff A p' q := by
   simp [gamePayoff, add_dotProduct, smul_dotProduct]
 
+/-- The expected payoff is linear in the column player's strategy. -/
 lemma gamePayoff_combo_right (A : Matrix m n ℝ) (p : m → ℝ) (q q' : n → ℝ) (a b : ℝ) :
     gamePayoff A p (a • q + b • q') = a * gamePayoff A p q + b * gamePayoff A p q' := by
   simp [gamePayoff, mulVec_add, mulVec_smul, dotProduct_add, dotProduct_smul]

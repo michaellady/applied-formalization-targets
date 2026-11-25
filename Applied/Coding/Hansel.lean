@@ -35,6 +35,8 @@ def BicliqueCover (V : Finset α) (I : Finset ι) (X Y : ι → Finset α) : Pro
 noncomputable def hanselWeight (I : Finset ι) (X Y : ι → Finset α) (v : α) : ℝ :=
   ∏ i ∈ I, if v ∈ X i ∨ v ∈ Y i then (1 / 2 : ℝ) else 1
 
+/-- `hanselWeight I X Y v = 2^{-d(v)}`, where `d(v)` is the number of `i ∈ I` with
+`v ∈ X i ∪ Y i`. -/
 theorem hanselWeight_eq (I : Finset ι) (X Y : ι → Finset α) (v : α) :
     hanselWeight I X Y v = (1 / 2 : ℝ) ^ (I.filter fun i => v ∈ X i ∨ v ∈ Y i).card := by
   classical

@@ -12,6 +12,16 @@ import Applied.Statistics.ConditionalError
 - formalized-elsewhere: not found in the Lean repositories searched (NEXT-TARGETS.md, 25 Nov 2026)
 - statement-review: unreviewed
 
+Scope of the name. The words "promising zone" in the id of this entry (ids are stable and are
+not renamed) and in some alias names below refer ONLY to the region where conditional power
+under the current trend is at least 50%, `z₁ ≥ c √(n₁ / (n₁ + n₂))`. The sample-size-increase
+theorem (5) is the result of Chen, DeMets and Lan (2004). It is NOT the full promising zone of
+Mehta and Pocock (2011) / Gao, Ware and Mehta (2008), whose lower end lies below 50%
+conditional power (roughly 0.3 to 0.4, depending on the interim fraction and on the maximal
+sample size); that lower part is not covered. Nor is it proved that the type I error is
+inflated when the sample size is increased outside the region: only the pointwise strict
+decrease of the critical value (4) is proved.
+
 Informal statement.
 
 (1) Conditional error principle, set form (`conditional_error_principle`). `P` is any measure
@@ -53,7 +63,8 @@ left-hand side is the argument of `1 - Φ` in the conditional power under the dr
 per observation, so this says "conditional power under the current trend at least 1/2"; the
 conditional power itself is not defined in Lean).
 
-(5) Sample-size increase with the conventional test
+(5) Sample-size increase with the conventional test, Chen–DeMets–Lan (2004): increase only
+when conditional power under the current trend is at least 50%
 (`conventional_test_promising_zone_type_one_error`). `n1 > 0`, `n2 > 0`, `c ≥ 0`.
 `N2 : Ω → ℕ` is `F1`-measurable, `N2 ω ≥ n2` for every `ω`, and `N2 ω ≠ n2` implies
 `Z n1 ω ≥ c √(n1 / (n1 + n2))`, for every `ω` (not just almost every). Then
@@ -84,16 +95,20 @@ Levels are stated as `N(0,1) [c, ∞)`, an extended nonnegative real, not as `α
 of unit-variance observations in a one-sample model; the two-arm case with equal allocation
 reduces to it but that reduction is not formalised. In (5) the second-stage size may depend on
 all first-stage data, not only on `Z n1`, and no upper bound on it is needed. The published
-rules restrict increases to a "promising zone" that also has an upper end and a maximal sample
-size; only the lower end `z ≥ c √(n1 / (n1 + n2))` matters for the type I error bound and only
-it is assumed. The "exactly when" in (4) is for real-valued second-stage sizes; for integer
+rules restrict increases to a zone that also has an upper end and a maximal sample
+size; for the Chen–DeMets–Lan result only the lower end `z ≥ c √(n1 / (n1 + n2))` (conditional
+power under the current trend at least 50%) matters for the type I error bound and only it is
+assumed. The Mehta–Pocock promising zone starts at a lower value of `z` that depends on the
+maximal sample size; increases for `z` between that value and `c √(n1 / (n1 + n2))` are NOT
+covered by (5). The "exactly when" in (4) is for real-valued second-stage sizes; for integer
 sizes only the sufficiency direction is used.
 
 Not covered: unknown variance (t-tests) and nuisance parameters; a group-sequential first
 stage or early stopping for efficacy or futility; decreases of the sample size with the
-conventional test; that the bound in (5) can fail outside the zone (only the pointwise strict
-decrease of the critical value is proved, not an inflated type I error); the Gao–Ware–Mehta
-extension of the zone below 50% conditional power; power, bias of estimates and confidence
+conventional test; that the bound in (5) can fail outside the region `z ≥ c √(n1 / (n1 + n2))` (only the
+pointwise strict decrease of the critical value is proved, not an inflated type I error;
+whether the level is inflated depends on the rule); the Mehta–Pocock / Gao–Ware–Mehta
+promising zone below 50% conditional power; power, bias of estimates and confidence
 intervals after adaptation; non-null drift; the general Müller–Schäfer principle with
 conditional expectations of test functions; a concrete probability space is not constructed
 here (one is `Applied.GroupSequential.canonicalMeasure` with the coordinate maps).

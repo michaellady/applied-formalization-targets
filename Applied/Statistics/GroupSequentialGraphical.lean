@@ -31,6 +31,19 @@ the look and with the level, and are right-continuous in the level.
   over the looks.
 
 No measurability is assumed anywhere (outer measure of the events).
+
+## Relation to other files and scope
+
+The theorems are for abstract families (`GSFamily`) that are monotone and right-continuous in
+the level and are assumed to have level; the only family with a proven level is the Bonferroni
+split over looks; level-monotone normal spending boundaries are assumed, not constructed.
+
+`GraphicalApproach.lean` supplies the weights and the sequentially rejective procedure for a
+single analysis; `GroupSequentialBoundaries.lean` the crossing events. Monotonicity and
+right-continuity in the level of actual alpha-spending boundaries are hypotheses of
+`GSFamily.ofBoundaries`, not theorems: the only family constructed unconditionally is the
+Bonferroni split over looks (`GSFamily.ofPValues`). Not here: Simes-based or parametric
+group-sequential closed tests, and stage-wise ordered p-values or estimates after stopping.
 -/
 
 open MeasureTheory Set
@@ -67,18 +80,21 @@ noncomputable def repeatedP (F : GSFamily Ω) (k : ℕ) (ω : Ω) : ℝ :=
 
 variable (F : GSFamily Ω)
 
+/-- The set of levels whose infimum defines the repeated p-value is bounded below (by `0`). -/
 lemma bddBelow_levels (k : ℕ) (ω : Ω) : BddBelow (insert 1 {γ | 0 ≤ γ ∧ ω ∈ F.E k γ}) :=
   ⟨0, by
     rintro γ (rfl | hγ)
     · exact zero_le_one
     · exact hγ.1⟩
 
+/-- The repeated p-value is non-negative. -/
 lemma repeatedP_nonneg (k : ℕ) (ω : Ω) : 0 ≤ F.repeatedP k ω := by
   refine le_csInf (insert_nonempty _ _) ?_
   rintro γ (rfl | hγ)
   · exact zero_le_one
   · exact hγ.1
 
+/-- The repeated p-value is at most one. -/
 lemma repeatedP_le_one (k : ℕ) (ω : Ω) : F.repeatedP k ω ≤ 1 :=
   csInf_le (F.bddBelow_levels k ω) (mem_insert _ _)
 
@@ -425,6 +441,8 @@ def GSFamily.ofBoundaries (c : ℝ → ℕ → EReal) (X : ℕ → Ω → ℝ)
     (fun j _ _ hγ hγγ' _ hω => (hanti j hγ hγγ').trans hω)
     (fun j γ hγ _ h => hrc j γ hγ _ h)
 
+/-- Unfolding lemma: the level-`γ` test of `GSFamily.ofBoundaries` has rejected by look `k` when
+some statistic `X j`, `j ≤ k`, has reached its boundary `c γ j`. -/
 lemma GSFamily.ofBoundaries_E (c : ℝ → ℕ → EReal) (X : ℕ → Ω → ℝ) (hanti hrc) (k : ℕ) (γ : ℝ) :
     (GSFamily.ofBoundaries c X hanti hrc).E k γ
       = ⋃ j ∈ Finset.range (k + 1), crossing (c γ) X j := rfl

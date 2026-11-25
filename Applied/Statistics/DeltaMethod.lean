@@ -16,6 +16,14 @@ The proof follows van der Vaart, "Asymptotic Statistics", Theorem 3.1: the seque
 `√n (Xₙ - θ)` is tight because it converges in distribution (portmanteau theorem), so `Xₙ → θ`
 in probability and the first-order Taylor remainder is negligible; one concludes with Slutsky's
 lemma and the continuous mapping theorem.
+
+## Scope
+
+Univariate, rate `√n`, first order. Not here: the multivariate delta method (Jacobian), general
+rates `rₙ → ∞`, the second-order delta method when `g' = 0`, and the special case of a normal
+limit stated with its variance `g'² σ²` (it follows by taking `Z` normal). The estimators `Xₙ`
+live on one probability space and the limit `Z` on another, as in Mathlib's
+`TendstoInDistribution`.
 -/
 
 open MeasureTheory Filter Asymptotics

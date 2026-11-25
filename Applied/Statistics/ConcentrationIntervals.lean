@@ -18,6 +18,13 @@ For random variables `X 0, …, X (n-1)` with common mean `m`, the sample mean i
 The variables are not required to be identically distributed: only the common mean (and, for
 Chebyshev, the common variance) is used. Versions for identically distributed variables are
 given as corollaries.
+
+## Relation to other files and scope
+
+Stand-alone (Mathlib only). `SimultaneousIntervals.lean` turns several such intervals into a
+simultaneous statement by Bonferroni. Probabilities are real numbers (`Measure.real`). Not
+here: variables with different ranges `[aᵢ, bᵢ]`, estimated variance (t-intervals),
+Bernstein-type intervals, and exact (Clopper–Pearson) or asymptotic normal intervals.
 -/
 
 open MeasureTheory ProbabilityTheory Finset

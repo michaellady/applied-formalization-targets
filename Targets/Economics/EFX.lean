@@ -32,7 +32,7 @@ valuation (`EFXAllButOne.lean`, `efx_exists_all_but_one_identical`), every agent
 two valuations (`EFXTwoTypes.lean`, `efx_exists_two_types`), and valuations in `{0, 1}`
 (`EFXBinary.lean`, `efx_exists_binary`). Relations with pairwise maximin share fairness are
 proved in `PMMSEFX.lean`: PMMS implies this strong form of EFX when all values are strictly
-positive (`isEFX_of_isPMMS`), and EFX implies `2/3`-PMMS for non-negative valuations
+positive (`isEFX_of_isPMMS`; for the strong form the positivity is needed), and EFX implies `2/3`-PMMS for non-negative valuations
 (`isApproxPMMS_two_thirds_of_isEFX`); PMMS existence is itself open (`PMMS.lean`,
 `PMMSExists`). This file itself contains only definitions. Conventions: valuations are real-valued and
 additive, allocations are complete (`a : Fin m → Fin n` gives every good to exactly one
@@ -44,13 +44,19 @@ values at zero), often written EFX₀. For the three-agent case: econcslib-bei
 (`EconCSLib/OpenProblem/EFXExistence.lean`, `EconCSLib/OpenProblem/New/EFXAdditiveExistence/Problem.lean`)
 uses the same strong definition (removal of every good of the other bundle, zero-valued ones
 included) and records the three-agent additive case as known in the literature, citing
-Chaudhury–Garg–Mehlhorn (EC 2020; journal version J. ACM 2024); it does not formalize it. The
-cross-check against that repository believes that Chaudhury–Garg–Mehlhorn define EFX with the
-removal of *every* good `g` of the other bundle, i.e. the strong form used here, but this was
-flagged as uncertain and the paper's definition has not been compared with `IsEFX` line by
-line: to be confirmed against the J. ACM version. Independently of that comparison,
-`EFXExistsThree` (stated below for the strong form) is now proved in
+Chaudhury–Garg–Mehlhorn (EC 2020; journal version J. ACM 2024); it does not formalize it. Chaudhury–Garg–Mehlhorn define EFX with the removal of *every* good `g` of the other bundle
+("`i` strongly envies `S` if `X_i <_i S \ g` for some `g ∈ S`"), i.e. the strong form used
+here; this was read in arXiv:2002.05119v3, where the main result is Theorem 20 (the J. ACM
+version was not consulted). `EFXExistsThree` (stated below for the strong form) is proved in
 `Targets/Economics/EFXThreeAgents.lean`; this file itself still only states it.
+
+The case `i = j`. `IsEFX` quantifies over all pairs `i`, `j`, including `i = j`. For `i = j`
+the condition says that agent `i`'s own bundle without any one of its goods `g` is worth at
+most the whole bundle, i.e. `v i g ≥ 0` for every good `g` that `i` receives. Under the
+hypothesis `0 ≤ v` of `EFXExists` and `EFXExistsThree` this is automatic, so the statements
+are the usual ones; without a sign condition `IsEFX` is stronger than the usual definition,
+which only compares distinct agents (this is the difference from the definition in
+econcslib-bei when values may be negative).
 -/
 
 namespace Targets.Economics

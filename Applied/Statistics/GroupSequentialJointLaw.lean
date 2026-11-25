@@ -42,6 +42,10 @@ Boundaries computed once from the canonical distribution:
   overall type-I error exactly `α` in every model (Pocock-type design).
 
 All of this is under the null hypothesis (zero drift).
+
+Not here: non-zero drift (power, sample-size calculation), non-integer information levels, the
+density of the canonical law, the recursive numerical integration that computes boundaries,
+and the classical named boundaries (O'Brien–Fleming, Pocock) as explicit numbers.
 -/
 
 open MeasureTheory ProbabilityTheory Finset
@@ -130,16 +134,20 @@ noncomputable def canonicalMeasure : Measure (ℕ → ℝ) :=
 instance : IsProbabilityMeasure canonicalMeasure := by
   unfold canonicalMeasure; infer_instance
 
+/-- Coordinates of the canonical model are measurable. -/
 lemma measurable_coord (i : ℕ) : Measurable (coord i) := measurable_pi_apply i
 
+/-- Each coordinate of the canonical model is standard normal. -/
 lemma map_coord (i : ℕ) : canonicalMeasure.map (coord i) = gaussianReal 0 1 :=
   Measure.infinitePi_map_eval _ i
 
+/-- The coordinates of the canonical model are mutually independent. -/
 lemma iIndepFun_coord : iIndepFun coord canonicalMeasure := by
   rw [iIndepFun_iff_map_fun_eq_infinitePi_map measurable_coord]
   simp only [map_coord]
   exact Measure.map_id
 
+/-- The standardised statistic `Z n` of measurable observations on `ℝ^ℕ` is measurable. -/
 lemma measurable_zStat {ξ' : ℕ → (ℕ → ℝ) → ℝ} (hξ : ∀ i, Measurable (ξ' i)) (n : ℕ) :
     Measurable (zStat ξ' n) :=
   (measurable_partialSum hξ n).div_const _

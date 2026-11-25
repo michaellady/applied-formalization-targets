@@ -44,6 +44,7 @@ def IsSorting (q : Fin m → ℝ) (σ : Equiv.Perm (Fin m)) : Prop := Monotone (
 /-- Every vector has a sorting permutation. -/
 theorem isSorting_sort (q : Fin m → ℝ) : IsSorting q (Tuple.sort q) := Tuple.monotone_sort q
 
+/-- Every vector has a sorting permutation (existence form of `isSorting_sort`). -/
 theorem exists_isSorting (q : Fin m → ℝ) : ∃ σ, IsSorting q σ := ⟨_, isSorting_sort q⟩
 
 /-! ### Positions and counts -/
@@ -104,6 +105,7 @@ noncomputable def holmSorted (α : ℝ) (q : Fin m → ℝ) (σ : Equiv.Perm (Fi
     Finset (Fin m) :=
   (univ.filter fun k : Fin m => (k : ℕ) < holmStop α q σ).image σ
 
+/-- The Holm stopping position is at most `m`. -/
 lemma holmStop_le (α : ℝ) (q : Fin m → ℝ) (σ : Equiv.Perm (Fin m)) : holmStop α q σ ≤ m :=
   Finset.min'_le _ _ (mem_insert_self _ _)
 
@@ -137,6 +139,8 @@ lemma holmStop_fails (α : ℝ) (q : Fin m → ℝ) (σ : Equiv.Perm (Fin m))
     rw [← this, show holmStop α q σ = (l : ℕ) from hl'.symm]
     exact (mem_filter.mp hl).2
 
+/-- Hypothesis `i` is rejected by the textbook Holm rule iff every position up to its own
+(`σ.symm i`) passes its threshold `α / (m - l)` (0-based `l`). -/
 lemma mem_holmSorted_iff (α : ℝ) (q : Fin m → ℝ) (σ : Equiv.Perm (Fin m)) (i : Fin m) :
     i ∈ holmSorted α q σ
       ↔ ∀ l : Fin m, l ≤ σ.symm i → q (σ l) ≤ α / ((m : ℝ) - (l : ℕ)) := by
@@ -223,6 +227,7 @@ noncomputable def hochbergSorted (α : ℝ) (q : Fin m → ℝ) (σ : Equiv.Perm
     Finset (Fin m) :=
   (univ.filter fun k : Fin m => (k : ℕ) < hochbergStop α q σ).image σ
 
+/-- The Hochberg stopping position is at most `m`. -/
 lemma hochbergStop_le (α : ℝ) (q : Fin m → ℝ) (σ : Equiv.Perm (Fin m)) :
     hochbergStop α q σ ≤ m :=
   Finset.sup_le fun k _ => by split_ifs <;> omega
@@ -248,6 +253,8 @@ lemma lt_hochbergStop_iff (α : ℝ) (q : Fin m → ℝ) (σ : Equiv.Perm (Fin m
     have := Fin.le_def.mp hkl
     omega
 
+/-- Hypothesis `i` is rejected by the textbook Hochberg rule iff some position at or after its
+own (`σ.symm i`) passes its threshold `α / (m - l)` (0-based `l`). -/
 lemma mem_hochbergSorted_iff (α : ℝ) (q : Fin m → ℝ) (σ : Equiv.Perm (Fin m)) (i : Fin m) :
     i ∈ hochbergSorted α q σ
       ↔ ∃ l : Fin m, σ.symm i ≤ l ∧ q (σ l) ≤ α / ((m : ℝ) - (l : ℕ)) := by
@@ -258,6 +265,7 @@ lemma mem_hochbergSorted_iff (α : ℝ) (q : Fin m → ℝ) (σ : Equiv.Perm (Fi
   · intro h
     exact ⟨σ.symm i, by simpa using h, by simp⟩
 
+/-- The textbook Hochberg procedure rejects exactly `hochbergStop` hypotheses. -/
 lemma card_hochbergSorted (α : ℝ) (q : Fin m → ℝ) (σ : Equiv.Perm (Fin m)) :
     (hochbergSorted α q σ).card = hochbergStop α q σ := by
   rw [hochbergSorted, Finset.card_image_of_injective _ σ.injective]
@@ -398,12 +406,16 @@ theorem holmSorted_eq_of_isSorting {α : ℝ} (hα : 0 ≤ α) (q : Fin m → �
   (holmSorted_eq_holm hα (fun j (_ : Unit) => q j) () σ hσ).trans
     (holmSorted_eq_holm hα (fun j (_ : Unit) => q j) () τ hτ).symm
 
+/-- For `α ≥ 0` the textbook Hochberg rule does not depend on how tied p-values are ordered:
+any two sorting permutations give the same rejection set. -/
 theorem hochbergSorted_eq_of_isSorting {α : ℝ} (hα : 0 ≤ α) (q : Fin m → ℝ)
     {σ τ : Equiv.Perm (Fin m)} (hσ : IsSorting q σ) (hτ : IsSorting q τ) :
     hochbergSorted α q σ = hochbergSorted α q τ :=
   (hochbergSorted_eq_hochberg hα (fun j (_ : Unit) => q j) () σ hσ).trans
     (hochbergSorted_eq_hochberg hα (fun j (_ : Unit) => q j) () τ hτ).symm
 
+/-- For `α ≥ 0` the textbook Benjamini–Hochberg rule does not depend on how tied p-values are
+ordered: any two sorting permutations give the same rejection set. -/
 theorem bhSorted_eq_of_isSorting {α : ℝ} (hα : 0 ≤ α) (q : Fin m → ℝ)
     {σ τ : Equiv.Perm (Fin m)} (hσ : IsSorting q σ) (hτ : IsSorting q τ) :
     bhSorted α q σ = bhSorted α q τ :=

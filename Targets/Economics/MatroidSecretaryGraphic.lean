@@ -7,7 +7,7 @@ import Targets.Economics.MatroidSecretary
 - id: econ-matroid-secretary-graphic
 - area: economics
 - status: formalized
-- source: N. Korula, M. Pál, "Algorithms for secretary problems on graphs and hypergraphs", ICALP 2009 (the random-vertex-order reduction and the constant `1/(2e)` for graphic matroids; exact statement and numbering to be confirmed); earlier constant-factor result for graphic matroids: M. Babaioff, N. Immorlica, R. Kleinberg, SODA 2007 (constant `1/16`, to be confirmed); the problem is from Babaioff–Immorlica–Kleinberg, SODA 2007. The proof formalized here follows the Korula–Pál idea; the constant is the known one, nothing new is claimed.
+- source: N. Korula, M. Pál, "Algorithms for secretary problems on graphs and hypergraphs", ICALP 2009; arXiv:0807.1139v1, Section 5, Theorem 5.2 (a `2e`-competitive algorithm for graphic matroids; read at source. Their model and algorithm differ from ours, see "Differences" below); earlier constant-factor result for graphic matroids: M. Babaioff, N. Immorlica, R. Kleinberg, SODA 2007 (constant `1/16`, to be confirmed); the problem is from Babaioff–Immorlica–Kleinberg, SODA 2007. The proof formalized here follows the Korula–Pál idea; the constant is the known one, nothing new is claimed.
 - used-in: online selection of a maximum-weight forest (e.g. online network design / spanning-tree auctions in random order); the matroid secretary literature
 - prerequisites: `Applied/Economics/MatroidSecretary.lean` (model), `Applied/Economics/MatroidSecretaryDirectSum.lean` (`blockSum`, `partitionOne`, `restrictAlg`), `Applied/Economics/SecretaryOneOverE.lean` (the `1/e` rule); Mathlib's `IndepMatroid.ofFinite`, `LinearIndepOn`, Hall's theorem (`Finset.all_card_le_biUnion_card_iff_exists_injective`), `Measure.count`, `SimpleGraph`. Mathlib has no graphic matroid at this pin, so one is defined here.
 - statement-review: unreviewed
@@ -50,9 +50,16 @@ Lean hypotheses and conventions disclosed.
 
 Differences from the textbook statement. The graphic matroid is the linear (signed incidence)
 representation, not the acyclicity definition (see above). The model is the base model's
-"matroid known in advance" variant (the algorithm knows the whole graph), which is the setting
-of Korula–Pál for graphic matroids as far as we know (to be confirmed). Competitiveness is
-against every independent set, equivalently the maximum-weight forest.
+"matroid known in advance" variant: the algorithm knows the whole graph before the first
+arrival and sees the identity of each arriving edge. This is NOT the model of Korula–Pál: in
+their Theorem 5.2 only the vertex set and the number of edges are known initially and the
+edges are revealed online. In this respect our theorem is weaker than theirs (an algorithm
+for their model works in ours, not conversely). The algorithm also differs: Korula–Pál fix an
+order of the vertices and flip one fair coin to choose one of the two orientations; here a
+uniformly random vertex order is drawn (a variant with the same analysis: each non-loop edge
+is oriented towards a given endpoint with probability `1/2`). The constant `1/(2e)` is the
+same. Competitiveness is against every independent set, equivalently the maximum-weight
+forest.
 
 What is proved (all in `Applied/Economics/MatroidSecretaryGraphic.lean`).
 * `hasCompetitiveRandomized_graphic`: `HasCompetitiveRandomized (graphic src tgt) (1/(2e))` for
@@ -67,9 +74,17 @@ What is proved (all in `Applied/Economics/MatroidSecretaryGraphic.lean`).
 * `conclusion_graphic`: the conclusion of `MatroidSecretaryConjecture` restricted to graphic
   matroids, with `c = 1/(2e)`.
 
+Model and status (common to all matroid secretary entries of this project). The matroid is
+known to the algorithm in advance, and the algorithm sees the identity as well as the weight
+of each arriving element; models in which the matroid is revealed online are not treated. The
+constants proved in this project are weaker than the best constants in the literature for the
+same classes. Partition matroids with capacities one (constant `1/e`) are already formalized
+in cslib-frontier (`MatroidSecretary.lean`); no novelty is claimed for that case.
+
 Not covered: the equivalence of `graphic` with the acyclicity definition; better constants for
 graphic matroids known in the literature; co-graphic,
-transversal, laminar and other matroid classes; models where the graph is revealed online.
+transversal, laminar and other matroid classes; models where the graph is revealed online
+(the model of Korula–Pál).
 -/
 
 namespace Targets.Economics

@@ -12,6 +12,10 @@ import Applied.Statistics.CombinationTests
 - formalized-elsewhere: not found in the Lean repositories searched (NEXT-TARGETS.md, 25 Nov 2026)
 - statement-review: unreviewed
 
+All results for Fisher's product test (Bauer–Köhne) are level BOUNDS (`≤`); attainment of the
+levels is not proved. The only exactness statement is (7), which reduces the rejection
+probability for independent, exactly uniform p-values to an area that is not computed here.
+
 Informal statement. `P` is a probability measure on `Ω`; `m1` is a sub-σ-algebra of the
 σ-algebra of `Ω` (the information available at the interim analysis). The first-stage
 p-value `p1` is a real function that is `m1`-measurable and valid: `P(p1 ≤ t) ≤ t` for all

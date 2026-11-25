@@ -19,6 +19,13 @@ import Mathlib.Tactic
   with probability at most `α` whenever `k ≥ (1 - α)(n + 1)`.
 
 No assumption is made on the distribution of the scores, and ties are allowed.
+
+## Relation to other files and scope
+
+`ConformalExact.lean` adds the matching upper bound on coverage when ties have probability
+zero. Not here: the translation of the counting event into an empirical quantile of the
+calibration scores, full and cross-conformal prediction, conditional coverage, and coverage
+under distribution shift.
 -/
 
 open MeasureTheory Finset
@@ -74,6 +81,8 @@ theorem card_filter_le_card_lt_le (x : ι → ℝ) (k : ℕ) :
       rw [← Finset.card_union_of_disjoint hdisj]; exact Finset.card_le_univ _
     omega
 
+/-- Subtraction form of `card_filter_le_card_lt_le`: at most `N - k` of `N` real numbers have at
+least `k` others strictly below (natural-number subtraction, so the bound is `0` for `k > N`). -/
 theorem card_filter_le_card_lt_le' (x : ι → ℝ) (k : ℕ) :
     (univ.filter fun i => k ≤ (univ.filter fun j => x j < x i).card).card
       ≤ Fintype.card ι - k := by
@@ -88,6 +97,8 @@ section Main
 variable [Fintype ι] [DecidableEq ι]
 
 omit [DecidableEq ι] in
+/-- The event "coordinate `i` has at least `k` coordinates strictly below it" is a measurable
+subset of `ι → ℝ`. -/
 lemma measurableSet_le_card_lt (k : ℕ) (i : ι) :
     MeasurableSet {x : ι → ℝ | k ≤ (univ.filter fun j => x j < x i).card} := by
   classical

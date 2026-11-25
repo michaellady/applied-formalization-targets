@@ -22,6 +22,13 @@ weights (probability mass functions; that they sum to one is never used). For a 
 sufficient if and only if `p θ x = g θ (T x) * h x` for some `g` and some `h ≥ 0`.
 `isSufficient_iff_exists_kernel` restates sufficiency as the existence of a single
 parameter-free conditional pmf.
+
+## Relation to other files and scope
+
+Sufficiency is used in `LehmannScheffe.lean` only through its consequence that conditional
+expectations given the statistic do not depend on the parameter; the two files are not
+formally connected. Not here: countably infinite or general sample spaces (dominated families,
+Halmos–Savage), the link with Mathlib's conditional kernels, and minimal sufficiency.
 -/
 
 open Finset
@@ -51,6 +58,7 @@ def HasFactorization (p : Θ → X → ℝ) (T : X → Y) : Prop :=
 
 variable {p : Θ → X → ℝ} {T : X → Y}
 
+/-- The marginal mass `P_θ(T = t)` is non-negative when the weights are. -/
 theorem marginal_nonneg (hp : ∀ θ x, 0 ≤ p θ x) (θ : Θ) (t : Y) : 0 ≤ marginal p T θ t :=
   sum_nonneg fun x _ => hp θ x
 

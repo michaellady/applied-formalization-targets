@@ -9,6 +9,7 @@ import Applied.Statistics.SimesExact
 - source: Y. Benjamini, Y. Hochberg, J. R. Statist. Soc. B 57 (1995) (inequality); equality for independent continuous null p-values: Y. Benjamini, D. Yekutieli, Ann. Statist. 29 (2001), and H. Finner, M. Roters, Biometrical J. 43 (2001) (exact statements to be confirmed)
 - used-in: shows that the Benjamini–Hochberg bound cannot be improved without estimating m₀; motivates adaptive procedures
 - prerequisites: Benjamini–Hochberg leave-one-out argument
+- formalized-elsewhere: partial precedent: atlas-lean `MathlibExt/Probability/Statistics/MultipleTesting/DiscreteBH.lean` :: `integral_fdp_stepUp_eq_sum`, an exact leave-one-out identity for the FDR of step-up procedures with monotone critical values, which overlaps with the decomposition `bh_fdp_decomposition` below (as reported by the project's prior-art review; not read or compiled here). The closed form `FDR = α m₀ / m` for uniform nulls was not found there.
 - statement-review: unreviewed
 
 Informal statement. Let `P` be a probability measure, `p i` (`i` in a finite set of size `m`)
