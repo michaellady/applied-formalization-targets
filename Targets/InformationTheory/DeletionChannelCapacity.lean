@@ -33,6 +33,16 @@ proved in `Targets/InformationTheory/DeletionErasureBound.lean` by writing the d
 as the erasure kernel followed by removal of the erasure symbols, then applying data
 processing and the weak converse of `Targets/InformationTheory/ChannelCodingConverse.lean`).
 
+Related combinatorial results (single deletions; they do not bound `C(d)`): Varshamov–Tenengolts
+codes correct one deletion and some `VT_a(n)` has at least `2ⁿ / (n + 1)` words
+(`coding-varshamov-tenengolts`, `Targets/Coding/VarshamovTenengolts.lean`); every
+single-deletion-correcting code of length `n` has at most `(1 + ε) 2ⁿ / n` words for large `n`
+(Levenshtein's upper bound, `coding-single-deletion-upper-bound`); in this channel model such a
+code is decoded without error whenever at most one bit is deleted, so its error probability is
+at most the probability of two or more deletions (`info-deletion-single-deletion-decoding`,
+`Targets/InformationTheory/DeletionSingleDecoding.lean`). That probability tends to `1` with the
+length for fixed `d > 0`, so these codes give no positive lower bound on `C(d)`.
+
 Known but NOT formalized here: `C(d) > 0` for every `d < 1`, with lower bounds of
 order `(1 - d)/9` (in bits; constant to be confirmed) for `d → 1`; `C(d) = 1 - (1 + o(1)) h(d)`
 bits as `d → 0` (to be confirmed); Dobrushin's theorem that `C(d) = lim (1/n) max I(Xⁿ; Y)`.
