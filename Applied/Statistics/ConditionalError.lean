@@ -34,6 +34,8 @@ the first stage):
   one-sided z-test, `A(z1) = N(0,1) [ (c √(n1+d) - z1 √n1) / √d, ∞ )`, in set form.
 * `critValue_le_critValue`, `critValue_lt_critValue`, `critValue_monotoneOn_iff`: the calculus
   fact about `m ↦ (c √(n1+m) - z1 √n1) / √m`.
+* `critValue_sub_trend_nonpos_iff`: the zone `z1 ≥ c √(n1 / (n1 + n2))` is "conditional power
+  under the current trend at least one half".
 * `measure_conventional_adaptive_le`: **sample-size increase in the promising zone with the
   conventional test** (Chen–DeMets–Lan 2004): type I error at most `N(0,1) [c, ∞)`.
 * `measure_weighted_adaptive_eq`: the test with the pre-planned weights (Cui–Hung–Wang 1999,
