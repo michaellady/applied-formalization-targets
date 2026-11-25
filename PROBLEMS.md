@@ -37,12 +37,12 @@ States: **done** (all three points), **partial** (statement plus some proved con
 | 342 | Li–Li network coding conjecture | todo | |
 | 94 | Strongly polynomial linear programming | todo | Needs a usable formal model of polynomial-time computation first |
 | 223 | Semidefinite feasibility in polynomial time | todo | Needs a usable formal model of polynomial-time computation first |
-| 207 | Capacity of the binary deletion channel | todo | Needs channel capacity definitions first |
-| 155 | Capacity of the relay channel | todo | Needs channel capacity definitions first |
-| 390 | Capacity region of 3-receiver broadcast channels | todo | Needs channel capacity definitions first |
-| 229 | Reliability function of the binary symmetric channel | todo | Needs channel capacity definitions first |
+| 207 | Capacity of the binary deletion channel | partial | Stated as a defined quantity; `0 ≤ C(d) ≤ log 2`, `C(0) = log 2`, `C(1) = 0` |
+| 155 | Capacity of the relay channel | stated | Defined with causal relay codes; `0 ≤ C ≤ log |X|` |
+| 390 | Capacity region of 3-receiver broadcast channels | stated | Region defined (private messages only); unclear whether the ranked problem means this general setting |
+| 229 | Reliability function of the binary symmetric channel | partial | Defined; shown non-negative and bounded; the exact open range of rates needs checking |
 | 325 | Computability of Shannon capacity of graphs | partial | Shannon capacity defined; `Θ(C₅) ≥ √5`, `3 ≤ Θ(C₇) ≤ 7`; the value of `Θ(C₇)` stated as open. Computability itself not stated |
-| 226 | Constant-query locally decodable codes | todo | |
+| 226 | Constant-query locally decodable codes | partial | Stated; the Hadamard code is proved to be a 2-query locally decodable code |
 | 204 | PAC learning of DNF in polynomial time | todo | Needs a usable formal model of polynomial-time computation first |
 | 131 | Planted clique conjecture | todo | Needs a usable formal model of polynomial-time computation first |
 | 232 | Classical worst-case reduction for LWE | todo | Needs a usable formal model of polynomial-time computation first |
@@ -57,10 +57,10 @@ faithfully until a usable model of polynomial-time computation exists in Lean.
 
 The channel-capacity foundations now exist for single-user channels with finite alphabets
 (entropy, mutual information, information capacity, capacity of the binary symmetric and
-erasure channels, data processing). Still needed before the five capacity problems can be
-stated: channels with memory or synchronisation errors (deletion channel), multi-terminal
-channels (relay, broadcast), block codes with error probability (reliability function), and
-quantum channels.
+erasure channels, data processing). Block codes, operational capacity, the deletion channel, relay and broadcast codes and the
+reliability function are now defined, so four of the five capacity problems are stated. No
+coding theorem is proved, so operational and information capacity are not yet linked. Quantum
+channels are still missing.
 
 ## C. First registry batch
 
