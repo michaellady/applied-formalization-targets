@@ -4,6 +4,7 @@ import Mathlib.MeasureTheory.Integral.Layercake
 import Mathlib.MeasureTheory.Function.Floor
 import Mathlib.MeasureTheory.Measure.Prod
 import Mathlib.Probability.Independence.Basic
+import Mathlib.MeasureTheory.Function.ConditionalExpectation.Real
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
 /-!
@@ -34,7 +35,12 @@ is a valid p-value *conditionally on the interim information*.
   levels of Fisher's product test with and without early stopping.
 * `IsCondValidPValue.select`: choosing the second-stage p-value from a countable family by an
   `m1`-measurable rule keeps conditional validity.
-* `IsCondValidPValue.of_indep`: a valid p-value independent of `m1` is conditionally valid.
+* `IsCondValidPValue.of_indep`, `IsCondValidPValue.of_indep_comp`: a valid p-value independent
+  of `m1` is conditionally valid.
+* `isCondValidPValue_of_condExp_le`: `P(p2 ≤ u | m1) ≤ u` almost surely for all `u` implies
+  `IsCondValidPValue` (the converse is not proved here).
+* `map_eq_of_isUniformPValue`, `measure_mem_eq_of_indepFun_uniform`: for independent, exactly
+  uniform p-values the pair is uniform on the unit square.
 
 ## Conventions
 
@@ -122,6 +128,46 @@ theorem IsCondValidPValue.of_indep (h : IsValidPValue P p2)
   rw [this, mul_comm]
   gcongr
   exact h u hu
+
+/-- A valid p-value of the form `f (X)`, with `X` independent of the interim information, is
+conditionally valid. -/
+theorem IsCondValidPValue.of_indep_comp {β : Type*} [MeasurableSpace β] {X : Ω → β} {f : β → ℝ}
+    (hf : Measurable f) (h : IsValidPValue P fun ω => f (X ω))
+    (hind : Indep m1 (MeasurableSpace.comap X inferInstance) P) :
+    IsCondValidPValue P m1 fun ω => f (X ω) := by
+  intro u hu A hA
+  have := (Indep_iff _ _ _).mp hind A {ω | f (X ω) ≤ u} hA
+    ⟨{x | f x ≤ u}, measurableSet_le hf measurable_const, rfl⟩
+  rw [this, mul_comm]
+  gcongr
+  exact h u hu
+
+/-- The conditional-expectation form implies the set form: if `p2` is measurable and
+`P(p2 ≤ u | m1) ≤ u` almost surely for every `u ≥ 0`, then `p2` is conditionally valid. -/
+theorem isCondValidPValue_of_condExp_le (hm : m1 ≤ mΩ) [IsFiniteMeasure P]
+    (hp2 : Measurable p2)
+    (h : ∀ u : ℝ, 0 ≤ u →
+      P[({ω | p2 ω ≤ u}).indicator (fun _ => (1 : ℝ)) | m1] ≤ᵐ[P] fun _ => u) :
+    IsCondValidPValue P m1 p2 := by
+  intro u hu A hA
+  have hS : MeasurableSet {ω | p2 ω ≤ u} := measurableSet_le hp2 measurable_const
+  have hint : Integrable (({ω | p2 ω ≤ u}).indicator (fun _ => (1 : ℝ))) P :=
+    (integrable_const 1).indicator hS
+  have e1 : ∫ ω in A, (P[({ω | p2 ω ≤ u}).indicator (fun _ => (1 : ℝ)) | m1]) ω ∂P
+      = P.real (A ∩ {ω | p2 ω ≤ u}) := by
+    rw [setIntegral_condExp hm hint hA, setIntegral_indicator hS, setIntegral_const,
+      smul_eq_mul, mul_one]
+  have e2 : ∫ ω in A, (P[({ω | p2 ω ≤ u}).indicator (fun _ => (1 : ℝ)) | m1]) ω ∂P
+      ≤ ∫ _ in A, u ∂P :=
+    setIntegral_mono_ae integrable_condExp.integrableOn (integrable_const u).integrableOn
+      (h u hu)
+  rw [setIntegral_const, smul_eq_mul, e1] at e2
+  calc P (A ∩ {ω | p2 ω ≤ u}) = ENNReal.ofReal (P.real (A ∩ {ω | p2 ω ≤ u})) :=
+        (ENNReal.ofReal_toReal (measure_ne_top _ _)).symm
+    _ ≤ ENNReal.ofReal (u * P.real A) := ENNReal.ofReal_le_ofReal (by rwa [mul_comm])
+    _ = ENNReal.ofReal u * ENNReal.ofReal (P.real A) := ENNReal.ofReal_mul hu
+    _ = ENNReal.ofReal u * P A := by
+        rw [show ENNReal.ofReal (P.real A) = P A from ENNReal.ofReal_toReal (measure_ne_top _ _)]
 
 /-- **Design selection.** If each member of a countable family of second-stage p-values is
 conditionally valid given `m1`, and the member used is chosen by an `m1`-measurable rule `D`,

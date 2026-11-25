@@ -23,6 +23,8 @@ the rejection region is written without the quantile function:
   exactly `z ≤ w₁ Z₁ + w₂ Z₂`.
 * `measure_inverseNormal_le`: the test has level `1 - Φ z`.
 * `measure_weightedZ_le`: the same on the z-scale (weighted z-statistic).
+* `measure_adaptive_weightedZ_le`: the second-stage design may be chosen from a countable set by
+  any rule that uses only interim information.
 * `measure_inverseNormal_eq`: for independent, exactly uniform p-values the rejection
   probability is exactly `1 - Φ z`.
 * `map_normalTail`: `1 - Φ(Z)` is uniform on `[0, 1]` for standard normal `Z`.
@@ -337,6 +339,29 @@ theorem measure_weightedZ_le (hm : m1 ≤ mΩ) [IsProbabilityMeasure P] {Z₁ Z�
   refine (measure_mono fun ω hω => ?_).trans
     (measure_inverseNormal_le hm h1 hZ1 h2 hw1 hw2 hw z)
   exact (mem_invNormalRegion_normalTail_iff hw1 hw2 _ _).mpr hω
+
+/-- **Data-driven second-stage design with pre-fixed weights.** The first-stage statistic `Z₁`
+is `m1`-measurable and standard normal. For each design `d` in a countable set, the
+second-stage statistic `Z₂ d` is standard normal and independent of the interim information
+`m1`. The design actually used, `D`, is any `m1`-measurable choice. With constant weights
+`w₁, w₂ ≥ 0`, `w₁² + w₂² = 1`, the weighted statistic `w₁ Z₁ + w₂ Z₂ D` exceeds `z` with
+probability at most `1 - Φ z`. -/
+theorem measure_adaptive_weightedZ_le (hm : m1 ≤ mΩ) [IsProbabilityMeasure P] {ι : Type*}
+    [Countable ι] {Z₁ : Ω → ℝ} {Z₂ : ι → Ω → ℝ} {D : Ω → ι}
+    (hZ1 : Measurable[m1] Z₁) (hlaw1 : P.map Z₁ = gaussianReal 0 1)
+    (hZ2 : ∀ d, Measurable (Z₂ d)) (hlaw2 : ∀ d, P.map (Z₂ d) = gaussianReal 0 1)
+    (hind : ∀ d, Indep m1 (MeasurableSpace.comap (Z₂ d) inferInstance) P)
+    (hD : ∀ d, MeasurableSet[m1] (D ⁻¹' {d}))
+    (hw1 : 0 ≤ w₁) (hw2 : 0 ≤ w₂) (hw : w₁ ^ 2 + w₂ ^ 2 = 1) (z : ℝ) :
+    P {ω | z ≤ w₁ * Z₁ ω + w₂ * Z₂ (D ω) ω} ≤ ENNReal.ofReal (normalTail z) := by
+  have h1 : IsValidPValue P fun ω => normalTail (Z₁ ω) :=
+    isValidPValue_zTest_upper P Z₁ (hZ1.mono hm le_rfl) hlaw1
+  have hm1 : Measurable[m1] fun ω => normalTail (Z₁ ω) := measurable_normalTail.comp hZ1
+  have h2 : ∀ d, IsCondValidPValue P m1 fun ω => normalTail (Z₂ d ω) := fun d =>
+    IsCondValidPValue.of_indep_comp measurable_normalTail
+      (isValidPValue_zTest_upper P (Z₂ d) (hZ2 d) (hlaw2 d)) (hind d)
+  have hsel := IsCondValidPValue.select hm h2 hD
+  exact measure_weightedZ_le hm (Z₂ := fun ω => Z₂ (D ω) ω) h1 hm1 hsel hw1 hw2 hw z
 
 /-- **Exactness.** For measurable, independent p-values that are both exactly uniform on
 `[0, 1]`, the inverse-normal test rejects with probability exactly `1 - Φ z`. -/
