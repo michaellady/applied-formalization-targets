@@ -88,7 +88,13 @@ foundations are the real next piece of work for this group.
 | Vickrey auction truthfulness | done | Reserve prices; uniqueness |
 | Stable matching existence | done | The algorithm itself; proposer-optimality |
 | Fano's inequality; Gibbs' inequality; source-coding lower bound | done | Random-variable form of Fano; achievability |
-| Remaining backlog entries (about 22) | todo | Not yet stated |
+| e-values and the e-BH procedure | done | — |
+| Conformal coverage upper bound; simultaneous confidence sets; Holm-adjusted p-values | done | Quantile form of conformal sets |
+| VCG mechanism truthfulness | done | General Groves payments |
+| Kelly criterion | done | Almost-sure growth interpretation |
+| Minimax theorem for matrix games | done | — |
+| Stable matchings: opposition of interests | partial | Existence of the proposer-optimal matching; lattice structure |
+| Remaining backlog entries (about 18) | todo | Not yet stated |
 
 ## After the tracker is worked through
 
