@@ -22,8 +22,9 @@ Everything is defined in this file from scratch (`IsTrifferentCode`, `maxTriffer
 
 Proved here (as theorems, from the library):
 * `trifferentRate_le`: `R ≤ log₂ (3/2) ≈ 0.585` (Körner's bound);
-* `trifferentRate_ge`: `log₂ √(9/7) ≈ 0.181 ≤ R` (random coding with alteration; the best
-  bound in the literature, about `0.212` from Körner–Marton, is not formalized).
+* `trifferentRate_ge`: `log₂ √(9/7) ≈ 0.181 ≤ R` (random coding with alteration); the
+  Körner–Marton bound `(1/4) log₂ (9/5) ≈ 0.212 ≤ R` is proved in
+  `Targets/Coding/TrifferenceKornerMarton.lean`.
 
 Open, stated as a `Prop` and not asserted: `RateLtKorner`, i.e. `R < log₂ (3/2)`: can Körner's
 upper bound on the rate be improved at all? (Believed open; to be confirmed.)
