@@ -68,7 +68,7 @@ quantum channels.
 |---|---|---|
 | Myerson's lemma; Neyman–Pearson; Gauss–Markov; gradient descent rate | done | — |
 | Delta method | done | Multivariate form |
-| Johnson–Lindenstrauss lemma | stated | Proof (Gaussian concentration for projections) |
+| Johnson–Lindenstrauss lemma | done | Sharper constants |
 | Marcus–Spielman–Srivastava (Kadison–Singer) | stated | Proof (interlacing polynomials; large) |
 | EFX existence | partial | Two agents and identical valuations proved; three-agent case on paper; general case open |
 
@@ -107,7 +107,9 @@ quantum channels.
 | Entropy, mutual information, channel capacity; binary symmetric and erasure channels; data processing | done | The channel coding theorem |
 | Hochberg- and Benjamini–Hochberg-adjusted p-values | done | Hommel-adjusted p-values |
 | Arrow's impossibility theorem | done | Version with indifference |
-| Remaining backlog entries (about 14) | todo | Not yet stated |
+| PAC bound for finite classes; uniform convergence and empirical risk minimisation | done | VC-dimension version |
+| Black–Scholes equation | done | Terminal condition; derivation from a price model |
+| Remaining backlog entries (about 11) | todo | Not yet stated |
 
 ## After the tracker is worked through
 
