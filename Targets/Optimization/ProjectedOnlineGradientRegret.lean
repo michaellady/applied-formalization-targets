@@ -21,7 +21,8 @@ starting point.
 
 Not covered: losses defined or convex only on `K`, subgradients of non-differentiable
 losses. Time-varying step sizes and the anytime `(3/2) D G √T` bound are in
-`Targets.Optimization.OnlineGradientAnytimeRegret`.
+`Targets.Optimization.OnlineGradientAnytimeRegret`. The conversion of regret bounds into
+excess-risk bounds for i.i.d. losses (online-to-batch) is in `Targets.Optimization.OnlineToBatch`.
 -/
 
 namespace Targets.Optimization
