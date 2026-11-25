@@ -17,6 +17,10 @@ Main results:
 * `DFA.exists_reset_le_pairMerging`: every synchronizing automaton with `n` states has a reset
   word of length at most `(n - 1) * n.choose 2` (the folklore cubic bound, obtained by merging
   pairs `n - 1` times).
+* `DFA.exists_merge_in_set`: any set of `k ≥ 2` states of a synchronizing automaton contains two
+  distinct states merged by a word of length at most `n.choose 2 - k.choose 2 + 1`.
+* `DFA.exists_reset_refined`, `DFA.exists_reset_cubic_third`: hence a reset word `w` with
+  `|w| + (n + 1).choose 3 ≤ (n - 1) * (n.choose 2 + 1)`, i.e. `3 |w| ≤ (n - 1)³ + 2 (n - 1)`.
 -/
 
 namespace Applied.Automata
@@ -385,6 +389,24 @@ theorem exists_reset_refined (hM : IsSynchronizing M) :
   apply Finset.card_le_one.mp himg
   · exact Finset.mem_image.mpr ⟨p, Finset.mem_univ _, rfl⟩
   · exact Finset.mem_image.mpr ⟨q, Finset.mem_univ _, rfl⟩
+
+/-- The refined bound in closed form: every synchronizing automaton with `n ≥ 1` states has a
+reset word `w` with `3 |w| ≤ (n - 1)³ + 2 (n - 1)`, i.e. `|w| ≤ (n - 1)(n² - 2n + 3) / 3`. -/
+theorem exists_reset_cubic_third (hM : IsSynchronizing M) :
+    ∃ w : List α, IsResetWord M w ∧
+      3 * w.length ≤ (Fintype.card σ - 1) ^ 3 + 2 * (Fintype.card σ - 1) := by
+  obtain ⟨w, hw, hlen⟩ := exists_reset_refined M hM
+  refine ⟨w, hw, ?_⟩
+  rcases Nat.eq_zero_or_pos (Fintype.card σ) with h0 | hpos
+  · rw [h0] at hlen ⊢
+    have : w.length = 0 := by simp at hlen; simp [hlen.1]
+    simp [this]
+  obtain ⟨m, hm⟩ : ∃ m, Fintype.card σ = m + 1 := ⟨Fintype.card σ - 1, by omega⟩
+  rw [hm, Nat.add_sub_cancel] at hlen ⊢
+  have h2 : (m + 1) * m.choose 1 = (m + 1).choose 2 * 2 := Nat.add_one_mul_choose_eq m 1
+  have h3 : (m + 2) * (m + 1).choose 2 = (m + 2).choose 3 * 3 := Nat.add_one_mul_choose_eq (m + 1) 2
+  rw [Nat.choose_one_right] at h2
+  nlinarith
 
 end PairBound
 
