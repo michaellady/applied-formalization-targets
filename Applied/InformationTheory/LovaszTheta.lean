@@ -167,6 +167,22 @@ theorem shannonCapacity_le_of_isOrthonormalRep [Fintype V] [Nonempty V]
         Real.rpow_le_rpow (Nat.cast_nonneg _) h (by positivity)
     _ = M := Real.pow_rpow_inv_natCast hM0 (Nat.succ_ne_zero k)
 
+/-- Scale-free form of `shannonCapacity_le_of_isOrthonormalRep`: the handle `c` need only be
+nonzero, with `‖c‖² ≤ M ⟪c, u v⟫²` for every vertex. -/
+theorem shannonCapacity_le_of_isOrthonormalRep' [Fintype V] [Nonempty V]
+    {G : SimpleGraph V} {u : V → EuclideanSpace ℝ ι} (hu : IsOrthonormalRep G u)
+    {c : EuclideanSpace ℝ ι} (hc : c ≠ 0) {M : ℝ} (hM : ∀ v, ‖c‖ ^ 2 ≤ M * ⟪c, u v⟫ ^ 2) :
+    shannonCapacity G ≤ M := by
+  have hn : 0 < ‖c‖ := norm_pos_iff.2 hc
+  refine shannonCapacity_le_of_isOrthonormalRep hu (c := ‖c‖⁻¹ • c) ?_ fun v => ?_
+  · rw [norm_smul, norm_inv, norm_norm, inv_mul_cancel₀ hn.ne']
+  · rw [real_inner_smul_left]
+    have h := hM v
+    have h2 : 0 < ‖c‖ ^ 2 := by positivity
+    calc (1 : ℝ) = ‖c‖ ^ 2 / ‖c‖ ^ 2 := (div_self h2.ne').symm
+      _ ≤ M * ⟪c, u v⟫ ^ 2 / ‖c‖ ^ 2 := div_le_div_of_nonneg_right h h2.le
+      _ = M * (‖c‖⁻¹ * ⟪c, u v⟫) ^ 2 := by field_simp
+
 /-! ### The pentagon: Lovász's umbrella -/
 
 /-- Azimuth `2πi/5` of the `i`-th rib of the umbrella. -/
@@ -203,7 +219,8 @@ lemma umbrellaAngle_sub (i j : Fin 5) (hij : i ≠ j)
       ((i : ℕ) : ℤ) - (j : ℕ) = 3 ∨ ((i : ℕ) : ℤ) - (j : ℕ) = -3 := by
     rw [SimpleGraph.cycleGraph_adj] at hadj
     revert i j; decide
-  have hsub : umbrellaAngle i - umbrellaAngle j = 2 * π * ((((i : ℕ) : ℤ) - (j : ℕ) : ℤ) : ℝ) / 5 := by
+  have hsub : umbrellaAngle i - umbrellaAngle j =
+      2 * π * ((((i : ℕ) : ℤ) - (j : ℕ) : ℤ) : ℝ) / 5 := by
     simp [umbrellaAngle]; ring
   rw [hsub]
   rcases key with h | h | h | h <;> rw [h] <;> push_cast
@@ -249,5 +266,107 @@ theorem shannonCapacity_cycleGraph_five_le :
 theorem shannonCapacity_cycleGraph_five :
     shannonCapacity (SimpleGraph.cycleGraph 5) = √5 :=
   le_antisymm shannonCapacity_cycleGraph_five_le sqrt_five_le_shannonCapacity_cycleGraph_five
+
+/-! ### The heptagon: an explicit rational Gram factorization -/
+
+/-- The vector `(a k · √(d k))ₖ` of `EuclideanSpace ℝ (Fin n)`, for rational `a` and `d`; with
+`d ≥ 0` the inner products are the rational numbers `∑ₖ a k b k d k`. -/
+noncomputable def sqrtScaled {n : ℕ} (d a : Fin n → ℚ) : EuclideanSpace ℝ (Fin n) :=
+  WithLp.toLp 2 fun k => (a k : ℝ) * √(d k : ℝ)
+
+lemma inner_sqrtScaled {n : ℕ} {d : Fin n → ℚ} (hd : ∀ k, 0 ≤ d k) (a b : Fin n → ℚ) :
+    ⟪sqrtScaled d a, sqrtScaled d b⟫ = ((∑ k, a k * b k * d k : ℚ) : ℝ) := by
+  rw [inner_euclidean]
+  push_cast
+  refine Finset.sum_congr rfl fun k _ => ?_
+  have h := Real.mul_self_sqrt (show (0 : ℝ) ≤ d k by exact_mod_cast hd k)
+  simp only [sqrtScaled]
+  calc (a k : ℝ) * √(d k : ℝ) * ((b k : ℝ) * √(d k : ℝ))
+      = a k * b k * (√(d k : ℝ) * √(d k : ℝ)) := by ring
+    _ = _ := by rw [h]
+
+/-- Unit lower-triangular factor `L` of the `LDLᵀ` factorization of the circulant matrix with
+`1` on the diagonal, `t = 11099/20000` between cyclic neighbours and `0` elsewhere. -/
+def c7L : Fin 7 → Fin 7 → ℚ :=
+  ![
+    ![1, 0, 0, 0, 0, 0, 0],
+    ![11099 / 20000, 1, 0, 0, 0, 0, 0],
+    ![0, 221980000 / 276812199, 1, 0, 0, 0, 0],
+    ![0, 0, 3072338596701 / 3072487960000, 1, 0, 0, 0],
+    ![0, 0, 0, 34101543868040000 / 27349873115215601, 1, 0, 0],
+    ![0, 0, 0, 0, 303556241705777955499 / 168504426912936060000, 1, 0],
+    ![11099 / 20000, -123187801 / 276812199, 1367261403299 / 3072487960000,
+      -15175234315215601 / 27349873115215601, 168429925664577955499 / 168504426912936060000,
+      5536094616701 / 6144826556701, 1]]
+
+/-- The (nonnegative) diagonal `D` of that factorization. -/
+def c7d : Fin 7 → ℚ :=
+  ![1,
+    276812199 / 400000000,
+    153624398 / 276812199,
+    27349873115215601 / 61449759200000000,
+    8425221345646803 / 27349873115215601,
+    917811566291671916599 / 3370088538258721200000000,
+    3151416245601 / 61448265567010000]
+
+lemma c7d_nonneg : ∀ k, 0 ≤ c7d k := by
+  intro k; fin_cases k <;> norm_num [c7d]
+
+lemma c7_gram_diag : ∀ i : Fin 7, ∑ k, c7L i k * c7L i k * c7d k = 1 := by
+  intro i; fin_cases i <;> norm_num [Fin.sum_univ_seven, c7L, c7d]
+
+lemma c7_gram_far : ∀ i j : Fin 7, (((i : ℕ) + 7 - j) % 7 = 2 ∨ ((i : ℕ) + 7 - j) % 7 = 3 ∨
+    ((i : ℕ) + 7 - j) % 7 = 4 ∨ ((i : ℕ) + 7 - j) % 7 = 5) →
+    ∑ k, c7L i k * c7L j k * c7d k = 0 := by
+  intro i j; fin_cases i <;> fin_cases j <;> norm_num [Fin.sum_univ_seven, c7L, c7d]
+
+/-- Coordinates of the handle `c = ∑ᵢ uᵢ`. -/
+def c7c (k : Fin 7) : ℚ := ∑ i, c7L i k
+
+lemma c7_handle : ∀ j : Fin 7, ∑ k, c7c k * c7L j k * c7d k = 21099 / 10000 := by
+  intro j; fin_cases j <;> norm_num [Fin.sum_univ_seven, c7L, c7d, c7c]
+
+lemma c7_handle_norm : ∑ k, c7c k * c7c k * c7d k = 7 * (21099 / 10000) := by
+  norm_num [Fin.sum_univ_seven, c7L, c7d, c7c]
+
+/-- An orthonormal representation of `C₇` in `ℝ⁷` (Gram matrix: `1` on the diagonal,
+`11099/20000` between neighbours, `0` between non-neighbours). -/
+noncomputable def c7Rep (i : Fin 7) : EuclideanSpace ℝ (Fin 7) := sqrtScaled c7d (c7L i)
+
+/-- The handle `c = ∑ᵢ c7Rep i`. -/
+noncomputable def c7Handle : EuclideanSpace ℝ (Fin 7) := sqrtScaled c7d c7c
+
+lemma cycleGraph_seven_far (i j : Fin 7) (hij : i ≠ j)
+    (hadj : ¬ (SimpleGraph.cycleGraph 7).Adj i j) :
+    ((i : ℕ) + 7 - j) % 7 = 2 ∨ ((i : ℕ) + 7 - j) % 7 = 3 ∨
+      ((i : ℕ) + 7 - j) % 7 = 4 ∨ ((i : ℕ) + 7 - j) % 7 = 5 := by
+  rw [SimpleGraph.cycleGraph_adj] at hadj
+  revert i j; decide
+
+theorem isOrthonormalRep_c7Rep : IsOrthonormalRep (SimpleGraph.cycleGraph 7) c7Rep := by
+  refine ⟨fun i => norm_eq_one_of_inner_self ?_, fun i j hij hadj => ?_⟩
+  · rw [c7Rep, inner_sqrtScaled c7d_nonneg, c7_gram_diag]; simp
+  · rw [c7Rep, c7Rep, inner_sqrtScaled c7d_nonneg,
+      c7_gram_far i j (cycleGraph_seven_far i j hij hadj)]
+    simp
+
+/-- **Upper bound for `C₇`.** `Θ(C₇) ≤ 70000/21099 ≈ 3.317693` (Lovász's `ϑ(C₇) ≈ 3.317667`). -/
+theorem shannonCapacity_cycleGraph_seven_le :
+    shannonCapacity (SimpleGraph.cycleGraph 7) ≤ 70000 / 21099 := by
+  have hcc : ⟪c7Handle, c7Handle⟫ = 7 * (21099 / 10000) := by
+    rw [c7Handle, inner_sqrtScaled c7d_nonneg, c7_handle_norm]; push_cast; ring
+  refine shannonCapacity_le_of_isOrthonormalRep' isOrthonormalRep_c7Rep (c := c7Handle) ?_
+    fun j => ?_
+  · intro h
+    rw [h, inner_zero_left] at hcc
+    norm_num at hcc
+  · rw [← real_inner_self_eq_norm_sq, hcc, c7Handle, c7Rep, inner_sqrtScaled c7d_nonneg,
+      c7_handle j]
+    norm_num
+
+/-- `Θ(C₇) < 3.3177`. -/
+theorem shannonCapacity_cycleGraph_seven_lt :
+    shannonCapacity (SimpleGraph.cycleGraph 7) < 33177 / 10000 :=
+  lt_of_le_of_lt shannonCapacity_cycleGraph_seven_le (by norm_num)
 
 end Applied.InformationTheory
