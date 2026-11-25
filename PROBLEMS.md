@@ -20,8 +20,8 @@ States: **done** (all three points), **partial** (statement plus some proved con
 | Problem | State | Missing |
 |---|---|---|
 | Rungs 1–7, 9, 12 | done | — |
-| 8. Graphical procedures | partial | General weight-update rule and its monotonicity |
-| 10. Positive dependence | partial | Positively correlated one-sided normal tests satisfy the condition |
+| 8. Graphical procedures | done | Weighted Simes and parametric variants |
+| 10. Positive dependence | partial | Independent and comonotone cases proved; positively correlated normals (correlation strictly between 0 and 1) still missing |
 | 11. Group-sequential designs | partial | Joint normal law of interim statistics; boundary computation |
 | 13. Simes and Benjamini–Hochberg for two-sided normal tests | partial | The conjectures themselves |
 
@@ -105,6 +105,7 @@ quantum channels.
 | Approximate differential privacy: post-processing, adaptive composition | done | Advanced composition; Gaussian mechanism |
 | Projected online gradient descent; stochastic gradient descent in expectation | done | Decreasing step sizes; high-probability bounds |
 | Entropy, mutual information, channel capacity; binary symmetric and erasure channels; data processing | done | The channel coding theorem |
+| Hochberg- and Benjamini–Hochberg-adjusted p-values | done | Hommel-adjusted p-values |
 | Remaining backlog entries (about 14) | todo | Not yet stated |
 
 ## After the tracker is worked through

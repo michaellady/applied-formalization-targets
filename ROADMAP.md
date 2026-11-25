@@ -21,9 +21,9 @@ assumptions hold in practice, so every target states its assumptions in plain la
 | 5 | False discovery rate (FDR); Benjamini–Hochberg under independence | proved | — |
 | 6 | Benjamini–Yekutieli (arbitrary dependence) | proved | — |
 | 7 | Šidák correction (independent p-values) | proved | — |
-| 8 | Closed weighted Bonferroni tests; sequentially rejective shortcut | proved | The general graphical weight-update rule (Bretz et al. 2009) and its monotonicity (Holm and fallback are done as instances) |
+| 8 | Closed weighted Bonferroni tests; sequentially rejective shortcut; the graphical approach, with order independence | proved | Weighted Simes and parametric local tests; adjusted p-values of graphical procedures |
 | 9 | Simes inequality, Hommel, Hochberg (independence) | proved | — |
-| 10 | Benjamini–Hochberg, Simes, Hommel, Hochberg under positive dependence | proved | That concrete distributions (one-sided tests of positively correlated normals) satisfy the condition |
+| 10 | Benjamini–Hochberg, Simes, Hommel, Hochberg under positive dependence; independence and comonotone families satisfy the condition | proved | Positively correlated normals with correlation strictly between 0 and 1 |
 | 11 | Group-sequential designs: alpha-spending principle | proved | Joint normal law of interim statistics; boundaries achieving a spending function |
 | 12 | Split conformal prediction: finite-sample coverage | proved | Upper bound on coverage without ties; full and cross-conformal methods |
 | 13 | Open problems stated in Lean, with partial results | stated | Any progress on the conjectures themselves (validity of the p-values and the independent case are proved) |
@@ -46,7 +46,6 @@ rung 10. The open content is the gap between arbitrary correlation and that cond
 ## Next steps, in order
 
 1. One-sided tests of positively correlated normals satisfy the rung-10 condition.
-2. The general graphical weight-update rule as an instance of rung 8.
 3. First applied open problems from the ProofAtlas list (see `BACKLOG.md`): sample
    compression, trifference, matroid secretary.
 4. Statement review of every target against its source.
