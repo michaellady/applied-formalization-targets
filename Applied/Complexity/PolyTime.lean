@@ -54,10 +54,12 @@ This is only meaningful when `enc` is injective. -/
 def DecidableInPolyTime {α : Type} (enc : α → List Bool) (L : α → Prop) : Prop :=
   InP fun w => ∃ a, enc a = w ∧ L a
 
+/-- Membership in `P` only depends on the language up to pointwise equivalence. -/
 theorem InP.congr {L L' : List Bool → Prop} (h : InP L) (hL : ∀ w, L w ↔ L' w) : InP L' := by
   obtain ⟨f, hf, hc⟩ := h
   exact ⟨f, fun w => (hf w).trans (hL w), hc⟩
 
+/-- `DecidableInPolyTime enc` only depends on the problem up to pointwise equivalence. -/
 theorem DecidableInPolyTime.congr {α : Type} {enc : α → List Bool} {L L' : α → Prop}
     (h : DecidableInPolyTime enc L) (hL : ∀ a, L a ↔ L' a) : DecidableInPolyTime enc L' :=
   InP.congr h fun _ => ⟨fun ⟨a, ha, h'⟩ => ⟨a, ha, (hL a).1 h'⟩,
@@ -79,6 +81,8 @@ def constTM (c : Bool) : FinTM2 where
   m _ := .pop () (fun _ o => o.isSome)
     (.branch id (.goto fun _ => ()) (.push () (fun _ => c) .halt))
 
+/-- The run of `constTM c` on an input `l`: after `|l| + 1` steps it has halted with exactly
+`[c]` on its stack. -/
 theorem constTM_run (c : Bool) (l : List Bool) (v : Bool) :
     (flip bind (constTM c).step)^[l.length + 1]
         (some (⟨some (), v, fun _ => l⟩ : (constTM c).Cfg)) =
@@ -122,6 +126,7 @@ noncomputable def constComputableInPolyTime {α : Type} (ea : α → List Bool) 
         exact h
       steps_le_m := by simp }
 
+/-- Constant Boolean functions are polynomial-time computable, for every input encoding. -/
 theorem polyTimeComputable_const {α : Type} (ea : α → List Bool) (c : Bool) :
     PolyTimeComputable ea encodeBool (fun _ : α => c) :=
   ⟨constComputableInPolyTime ea c⟩
@@ -151,10 +156,12 @@ decoded uniquely. -/
 def PrefixFree {α : Type*} (e : α → List Bool) : Prop :=
   ∀ a a' r r', e a ++ r = e a' ++ r' → a = a' ∧ r = r'
 
+/-- A prefix-free code is injective. -/
 theorem PrefixFree.injective {α : Type*} {e : α → List Bool} (h : PrefixFree e) :
     Function.Injective e := fun a a' hh =>
   (h a a' [] [] (by simpa using hh)).1
 
+/-- Precomposing a prefix-free code with an injective map gives a prefix-free code. -/
 theorem PrefixFree.comp {α β : Type*} {e : α → List Bool} (h : PrefixFree e) {g : β → α}
     (hg : Function.Injective g) : PrefixFree (e ∘ g) := fun _ _ r r' hh =>
   let ⟨h1, h2⟩ := h _ _ r r' hh
@@ -176,11 +183,13 @@ def sd : List Bool → List Bool
   | [] => [false]
   | b :: w => true :: b :: sd w
 
+/-- The self-delimiting form of `w` has length `2 |w| + 1`. -/
 @[simp] theorem length_sd (w : List Bool) : (sd w).length = 2 * w.length + 1 := by
   induction w with
   | nil => rfl
   | cons b w ih => simp [sd, ih]; ring
 
+/-- The self-delimiting form of bit strings is a prefix-free code. -/
 theorem prefixFree_sd : PrefixFree sd := by
   intro w
   induction w with
@@ -203,6 +212,7 @@ theorem prefixFree_sd : PrefixFree sd := by
 self-delimiting form. Its length is `2 * (number of binary digits) + 1`. -/
 def encNat (n : ℕ) : List Bool := sd (encodeNat n)
 
+/-- The binary encoding of natural numbers is prefix-free. -/
 theorem prefixFree_encNat : PrefixFree encNat :=
   prefixFree_sd.comp fun a b h => by
     have := congrArg decodeNat h
@@ -211,6 +221,7 @@ theorem prefixFree_encNat : PrefixFree encNat :=
 /-- An integer: a sign bit (`1` for negative) followed by the absolute value. -/
 def encInt (z : ℤ) : List Bool := decide (z < 0) :: encNat z.natAbs
 
+/-- The encoding of integers is prefix-free. -/
 theorem prefixFree_encInt : PrefixFree encInt := by
   intro a a' r r' h
   simp only [encInt, List.cons_append, List.cons.injEq, decide_eq_decide] at h
@@ -222,6 +233,7 @@ theorem prefixFree_encInt : PrefixFree encInt := by
 /-- A rational number: numerator and denominator of the reduced fraction, in binary. -/
 def encRat (q : ℚ) : List Bool := encInt q.num ++ encNat q.den
 
+/-- The encoding of rationals is prefix-free. -/
 theorem prefixFree_encRat : PrefixFree encRat := by
   have h := (prefixFree_encInt.prod prefixFree_encNat).comp
     (g := fun q : ℚ => (q.num, q.den)) (fun a b hab => by
@@ -234,6 +246,7 @@ def encList {α : Type*} (e : α → List Bool) : List α → List Bool
   | [] => [false]
   | a :: l => true :: (e a ++ encList e l)
 
+/-- Lists of code words of a prefix-free code form a prefix-free code. -/
 theorem PrefixFree.list {α : Type*} {e : α → List Bool} (h : PrefixFree e) :
     PrefixFree (encList e) := by
   intro l
@@ -257,6 +270,7 @@ theorem PrefixFree.list {α : Type*} {e : α → List Bool} (h : PrefixFree e) :
 def encVec {α : Type*} {n : ℕ} (e : α → List Bool) (f : Fin n → α) : List Bool :=
   encList e (List.ofFn f)
 
+/-- Vectors `Fin n → α` of code words of a prefix-free code form a prefix-free code. -/
 theorem PrefixFree.vec {α : Type*} {e : α → List Bool} (h : PrefixFree e) (n : ℕ) :
     PrefixFree (encVec e : (Fin n → α) → List Bool) :=
   h.list.comp List.ofFn_injective

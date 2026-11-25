@@ -67,8 +67,10 @@ def S (v : Fin (n + n) → ℚ) (j : ℕ) : ℚ := if h : j < n then v (sc ⟨j,
 /-- `L v i = ∑_{j<i} 10^(i-j) x_j`. -/
 def L (v : Fin (n + n) → ℚ) (i : ℕ) : ℚ := ∑ j ∈ range i, 10 ^ (i - j) * X v j
 
+/-- `L_0 = 0`. -/
 theorem L_zero (v : Fin (n + n) → ℚ) : L v 0 = 0 := by simp [L]
 
+/-- The recursion `L_{i+1} = 10 (L_i + x_i)`. -/
 theorem L_succ (v : Fin (n + n) → ℚ) (i : ℕ) : L v (i + 1) = 10 * (L v i + X v i) := by
   simp only [L, sum_range_succ, mul_add, mul_sum]
   congr 1
@@ -78,6 +80,7 @@ theorem L_succ (v : Fin (n + n) → ℚ) (i : ℕ) : L v (i + 1) = 10 * (L v i +
     ring
   · simp
 
+/-- The `i`-th constraint row reads `2 L_i + x_i + s_i`. -/
 theorem row (v : Fin (n + n) → ℚ) (i : ℕ) (hi : i < n) :
     ((kleeMinty n).A *ᵥ v) ⟨i, hi⟩ = 2 * L v i + X v i + S v i := by
   simp only [mulVec, dotProduct, Fin.sum_univ_add, kleeMinty, Fin.addCases_left,
@@ -103,6 +106,7 @@ theorem row (v : Fin (n + n) → ℚ) (i : ℕ) (hi : i < n) :
   simp only [mem_range.2 hi, ↓reduceIte]
   rfl
 
+/-- Ten times the objective is `L_n`. -/
 theorem objective_mul (v : Fin (n + n) → ℚ) : 10 * ((kleeMinty n).c ⬝ᵥ v) = L v n := by
   simp only [dotProduct, Fin.sum_univ_add, kleeMinty, Fin.addCases_left, Fin.addCases_right,
     zero_mul, sum_const_zero, add_zero, L, mul_sum]
@@ -112,23 +116,29 @@ theorem objective_mul (v : Fin (n + n) → ℚ) : 10 * ((kleeMinty n).c ⬝ᵥ v
   rw [show n - (j : ℕ) = (n - 1 - j) + 1 by omega, pow_succ]
   ring
 
+/-- `X v j` is the coordinate of `v` at the column of `x_j`. -/
 @[simp] theorem X_xc (v : Fin (n + n) → ℚ) (j : Fin n) : X v j = v (xc j) := by
   simp [X, j.2]
 
+/-- `S v j` is the coordinate of `v` at the column of `s_j`. -/
 @[simp] theorem S_sc (v : Fin (n + n) → ℚ) (j : Fin n) : S v j = v (sc j) := by
   simp [S, j.2]
 
+/-- `X v j = 0` beyond the last variable. -/
 theorem X_of_le (v : Fin (n + n) → ℚ) {j : ℕ} (hj : n ≤ j) : X v j = 0 := by
   simp [X, show ¬ j < n by omega]
 
+/-- `S v j = 0` beyond the last slack. -/
 theorem S_of_le (v : Fin (n + n) → ℚ) {j : ℕ} (hj : n ≤ j) : S v j = 0 := by
   simp [S, show ¬ j < n by omega]
 
+/-- Every column is the column of some `x_j` or of some slack `s_k`. -/
 theorem col_cases (c : Fin (n + n)) : (∃ j, c = xc j) ∨ ∃ k, c = sc k := by
   refine Fin.addCases (fun j => ?_) (fun k => ?_) c
   · exact Or.inl ⟨j, rfl⟩
   · exact Or.inr ⟨k, rfl⟩
 
+/-- The columns of the `x` variables and of the slacks are distinct. -/
 theorem xc_ne_sc (j k : Fin n) : xc j ≠ sc k := by
   intro h
   have := congrArg Fin.val h
@@ -152,15 +162,18 @@ theorem row_eq {v : Fin (n + n) → ℚ} {w : Fin n → ℚ} (h : (kleeMinty n).
 def basisOf (T : Fin n → Bool) : Finset (Fin (n + n)) :=
   univ.filter fun c => Fin.addCases (motive := fun _ => Bool) (fun j => T j) (fun k => !T k) c
 
+/-- `x_j` is in `basisOf T` iff `T j`. -/
 @[simp] theorem xc_mem_basisOf (T : Fin n → Bool) (j : Fin n) : xc j ∈ basisOf T ↔ T j = true := by
   simp [basisOf, xc]
 
+/-- `s_k` is in `basisOf T` iff `¬ T k`. -/
 @[simp] theorem sc_mem_basisOf (T : Fin n → Bool) (k : Fin n) :
     sc k ∈ basisOf T ↔ T k = false := by
   rw [basisOf, mem_filter]
   simp only [sc, Fin.addCases_right]
   simp
 
+/-- `basisOf T` has `n` columns, one from each pair `(x_i, s_i)`. -/
 theorem card_basisOf (T : Fin n → Bool) : (basisOf T).card = n := by
   rw [basisOf, card_filter, Fin.sum_univ_add]
   simp only [Fin.addCases_left, Fin.addCases_right, ← sum_add_distrib]
@@ -168,6 +181,7 @@ theorem card_basisOf (T : Fin n → Bool) : (basisOf T).card = n := by
       if (!T x) = true then 1 else 0) = 1 by cases T x <;> simp]
   simp
 
+/-- `basisOf T` is a basis of the Klee–Minty program. -/
 theorem isBasis_basisOf (T : Fin n → Bool) : (kleeMinty n).IsBasis (basisOf T) := by
   refine ⟨card_basisOf T, ((kleeMinty n).linearIndependent_col_iff _).2 fun z hAz hz => ?_⟩
   have hrow : ∀ i, i < n → 2 * L z i + X z i + S z i = 0 := fun i hi => by
@@ -222,6 +236,7 @@ theorem pair_pos {v : Fin (n + n) → ℚ} (hrow : ∀ i, i < n → 2 * L v i + 
   have hp : (0 : ℚ) < 100 ^ k := by positivity
   linarith
 
+/-- A solution of `A v = b` satisfies the row equations `2 L_i + x_i + s_i = 100^i`. -/
 theorem hrow_of_mulVec {v : Fin (n + n) → ℚ} (h : (kleeMinty n).A *ᵥ v = (kleeMinty n).b) :
     ∀ i, i < n → 2 * L v i + X v i + S v i = 100 ^ i := fun i hi => by
   rw [row_eq h i hi]; rfl
@@ -272,8 +287,10 @@ theorem isFeasibleBasis_basisOf (T : Fin n → Bool) : (kleeMinty n).IsFeasibleB
 /-- The index of the constraint a column belongs to (`x_j ↦ j`, `s_k ↦ k`). -/
 def pairIdx (c : Fin (n + n)) : Fin n := Fin.addCases (motive := fun _ => Fin n) id id c
 
+/-- The pair of the column of `x_j` is `j`. -/
 @[simp] theorem pairIdx_xc (j : Fin n) : pairIdx (xc j) = j := by simp [pairIdx, xc]
 
+/-- The pair of the column of `s_k` is `k`. -/
 @[simp] theorem pairIdx_sc (k : Fin n) : pairIdx (sc k) = k := by
   simp only [pairIdx, sc, Fin.addCases_right, id]
 
