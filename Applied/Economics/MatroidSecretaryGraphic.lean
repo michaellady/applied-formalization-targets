@@ -192,6 +192,38 @@ lemma src_ne_tgt_of_indep {I : Set E} (hI : (graphic src tgt).Indep I) {e : E} (
   rw [graphic_indep_iff] at hI
   exact hI.ne_zero he (by simp [incVec, h])
 
+omit [Fintype V] in
+/-- Sanity check: two parallel edges (same endpoints, in either direction) are dependent. -/
+lemma graphic_not_indep_pair {e₁ e₂ : E} (hne : e₁ ≠ e₂)
+    (h : (src e₁ = src e₂ ∧ tgt e₁ = tgt e₂) ∨ (src e₁ = tgt e₂ ∧ tgt e₁ = src e₂)) :
+    ¬ (graphic src tgt).Indep {e₁, e₂} := by
+  rw [graphic_indep_iff, linearIndepOn_insert (by simpa using hne)]
+  rintro ⟨-, hspan⟩
+  apply hspan
+  rw [Set.image_singleton]
+  rcases h with ⟨h1, h2⟩ | ⟨h1, h2⟩
+  · have : incVec src tgt e₁ = incVec src tgt e₂ := by simp [incVec, h1, h2]
+    rw [this]; exact Submodule.mem_span_singleton_self _
+  · have : incVec src tgt e₁ = (-1 : ℚ) • incVec src tgt e₂ := by
+      simp [incVec, h1, h2]
+    rw [this]; exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self _)
+
+omit [Fintype V] in
+/-- Sanity check: the three edges of a directed triangle are dependent. -/
+lemma graphic_not_indep_triangle {e₁ e₂ e₃ : E} (h12 : e₁ ≠ e₂) (h13 : e₁ ≠ e₃)
+    (h1 : tgt e₁ = src e₂) (h2 : tgt e₂ = src e₃) (h3 : tgt e₃ = src e₁) :
+    ¬ (graphic src tgt).Indep {e₁, e₂, e₃} := by
+  rw [graphic_indep_iff, linearIndepOn_insert (by simp [h12, h13])]
+  rintro ⟨-, hspan⟩
+  apply hspan
+  have : incVec src tgt e₁ = (-1 : ℚ) • incVec src tgt e₂ + (-1 : ℚ) • incVec src tgt e₃ := by
+    rw [neg_one_smul, neg_one_smul]
+    simp only [incVec, h1, h2, h3]
+    abel
+  rw [this]
+  refine Submodule.add_mem _ (Submodule.smul_mem _ _ (Submodule.subset_span ⟨e₂, by simp, rfl⟩))
+    (Submodule.smul_mem _ _ (Submodule.subset_span ⟨e₃, by simp, rfl⟩))
+
 /-! ### Random vertex orders -/
 
 /-- For two distinct vertices `a` and `b`, exactly half of the vertex orders put `a` before
