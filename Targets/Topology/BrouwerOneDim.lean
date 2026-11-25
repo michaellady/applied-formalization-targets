@@ -7,7 +7,7 @@ import Applied.Topology.BrouwerOneDim
 - area: topology
 - status: formalized
 - source: classical consequence of the intermediate value theorem (B. Bolzano, 1817); the general theorem is L. E. J. Brouwer, "Über Abbildung von Mannigfaltigkeiten", Math. Ann. 71 (1912). Textbook form of the one-dimensional case: e.g. any real analysis text, as an exercise on the intermediate value theorem (exact reference to be confirmed)
-- used-in: prerequisite of Nash's existence theorem (`Targets/Economics/NashExistence.lean`), which needs the general (higher-dimensional) theorem
+- used-in: elementary special case of Brouwer's theorem (`Targets/Topology/Brouwer.lean`)
 - prerequisites: Mathlib's intermediate value theorem `intermediate_value_Icc'`
 - statement-review: unreviewed
 
@@ -23,10 +23,9 @@ Differences from the textbook statement: this is only the one-dimensional case o
 theorem. The hypothesis `a ≤ b` is needed (for `a > b` the interval is empty and there is no
 fixed point); `f` is a total function on `ℝ` and only its values on `[a, b]` matter.
 
-Not covered: Brouwer's theorem in dimension `≥ 2` (for the standard simplex `stdSimplex ℝ (Fin
-(n+1))`, `n ≥ 2`, or the cube `[0,1]^n`), Sperner's lemma, Kakutani's theorem, and therefore
-Nash's existence theorem, which remains open in this project
-(`Targets/Economics/NashExistence.lean`).
+Not covered here: the higher-dimensional theorem is proved separately, by a different route
+(Sperner's lemma for the Kuhn triangulation of the cube), in `Targets/Topology/Brouwer.lean`;
+it is used for Nash's existence theorem (`Targets/Economics/NashExistence.lean`).
 -/
 
 namespace Targets.Topology
