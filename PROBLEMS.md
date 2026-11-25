@@ -109,7 +109,12 @@ channels are still missing.
 | Arrow's impossibility theorem | done | Version with indifference |
 | PAC bound for finite classes; uniform convergence and empirical risk minimisation | done | VC-dimension version |
 | Black–Scholes equation | done | Terminal condition; derivation from a price model |
-| Remaining backlog entries (about 11) | todo | Not yet stated |
+| Chebyshev and Hoeffding confidence intervals | done | — |
+| Fisher–Neyman factorization (finite sample space) | done | Countable and general cases |
+| Neyman–Pearson for randomized tests | done | Existence of a test of given size; converse |
+| Lehmann–Scheffé | partial | Stated with a sub-σ-algebra and a consequence of sufficiency, not sufficiency itself |
+| Glivenko–Cantelli | done | Rates (DKW inequality) |
+| Remaining backlog entries (about 7) | todo | Not yet stated |
 
 ## After the tracker is worked through
 
