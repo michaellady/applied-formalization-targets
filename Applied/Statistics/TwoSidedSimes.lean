@@ -430,4 +430,173 @@ theorem twoSided_key_ineq (P : Measure Ω) [IsProbabilityMeasure P] {W X Y : Ω 
 
 end KeyInequality
 
+section SimesTwo
+
+/-- For two p-values, the Simes test rejects only if the smaller is at most `α / 2` or both are
+at most `α`. -/
+lemma simes_two_cases {α : ℝ} (q : Fin 2 → ℝ) (h : 1 ≤ bhK α q) :
+    (q 0 ≤ α / 2 ∨ q 1 ≤ α / 2) ∨ (q 0 ≤ α ∧ q 1 ≤ α) := by
+  have hle := bhK_le (α := α) q
+  have hc := bhK_le_bhCount (α := α) q
+  simp only [Fintype.card_fin] at hle
+  unfold bhCount at hc
+  simp only [Fintype.card_fin, Nat.cast_ofNat] at hc
+  interval_cases hk : bhK α q
+  · left
+    obtain ⟨j, hj⟩ := Finset.card_pos.mp (lt_of_lt_of_le Nat.one_pos hc)
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Nat.cast_one, mul_one] at hj
+    fin_cases j
+    · exact Or.inl hj
+    · exact Or.inr hj
+  · right
+    have hcard : (Finset.univ.filter fun j : Fin 2 => q j ≤ α * ((2 : ℕ) : ℝ) / 2).card =
+        Fintype.card (Fin 2) := le_antisymm (Finset.card_le_univ _) (by simpa using hc)
+    have huniv := Finset.eq_univ_of_card _ hcard
+    have h0 : (0 : Fin 2) ∈ Finset.univ.filter fun j : Fin 2 => q j ≤ α * ((2 : ℕ) : ℝ) / 2 := by
+      rw [huniv]; exact Finset.mem_univ _
+    have h1 : (1 : Fin 2) ∈ Finset.univ.filter fun j : Fin 2 => q j ≤ α * ((2 : ℕ) : ℝ) / 2 := by
+      rw [huniv]; exact Finset.mem_univ _
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Nat.cast_ofNat] at h0 h1
+    constructor <;> linarith
+
+lemma simes_two_arith_aux {α x a₀ a₁ b₀ b₁ y₀ y₁ : ℝ} (hx : 0 ≤ x) (ha₀ : a₀ ≤ α / 2)
+    (ha₁ : a₁ ≤ α / 2) (hb₁ : b₁ ≤ α) (hxb₀ : x ≤ b₀) (ha₀b : a₀ ≤ b₀) (ha₁b : a₁ ≤ b₁)
+    (ha₀n : 0 ≤ a₀) (_ha₁n : 0 ≤ a₁) (hy₀ : 0 ≤ y₀) (hy₁ : 0 ≤ y₁)
+    (h₀ : x * a₀ ≤ y₀ * b₀) (h₁ : x * a₁ ≤ y₁ * b₁) (hb : b₀ ≤ b₁) :
+    x + (a₀ - y₀) + (a₁ - y₁) ≤ α := by
+  rcases (hx.trans hxb₀).eq_or_lt with hb₀ | hb₀
+  · have : x = 0 := by linarith
+    have : a₀ = 0 := by linarith
+    linarith
+  have hb₁pos : 0 < b₁ := lt_of_lt_of_le hb₀ hb
+  have hg : (x + (a₀ - y₀) + (a₁ - y₁)) * (b₀ * b₁) ≤
+      (b₁ * (b₀ - a₀) - a₁ * b₀) * x + (a₀ + a₁) * (b₀ * b₁) := by
+    nlinarith [mul_le_mul_of_nonneg_right h₀ hb₁pos.le, mul_le_mul_of_nonneg_right h₁ hb₀.le]
+  have hg2 : (b₁ * (b₀ - a₀) - a₁ * b₀) * x + (a₀ + a₁) * (b₀ * b₁) ≤ α * (b₀ * b₁) := by
+    have hpos : 0 ≤ b₀ * b₁ := (mul_pos hb₀ hb₁pos).le
+    rcases le_total (b₁ * (b₀ - a₀) - a₁ * b₀) 0 with hK | hK
+    · nlinarith [mul_nonpos_of_nonpos_of_nonneg hK hx, mul_le_mul_of_nonneg_right
+        (show a₀ + a₁ ≤ α by linarith) hpos]
+    · have hKx : (b₁ * (b₀ - a₀) - a₁ * b₀) * x ≤ (b₁ * (b₀ - a₀) - a₁ * b₀) * b₀ :=
+        mul_le_mul_of_nonneg_left hxb₀ hK
+      nlinarith [mul_nonneg (mul_nonneg (sub_nonneg.2 hb) (sub_nonneg.2 ha₁b)) hb₀.le,
+        mul_nonneg hpos (sub_nonneg.2 hb₁)]
+  exact le_of_mul_le_mul_right (hg.trans hg2) (mul_pos hb₀ hb₁pos)
+
+/-- The arithmetic core of the two-statistic Simes bound. `x = P (B₀ ∩ B₁)`, `aⱼ = P (Aⱼ)`,
+`bⱼ = P (Bⱼ)`, `y₀ = P (A₀ ∩ B₁)`, `y₁ = P (A₁ ∩ B₀)`. -/
+lemma simes_two_arith {α x a₀ a₁ b₀ b₁ y₀ y₁ : ℝ} (hx : 0 ≤ x) (ha₀ : a₀ ≤ α / 2)
+    (ha₁ : a₁ ≤ α / 2) (hb₀ : b₀ ≤ α) (hb₁ : b₁ ≤ α) (hxb₀ : x ≤ b₀) (hxb₁ : x ≤ b₁)
+    (ha₀b : a₀ ≤ b₀) (ha₁b : a₁ ≤ b₁) (ha₀n : 0 ≤ a₀) (ha₁n : 0 ≤ a₁) (hy₀ : 0 ≤ y₀)
+    (hy₁ : 0 ≤ y₁) (h₀ : x * a₀ ≤ y₀ * b₀) (h₁ : x * a₁ ≤ y₁ * b₁) :
+    x + (a₀ - y₀) + (a₁ - y₁) ≤ α := by
+  rcases le_total b₀ b₁ with hb | hb
+  · exact simes_two_arith_aux hx ha₀ ha₁ hb₁ hxb₀ ha₀b ha₁b ha₀n ha₁n hy₀ hy₁ h₀ h₁ hb
+  · have := simes_two_arith_aux hx ha₁ ha₀ hb₀ hxb₁ ha₁b ha₀b ha₁n ha₀n hy₁ hy₀ h₁ h₀ hb
+    linarith
+
+variable {Ω : Type*} [MeasurableSpace Ω]
+
+/-- **Simes inequality for two two-sided z-tests with any correlation in `(-1, 1)`.** Let
+`W`, `ε 0`, `ε 1` be standard normal, `W` independent of the pair `(ε 0, ε 1)` and
+`ε 0` independent of `ε 1`, and `Z j = a j W + b j ε j` with `a j ^ 2 + b j ^ 2 = 1` and
+`b j ≠ 0`. Each `Z j` is standard normal and `Corr(Z 0, Z 1) = a 0 a 1`, which takes every
+value in `(-1, 1)` (the loadings may have either sign). For the two-sided p-values
+`p j = 2 (1 - Φ(|Z j|))` and every `α ≥ 0`, the Simes test (`p₍₁₎ ≤ α / 2` or `p₍₂₎ ≤ α`)
+rejects with probability at most `α`. -/
+theorem measure_simes_twoSided_oneFactor_two (P : Measure Ω) [IsProbabilityMeasure P]
+    (W : Ω → ℝ) (ε : Fin 2 → Ω → ℝ) (hW : Measurable W) (hε : ∀ j, Measurable (ε j))
+    (hWε : IndepFun W (fun ω => (ε 0 ω, ε 1 ω)) P) (hε01 : IndepFun (ε 0) (ε 1) P)
+    (hlawW : P.map W = gaussianReal 0 1) (hlawε : ∀ j, P.map (ε j) = gaussianReal 0 1)
+    (a b : Fin 2 → ℝ) (hab : ∀ j, a j ^ 2 + b j ^ 2 = 1) (hb : ∀ j, b j ≠ 0)
+    {α : ℝ} (hα : 0 ≤ α) :
+    P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf (gaussianReal 0 1) |a j * W ω + b j * ε j ω|)}
+      ≤ ENNReal.ofReal α := by
+  set N := gaussianReal 0 1 with hN
+  set U : ℝ → Set ℝ := fun t => {r | 2 * (1 - cdf N r) ≤ t} with hU
+  have hUm : ∀ t, MeasurableSet (U t) := fun t =>
+    measurableSet_le (((monotone_cdf N).measurable.const_sub 1).const_mul 2) measurable_const
+  have hUup : ∀ t x y, 0 ≤ x → x ≤ y → x ∈ U t → y ∈ U t := by
+    intro t x y _ hxy hx
+    have := monotone_cdf N hxy
+    simp only [hU, Set.mem_ofPred_eq] at hx ⊢
+    linarith
+  have hsubU : U (α / 2) ⊆ U α := by
+    intro x hx
+    simp only [hU, Set.mem_ofPred_eq] at hx ⊢
+    linarith
+  set A : Fin 2 → Set Ω := fun j => {ω | |a j * W ω + b j * ε j ω| ∈ U (α / 2)} with hA
+  set B : Fin 2 → Set Ω := fun j => {ω | |a j * W ω + b j * ε j ω| ∈ U α} with hB
+  have hZm : ∀ j, Measurable fun ω => a j * W ω + b j * ε j ω := fun j =>
+    (hW.const_mul _).add ((hε j).const_mul _)
+  have hmeasU : ∀ j t, MeasurableSet {ω | |a j * W ω + b j * ε j ω| ∈ U t} := fun j t =>
+    (measurable_norm.comp (hZm j)) (hUm t)
+  have hWj : ∀ j, IndepFun W (ε j) P := by
+    intro j
+    fin_cases j
+    · exact hWε.comp measurable_id measurable_fst
+    · exact hWε.comp measurable_id measurable_snd
+  have hvalid : ∀ j t, 0 ≤ t → P {ω | |a j * W ω + b j * ε j ω| ∈ U t} ≤ ENNReal.ofReal t :=
+    fun j t ht => isValidPValue_zTest_twoSided P _ (hZm j)
+      (map_oneFactor_gaussian P W (ε j) hW (hε j) (hWj j) hlawW (hlawε j) (hab j)) t ht
+  -- the rejection region
+  have hsub : {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf N |a j * W ω + b j * ε j ω|)} ⊆
+      (B 0 ∩ B 1) ∪ (A 0 \ B 1) ∪ (A 1 \ B 0) := by
+    intro ω hω
+    have hc := simes_two_cases _ hω
+    have hA0 : ω ∈ A 0 → ω ∈ B 0 := fun h => hsubU h
+    have hA1 : ω ∈ A 1 → ω ∈ B 1 := fun h => hsubU h
+    change (ω ∈ A 0 ∨ ω ∈ A 1) ∨ (ω ∈ B 0 ∧ ω ∈ B 1) at hc
+    simp only [Set.mem_union, Set.mem_inter_iff, Set.mem_sdiff]
+    tauto
+  -- the two key inequalities
+  have k₀ : P (B 0 ∩ B 1) * P (A 0) ≤ P (A 0 ∩ B 1) * P (B 0) :=
+    twoSided_key_ineq P hW (hε 0) (hε 1) hWε hε01 (hlawε 0) (hlawε 1) (a 0) (a 1) (hb 0) (hb 1)
+      (hUm α) (hUm (α / 2)) (hUm α) hsubU (hUup _) (hUup _)
+  have hWε' : IndepFun W (fun ω => (ε 1 ω, ε 0 ω)) P :=
+    hWε.comp measurable_id measurable_swap
+  have k₁ : P (B 1 ∩ B 0) * P (A 1) ≤ P (A 1 ∩ B 0) * P (B 1) :=
+    twoSided_key_ineq P hW (hε 1) (hε 0) hWε' hε01.symm (hlawε 1) (hlawε 0) (a 1) (a 0) (hb 1)
+      (hb 0) (hUm α) (hUm (α / 2)) (hUm α) hsubU (hUup _) (hUup _)
+  rw [Set.inter_comm (B 1)] at k₁
+  -- pass to real numbers
+  have hfin : ∀ s : Set Ω, P s ≠ ⊤ := fun s => measure_ne_top P s
+  have hdiff : ∀ i k, (P (A i \ B k)).toReal = (P (A i)).toReal - (P (A i ∩ B k)).toReal := by
+    intro i k
+    have h := measure_sdiff_add_inter (μ := P) (A i) (hmeasU k α)
+    have h' := congrArg ENNReal.toReal h
+    rw [ENNReal.toReal_add (hfin _) (hfin _)] at h'
+    linarith
+  have kr : ∀ {s t u v : Set Ω}, P s * P t ≤ P u * P v →
+      (P s).toReal * (P t).toReal ≤ (P u).toReal * (P v).toReal := by
+    intro s t u v h
+    have := ENNReal.toReal_mono (ENNReal.mul_ne_top (hfin _) (hfin _)) h
+    rwa [ENNReal.toReal_mul, ENNReal.toReal_mul] at this
+  have hval : ∀ j t, 0 ≤ t → (P {ω | |a j * W ω + b j * ε j ω| ∈ U t}).toReal ≤ t :=
+    fun j t ht => ENNReal.toReal_le_of_le_ofReal ht (hvalid j t ht)
+  have hmono : ∀ {s t : Set Ω}, s ⊆ t → (P s).toReal ≤ (P t).toReal := fun h =>
+    ENNReal.toReal_mono (hfin _) (measure_mono h)
+  have hreal : (P (B 0 ∩ B 1)).toReal + (P (A 0 \ B 1)).toReal + (P (A 1 \ B 0)).toReal ≤ α := by
+    rw [hdiff, hdiff]
+    have k₀' := kr k₀
+    have k₁' := kr k₁
+    exact simes_two_arith ENNReal.toReal_nonneg (hval 0 _ (by positivity))
+      (hval 1 _ (by positivity)) (hval 0 _ hα) (hval 1 _ hα) (hmono Set.inter_subset_left)
+      (hmono Set.inter_subset_right) (hmono fun ω h => hsubU h) (hmono fun ω h => hsubU h)
+      ENNReal.toReal_nonneg ENNReal.toReal_nonneg ENNReal.toReal_nonneg ENNReal.toReal_nonneg
+      (by linarith [k₀']) (by linarith [k₁'])
+  calc P {ω | 1 ≤ bhK α fun j => 2 * (1 - cdf N |a j * W ω + b j * ε j ω|)}
+      ≤ P ((B 0 ∩ B 1) ∪ (A 0 \ B 1) ∪ (A 1 \ B 0)) := measure_mono hsub
+    _ ≤ P (B 0 ∩ B 1) + P (A 0 \ B 1) + P (A 1 \ B 0) :=
+        (measure_union_le _ _).trans (by gcongr; exact measure_union_le _ _)
+    _ = ENNReal.ofReal ((P (B 0 ∩ B 1)).toReal + (P (A 0 \ B 1)).toReal +
+          (P (A 1 \ B 0)).toReal) := by
+        rw [ENNReal.ofReal_add (by positivity) ENNReal.toReal_nonneg,
+          ENNReal.ofReal_add ENNReal.toReal_nonneg ENNReal.toReal_nonneg,
+          ENNReal.ofReal_toReal (hfin _), ENNReal.ofReal_toReal (hfin _),
+          ENNReal.ofReal_toReal (hfin _)]
+    _ ≤ ENNReal.ofReal α := ENNReal.ofReal_le_ofReal hreal
+
+end SimesTwo
+
 end Applied.MultipleTesting
