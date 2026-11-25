@@ -26,7 +26,8 @@ textbook value. Tied p-values share the multiplier of the first position in the 
 the tie convention of `Applied.MultipleTesting.holm`; software that breaks ties by position
 reports adjusted p-values that are at most these.
 
-Not covered: adjusted p-values for the Hochberg and Hommel procedures; validity of the
+Not covered: adjusted p-values for the Hochberg procedure (Hommel-adjusted p-values, defined
+through closed testing, are in `Targets/Statistics/HommelAdjusted.lean`); validity of the
 adjusted p-values as p-values for the intersection hypotheses.
 -/
 
