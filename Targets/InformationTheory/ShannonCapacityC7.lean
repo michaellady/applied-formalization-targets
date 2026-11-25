@@ -65,8 +65,10 @@ the upper bound `(ϑ(C₇) + o(1))ⁿ` on `α(C₇^{⊠n})` can be improved to `
 the negation-type companion of `ShannonCapacityC7EqLovaszTheta`: a positive answer would give
 `Θ(C₇) < ϑ(C₇)`, and conversely. Its solved variant `green_38.variants.best_upper` (stated
 there with `sorry`) would follow from `shannonCapacityC7_le_lovaszTheta` and the bound
-`α(C₇^{⊠n}) ≤ ϑ(C₇)ⁿ` behind it. Both remarks need a bridge between their
-`LargestAdmissibleCardinality n` and `α(C₇^{⊠n})`, which is not formalized.
+`α(C₇^{⊠n}) ≤ ϑ(C₇)ⁿ` behind it. The bridge between their
+`LargestAdmissibleCardinality n` and `α(C₇^{⊠n})` is proved in
+`Applied/InformationTheory/LovaszBridge.lean` (`largestAdmissibleCardinality_eq`), together
+with `green_38.variants.best_upper` and `best_lower` in their definitions (copied verbatim).
 -/
 
 open Applied.InformationTheory

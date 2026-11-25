@@ -44,6 +44,11 @@ import Applied.Economics.StochasticGame
 import Applied.Economics.VCG
 import Applied.Economics.Vickrey
 import Applied.Economics.Welfare
+import Applied.Economics.EFXBridge
+import Applied.Economics.EFXSanity
+import Applied.Economics.PMMSSanity
+import Applied.Economics.MatroidSecretarySanity
+import Applied.Economics.SecretarySanity
 
 /-!
 # All of `Applied/Economics`
