@@ -31,7 +31,7 @@ correlation matrix, and let `p i = 2 (1 - Φ(|Z i|))` be the two-sided p-values.
     interval-arithmetic certificate over 1000 bins of `Z` and a grid of 7425 thresholds, run
     with the Arb library; the preprint states the proof was produced by a language model and
     checked by the author.
-  - Lei (arXiv:2607.14812v4, Theorem 2.1 and Proposition 2.3): for every `q ∈ (0, 1)` there
+  - Lei (arXiv:2607.14812v4, Theorem 2.1 and Propositions 2.2–2.3): for every `q ∈ (0, 1)` there
     are finite Gaussian models with positive definite correlation matrix whose false discovery
     rate is arbitrarily close to an explicit `ℓ₌(q) > q`, with
     `ℓ₌(q) = q √(log(1/q)) / (2 √π) + 0.6492828… q + o(q)`; so no bound of the form `C q` holds.
@@ -39,8 +39,17 @@ correlation matrix, and let `p i = 2 (1 - Φ(|Z i|))` be the two-sided p-values.
   in Lean: `not_bhTwoSidedGaussian` in `Targets/Statistics/BHTwoSidedCounterexample.lean` proves
   `¬ BHTwoSidedGaussian` from Dobriban's model at level `1/100` (false discovery rate above
   `0.0104` for all sufficiently large `N`, as in the preprint's Theorem 1), with a
-  finite-sample argument and a certificate checked by the Lean kernel. Lei's results are not
-  formalized. The `def` below is kept unchanged so that the refutation can refer to it.
+  finite-sample argument and a certificate checked by the Lean kernel. This establishes the
+  statement of the preprint's Theorem 1 by a different argument and a different certificate; it
+  does not check the preprint's own proof or its Arb certificate. The threshold `N₀` is not
+  explicit and, from the proof, astronomically large (about `10⁵⁰`; the mechanism involves
+  p-value thresholds near `10⁻¹⁷`), so nothing is proved here for any practical number of
+  hypotheses, and positive definiteness of the correlation matrix of the Lean witness is not
+  proved (the statement does not require it). Dobriban's Theorem 1 was formalized in Lean 4
+  before us, following the preprint's asymptotic proof, by L. Ramirez
+  (github.com/Mnehmos/BHFormalization, July 2026, `GaussianBHCounterexample`; read, not built by
+  us); that project does not state the general conjecture or its negation. Lei's results are
+  not formalized. The `def` below is kept unchanged so that the refutation can refer to it.
 
 Both are written as propositions, not theorems, so nothing here asserts them. The first is
 open; the second is false (see above).
