@@ -29,6 +29,9 @@ Not covered: the coding theorem for `0 < e < 1`; erasure channels over larger al
 The converse `opCapacity (memoryless (bec e)) ≤ (1 - e) log 2` is in
 `Targets/InformationTheory/ChannelCodingConverse.lean`, and the full coding theorem at the
 degenerate endpoints `e = 0, 1` is in `Targets/InformationTheory/BecCodingEndpoints.lean`.
+For `0 ≤ e ≤ 1`, every rate `R < ½ log (2 / (1 + e))` (half the cutoff rate, strictly below
+capacity for `e < 1`) is shown achievable in
+`Targets/InformationTheory/BecCutoffRateAchievability.lean`.
 -/
 
 namespace Targets.InformationTheory

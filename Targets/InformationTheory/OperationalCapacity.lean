@@ -69,7 +69,8 @@ converse half `opCapacity (memoryless W) ≤ capacity W`, together with the weak
 general (only for the binary erasure channel at the degenerate endpoints `e = 0, 1`, in
 `Targets/InformationTheory/BecCodingEndpoints.lean`, and for the BSC at `q = 0, 1/2, 1` and
 letter-wise zero-error-decodable channels, in
-`Targets/InformationTheory/ZeroErrorCodingEndpoints.lean`). Also
+`Targets/InformationTheory/ZeroErrorCodingEndpoints.lean`; a positive but sub-capacity
+achievable rate for the BEC is in `Targets/InformationTheory/BecCutoffRateAchievability.lean`). Also
 not covered: the equivalence of maximal and average error criteria; strong converses.
 -/
 
