@@ -38,14 +38,19 @@ namespace Applied.Probability
 /-- The sign `±1` coded by a Boolean: `true ↦ -1`, `false ↦ 1`. -/
 def sg (b : Bool) : ℝ := if b then -1 else 1
 
+/-- `true` codes the sign `-1`. -/
 @[simp] lemma sg_true : sg true = -1 := by simp [sg]
 
+/-- `false` codes the sign `+1`. -/
 @[simp] lemma sg_false : sg false = 1 := by simp [sg]
 
+/-- A sign squares to one. -/
 lemma sg_mul_self (b : Bool) : sg b * sg b = 1 := by cases b <;> simp
 
+/-- Multiplying signs corresponds to `xor` of their codes. -/
 lemma sg_xor (a b : Bool) : sg (xor a b) = sg a * sg b := by cases a <;> cases b <;> simp
 
+/-- A sign has absolute value one. -/
 lemma abs_sg (b : Bool) : |sg b| = 1 := by cases b <;> simp
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -54,11 +59,15 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 noncomputable def signSum (M : ι → ι → ℝ) (w : ι → ℝ) : ℝ :=
   ∑ σ : ι → Bool, Real.exp (∑ i, ∑ j, M i j * (sg (σ i) * w i) * (sg (σ j) * w j))
 
+/-- The sign sum is a sum of exponentials, hence positive. -/
 lemma signSum_pos (M : ι → ι → ℝ) (w : ι → ℝ) : 0 < signSum M w :=
   Finset.sum_pos (fun _ _ => Real.exp_pos _) Finset.univ_nonempty
 
 section Ginibre
 
+/-- For `a, b ≥ 0`:
+`(-a) ^ m * (-b) ^ n + (-b) ^ m * (-a) ^ n + b ^ m * a ^ n + a ^ m * b ^ n ≥ 0`
+(the two negative-sign terms are cancelled by the two positive ones when `m + n` is odd). -/
 lemma four_term_nonneg {a b : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b) (m n : ℕ) :
     0 ≤ (-a) ^ m * (-b) ^ n + (-b) ^ m * (-a) ^ n + (b ^ m * a ^ n + a ^ m * b ^ n) := by
   have hX : 0 ≤ a ^ m * b ^ n := mul_nonneg (pow_nonneg ha m) (pow_nonneg hb n)
@@ -103,15 +112,18 @@ def ginibreCone (u v : ι → ℝ) : Subsemiring ((ι → Bool × Bool) → ℝ)
     ({F | ∃ c : ℝ, 0 ≤ c ∧ F = fun _ => c} ∪ Set.range (pF u v) ∪ Set.range (qF u v))
 
 omit [Fintype ι] [DecidableEq ι] in
+/-- Non-negative constants lie in the cone. -/
 lemma const_mem_ginibreCone (u v : ι → ℝ) {c : ℝ} (hc : 0 ≤ c) :
     (fun _ => c) ∈ ginibreCone u v :=
   Subsemiring.subset_closure (Or.inl (Or.inl ⟨c, hc, rfl⟩))
 
 omit [Fintype ι] [DecidableEq ι] in
+/-- The rotated variables `p i` lie in the cone. -/
 lemma pF_mem_ginibreCone (u v : ι → ℝ) (i : ι) : pF u v i ∈ ginibreCone u v :=
   Subsemiring.subset_closure (Or.inl (Or.inr ⟨i, rfl⟩))
 
 omit [Fintype ι] [DecidableEq ι] in
+/-- The rotated variables `q i` lie in the cone. -/
 lemma qF_mem_ginibreCone (u v : ι → ℝ) (i : ι) : qF u v i ∈ ginibreCone u v :=
   Subsemiring.subset_closure (Or.inr ⟨i, rfl⟩)
 
@@ -171,10 +183,12 @@ lemma sum_mul_sum_config (f g : (ι → Bool) → ℝ) :
   exact ((Equiv.arrowProdEquivProdArrow ι (fun _ => Bool) (fun _ => Bool)).sum_comp
     (fun p : (ι → Bool) × (ι → Bool) => f p.1 * g p.2)).symm
 
+/-- The exponential series of a real number. -/
 lemma hasSum_exp_real (a : ℝ) : HasSum (fun n : ℕ => a ^ n / (n ! : ℝ)) (Real.exp a) := by
   rw [Real.exp_eq_exp_ℝ]
   exact NormedSpace.expSeries_div_hasSum_exp a
 
+/-- `1 - (-1) ^ m` is `0` or `2`, hence non-negative. -/
 lemma one_sub_neg_one_pow_nonneg (m : ℕ) : (0 : ℝ) ≤ 1 - (-1) ^ m := by
   rcases neg_one_pow_eq_or ℝ m with h | h <;> rw [h] <;> norm_num
 

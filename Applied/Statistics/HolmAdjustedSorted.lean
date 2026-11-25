@@ -10,6 +10,16 @@ textbook `max_{l ≤ k} (m - l) p_(σ l)` (in 1-based terms `max_{j ≤ k+1} (m 
 and the capped version equals `max_{l ≤ k} min(1, (m - l) p_(σ l))`.
 
 * `holmAdjusted_sorted`, `min_one_holmAdjusted_sorted`.
+
+Non-negativity is needed only because of ties. `holmAdjusted` gives every p-value of a tie block
+the multiplier `m - f` of the block's first position `f`, while the sorted formula has one term
+`(m - l) p` per tied position `l ≥ f`, with smaller multipliers. For `p ≥ 0` those extra terms
+are dominated; for `p < 0` they are larger and the two maxima can differ (`m = 2`,
+`p = (-1, -1)`: `-2` against `-1`).
+
+Related: `HolmAdjusted` (definition and the characterisation "rejected iff adjusted p-value
+`≤ α`"), `SortedProcedures` (sorting permutations `IsSorting`, sorted form of `holm` itself).
+Not here: sorted formulas for Hochberg-, Hommel- or Benjamini–Hochberg-adjusted p-values.
 -/
 
 open Finset

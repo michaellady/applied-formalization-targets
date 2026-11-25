@@ -7,6 +7,10 @@ import Mathlib.MeasureTheory.Constructions.BorelSpace.Order
 /-!
 # The Benjamini–Hochberg procedure
 
+The step-up procedure of Benjamini and Hochberg (1995) and its false discovery rate under
+independence. Notation as in `Applied.Statistics.MultipleTesting`; `m₀ = |H₀|` is the number of
+true nulls.
+
 ## Deterministic part
 
 For a vector of p-values `q : ι → ℝ` with `m = |ι|`:
@@ -16,13 +20,39 @@ For a vector of p-values `q : ι → ℝ` with `m = |ι|`:
 * `bhReject α q`: the rejected hypotheses, those with `q j ≤ α (bhK α q) / m`.
 * `bhK_update_eq`: the leave-one-out lemma. If hypothesis `i` is rejected, setting its p-value
   to zero does not change the number of rejections.
+* `fdp H₀ R`: the false discovery proportion `|R ∩ H₀| / |R|` of a rejection set (`0 / 0 = 0`).
 * `fdp_bhReject_le`: pointwise bound on the false discovery proportion.
+
+## Probabilistic part
+
+* `fdr P H₀ R`: the false discovery rate, the expectation of `fdp H₀ (R ω)`.
+* `fdr_bhReject_le`: the **Benjamini–Hochberg theorem**. If every true-null p-value is valid and
+  independent of the vector of the other p-values, the procedure at level `α ≥ 0` has false
+  discovery rate at most `α m₀ / m`. Nothing is assumed about the false nulls or about
+  dependence among them.
+* `fdr_bhReject_le_of_iIndepFun`: the textbook corollary for mutually independent p-values,
+  with the bound `α`.
+
+## Conventions
 
 `bhReject` is written without sorting; `bhSorted_eq_bhReject` in
 `Applied.Statistics.SortedProcedures` proves that it agrees with the textbook step-up rule on
 sorted p-values (for `α ≥ 0`, any tie-breaking). `fdr_bhReject_eq` in
 `Applied.Statistics.SimesExact` shows that the bound `α m₀ / m` is attained for exactly uniform
 independent null p-values.
+
+## Related files
+
+* `BHMonotone`: the number of rejections equals `bhK`; monotonicity in the p-values.
+* `BenjaminiYekutieli`: arbitrary dependence, with the harmonic factor.
+* `PRDS`: positive dependence, with the same bound `α m₀ / m`.
+* `Simes`: the Simes test is the event `1 ≤ bhK α q`.
+* `StepUpAdjusted`: Benjamini–Hochberg-adjusted p-values.
+
+## Not in this file
+
+Adaptive procedures that estimate `m₀` (Storey; Benjamini–Krieger–Yekutieli), weighted
+Benjamini–Hochberg, and control of the false discovery proportion in probability.
 -/
 
 open Finset
@@ -56,11 +86,13 @@ noncomputable def fdp [DecidableEq ι] (H₀ R : Finset ι) : ℝ≥0∞ :=
 
 variable {α}
 
+/-- The cut-off index is at most the number `m` of hypotheses. -/
 lemma bhK_le (q : ι → ℝ) : bhK α q ≤ Fintype.card ι := by
   refine Finset.sup_le fun k hk => ?_
   have : k ≤ Fintype.card ι := Nat.lt_succ_iff.mp (mem_range.mp hk)
   split_ifs <;> omega
 
+/-- At the cut-off `k = bhK α q`, at least `k` p-values are at most `α k / m`. -/
 lemma bhK_le_bhCount (q : ι → ℝ) : bhK α q ≤ bhCount α q (bhK α q) := by
   obtain ⟨k, -, hk⟩ := Finset.exists_mem_eq_sup (range (Fintype.card ι + 1)) nonempty_range_add_one
     (fun k => if k ≤ bhCount α q k then k else 0)
@@ -71,12 +103,15 @@ lemma bhK_le_bhCount (q : ι → ℝ) : bhK α q ≤ bhCount α q (bhK α q) := 
   · simp only [h, ↓reduceIte] at hk'
     rw [hk']; exact Nat.zero_le _
 
+/-- Any `k ≤ m` such that at least `k` p-values are at most `α k / m` is at most the cut-off. -/
 lemma le_bhK (q : ι → ℝ) {k : ℕ} (hk : k ≤ Fintype.card ι) (h : k ≤ bhCount α q k) :
     k ≤ bhK α q := by
   have h1 : k = (fun k => if k ≤ bhCount α q k then k else 0) k := by simp [h]
   exact h1.le.trans (Finset.le_sup (f := fun k => if k ≤ bhCount α q k then k else 0)
     (mem_range.mpr (Nat.lt_succ_iff.mpr hk)))
 
+/-- The procedure rejects at least `bhK α q` hypotheses (exactly that many for `α ≥ 0`:
+`card_bhReject` in `Applied.Statistics.BHMonotone`). -/
 lemma bhK_le_card_bhReject (q : ι → ℝ) : bhK α q ≤ (bhReject α q).card :=
   bhK_le_bhCount q
 
@@ -182,6 +217,7 @@ noncomputable def fdr (P : Measure Ω) (H₀ : Finset ι) (R : Ω → Finset ι)
   ∫⁻ ω, fdp H₀ (R ω) ∂P
 
 omit [DecidableEq ι] in
+/-- The count `bhCount α q k` is a measurable function of the vector of p-values. -/
 lemma measurable_bhCount (k : ℕ) : Measurable fun q : ι → ℝ => bhCount α q k := by
   classical
   have : (fun q : ι → ℝ => bhCount α q k)
@@ -193,6 +229,7 @@ lemma measurable_bhCount (k : ℕ) : Measurable fun q : ι → ℝ => bhCount α
       measurable_const measurable_const
 
 omit [DecidableEq ι] in
+/-- The cut-off index `bhK α q` is a measurable function of the vector of p-values. -/
 lemma measurable_bhK : Measurable fun q : ι → ℝ => bhK α q := by
   have hterm : ∀ k : ℕ, Measurable fun q : ι → ℝ => if k ≤ bhCount α q k then k else 0 :=
     fun k => Measurable.ite (measurableSet_le measurable_const (measurable_bhCount k))

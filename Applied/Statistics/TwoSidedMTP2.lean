@@ -43,18 +43,22 @@ section Folding
 def flip (σ : ι → Bool) (z : ι → ℝ) : ι → ℝ := fun i => sg (σ i) * z i
 
 omit [Fintype ι] [DecidableEq ι] in
+/-- A coordinatewise sign change is an involution. -/
 lemma flip_flip (σ : ι → Bool) (z : ι → ℝ) : flip σ (flip σ z) = z := by
   funext i
   simp only [flip]
   rw [← mul_assoc, sg_mul_self, one_mul]
 
 omit [Fintype ι] [DecidableEq ι] in
+/-- A coordinatewise sign change is measurable. -/
 lemma measurable_flip (σ : ι → Bool) : Measurable (flip σ) :=
   measurable_pi_iff.mpr fun i => (measurable_pi_apply i).const_mul _
 
+/-- A sign is non-zero. -/
 lemma sg_ne_zero (b : Bool) : sg b ≠ 0 := by cases b <;> simp
 
 omit [DecidableEq ι] in
+/-- A coordinatewise sign change preserves Lebesgue measure on `ℝ^ι`. -/
 lemma measurePreserving_flip (σ : ι → Bool) :
     MeasurePreserving (flip σ) (Measure.pi fun _ : ι => (volume : Measure ℝ))
       (Measure.pi fun _ : ι => (volume : Measure ℝ)) := by
@@ -67,6 +71,7 @@ lemma measurePreserving_flip (σ : ι → Bool) :
 def posOrthant : Set (ι → ℝ) := {w | ∀ i, 0 < w i}
 
 omit [DecidableEq ι] in
+/-- The open positive orthant is measurable. -/
 lemma measurableSet_posOrthant : MeasurableSet (posOrthant : Set (ι → ℝ)) := by
   have : (posOrthant : Set (ι → ℝ)) = ⋂ i, {w | 0 < w i} := by
     ext w; simp [posOrthant]
@@ -170,12 +175,15 @@ noncomputable def gaussDensity (C : ℝ≥0∞) (B : ι → ι → ℝ) (z : ι 
   C * ENNReal.ofReal (Real.exp (-(1 / 2) * ∑ i, ∑ j, B i j * z i * z j))
 
 omit [DecidableEq ι] in
+/-- The (unnormalised) normal density is measurable. -/
 lemma measurable_gaussDensity (C : ℝ≥0∞) (B : ι → ι → ℝ) : Measurable (gaussDensity C B) := by
   unfold gaussDensity
   refine measurable_const.mul (ENNReal.measurable_ofReal.comp (Real.measurable_exp.comp
     (measurable_const.mul (Finset.measurable_sum _ fun i _ => Finset.measurable_sum _ fun j _ =>
       (measurable_const.mul (measurable_pi_apply i)).mul (measurable_pi_apply j)))))
 
+/-- The sum of the normal density over all sign changes of `w` is the sign sum `signSum` of
+`Applied/Statistics/IsingMTP2.lean` with matrix `-B / 2`, times the constant. -/
 lemma sum_gaussDensity_flip (C : ℝ≥0∞) (B : ι → ι → ℝ) (w : ι → ℝ) :
     ∑ σ : ι → Bool, gaussDensity C B (flip σ w) =
       C * ENNReal.ofReal (signSum (fun i j => -(B i j) / 2) w) := by
@@ -195,6 +203,7 @@ lemma sum_gaussDensity_flip (C : ℝ≥0∞) (B : ι → ι → ℝ) (w : ι →
 noncomputable def foldedGaussDensity (C : ℝ≥0∞) (B : ι → ι → ℝ) (w : ι → ℝ) : ℝ≥0∞ :=
   posOrthant.indicator 1 w * ∑ σ : ι → Bool, gaussDensity C B (flip σ w)
 
+/-- The folded normal density is measurable. -/
 lemma measurable_foldedGaussDensity (C : ℝ≥0∞) (B : ι → ι → ℝ) :
     Measurable (foldedGaussDensity C B) :=
   (measurable_one.indicator measurableSet_posOrthant).mul

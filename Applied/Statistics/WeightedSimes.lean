@@ -11,10 +11,11 @@ The weighted Simes test of an intersection hypothesis `I` with weights `w I i` r
 some `i ∈ I` has `p i ≤ α * ∑ {w I l : l ∈ I, p l ≤ p i}` (`weightedSimesLocal`).
 
 * `measure_weightedSimes_le_of_prds`: for a finite family of valid p-values that is positively
-  regression dependent in the sense of `IsPRDSOn` (the conditioning-on-`p i ≤ t` form of
-  Blanchard and Roquain, not the classical definition), non-negative weights with sum at most
+  regression dependent in the sense of `IsPRDSOn` (the conditioning-on-`p i ≤ t` consequence of
+  PRDS, the definition of Ramdas et al. 2019, sometimes called weak PRDS; implied by the
+  classical definition, `IsClassicalPRDSOn.isPRDSOn`), non-negative weights with sum at most
   one and `α ≥ 0`, the weighted Simes test rejects with probability at most `α`.
-  The proof is the self-consistency argument of Blanchard and Roquain (2008) with the
+  The proof is the self-consistency argument of Blanchard and Roquain (2008, Theorem 4.1 and Lemma 3.2 (ii)) with the
   weighted volume `wsVolume` of the weighted step-up procedure; its algebraic core is
   `prds_core_finset`.
 * `measure_weightedSimesLocal_le_of_prds`, `measure_weightedSimesLocal_le` (independence).

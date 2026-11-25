@@ -16,6 +16,12 @@ hypotheses containing `i`.
 * `hommelAdjusted p ω i = max_{S ∋ i} simesPValue p ω S` (not capped at one).
 * `mem_hommel_iff_hommelAdjusted_le`: for `α ≥ 0`, Hommel's procedure rejects `i` iff its
   adjusted p-value is at most `α`. `mem_hommel_mono`, `le_hommelAdjusted`.
+
+Related: `Simes` (`simesLocal`, `hommel` and its family-wise error rate), `StepUpAdjusted`
+(Hochberg-adjusted p-values).
+Not in this file: Hommel's sorted shortcut formula for the adjusted p-values (the definition
+here ranges over all intersection hypotheses), and any probabilistic statement about adjusted
+p-values.
 -/
 
 open Finset
@@ -37,6 +43,7 @@ noncomputable def simesPValue (p : ι → Ω → ℝ) (ω : Ω) (S : Finset ι) 
   else 0
 
 omit [Fintype ι] [DecidableEq ι] in
+/-- For `j ∈ S` the count `#{l ∈ S | p l ≤ p j}` is positive (it counts `j` itself). -/
 lemma simesCount_pos (p : ι → Ω → ℝ) (ω : Ω) {S : Finset ι} {j : ι} (hj : j ∈ S) :
     0 < simesCount p ω S j := by
   classical
@@ -101,6 +108,8 @@ noncomputable def hommelAdjusted (p : ι → Ω → ℝ) (ω : Ω) (i : ι) : �
     (show (univ.filter fun S : Finset ι => i ∈ S).Nonempty from
       ⟨{i}, mem_filter.mpr ⟨mem_univ _, mem_singleton_self i⟩⟩) (simesPValue p ω)
 
+/-- The Hommel-adjusted p-value is at most `a` iff the Simes p-value of every intersection
+hypothesis containing `i` is. -/
 lemma hommelAdjusted_le_iff (p : ι → Ω → ℝ) (ω : Ω) (i : ι) (a : ℝ) :
     hommelAdjusted p ω i ≤ a ↔ ∀ S : Finset ι, i ∈ S → simesPValue p ω S ≤ a := by
   unfold hommelAdjusted

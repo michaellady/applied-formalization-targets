@@ -15,6 +15,18 @@ at most one, and is rejected when some `p i ≤ w I i * α`.
 * `SeqRejectable.subset_closedTest` and `closedTest_eq_of_seqRejectable_of_stuck`: when the
   weights are monotone (they can only grow as hypotheses are removed), the sequential
   procedure rejects exactly what the closed test rejects, whatever order it proceeds in.
+* `fwer_seqRejectable_le`: hence every set reached by the sequential procedure has family-wise
+  error rate at most `α`.
+
+In Lean, a family of weights is `w : Finset ι → ι → ℝ` (`w I i` is the weight of `i` in the
+intersection hypothesis `I`; values for `i ∉ I` are never used), `weightedLocal α w p I` is the
+local test, `MonotoneWeights w` says `w I i ≤ w J i` for `i ∈ J ⊆ I`, and `Stuck α w q J` says
+that no hypothesis of `J` can be rejected with the weights of `J`.
+
+Related: `Shortcuts` (Holm and fallback weights), `GraphicalApproach` (weights defined by a
+graph), `WeightedSimes` (weighted Simes local tests in place of weighted Bonferroni ones).
+Not here: existence of a maximal sequentially rejectable set as a function of the data (the
+results are stated for any reachable set), and adjusted p-values.
 -/
 
 open MeasureTheory Finset

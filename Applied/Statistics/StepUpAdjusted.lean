@@ -13,13 +13,19 @@ formulas for the hypothesis at position `r` are
 usually capped at one. Here they are written without sorting:
 
 * `hochbergAdjusted p ω i`: the minimum of `(#{l | p j < p l} + 1) * p j` over `j` with
-  `p i ≤ p j` (tied p-values use the multiplier of the last position in the tie); `mem_hochberg_iff_hochbergAdjusted_le`: `hochberg α p` rejects `i` exactly when
-  this is at most `α`.
+  `p i ≤ p j` (tied p-values use the multiplier of the last position in the tie);
+  `mem_hochberg_iff_hochbergAdjusted_le`: `hochberg α p` rejects `i` exactly when this is at
+  most `α`.
 * `bhAdjusted q i`: the minimum of `m / #{l | q l ≤ q j} * q j` over `j` with `q i ≤ q j`;
   `mem_bhReject_iff_bhAdjusted_le`: for `α ≥ 0`, `bhReject α q` rejects `i` exactly when this
   is at most `α`.
 
 No cap at one is applied; the capped versions are equivalent for levels `α < 1`.
+
+Related: `HolmAdjusted` (step-down), `HommelAdjusted` (closed Simes test), `Simes` and
+`BenjaminiHochberg` (the procedures themselves and their error rates).
+Not in this file: the sorted formulas `min_{l ≥ r} …` as theorems about a sorting permutation
+(only the sort-free forms are proved), and any probabilistic statement about adjusted p-values.
 -/
 
 open Finset
@@ -36,6 +42,7 @@ there are no ties; tied p-values share the multiplier of the last position in th
 noncomputable def hochbergFactor (p : ι → Ω → ℝ) (ω : Ω) (j : ι) : ℝ :=
   ((univ.filter fun l => p j ω < p l ω).card : ℝ) + 1
 
+/-- The Hochberg multiplier is at least one. -/
 lemma one_le_hochbergFactor (p : ι → Ω → ℝ) (ω : Ω) (j : ι) : 1 ≤ hochbergFactor p ω j := by
   unfold hochbergFactor
   exact le_add_of_nonneg_left (Nat.cast_nonneg _)
@@ -48,12 +55,14 @@ noncomputable def hochbergAdjusted (p : ι → Ω → ℝ) (ω : Ω) (i : ι) : 
       ⟨i, mem_filter.mpr ⟨mem_univ i, le_rfl⟩⟩)
     fun j => hochbergFactor p ω j * p j ω
 
+/-- The Hochberg-adjusted p-value is at most `a` iff some term of the minimum is. -/
 lemma hochbergAdjusted_le_iff (p : ι → Ω → ℝ) (ω : Ω) (i : ι) (a : ℝ) :
     hochbergAdjusted p ω i ≤ a ↔ ∃ j, p i ω ≤ p j ω ∧ hochbergFactor p ω j * p j ω ≤ a := by
   unfold hochbergAdjusted
   rw [Finset.inf'_le_iff]
   simp
 
+/-- `a` is at most the Hochberg-adjusted p-value iff it is at most every term of the minimum. -/
 lemma le_hochbergAdjusted_iff (p : ι → Ω → ℝ) (ω : Ω) (i : ι) (a : ℝ) :
     a ≤ hochbergAdjusted p ω i ↔ ∀ j, p i ω ≤ p j ω → a ≤ hochbergFactor p ω j * p j ω := by
   unfold hochbergAdjusted
@@ -131,12 +140,15 @@ noncomputable def bhAdjusted (q : ι → ℝ) (i : ι) : ℝ :=
       ⟨i, mem_filter.mpr ⟨mem_univ i, le_rfl⟩⟩)
     fun j => bhFactor q j * q j
 
+/-- The Benjamini–Hochberg-adjusted p-value is at most `a` iff some term of the minimum is. -/
 lemma bhAdjusted_le_iff (q : ι → ℝ) (i : ι) (a : ℝ) :
     bhAdjusted q i ≤ a ↔ ∃ j, q i ≤ q j ∧ bhFactor q j * q j ≤ a := by
   unfold bhAdjusted
   rw [Finset.inf'_le_iff]
   simp
 
+/-- `a` is at most the Benjamini–Hochberg-adjusted p-value iff it is at most every term of the
+minimum. -/
 lemma le_bhAdjusted_iff (q : ι → ℝ) (i : ι) (a : ℝ) :
     a ≤ bhAdjusted q i ↔ ∀ j, q i ≤ q j → a ≤ bhFactor q j * q j := by
   unfold bhAdjusted
