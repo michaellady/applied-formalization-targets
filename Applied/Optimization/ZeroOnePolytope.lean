@@ -22,6 +22,10 @@ A *0/1-point* of `ℝ ^ d` is a point all of whose coordinates are `0` or `1`. F
   `hammingDist u v` edges of `convexHull ℝ S`.
 * `naddef`: two vertices of a 0/1-polytope in `ℝ ^ d` are joined by a walk of at most `d`
   edges.
+* Tightness for the cube `zeroOneCube d` (all 0/1-points): an edge of its hull changes at most
+  one coordinate (`hammingDist_le_one_of_adjVertices_cube`), so a walk from `u` to `v` has at
+  least `hammingDist u v` edges (`hammingDist_le_of_vertexDistLE_cube`), and `0`, `1` are at
+  distance exactly `d` (`cube_not_vertexDistLE_lt`).
 
 The proof is Naddef's induction, organised as induction on the Hamming distance with `S` fixed:
 among the points `w ≠ u` of `S` that agree with `u` wherever `u` and `v` agree, take one with
@@ -290,5 +294,94 @@ theorem naddef {S : Set (Fin d → ℝ)} (hS : ∀ s ∈ S, IsZeroOne s) {u v : 
   rw [extremePoints_convexHull_zeroOne hS] at hu hv
   exact (vertexDistLE_hammingDist_zeroOne hS hu hv).mono
     (hammingDist_le_card_fintype.trans (by simp))
+
+/-! ### Tightness: the cube -/
+
+/-- The set of all 0/1-points of `ℝ ^ d`; its convex hull is the unit cube. -/
+def zeroOneCube (d : ℕ) : Set (Fin d → ℝ) := {x | IsZeroOne x}
+
+/-- Naddef's bound for the cube: any two 0/1-points are joined by a walk of at most
+`hammingDist u v` edges of `convexHull ℝ (zeroOneCube d)`. -/
+theorem cube_vertexDistLE_hammingDist {u v : Fin d → ℝ} (hu : IsZeroOne u) (hv : IsZeroOne v) :
+    VertexDistLE (convexHull ℝ (zeroOneCube d)) u v (hammingDist u v) :=
+  vertexDistLE_hammingDist_zeroOne (fun _ hs => hs) hu hv
+
+/-- The endpoints of an edge of the cube differ in at most one coordinate. -/
+theorem hammingDist_le_one_of_adjVertices_cube {a b : Fin d → ℝ}
+    (h : AdjVertices (convexHull ℝ (zeroOneCube d)) a b) : hammingDist a b ≤ 1 := by
+  classical
+  have hext := extremePoints_convexHull_zeroOne (S := zeroOneCube d) (fun _ hs => hs)
+  have ha : IsZeroOne a := by have := h.2.1; rw [hext] at this; exact this
+  have hb : IsZeroOne b := by have := h.2.2.1; rw [hext] at this; exact this
+  by_contra hlt
+  push Not at hlt
+  have h2 : 1 < (Finset.univ.filter fun k => a k ≠ b k).card := hlt
+  obtain ⟨i, hi, j, hj, hij⟩ := Finset.one_lt_card.1 h2
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hi hj
+  set a' := Function.update a i (b i) with ha'
+  set b' := Function.update b i (a i) with hb'
+  have h01 : ∀ (x : Fin d → ℝ) (c : ℝ), IsZeroOne x → (c = 0 ∨ c = 1) →
+      Function.update x i c ∈ zeroOneCube d := by
+    intro x c hx hc k
+    by_cases hk : k = i
+    · subst hk; simpa using hc
+    · rw [Function.update_of_ne hk]; exact hx k
+  have ha'S : a' ∈ convexHull ℝ (zeroOneCube d) := subset_convexHull ℝ _ (h01 a _ ha (hb i))
+  have hb'S : b' ∈ convexHull ℝ (zeroOneCube d) := subset_convexHull ℝ _ (h01 b _ hb (ha i))
+  have hmid : (1 / 2 : ℝ) • a + (1 / 2 : ℝ) • b = (1 / 2 : ℝ) • a' + (1 / 2 : ℝ) • b' := by
+    funext k
+    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, ha', hb']
+    by_cases hk : k = i
+    · subst hk; simp; ring
+    · simp [Function.update_of_ne hk]
+  have hmseg : (1 / 2 : ℝ) • a + (1 / 2 : ℝ) • b ∈ segment ℝ a b :=
+    ⟨1 / 2, 1 / 2, by norm_num, by norm_num, by norm_num, rfl⟩
+  have hmopen : (1 / 2 : ℝ) • a + (1 / 2 : ℝ) • b ∈ openSegment ℝ a' b' :=
+    ⟨1 / 2, 1 / 2, by norm_num, by norm_num, by norm_num, hmid.symm⟩
+  obtain ⟨s, t, hs, ht, hst, hcomb⟩ := h.2.2.2.left_mem_of_mem_openSegment ha'S hb'S hmseg hmopen
+  have ci := congrFun hcomb i
+  have cj := congrFun hcomb j
+  simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, ha', Function.update_self,
+    Function.update_of_ne (Ne.symm hij)] at ci cj
+  -- coordinate `i` forces `t = 1`, coordinate `j` forces `t = 0`
+  have hs' : s = 1 - t := by linarith
+  subst hs'
+  have hti : (1 - t) * (b i - a i) = 0 := by linarith
+  have htj : t * (b j - a j) = 0 := by linarith
+  rcases mul_eq_zero.1 hti with h1 | h1
+  · rcases mul_eq_zero.1 htj with h3 | h3
+    · linarith
+    · exact hj (by linarith)
+  · exact hi (by linarith)
+
+/-- In the cube, a walk of at most `N` edges from `u` to `v` forces `hammingDist u v ≤ N`. -/
+theorem hammingDist_le_of_vertexDistLE_cube {u v : Fin d → ℝ} {N : ℕ}
+    (h : VertexDistLE (convexHull ℝ (zeroOneCube d)) u v N) : hammingDist u v ≤ N := by
+  classical
+  obtain ⟨p, hp0, k, hk, hpk, hp⟩ := h
+  have key : ∀ i ≤ k, hammingDist u (p i) ≤ i := by
+    intro i
+    induction i with
+    | zero => intro _; rw [hp0, hammingDist_self]
+    | succ i ih =>
+      intro hi
+      have h1 := ih (by omega)
+      have h2 := hammingDist_le_one_of_adjVertices_cube (hp i (by omega))
+      have h3 := hammingDist_triangle u (p i) (p (i + 1))
+      omega
+  have := key k le_rfl
+  rw [hpk] at this
+  omega
+
+/-- Naddef's bound is attained: in the cube, the 0/1-points `0` and `1` are not joined by any
+walk of fewer than `d` edges. -/
+theorem cube_not_vertexDistLE_lt {N : ℕ} (hN : N < d) :
+    ¬ VertexDistLE (convexHull ℝ (zeroOneCube d)) (fun _ => 0) (fun _ => 1) N := by
+  classical
+  intro h
+  have := hammingDist_le_of_vertexDistLE_cube h
+  have hd : hammingDist (fun _ : Fin d => (0 : ℝ)) (fun _ => 1) = d := by
+    simp [hammingDist]
+  omega
 
 end Applied.Optimization
