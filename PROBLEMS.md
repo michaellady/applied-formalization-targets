@@ -94,7 +94,11 @@ foundations are the real next piece of work for this group.
 | Kelly criterion | done | Almost-sure growth interpretation |
 | Minimax theorem for matrix games | done | — |
 | Stable matchings: opposition of interests | partial | Existence of the proposer-optimal matching; lattice structure |
-| Remaining backlog entries (about 18) | todo | Not yet stated |
+| AdaBoost training-error bound | done | Optimality of the vote weights |
+| Frank–Wolfe O(1/k) rate | done | Existence of the linear minimiser |
+| Approximate differential privacy: post-processing, adaptive composition | done | Advanced composition; Gaussian mechanism |
+| Projected online gradient descent; stochastic gradient descent in expectation | done | Decreasing step sizes; high-probability bounds |
+| Remaining backlog entries (about 14) | todo | Not yet stated |
 
 ## After the tracker is worked through
 
