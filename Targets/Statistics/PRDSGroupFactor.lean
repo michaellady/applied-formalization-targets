@@ -14,7 +14,7 @@ import Applied.Statistics.PRDSFactorModels
 Informal statement. Throughout, `P` is a probability measure, the hypotheses are indexed by a
 finite type `ι`, the groups by a finite type `κ`, `Φ` is the standard normal distribution
 function, and "positively regression dependent" means `Applied.MultipleTesting.IsPRDSOn`: the
-conditioning-on-`pᵢ ≤ t` form of Blanchard and Roquain (weak PRDS), cleared of denominators,
+conditioning-on-`pᵢ ≤ t` form (the definition of Ramdas et al. 2019, Def. 1; weak PRDS), cleared of denominators,
 not the definition of Benjamini and Yekutieli, which conditions on `pᵢ = t`. That the classical condition
 implies this form is proved separately, in `Applied/Statistics/ClassicalPRDS.lean`.
 

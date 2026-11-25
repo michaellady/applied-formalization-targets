@@ -15,7 +15,7 @@ Informal statement. Throughout, "positively regression dependent on `H₀`" mean
 `Applied.MultipleTesting.IsPRDSOn`: for every `i` in `H₀`, every measurable increasing set `D`
 of p-value vectors and all `s ≤ t`,
 `P(D, pᵢ ≤ s) · P(pᵢ ≤ t) ≤ P(D, pᵢ ≤ t) · P(pᵢ ≤ s)`. This is the conditioning-on-`pᵢ ≤ t`
-form of Blanchard and Roquain (weak PRDS), not the definition of Benjamini and Yekutieli,
+form (the definition of Ramdas et al. 2019, Def. 1; weak PRDS), not the definition of Benjamini and Yekutieli,
 which conditions on `pᵢ = t`. The classical condition implies this form
 (`Targets/Statistics/ClassicalPRDS.lean`). The hypotheses are indexed by a finite type and `P` is a
 probability measure.

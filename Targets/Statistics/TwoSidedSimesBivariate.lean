@@ -7,7 +7,7 @@ import Targets.Statistics.OpenTwoSidedGaussian
 - id: stat-two-sided-simes-bivariate
 - area: statistics
 - status: formalized
-- source: E. Samuel-Cahn, "Is the Simes improved Bonferroni procedure conservative?", Biometrika 83 (1996) 928–933 (two-sided tests, two normal statistics; to be confirmed); S. Karlin, Y. Rinott, "Classes of orderings of measures and related correlation inequalities. I. Multivariate totally positive distributions", J. Multivariate Anal. 10 (1980) 467–498 (absolute values of a bivariate normal vector are MTP2; to be confirmed); S. K. Sarkar, "Some probability inequalities for ordered MTP2 random variables: a proof of the Simes conjecture", Ann. Statist. 26 (1998) 494–504. The case `m = 2` is known; the proof here is our own route (conditioning on a common factor plus the monotone likelihood ratio of the folded normal family), not the proof of those papers.
+- source: E. Samuel-Cahn, "Is the Simes improved Bonferroni procedure conservative?", Biometrika 83 (1996) 928–933 (cited in the literature for the two-sided bivariate case; to be confirmed: paper not read; abstract mentions one-sided tests). The result also follows from Karlin–Rinott's MTP2 criterion plus Sarkar 1998: S. Karlin, Y. Rinott, "Classes of orderings of measures and related correlation inequalities. I. Multivariate totally positive distributions", J. Multivariate Anal. 10 (1980) 467–498, and "Total positivity properties of absolute value multinormal variables …", Ann. Statist. 9 (1981) 1035–1049 (the absolute values of a normal vector are MTP2 under a sign condition on the inverse covariance, which always holds for two variables; to be confirmed), combined with S. K. Sarkar, "Some probability inequalities for ordered MTP2 random variables: a proof of the Simes conjecture", Ann. Statist. 26 (1998) 494–504 (Simes for MTP2 statistics; to be confirmed). The case `m = 2` is known; the proof here is our own route (conditioning on a common factor plus the monotone likelihood ratio of the folded normal family), not the proof of those papers.
 - used-in: two-sided z-tests of two endpoints, two doses or two subgroups with correlated statistics, analysed with the Simes, Hochberg or Hommel procedure
 - prerequisites: `Applied/Statistics/TwoSidedSimes.lean`; Mathlib's Gaussian measures (`IsGaussian`, `HasGaussianLaw`, independence of uncorrelated jointly Gaussian variables)
 - statement-review: unreviewed
@@ -73,8 +73,8 @@ almost surely.
 Not covered: three or more true nulls with arbitrary correlation (the open case); the
 Benjamini–Hochberg false discovery rate for two-sided tests (`BHTwoSidedGaussian`, reported
 disputed), even for `m = 2` with one false null; positive regression dependence of two-sided
-p-values, which is not proved in this file, neither in the library's weak (Blanchard–Roquain,
-conditioning on `p i ≤ t`) form `IsPRDSOn` nor in Benjamini–Yekutieli's classical form;
+p-values, which is not proved in this file, neither in the library's weak (conditioning on `p i ≤ t`;
+Ramdas et al. 2019, Def. 1) form `IsPRDSOn` nor in Benjamini–Yekutieli's classical form;
 multivariate `t` statistics. One-factor models with any number of statistics, and the
 Karlin–Rinott (MTP2) class, are covered in `Targets/Statistics/TwoSidedOneFactor.lean` and
 `Targets/Statistics/TwoSidedKarlinRinott.lean`, which also prove weak PRDS of the two-sided

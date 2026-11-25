@@ -6,7 +6,7 @@ import Applied.Statistics.WeightedSimes
 - id: stat-weighted-simes
 - area: statistics
 - status: formalized
-- source: Y. Benjamini, Y. Hochberg, "Multiple hypotheses testing with weights", Scand. J. Statist. 24 (1997), 407–418 (weighted Simes test; statement number to be confirmed); Y. Hochberg, U. Liberman, "An extended Simes' test", Statist. Probab. Lett. 21 (1994), 101–105 (to be confirmed); G. Blanchard, E. Roquain, "Two simple sufficient conditions for FDR control", Electron. J. Stat. 2 (2008), 963–992 (self-consistency argument and the conditioning-on-`pᵢ ≤ t` dependence condition; the lemma used is their Lemma 3.2, number to be confirmed); F. Bretz, M. Posch, E. Glimm, F. Klinglmueller, W. Maurer, K. Rohmeyer, "Graphical approaches for multiple comparison procedures using weighted Bonferroni, Simes, or parametric tests", Biometrical J. 53 (2011), 894–913 (Simes-based graphical closed tests; section to be confirmed)
+- source: Y. Benjamini, Y. Hochberg, "Multiple hypotheses testing with weights", Scand. J. Statist. 24 (1997), 407–418 (weighted Simes test; statement number to be confirmed); Y. Hochberg, U. Liberman, "An extended Simes' test", Statist. Probab. Lett. 21 (1994), 101–105 (to be confirmed); G. Blanchard, E. Roquain, "Two simple sufficient conditions for FDR control", Electron. J. Stat. 2 (2008), 963–992 (self-consistency argument: their Theorem 4.1 and Lemma 3.2 (ii); the conditioning-on-`pᵢ ≤ t` condition is their condition (7)); F. Bretz, M. Posch, E. Glimm, F. Klinglmueller, W. Maurer, K. Rohmeyer, "Graphical approaches for multiple comparison procedures using weighted Bonferroni, Simes, or parametric tests", Biometrical J. 53 (2011), 894–913 (Simes-based graphical closed tests; section to be confirmed)
 - used-in: Hochberg- and Hommel-type gatekeeping and graphical procedures in confirmatory clinical trials; `ROADMAP.md` rung 8 (weighted Simes local tests)
 - prerequisites: `Applied/Statistics/PRDS.lean` (`IsPRDSOn`), `Applied/Statistics/GraphicalApproach.lean` (`graphWeights`), `Applied/Statistics/SequentiallyRejective.lean`
 - formalized-elsewhere: not found in the Lean repositories searched (NEXT-TARGETS.md, 25 Nov 2026)
@@ -14,10 +14,14 @@ import Applied.Statistics.WeightedSimes
 
 Informal statement. `P` is a probability measure and the p-values are real random variables.
 "Valid" means super-uniform (`P(p ≤ t) ≤ t` for `t ≥ 0`). "Positively regression dependent"
-means `Applied.MultipleTesting.IsPRDSOn`: the conditioning-on-`pᵢ ≤ t` form of Blanchard and
-Roquain (weak PRDS), cleared of denominators; it is not the definition of Benjamini and
-Yekutieli, which conditions on `pᵢ = t`, and the implication from the classical definition is
-not formalized here.
+means `Applied.MultipleTesting.IsPRDSOn`: the conditioning-on-`pᵢ ≤ t` consequence of PRDS used in the
+proofs of Benjamini–Yekutieli and Blanchard–Roquain (their condition (7), proof of Prop. 3.6),
+which is the definition of PRDS in Ramdas et al. 2019, Def. 1
+(weak PRDS), cleared of denominators; it is not the definition of Benjamini and Yekutieli,
+which conditions on `pᵢ = t`. The classical definition implies it
+(`Applied.MultipleTesting.IsClassicalPRDSOn.isPRDSOn`, `Targets/Statistics/ClassicalPRDS.lean`).
+The argument formalized is that of Blanchard and Roquain (2008), Theorem 4.1 and
+Lemma 3.2 (ii).
 
 The weighted Simes test of an intersection hypothesis `I` (a finite set of hypotheses) with
 weights `w I i` at level `α` rejects when some `i ∈ I` satisfies

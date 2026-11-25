@@ -27,7 +27,10 @@ Also: positive regression dependence on `H₀` holds if and only if it holds on 
 `i` in `H₀`.
 
 The dependence condition. "Positively regression dependent" above always means
-`Applied.MultipleTesting.IsPRDSOn`, which is the conditioning-on-`pᵢ ≤ t` form used by Blanchard and Roquain (sometimes called weak PRDS),
+`Applied.MultipleTesting.IsPRDSOn`, which is the conditioning-on-`pᵢ ≤ t` consequence of PRDS used
+in the proofs of Benjamini–Yekutieli and Blanchard–Roquain (their condition (7), proof of
+Prop. 3.6); it is the definition of PRDS in Ramdas et al. 2019, Def. 1, sometimes called weak
+PRDS. Here it is
 cleared of denominators: `P(D, pᵢ ≤ s) · P(pᵢ ≤ t) ≤ P(D, pᵢ ≤ t) · P(pᵢ ≤ s)` for `s ≤ t`.
 It is not the definition of Benjamini and Yekutieli, whose PRDS conditions on `pᵢ = t`. The
 classical condition implies this form: `Applied.MultipleTesting.IsClassicalPRDSOn.isPRDSOn`
