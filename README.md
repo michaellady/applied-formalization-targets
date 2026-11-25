@@ -11,6 +11,16 @@ Pure-mathematics conjectures belong in
 [Formal Conjectures](https://github.com/google-deepmind/formal-conjectures); this registry covers
 the applied results that project does not target.
 
+## Read this first
+
+- **Prior art.** Most results here have also been formalized by others; see `NOVELTY.md` before
+  citing anything as a first.
+- **Review status.** Statements have had a single-model automated audit (`REVIEW.md`) and no
+  human review. A machine-checked proof shows a statement is true, not that it is the theorem
+  the source states.
+- **How it was made.** The proofs were written by an LLM (Claude) working with parallel
+  agents and the Lean compiler, in late November 2026.
+
 ## Two layers
 
 - **`Applied/`: the library.** Reusable definitions and lemmas (p-values, error rates, smooth

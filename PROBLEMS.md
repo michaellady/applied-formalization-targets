@@ -118,7 +118,22 @@ channels are still missing.
 | Gibbard–Satterthwaite | done | Versions with indifference |
 | Posted price is optimal for a single buyer | done | Virtual values; multiple bidders |
 | Shapley value: axioms and uniqueness | done | Subset-formula form |
-| Remaining backlog entries (about 5) | todo | Not yet stated |
+| Second welfare theorem | done | Production; non-negative prices |
+| Revenue equivalence, Bayesian form | done | Interim rules are primitive; no ex-post mechanism |
+| Nash equilibrium: zero-sum games and potential games | partial | General existence needs a fixed-point theorem missing from Mathlib; stated with `sorry` in `Targets/` |
+| Bondareva–Shapley | done | — |
+| Compressed sensing: null space property and restricted isometry | done | Optimal constants |
+| Proximal gradient (ISTA) rate; tuned Hedge bound; Massart's lemma; discrete sampling theorem | done | Rademacher generalization bound; reconstruction formula |
+| Remaining backlog entries (about 3) | todo | Not yet stated |
+
+## Prior art
+
+`NOVELTY.md` records a literature and repository survey done on 25 November 2026. About
+three-quarters of the results here already had a public Lean 4 formalization elsewhere,
+mostly from 2026. The apparent firsts are the Simes–Hochberg–Hommel–Šidák family, the
+graphical approach, adjusted p-values, trifferent codes, Frank–Wolfe, online gradient
+descent, AdaBoost, Johnson–Lindenstrauss, the secretary rule and the matroid secretary
+statement. Those negatives come from searches, not from an exhaustive check.
 
 ## After the tracker is worked through
 
