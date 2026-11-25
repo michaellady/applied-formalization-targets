@@ -1,13 +1,61 @@
 import Applied.Economics.MatroidSecretaryGraphic
 
 /-!
-# Laminar matroids
+# The matroid secretary problem for laminar matroids of bounded depth
 
-* `IsLaminar F`: a finite family `F` of finite subsets of `E` is laminar (any two members are
-  nested or disjoint).
+Everything uses the model of `Applied/Economics/MatroidSecretary.lean` unchanged.
+
+## Laminar matroids
+
+* `IsLaminar F`: a finite family `F : Finset (Finset E)` is laminar (any two members are nested
+  or disjoint).
 * `laminar F hF c`: the laminar matroid of a laminar family `F` with capacities
-  `c : Finset E → ℕ`: a set `I` is independent iff `|I ∩ A| ≤ c A` for every `A ∈ F`. The
-  augmentation axiom is proved in `laminar_augment` (maximal tight sets are disjoint).
+  `c : Finset E → ℕ`: a set `I` is independent iff `|I ∩ A| ≤ c A` for every `A ∈ F`; ground set
+  `univ`. The augmentation axiom is `laminar_augment` (maximal tight sets are pairwise disjoint).
+  Elements in no member of `F` are free; elements of a member of capacity `0` are loops.
+  Sanity check: `laminar_univ_eq_uniform` (the family `{E}` with capacity `k` gives the uniform
+  matroid of rank `k`).
+
+## A random colouring with few collisions
+
+Let `n = |E|`, `a = ⌊log₂ n⌋` and `G = (ZMod 2)^a` (bit vectors). For a predicate `p` on sets,
+`mexp p` is the minimum of `a` and of `⌊log₂ c A⌋` over the members `A ∈ F` with `p A`.
+A colour seed (`ColSeed E`) is a bit vector `s B` for every set `B` and `u e` for every element
+`e`; the colour of `e` is (`colHom`)
+`trunc_{mexp (e ∈ ·)} (u e) + ∑_{B ∈ F, e ∈ B} trunc_{mexp (B ⊂ ·)} (s B)`,
+where `trunc_k` keeps the first `k` coordinates. (This is the XOR form of the top-down "random
+nested palettes" scheme.)
+
+* `colHom_sub_colTop_mem`, `card_le_of_injOn_col` (**palettes**, uses laminarity): inside a
+  member `A ∈ F` all colours lie in a translate of a set of `2^{mexp (A ⊆ ·)} ≤ c A` bit vectors,
+  so a set of elements of `A` with pairwise distinct colours has at most `c A` elements
+  (if `c A ≥ 1`).
+* `card_col_eq_mul_le` (**collisions**): for `e ≠ f`, the colours of `e` and `f` agree for at most
+  a fraction `2^{-κ}` of the seeds, `κ = mexp (e ∈ · ∧ f ∈ ·)` (the colour difference is an
+  additive map of the seed whose range contains all bit vectors supported on the first `κ`
+  coordinates).
+* `sum_half_pow_mexp_le`: for `e` in an independent set `I`, if `e` lies in at most `h` members
+  of `F`, then `∑_{f ∈ I, f ≠ e} 2^{-κ(e,f)} ≤ 2(h+1)` (each member `A ∋ e` contributes at most
+  `|I ∩ A| · 2/c A ≤ 2`, the cap `a` contributes at most `2`).
+
+## The algorithm and the result
+
+* `hasCompetitiveRandomized_of_sum`: a family of feasible algorithms indexed by a finite type,
+  drawn uniformly, is a randomized algorithm.
+* `hasCompetitiveRandomized_laminar` (**main theorem**): if every element lies in at most `h`
+  members of the laminar family `F`, the laminar matroid has a feasible randomized
+  `1/(8e(h+1))`-competitive online algorithm. The algorithm keeps each non-loop element
+  independently with probability `1/(4(h+1))`, colours the elements by a uniformly random seed,
+  and runs the `⌊nᵢ/e⌋` rule (`partitionSecretaryRule`) in each colour class of the kept
+  elements. Analysis: an element `e` of an independent set `I` is kept and has a colour shared
+  by no other kept element of `I` with probability at least
+  `1/m - (1/m²) · 2(h+1) = 1/(8(h+1))` (`m = 4(h+1)`, `card_isoSet_ge`); these elements form an
+  independent set of the colour partition matroid, against which the rule is `1/e`-competitive.
+* `hasCompetitiveRandomized_laminar_card`: the same with `h = |F|`.
+
+Not proved: a constant independent of the depth for general laminar matroids (Im–Wang 2011,
+Jaillet–Soto–Zenklusen 2013 and later work obtain one with algorithms that use a sample of the
+arrivals). The algorithm here does not look at the weights before choosing its colouring.
 -/
 
 open Finset Function
@@ -798,5 +846,29 @@ theorem hasCompetitiveRandomized_laminar {E : Type} [Fintype E] (F : Finset (Fin
       _ = ∑ ω : Ω, 1 / Real.exp 1 * ∑ e ∈ isoSet F c I ω, w e := by
           rw [← Finset.mul_sum, hswap]
       _ ≤ ∑ ω : Ω, expWeight (alg ω) w := Finset.sum_le_sum fun ω _ => hstep ω
+
+/-- The same with the depth bound `h = |F|`: every laminar matroid has a
+`1/(8e(|F|+1))`-competitive randomized online algorithm (a constant depending on the family). -/
+theorem hasCompetitiveRandomized_laminar_card {E : Type} [Fintype E] (F : Finset (Finset E))
+    (hF : IsLaminar F) (c : Finset E → ℕ) :
+    HasCompetitiveRandomized (laminar F hF c) (1 / (8 * Real.exp 1 * (#F + 1))) :=
+  hasCompetitiveRandomized_laminar F hF c #F fun _ => Finset.card_filter_le _ _
+
+/-! ### Sanity checks -/
+
+omit [Fintype E] in
+lemma isLaminar_singleton (A : Finset E) : IsLaminar ({A} : Finset (Finset E)) := by
+  intro B hB C hC
+  rw [mem_singleton] at hB hC
+  subst hB hC
+  exact Or.inl (subset_refl _)
+
+/-- Sanity check: the laminar matroid of the family `{E}` with capacity `k` is the uniform
+matroid of rank `k`. -/
+lemma laminar_univ_eq_uniform (k : ℕ) :
+    laminar {univ} (isLaminar_singleton univ) (fun _ => k) = uniform E k := by
+  refine Matroid.ext_indep rfl fun I _ => ?_
+  rw [laminar_indep_iff, uniform_indep_iff]
+  simp
 
 end Applied.Economics.MatroidSecretary
