@@ -16,7 +16,8 @@ single points, with distribution function `F`, then `1 - F(X)` is a valid p-valu
 null, `P(1 - F(X) ≤ t) ≤ t`. If the null distribution is also symmetric about zero, then
 `2 (1 - F(|X|))` is valid. In particular the one- and two-sided z-test p-values are valid.
 
-Not yet covered: lower-tail p-values, discrete statistics, t- and chi-squared tests.
+Lower-tail p-values are in `Targets/Statistics/LowerTailPValue.lean`. Not yet covered:
+t- and chi-squared tests.
 -/
 
 namespace Targets.Statistics

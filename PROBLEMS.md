@@ -61,7 +61,7 @@ foundations are the real next piece of work for this group.
 | Problem | State | Missing |
 |---|---|---|
 | Myerson's lemma; Neyman–Pearson; Gauss–Markov; gradient descent rate | done | — |
-| Delta method | stated | Proof (needs a tightness argument) |
+| Delta method | done | Multivariate form |
 | Johnson–Lindenstrauss lemma | stated | Proof (Gaussian concentration for projections) |
 | Marcus–Spielman–Srivastava (Kadison–Singer) | stated | Proof (interlacing polynomials; large) |
 | EFX existence | stated | Three-agent case on paper; general case open |
@@ -78,7 +78,14 @@ foundations are the real next piece of work for this group.
 | Revenue equivalence | partial | Single-bidder form only |
 | First welfare theorem | done | Production economies; second welfare theorem |
 | Rao–Blackwell | partial | Sufficiency; Lehmann–Scheffé |
-| Remaining backlog entries (about 32) | todo | Not yet stated |
+| Hedge regret bound | done | Tuned √(T log N) form |
+| Online gradient descent regret; convex Lipschitz rate | done | Projection; decreasing steps |
+| Nesterov accelerated gradient, O(1/k²) | done | Equivalence with the two-sequence momentum form |
+| Randomized response; geometric mechanism | done | Continuous Laplace and Gaussian mechanisms |
+| Lower-tail and combined (min, max) p-values | done | — |
+| Benjamini–Hochberg: rejection count and monotonicity | done | — |
+| Hamming, Singleton, Plotkin bounds; entropy bound on Hamming balls | done | Sharper Plotkin form |
+| Remaining backlog entries (about 25) | todo | Not yet stated |
 
 ## After the tracker is worked through
 
