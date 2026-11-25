@@ -14,8 +14,8 @@ import Mathlib.Analysis.SpecialFunctions.Sqrt
 - prerequisites: Mathlib `TendstoInDistribution`; Slutsky-type lemmas
 - statement-review: unreviewed
 
-Informal statement. If `√n (Xₙ - θ)` converges in distribution to `Z` and `g` is differentiable
-at `θ` with derivative `g'`, then `√n (g Xₙ - g θ)` converges in distribution to `g' · Z`.
+Informal statement. If the `Xₙ` are measurable, `√n (Xₙ - θ)` converges in distribution to `Z`,
+and `g` is Borel measurable (everywhere) and differentiable at `θ` with derivative `g'`, then `√n (g Xₙ - g θ)` converges in distribution to `g' · Z`.
 -/
 
 open MeasureTheory Filter
