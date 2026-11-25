@@ -1,4 +1,6 @@
 import Applied.Economics.EFXThree
+import Applied.Economics.EFXTwoTypes
+import Applied.Economics.EFX
 
 /-!
 # Bridge: EFX for three agents in the vocabulary of EconCSLib
