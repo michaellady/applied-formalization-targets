@@ -300,6 +300,7 @@ theorem broadcastAchievable_zero [Nonempty X] (W : X → Y₁ × Y₂ × Y₃ �
     simp [BroadcastCode.errorProb, hm]
   simp [BroadcastCode.avgError, this, hε.le]
 
+/-- The zero rate triple lies in the capacity region of every broadcast channel. -/
 theorem zero_mem_broadcastCapacityRegion [Nonempty X] (W : X → Y₁ × Y₂ × Y₃ → ℝ) :
     (0, 0, 0) ∈ broadcastCapacityRegion W :=
   subset_closure ⟨le_rfl, le_rfl, le_rfl, broadcastAchievable_zero W⟩

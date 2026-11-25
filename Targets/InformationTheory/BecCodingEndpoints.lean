@@ -32,9 +32,10 @@ Differences from the textbook statement. Only the degenerate erasure probabiliti
 from the trivial bounds `0 ≤ opCapacity ≤ log |X|` plus an explicit zero-error code, and needs
 no random coding. Units are nats (bits: `1 - e`). Maximal error criterion.
 
-Not covered: achievability for `0 < e < 1` (random linear codes / union bound over erasure
-patterns), which is the substantive part of the BEC coding theorem; the binary symmetric
-channel; general memoryless channels. The open-direction statement
+Not covered here: achievability for `0 < e < 1`, which is the substantive part of the BEC
+coding theorem (now proved in `Targets/InformationTheory/BecCodingTheorem.lean`, which
+supersedes this entry); the binary symmetric channel
+(`Targets/InformationTheory/BscCodingTheorem.lean`); general memoryless channels. The open-direction statement
 `capacity W ≤ opCapacity (memoryless W)` remains unformalized in general.
 -/
 

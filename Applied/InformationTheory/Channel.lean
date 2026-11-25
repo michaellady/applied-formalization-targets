@@ -13,8 +13,10 @@ probability vectors on `X` (`inputDists X`).
 * `outputDist p W`: the output distribution `∑ x, p x * W x y`.
 * `capacity W`: the **information capacity** `sup_p I(p, W)`, the supremum of the mutual
   information between input and output over input distributions. (The channel coding theorem,
-  which identifies it with the operational capacity, is not formalized; its converse half is
-  in `Applied/InformationTheory/MemorylessConverse.lean`.)
+  which identifies it with the operational capacity `opCapacity (memoryless W)` of
+  `BlockCodes`, is formalized only in part: the converse half for every channel is in
+  `Applied/InformationTheory/MemorylessConverse.lean`, and the full theorem for the binary
+  erasure and binary symmetric channels is in `ErasureCapacity` and `BscCapacity`.)
 * `mutualInfo_joint_eq`: `I(p, W) = H(pW) - ∑ p(x) H(W(· | x))`.
 * `mutualInfo_joint_le_capacity`, `capacity_le_of_forall_le`, `capacity_nonneg`,
   `capacity_le_log_card_input`, `capacity_le_log_card_output`, `capacity_le_log_min_card`.

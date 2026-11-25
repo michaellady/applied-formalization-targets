@@ -7,10 +7,10 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 - id: info-shannon-capacity-c7
 - area: information-theory
 - status: open
-- source: C. E. Shannon, "The zero error capacity of a noisy channel", IRE Trans. Inform. Theory 2 (1956); L. Lovász, "On the Shannon capacity of a graph", IEEE Trans. Inform. Theory 25 (1979); lower bounds: S. C. Polak, A. Schrijver, "New lower bound on the Shannon capacity of C7 from circular graphs", Inform. Process. Lett. 143 (2019), `367^{1/5}`; improved in 2026 by Itty, Rosin, Carstensen and Reichman (arXiv:2607.21517, `134753^{1/10} > 3.25802`), Gao (arXiv:2607.27869, `3.258789…`) and Buys, Polak and Zuiddam (arXiv:2607.29681, `3.2588…`), as recorded in formal-conjectures `GreensOpenProblems/38.lean` (we have not read these three papers; details to be confirmed)
+- source: C. E. Shannon, "The zero error capacity of a noisy channel", IRE Trans. Inform. Theory 2 (1956); L. Lovász, "On the Shannon capacity of a graph", IEEE Trans. Inform. Theory 25 (1979); lower bounds: S. C. Polak, A. Schrijver, "New lower bound on the Shannon capacity of C7 from circular graphs", Inform. Process. Lett. 143 (2019), `367^{1/5}`; improved in 2026 by Itty, Rosin, Carstensen and Reichman (arXiv:2607.21517, `134753^{1/10} > 3.25802`), Gao (arXiv:2607.27869, `3.258789…`) and Buys, Polak and Zuiddam (arXiv:2607.29681, `3.2588…`), as recorded in formal-conjectures `GreensOpenProblems/38.lean` (abstracts checked 2026-11-25; details to be confirmed)
 - used-in: zero-error communication over a noisy channel; the smallest case in which the zero-error capacity of a channel is unknown
 - prerequisites: `SimpleGraph.indepNum`, `SimpleGraph.cycleGraph` (Mathlib); strong graph powers and the Shannon capacity are defined in `Applied/InformationTheory/ShannonCapacity.lean` (Mathlib has no strong product)
-- formalized-elsewhere: the proposition `ShannonCapacityC7EqLovaszTheta` was not found stated in any project checked on 2026-11-25. Closely related: formal-conjectures (github.com/google-deepmind/formal-conjectures), `FormalConjectures/GreensOpenProblems/38.lean` :: `green_38.upper` (open: can the upper bound `ϑ(C₇)` be improved; a positive answer would refute the proposition here, after a bridge between the definitions). Lower bound: spectra-research/shannon-capacity-lean (github.com/spectra-research/shannon-capacity-lean), `ShannonBounds/Main.lean` :: `shannonCapacity_cycleGraph_7_ge` (`3.258827985920007 ≤ Θ(C₇)`, same definition of `shannonCapacity`, certificates checked with `native_decide`). The upper bound `Θ(C₇) ≤ ϑ(C₇)` was not found proved outside this project (clones of 2026-11-25; statements read at source, proofs not re-checked)
+- formalized-elsewhere: the same proposition as `ShannonCapacityC7EqLovaszTheta` is stated as an open problem in google-deepmind/formal-conjectures PR #5321 (`shannonCapacityC7`, unmerged as of 2026-11-25); it was not found stated on the main branch of any project checked on 2026-11-25. Closely related: formal-conjectures (github.com/google-deepmind/formal-conjectures), `FormalConjectures/GreensOpenProblems/38.lean` :: `green_38.upper` (open: can the upper bound `ϑ(C₇)` be improved; a positive answer would refute the proposition here, after a bridge between the definitions). Lower bound: spectra-research/shannon-capacity-lean (github.com/spectra-research/shannon-capacity-lean), `ShannonBounds/Main.lean` :: `shannonCapacity_cycleGraph_7_ge` (`3.258827985920007 ≤ Θ(C₇)`, same definition of `shannonCapacity`, certificates checked with `native_decide`). The upper bound `Θ(C₇) ≤ ϑ(C₇)` was not found proved outside this project (clones of 2026-11-25; statements read at source, proofs not re-checked)
 - statement-review: unreviewed
 
 Informal statement. For a finite graph `G`, the strong power `G^{⊠k}` has as vertices the words
@@ -21,10 +21,10 @@ channel whose confusability graph is `G`. Lovász proved `Θ(C₅) = √5`. The 
 not known. The known bounds are, to our knowledge,
 `3.2588 ≤ Θ(C₇) ≤ ϑ(C₇) = 7 cos(π/7) / (1 + cos(π/7)) ≈ 3.3177`, the upper bound being the
 Lovász theta function. The lower bound has been improved several times since the
-Polak–Schrijver bound `367^{1/5} ≈ 3.2577` (2019): Itty–Rosin–Carstensen–Reichman
+Polak–Schrijver bound `367^{1/5} > 3.2578` (2019): Itty–Rosin–Carstensen–Reichman
 (arXiv:2607.21517) give `134753^{1/10} > 3.25802`, Gao (arXiv:2607.27869) gives `3.258789…`, and
 Buys–Polak–Zuiddam (arXiv:2607.29681) give `3.2588…`. These three are cited as recorded in
-formal-conjectures `GreensOpenProblems/38.lean`; we have not read the papers (details to be
+formal-conjectures `GreensOpenProblems/38.lean`; abstracts checked 2026-11-25 (details to be
 confirmed). The last one is verified in Lean in `spectra-research/shannon-capacity-lean`
 (`ShannonBounds/Main.lean` :: `shannonCapacity_cycleGraph_7_ge`,
 `3.258827985920007 ≤ shannonCapacity (cycleGraph 7)`, with the same definition of
@@ -39,7 +39,7 @@ aware; it is one natural candidate for the answer, not a consensus conjecture.
 What is proved (in `Applied/`): `3 ≤ Θ(C₇) ≤ 7` (the trivial bounds `α(G) ≤ Θ(G) ≤ |V|`);
 `α(G^{⊠k})^{1/k} ≤ Θ(G)` for every `k ≥ 1`; `α(C₅ ⊠ C₅) ≥ 5` and hence `√5 ≤ Θ(C₅)`.
 Better lower bounds from explicit independent sets, up to `α(C₇^{⊠5}) ≥ 367` and hence
-`367^{1/5} ≈ 3.2577 ≤ Θ(C₇)`, are in `Targets/InformationTheory/ShannonCapacityC7Lower.lean`.
+`367^{1/5} > 3.2578 ≤ Θ(C₇)`, are in `Targets/InformationTheory/ShannonCapacityC7Lower.lean`.
 This is the best lower bound proved in this project, and it is checked by the Lean kernel
 (`decide`, no `native_decide`); it is not the best known lower bound (see above). So this
 project proves `367^{1/5} ≤ Θ(C₇) ≤ 7 cos(π/7) / (1 + cos(π/7))`.

@@ -44,7 +44,9 @@ lemma strongPow_adj {G : SimpleGraph V} {k : ℕ} {f g : Fin k → V} :
 
 /-- The Shannon capacity `Θ(G) = sup_{k ≥ 1} α(G^{⊠k})^{1/k}` of a graph, as a real number
 (the supremum is indexed by `k + 1` for `k : ℕ`). For a finite graph the family is bounded by
-`|V|`, see `le_shannonCapacity`. -/
+`|V|`, see `le_shannonCapacity`. The definition is only meaningful for a finite nonempty vertex
+type: otherwise it can take the junk value `0` (for an infinite type `indepNum` may be the
+supremum of an unbounded set of naturals, which is `0`; for an empty type every term is `0`). -/
 noncomputable def shannonCapacity (G : SimpleGraph V) : ℝ :=
   ⨆ k : ℕ, ((strongPow G (k + 1)).indepNum : ℝ) ^ (((k + 1 : ℕ) : ℝ)⁻¹)
 

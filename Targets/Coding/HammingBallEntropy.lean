@@ -19,8 +19,10 @@ The inequality is between real numbers. For `n = 0` the quotient `k / n` is read
 The left-hand side is the number of binary words of length `n` within Hamming distance `k`
 of a fixed word: `ballCard n d = ∑_{i < d} (n choose i)`.
 
-Not covered: the matching lower bound `2^(n H(k/n)) / (n + 1) ≤ ∑_{i ≤ k} (n choose i)`; the
-asymptotic rate form of the Gilbert–Varshamov bound; real (non-integer) radius `δ n`.
+Not covered here: the matching lower bound `2^(n H(k/n)) / (n + 1) ≤ ∑_{i ≤ k} (n choose i)`
+(proved in `Targets/Coding/BinomialEntropyLower.lean`); the rate form of the Gilbert–Varshamov
+bound (`Targets/Coding/GilbertVarshamovRate.lean`, `Targets/Coding/RateSandwich.lean`); real
+(non-integer) radius `δ n`.
 -/
 
 namespace Targets.Coding

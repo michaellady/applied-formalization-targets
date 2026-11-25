@@ -116,6 +116,10 @@ lemma ballAgree_comm (q : ℝ) (k : ℕ) (x x' : Fin n → Bool) :
   rw [hdist_flipOut_comm]
 
 open Classical in
+/-- **Error bound for the bounded-distance decoder on the BSC.** For the codebook `c` and the
+decoder `bscCode q k c` (output a message whose codeword is within Hamming distance `k` of the
+received word), message `m` is decoded wrongly with probability at most
+`P(more than k flips) + ∑_{m' ≠ m} P(the output of c m is within distance k of c m')`. -/
 theorem bscCode_errorProb_le_tail_add {q : ℝ} (h0 : 0 ≤ q) (h1 : q ≤ 1) (k : ℕ) {M : ℕ}
     (c : Fin (M + 1) → (Fin n → Bool)) (m : Fin (M + 1)) :
     (bscCode q k c).errorProb m ≤

@@ -164,6 +164,7 @@ theorem reliabilityFunction_memoryless_le {Y : Type} [Fintype Y] [Nonempty Y] [N
 rate `R` nats per channel use. -/
 noncomputable def bscReliability (q R : ℝ) : ℝ := reliabilityFunction (memoryless (bsc q)) R
 
+/-- The reliability function of the BSC is nonnegative at every rate. -/
 theorem bscReliability_nonneg {q : ℝ} (h0 : 0 ≤ q) (h1 : q ≤ 1) (R : ℝ) :
     0 ≤ bscReliability q R :=
   reliabilityFunction_nonneg (isStochastic_memoryless (isChannel_bsc h0 h1)) R

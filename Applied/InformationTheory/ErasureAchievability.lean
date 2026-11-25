@@ -1,4 +1,5 @@
 import Applied.InformationTheory.BlockCodes
+import Applied.InformationTheory.CodebookSelection
 
 /-!
 # A positive achievable rate for the binary erasure channel (union–Bhattacharyya bound)
@@ -144,45 +145,22 @@ theorem becCode_errorProb_le {e : ℝ} (h0 : 0 ≤ e) (h1 : e ≤ 1) {M : ℕ}
         · simp
         · exact sum_consistent_kernel e (c m) (c m')
 
-/-- The total pairwise sum of a codebook. -/
+/-- The total pairwise sum `∑_{m ≠ m'} e ^ d(c m, c m')` of a codebook; this is
+`offSum (pairF e) c` (definitionally). -/
 noncomputable def pairSum (e : ℝ) {K : ℕ} (c : Fin K → (Fin n → Bool)) : ℝ :=
   ∑ m, ∑ m', if m = m' then 0 else pairF e (c m) (c m')
 
-lemma pairSum_cons (e : ℝ) {K : ℕ} (x : Fin n → Bool) (c : Fin K → (Fin n → Bool)) :
-    pairSum e (Fin.cons x c : Fin (K + 1) → (Fin n → Bool)) =
-      2 * ∑ j, pairF e x (c j) + pairSum e c := by
-  unfold pairSum
-  simp only [Fin.sum_univ_succ, Fin.cons_zero, Fin.cons_succ, Fin.succ_inj,
-    (Fin.succ_ne_zero _).symm, Fin.succ_ne_zero, ite_true, ite_false, zero_add,
-    Finset.sum_add_distrib]
-  simp only [pairF_comm e _ x]
-  ring
-
 /-- **Greedy codebook.** For every `K` there are `K` codewords with total pairwise sum at most
-`K ^ 2 ((1 + e) / 2) ^ n`. -/
+`K ^ 2 ((1 + e) / 2) ^ n`.  This is the general greedy lemma
+`exists_codebook_offSum_le_of_symm` applied to the symmetric weight `pairF e`, whose row sums
+are `(1 + e) ^ n` by `sum_pairF`. -/
 theorem exists_codebook_pairSum_le {e : ℝ} (h0 : 0 ≤ e) (K : ℕ) :
     ∃ c : Fin K → (Fin n → Bool), pairSum e c ≤ (K : ℝ) ^ 2 * ((1 + e) / 2) ^ n := by
-  induction K with
-  | zero => exact ⟨Fin.elim0, by simp [pairSum]⟩
-  | succ K ih =>
-    obtain ⟨c, hc⟩ := ih
-    have hρ : 0 ≤ ((1 + e) / 2) ^ n := pow_nonneg (by linarith) n
-    have havg : ∑ x : Fin n → Bool, ∑ j, pairF e x (c j) ≤
-        ∑ _x : Fin n → Bool, (K : ℝ) * ((1 + e) / 2) ^ n := by
-      rw [Finset.sum_comm]
-      simp only [fun j => (show ∑ x : Fin n → Bool, pairF e x (c j) = (1 + e) ^ n by
-        simp only [pairF_comm e _ (c j)]; exact sum_pairF e (c j))]
-      simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fun, Fintype.card_bool,
-        Fintype.card_fin, nsmul_eq_mul, div_pow]
-      have h2 : (0 : ℝ) < 2 ^ n := by positivity
-      field_simp
-      push_cast
-      exact le_rfl
-    obtain ⟨x, -, hx⟩ := Finset.exists_le_of_sum_le univ_nonempty havg
-    refine ⟨Fin.cons x c, ?_⟩
-    rw [pairSum_cons]
-    push_cast
-    nlinarith
+  obtain ⟨c, hc⟩ := exists_codebook_offSum_le_of_symm (f := pairF (n := n) e)
+    (pairF_nonneg h0) (pairF_comm e) (fun x => (sum_pairF e x).le) K
+  refine ⟨c, hc.trans_eq ?_⟩
+  simp only [Fintype.card_fun, Fintype.card_bool, Fintype.card_fin, Nat.cast_pow,
+    Nat.cast_ofNat, div_pow]
 
 /-- **Fixed-`n` error bound.** For every block length `n` and every `M` there is a code with
 `M + 1` messages for the memoryless BEC whose maximal error is at most

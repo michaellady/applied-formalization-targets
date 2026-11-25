@@ -19,7 +19,9 @@ All logarithms are natural, so capacities are in nats per channel use.
   the binary symmetric channel is at most `log 2 - h(q)`, that of the binary erasure channel at
   most `(1 - e) log 2`.
 
-Achievability (`capacity W ≤ opCapacity (memoryless W)`) is not formalized.
+Achievability (`capacity W ≤ opCapacity (memoryless W)`) is not formalized for a general
+channel; for the binary erasure and binary symmetric channels it is proved in `ErasureCapacity`
+and `BscCapacity`.
 -/
 
 open Finset Real

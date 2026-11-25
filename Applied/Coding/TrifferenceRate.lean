@@ -15,7 +15,8 @@ import Mathlib.Topology.Algebra.Order.LiminfLimsup
 * `trifferenceMax_one`, …, `trifferenceMax_four`: `T(1..4) = 3, 4, 6, 9`.
 * `three_le_trifferenceMax`, `nine_le_trifferenceMax`.
 * `two_mul_trifferenceMax_succ_le`: the recursion `2 T(n + 1) ≤ 3 T(n)` for `n ≥ 1`.
-* `trifferenceMax_le`: Körner's bound `T(n) ≤ 2 (3/2)ⁿ`.
+* `trifferenceMax_le`: the elementary bound `T(n) ≤ 2 (3/2)ⁿ`
+  (Körner 1973; see Körner–Marton 1988, Elias 1988; attribution varies).
 * `logb_trifferenceMax_div_le`: `log₂ T(n) / n ≤ 1 / n + log₂ (3/2)` for `n ≥ 1`.
 * `trifferenceRate_nonneg`, `trifferenceRate_le`: `0 ≤ trifferenceRate ≤ log₂ (3/2)`.
 -/
@@ -128,7 +129,7 @@ theorem exists_isTrifferent_card_nine (n : ℕ) (hn : 4 ≤ n) :
     obtain ⟨C', hC', hcard'⟩ := exists_isTrifferent_succ hC
     exact ⟨C', hC', hcard'.trans hcard⟩
 
-/-- The recursion behind Körner's bound, for the maximum: `2 T(n + 1) ≤ 3 T(n)` for `n ≥ 1`.
+/-- The recursion behind the elementary bound, for the maximum: `2 T(n + 1) ≤ 3 T(n)` for `n ≥ 1`.
 (It fails for `n = 0`: `T(0) = 1`, `T(1) = 3`.) -/
 theorem two_mul_trifferenceMax_succ_le {n : ℕ} (hn : 1 ≤ n) :
     2 * trifferenceMax (n + 1) ≤ 3 * trifferenceMax n := by
@@ -139,7 +140,8 @@ theorem two_mul_trifferenceMax_succ_le {n : ℕ} (hn : 1 ≤ n) :
   · have := hC'.card_le_trifferenceMax
     omega
 
-/-- **Körner's bound** for `T(n)`: `T(n) ≤ 2 (3/2)ⁿ`. -/
+/-- **The elementary bound** for `T(n)`: `T(n) ≤ 2 (3/2)ⁿ`
+(Körner 1973; see Körner–Marton 1988, Elias 1988; attribution varies). -/
 theorem trifferenceMax_le (n : ℕ) : (trifferenceMax n : ℝ) ≤ 2 * (3 / 2 : ℝ) ^ n := by
   obtain ⟨C, hC, hcard⟩ := exists_isTrifferent_card_eq_trifferenceMax n
   rw [← hcard]
@@ -153,7 +155,7 @@ theorem logb_trifferenceMax_div_nonneg (n : ℕ) :
   have h1 : (1 : ℝ) ≤ trifferenceMax n := by exact_mod_cast one_le_trifferenceMax n
   exact div_nonneg (Real.logb_nonneg (by norm_num) h1) (Nat.cast_nonneg n)
 
-/-- Körner's bound in logarithmic form: `log₂ T(n) ≤ 1 + n log₂ (3/2)`. -/
+/-- The elementary bound in logarithmic form: `log₂ T(n) ≤ 1 + n log₂ (3/2)`. -/
 theorem logb_trifferenceMax_le (n : ℕ) :
     Real.logb 2 (trifferenceMax n) ≤ 1 + n * Real.logb 2 (3 / 2) := by
   have h1 : (0 : ℝ) < trifferenceMax n := by exact_mod_cast one_le_trifferenceMax n
@@ -161,7 +163,7 @@ theorem logb_trifferenceMax_le (n : ℕ) :
   rwa [Real.logb_mul (by norm_num) (by positivity), Real.logb_self_eq_one (by norm_num),
     Real.logb_pow] at h
 
-/-- Körner's bound for the rate sequence: `log₂ T(n) / n ≤ 1 / n + log₂ (3/2)` for `n ≥ 1`. -/
+/-- The elementary bound for the rate sequence: `log₂ T(n) / n ≤ 1 / n + log₂ (3/2)` for `n ≥ 1`. -/
 theorem logb_trifferenceMax_div_le {n : ℕ} (hn : 1 ≤ n) :
     Real.logb 2 (trifferenceMax n) / n ≤ 1 / n + Real.logb 2 (3 / 2) := by
   have hn' : (0 : ℝ) < n := by exact_mod_cast hn
@@ -203,7 +205,7 @@ theorem trifferenceRate_nonneg : 0 ≤ trifferenceRate := by
     isBoundedUnder_le_trifferenceRate
   simpa [trifferenceRate] using h
 
-/-- **Körner's bound for the rate**: `trifferenceRate ≤ log₂ (3/2)`. -/
+/-- **The elementary bound for the rate**: `trifferenceRate ≤ log₂ (3/2)`. -/
 theorem trifferenceRate_le : trifferenceRate ≤ Real.logb 2 (3 / 2) := by
   have ht : Tendsto (fun n : ℕ => 1 / (n : ℝ) + Real.logb 2 (3 / 2)) atTop
       (𝓝 (Real.logb 2 (3 / 2))) := by

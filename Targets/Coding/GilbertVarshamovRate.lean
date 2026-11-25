@@ -23,8 +23,9 @@ Difference from the textbook statement: the textbook asymptotic form is stated f
 distance `d = ⌊δ n⌋` and rate `1 - H(δ)` as `n → ∞`. Here the minimum distance is `k + 1` and the
 entropy is evaluated at `k / n = (d - 1) / n`; no limit is taken.
 
-Not covered: the limit statement `lim inf log₂ A(n, ⌊δn⌋) / n ≥ 1 - H(δ)`; linear codes
-(Varshamov's version); alphabets other than `{0, 1}`.
+Not covered here: the limit statement `lim inf log₂ A(n, ⌊δn⌋) / n ≥ 1 - H(δ)` (proved in
+`Targets/Coding/RateSandwich.lean`); linear codes (the finite Varshamov bound is in
+`Targets/Coding/Varshamov.lean`); alphabets other than `{0, 1}`.
 -/
 
 namespace Targets.Coding

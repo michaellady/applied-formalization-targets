@@ -22,8 +22,11 @@ All logarithms are natural, so rates and capacities are in nats per channel use.
 * `achievable_zero`, `Achievable.mono`, `Achievable.le_log_card`, `opCapacity_nonneg`,
   `opCapacity_le_log_card`, `le_opCapacity`, `opCapacity_eq_zero_of_const`.
 
-The channel coding theorem (`opCapacity (memoryless W) = capacity W`) is not formalized; its
-converse half is in `Applied/InformationTheory/MemorylessConverse.lean`.
+The channel coding theorem (`opCapacity (memoryless W) = capacity W`) is not formalized for a
+general channel `W`.  Its converse half (`≤`) is in
+`Applied/InformationTheory/MemorylessConverse.lean`; the full equality is proved for the binary
+erasure channel (`ErasureCapacity`), the binary symmetric channel (`BscCapacity`) and channels
+with a zero-error letter decoder (`ZeroErrorEndpoints`).
 -/
 
 open Finset Real
