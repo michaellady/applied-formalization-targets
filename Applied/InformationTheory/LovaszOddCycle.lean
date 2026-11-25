@@ -212,6 +212,8 @@ lemma cycleGraph_adj_of_val (n : ℕ) (hn : 3 ≤ n) (i j : Fin n)
     have hij : i < j := by rw [Fin.lt_def]; omega
     left; rw [Fin.coe_sub_iff_lt.2 hij]; omega
 
+/-- For odd `n ≥ 3`, `oddRep n` is an orthonormal representation of the cycle `Cₙ`: unit
+vectors, orthogonal for distinct non-adjacent vertices (Lovász's generalised umbrella). -/
 theorem isOrthonormalRep_oddRep (n : ℕ) (hn : 3 ≤ n) (hodd : Odd n) :
     IsOrthonormalRep (SimpleGraph.cycleGraph n) (oddRep n) := by
   have hn0 : 0 < n := by omega

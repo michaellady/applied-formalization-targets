@@ -14,11 +14,19 @@ This file connects the combinatorial single-deletion codes of
   `m + 1`, the channel output with at most one deletion determines the codeword.
 * `IsSingleDeletionCode.exists_decoder`: hence a decoder that is always right when at most one
   bit is deleted (zero-error decoding of one deletion).
-* `IsSingleDeletionCode.errorProb_le`: as a block code for the deletion channel with deletion
-  probability `d ∈ [0, 1]`, every message is decoded wrongly with probability at most
+* `errorProb_le_of_decoder`: for a block code for the deletion channel with deletion
+  probability `d ∈ [0, 1]` whose decoder is right whenever at most one bit is deleted, every
+  message is decoded wrongly with probability at most
   `1 - (1 - d)^(m+1) - (m + 1) d (1 - d)^m`, the probability of two or more deletions.
+* `IsSingleDeletionCode.exists_blockCode`: a nonempty single-deletion-correcting code gives
+  such a block code, with `|C|` messages.
 * `exists_blockCode_vt`: a VT code gives a block code with `M` messages,
   `(m + 2) M ≥ 2^(m+1)`, and this error bound.
+
+Not in this file: any capacity statement.  For fixed `d > 0` the error bound tends to `1` as the
+length grows (although the rate of the VT codes tends to `log 2`), so nothing follows for
+`Achievable` or `deletionCapacity`; the capacity lower bounds are in `DeletionLowerBound` and
+`DeletionPositive`.
 -/
 
 open Finset Applied.Coding

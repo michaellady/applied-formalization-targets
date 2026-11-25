@@ -46,8 +46,11 @@ variable {ι : Type*} [DecidableEq ι]
 /-- The elementary symmetric polynomial of degree `|A| - 1` in the values `m a`, `a ∈ A`. -/
 noncomputable def esymmTop (A : Finset ι) (m : ι → ℝ) : ℝ := ∑ a ∈ A, ∏ b ∈ A.erase a, m b
 
+/-- `esymmTop` of the empty family is `0`. -/
 theorem esymmTop_empty (m : ι → ℝ) : esymmTop ∅ m = 0 := by simp [esymmTop]
 
+/-- Recursion for `esymmTop`: adding a new index `j` to `s` gives
+`e_{|s|}(insert j s) = ∏_{b ∈ s} m b + m j · e_{|s|-1}(s)`. -/
 theorem esymmTop_insert {j : ι} {s : Finset ι} (hj : j ∉ s) (m : ι → ℝ) :
     esymmTop (insert j s) m = ∏ b ∈ s, m b + m j * esymmTop s m := by
   rw [esymmTop, sum_insert hj, erase_insert hj, esymmTop, mul_sum]
@@ -202,6 +205,8 @@ private lemma cons_cond (A : Finset ι) {j : ℕ} (a : ι) (g : Fin j → ι) :
   · rintro ⟨h3, h2, h4⟩
     exact ⟨⟨fun t e => (h4 t).1 e, h2⟩, h3, fun t => (h4 t).2⟩
 
+/-- Recursion for `injSum` on the first coordinate of the injective tuple: choose its first
+entry `a ∈ A`, then an injective `j`-tuple in `A.erase a`. -/
 theorem injSum_succ (m : ι → ℝ) (A : Finset ι) (j : ℕ) :
     injSum m A (j + 1) = ∑ a ∈ A, m a * injSum m (A.erase a) j := by
   rw [injSum, ← (Fin.consEquiv fun _ => ι).sum_comp, Fintype.sum_prod_type,

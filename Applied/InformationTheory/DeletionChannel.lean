@@ -71,6 +71,7 @@ theorem isStochastic_deletionChannel {d : ℝ} (h0 : 0 ≤ d) (h1 : d ≤ 1) :
 nats per input bit. -/
 noncomputable def deletionCapacity (d : ℝ) : ℝ := opCapacity (deletionChannel d)
 
+/-- The capacity of the deletion channel is nonnegative. -/
 theorem deletionCapacity_nonneg (d : ℝ) : 0 ≤ deletionCapacity d := opCapacity_nonneg _
 
 /-- The capacity of the deletion channel is at most `log 2` nats (one bit) per input bit. -/

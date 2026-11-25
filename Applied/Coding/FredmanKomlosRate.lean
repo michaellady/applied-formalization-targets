@@ -33,6 +33,7 @@ symbol; the `n = 0` term is `0` by Lean's division convention). -/
 noncomputable def perfectHashRate (k : ℕ) : ℝ :=
   Filter.limsup (fun n : ℕ => Real.logb 2 (perfectHashMax k n) / n) Filter.atTop
 
+/-- Every perfect `k`-hash code of length `n` has at most `perfectHashMax k n` codewords. -/
 theorem IsPerfectHashCode.card_le_perfectHashMax {k n : ℕ} {C : Finset (Fin n → Fin k)}
     (hC : IsPerfectHashCode k C) : C.card ≤ perfectHashMax k n := by
   classical
@@ -45,6 +46,8 @@ theorem isPerfectHashCode_empty {k n : ℕ} (hk : 1 ≤ k) :
   rw [subset_empty.mp hS, card_empty] at hcard
   omega
 
+/-- The maximum `perfectHashMax k n` is attained: for `k ≥ 1` there is a perfect `k`-hash code
+of length `n` with exactly `perfectHashMax k n` codewords. -/
 theorem exists_isPerfectHashCode_card_eq_perfectHashMax {k : ℕ} (hk : 1 ≤ k) (n : ℕ) :
     ∃ C : Finset (Fin n → Fin k), IsPerfectHashCode k C ∧ C.card = perfectHashMax k n := by
   classical
@@ -73,6 +76,8 @@ private lemma logb_natCast_nonneg (N : ℕ) : 0 ≤ Real.logb 2 (N : ℝ) := by
   · simp
   · exact Real.logb_nonneg (by norm_num) (by exact_mod_cast h)
 
+/-- The terms `log₂ (perfectHashMax k n) / n` of the rate sequence are nonnegative (also when
+`perfectHashMax k n = 0` or `n = 0`, by Lean's conventions `log 0 = 0`, `x / 0 = 0`). -/
 theorem perfectHashRate_seq_nonneg (k n : ℕ) :
     0 ≤ Real.logb 2 (perfectHashMax k n) / n :=
   div_nonneg (logb_natCast_nonneg _) (Nat.cast_nonneg _)

@@ -12,7 +12,8 @@ All logarithms are natural, so rates are in nats per channel use.
 * `opCapacity_memoryless_bec_eq_capacity_of_endpoint`: for `e ∈ {0, 1}`,
   `opCapacity (memoryless (bec e)) = capacity (bec e) = (1 - e) log 2`.
 
-Achievability for `0 < e < 1` is not formalized here.
+Achievability for `0 < e < 1` is not in this file; it is `achievable_memoryless_bec` in
+`Applied/InformationTheory/ErasureCapacity.lean`.
 -/
 
 open Finset Real
