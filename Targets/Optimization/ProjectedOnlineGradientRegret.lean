@@ -20,7 +20,8 @@ and any two points of `K` are at distance at most `D`, the right-hand side can b
 starting point.
 
 Not covered: losses defined or convex only on `K`, subgradients of non-differentiable
-losses, time-varying step sizes, the tuned `O(D G √T)` form of the bound.
+losses. Time-varying step sizes and the anytime `(3/2) D G √T` bound are in
+`Targets.Optimization.OnlineGradientAnytimeRegret`.
 -/
 
 namespace Targets.Optimization

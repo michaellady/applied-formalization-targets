@@ -21,7 +21,7 @@ real Hilbert space, let `K` be a convex set any two points of which are at dista
 Not covered: existence of the linear minimisers `s k` (it is a hypothesis; it holds when `K`
 is compact), functions that are convex or smooth only on `K` (here on the whole space),
 Jaggi's curvature constant in place of `L D²`, approximate linear minimisation, line search,
-the duality-gap certificate, and away-step or other linearly convergent variants.
+and away-step or other linearly convergent variants.
 -/
 
 namespace Targets.Optimization
