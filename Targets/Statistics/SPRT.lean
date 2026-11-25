@@ -34,8 +34,8 @@ null probability under `P`).
   stops), `P(Λ τ ≥ A) ≤ 1/A`: the SPRT with upper threshold `A` has type-I error at most
   `1/A`, whatever the lower threshold. This is weaker than Wald's bound `α ≤ (1-β)/A`, which
   also involves the type-II error `β`; that sharper bound is not formalized here, but an
-  abstract change-of-measure version (with the density of `P₁` w.r.t. `P₀` on each `F n` as a
-  hypothesis) is in `Targets/Statistics/SPRTWaldChangeOfMeasure.lean`.
+  change-of-measure version is in `Targets/Statistics/SPRTWaldChangeOfMeasure.lean`
+  (abstractly, and for i.i.d. observations with null density `p₀ > 0`).
 * If `∫ p₁ dν = 1` and `p₁ = 0` `ν`-almost everywhere on `{p₀ = 0}`, then `Λ` is a
   martingale and `E[Λ n] = 1` for all `n`.
 
