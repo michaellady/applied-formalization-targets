@@ -9,7 +9,7 @@ import Targets.Economics.Myerson
 - source: R. Myerson, "Optimal auction design", Math. Oper. Res. 6 (1981); J. Riley, W. Samuelson, "Optimal auctions", Amer. Econ. Rev. 71 (1981); textbook form: V. Krishna, "Auction Theory" (theorem numbering to be confirmed)
 - used-in: auction theory (first-price, second-price and all-pay auctions raise the same expected revenue), optimal auction design
 - prerequisites: `Targets.Economics.myerson_payment_identity` (this project), Mathlib interval and Bochner integrals
-- formalized-elsewhere: not checked
+- formalized-elsewhere: econcslib-bei `EconCSLib/MechanismDesign/Auction/Myerson.lean` :: `payment_formula_of_isDSIC_of_zeroNormalized` and `Auction/BayesianSingleItem.lean` (interim formulas); elazarg/GameTheory `GameTheory/Analysis/RevenueEquivalence.lean` :: `revenue_equivalence` (different model: types in an interval `[a, b]`, PMF priors). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. There is a set `ι` of bidders (any type; no finiteness is needed except for

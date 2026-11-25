@@ -9,7 +9,7 @@ import Applied.Economics.Minimax
 - source: J. von Neumann, "Zur Theorie der Gesellschaftsspiele", Math. Annalen 100 (1928); generalisation used in the proof: M. Sion, "On general minimax theorems", Pacific J. Math. 8 (1958); textbook theorem number to be confirmed
 - used-in: zero-sum games, LP duality, Yao's principle, boosting, online learning
 - prerequisites: Mathlib's `Sion.exists_isSaddlePointOn` (Sion's minimax theorem), from which this is a short corollary; Mathlib lists the matrix-game case as a TODO
-- formalized-elsewhere: the general theorem is Mathlib's `Sion.exists_isSaddlePointOn` / `Sion.minimax'` (`Mathlib/Topology/Sion.lean`)
+- formalized-elsewhere: the general theorem is Mathlib's `Sion.exists_isSaddlePointOn` / `Sion.minimax'` (`Mathlib/Topology/Sion.lean`); the matrix-game form is also atlas-lean `MathlibExt/GameTheory/ZeroSumMinimax.lean` :: `matrixGame_minimax` (on `Fin m`, `Fin n`; equivalent; read, not compiled here)
 - statement-review: unreviewed
 
 Informal statement. Let `A` be a real matrix with rows indexed by a finite nonempty type `m`

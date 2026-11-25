@@ -12,6 +12,7 @@ import Mathlib.Tactic
 - source: A. C. Aitken, "On least squares and linear combination of observations", Proc. Roy. Soc. Edinburgh 55 (1935); textbook form e.g. Hayashi, "Econometrics", Prop. 1.1
 - used-in: econometrics, regression, geodesy, any use of ordinary least squares
 - prerequisites: Mathlib `Matrix.PosSemidef`
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/GaussMarkov.lean` :: `gaussMarkov_covariance_minimality` (equivalent; both algebraic). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. In the linear model `y = X β + ε` with `E ε = 0`, `Cov ε = σ² I` and `X` of

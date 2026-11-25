@@ -9,6 +9,7 @@ import Applied.Economics.Vickrey
 - source: W. Vickrey, "Counterspeculation, auctions, and competitive sealed tenders", J. Finance 16 (1961); textbook form: T. Roughgarden, "Twenty Lectures on Algorithmic Game Theory", Lecture 2 (theorem number to be confirmed)
 - used-in: auction design, ad auctions, mechanism design (base case of VCG)
 - prerequisites: finite suprema only
+- formalized-elsewhere: econcslib-bei `EconCSLib/MechanismDesign/Auction/Vickrey.lean` :: `mechanism_isDSIC`; elazarg/GameTheory `Mechanism/Auction.lean` (equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Finitely many, at least two, bidders submit real bids for one item. A

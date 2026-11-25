@@ -9,6 +9,7 @@ import Applied.Statistics.LehmannScheffe
 - source: E. L. Lehmann, H. Scheffé, "Completeness, similar regions, and unbiased estimation. Part I", Sankhyā 10 (1950) (theorem number to be confirmed)
 - used-in: uniformly minimum-variance unbiased estimation (for example in exponential families)
 - prerequisites: conditional expectation and law of total variance (Mathlib); Rao–Blackwell (`Applied/Statistics/RaoBlackwell.lean`)
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/Sufficiency/UMVU.lean` :: `umvu_of_complete_sufficient` (assumes completeness and sufficiency of a statistic; the statement here replaces sufficiency by its consequence `HasCommonCondExp`, and no bridge from sufficiency is proved); lean-cksd `ae_eq_of_isCompleteStatistic_of_isUnbiasedEstimator`. Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `P θ` (`θ ∈ Θ`) be probability measures on a measurable space and `m`

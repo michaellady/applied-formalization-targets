@@ -9,6 +9,7 @@ import Applied.Economics.Welfare
 - source: K. J. Arrow, "An extension of the basic theorems of classical welfare economics" (1951); G. Debreu, "Theory of Value" (1959); textbook form: Mas-Colell, Whinston, Green, "Microeconomic Theory" (1995), Proposition 16.C.1
 - used-in: the efficiency case for competitive markets; a baseline in market design and policy analysis
 - prerequisites: inner product spaces
+- formalized-elsewhere: atlas-lean `Domains/Economics/FirstWelfare.lean` :: `isParetoEfficient_of_isWalrasianEquilibrium`; cslib-frontier `Market/Basic.lean` (different model: consumption set the non-negative orthant there, the whole inner-product space here; neither statement implies the other). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. In an exchange economy where every agent's preferences are locally

@@ -9,6 +9,7 @@ import Applied.Economics.BondarevaShapley
 - source: O. N. Bondareva, "Some applications of linear programming methods to the theory of cooperative games" (in Russian), Problemy Kibernetiki 10 (1963); L. S. Shapley, "On balanced sets and cores", Naval Res. Logist. Quart. 14 (1967); textbook theorem number to be confirmed
 - used-in: cooperative game theory, cost sharing, market games, matching and assignment games
 - prerequisites: `Applied.Economics.exists_saddle_point` (matrix-game minimax theorem of this project, from Mathlib's Sion minimax theorem); Mathlib has no linear-programming duality in the form usually used for this proof
+- formalized-elsewhere: atlas-lean `MathlibExt/GameTheory/BondarevaShapley.lean` :: `bondareva_shapley` (identical definitions of core and balancedness, including the weight on `∅`; equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `N` be a finite set of players (with decidable equality) and

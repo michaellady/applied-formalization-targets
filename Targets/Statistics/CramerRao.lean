@@ -9,6 +9,7 @@ import Applied.Statistics.CramerRao
 - source: H. Cramér, "Mathematical Methods of Statistics" (1946); C. R. Rao (1945)
 - used-in: lower bounds on estimator variance in statistics, signal processing and experimental design
 - prerequisites: Cauchy–Schwarz for integrals
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/MultiparameterCramerRao.lean`, `FisherInformation*.lean` (Fisher information and a multiparameter bound; the statement here is only the Cauchy–Schwarz core). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. For a square-integrable estimator `T` and a mean-zero square-integrable

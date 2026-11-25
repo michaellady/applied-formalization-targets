@@ -9,6 +9,7 @@ import Applied.Statistics.ConformalExact
 - source: J. Lei, M. G'Sell, A. Rinaldo, R. J. Tibshirani, L. Wasserman, "Distribution-free predictive inference for regression", J. Amer. Statist. Assoc. 113 (2018) (upper bound `1 - α + 1/(n+1)` on coverage for almost surely distinct scores; theorem number to be confirmed); V. Vovk, A. Gammerman, G. Shafer, "Algorithmic Learning in a Random World" (2005)
 - used-in: showing that conformal prediction sets are not needlessly conservative; calibration of conformal p-values
 - prerequisites: exchangeability; a counting lemma on ranks of distinct numbers
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/SplitConformalExactCoverage.lean` :: `measure_coe_le_splitConformalThreshold_eq_of_ae_injective`, `measure_coe_le_splitConformalThreshold_le` (equivalent; order-statistic phrasing). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Take `N = n + 1` real scores (`n` calibration scores and one test score),

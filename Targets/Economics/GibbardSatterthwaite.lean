@@ -9,6 +9,7 @@ import Applied.Economics.GibbardSatterthwaite
 - source: A. Gibbard, "Manipulation of voting schemes: a general result", Econometrica 41 (1973); M. A. Satterthwaite, "Strategy-proofness and Arrow's conditions", J. Econ. Theory 10 (1975) (theorem numbering to be confirmed); the reduction to Arrow's theorem follows the textbook route (e.g. N. Nisan et al., "Algorithmic Game Theory", Section 9.2.4, to be confirmed)
 - used-in: voting theory, mechanism design without money, impossibility results for strategy-proof rules
 - prerequisites: `Applied.Economics.Arrow` (Arrow's theorem for strict preferences); Mathlib has no social choice theory
+- formalized-elsewhere: atlas-lean `MathlibExt/GameTheory/SocialChoice/GibbardSatterthwaite.lean` :: `gibbard_satterthwaite` (onto and strategy-proof, as here; equivalent); econcslib-bei `EconCSLib/SocialChoice/Voting/GibbardSatterthwaite.lean` (resolute, unanimous, set-valued rules; equivalent by the standard reduction, not formalized); elazarg/GameTheory `GameTheory/Core/GibbardSatterthwaite.lean` :: `impossibility`. Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `V` be a finite set of voters and `X` a set of at least three

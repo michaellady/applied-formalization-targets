@@ -9,6 +9,7 @@ import Applied.Statistics.RaoBlackwell
 - source: C. R. Rao (1945); D. Blackwell, "Conditional expectation and unbiased sequential estimation", Ann. Math. Statist. 18 (1947)
 - used-in: improving estimators by conditioning; variance reduction in Monte Carlo
 - prerequisites: conditional expectation, law of total variance (Mathlib)
+- formalized-elsewhere: lean-cksd `CKSD/Inference/Estimation.lean` :: `exists_rao_blackwell_estimator` (with sufficiency; the statement here is the conditioning-variance inequality without sufficiency). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Conditioning a square-integrable estimator on any sub-σ-algebra keeps its

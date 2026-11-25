@@ -9,6 +9,7 @@ import Applied.Economics.Shapley
 - source: L. S. Shapley, "A value for n-person games", in Contributions to the Theory of Games II, Ann. Math. Studies 28 (1953), pp. 307–317 (theorem numbering to be confirmed)
 - used-in: cooperative game theory, cost allocation, feature attribution in machine learning (SHAP), power indices
 - prerequisites: finite sums over bijections `N ≃ Fin n`; Mathlib has no cooperative game theory (searched for `Shapley`)
+- formalized-elsewhere: cslib-frontier `CslibFrontier/GameTheory/Cooperative/ShapleyValue.lean` :: `existsUnique_shapleyValue` (uniqueness from anonymity and dummy, which are stronger axioms than the symmetry and null-player axioms used here); atlas-lean `GameTheory/ShapleyValue.lean`; elazarg/GameTheory `GameTheory/Core/Shapley.lean` :: `shapleyValue_unique` (same axioms as here). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. A cooperative game on a finite player set `N` assigns a real worth `v S`

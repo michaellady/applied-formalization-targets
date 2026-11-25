@@ -9,6 +9,7 @@ import Applied.Statistics.NeymanPearsonRandomized
 - source: J. Neyman, E. S. Pearson, "On the problem of the most efficient tests of statistical hypotheses", Phil. Trans. R. Soc. A 231 (1933); the randomized form is the "sufficiency" part of the Neyman–Pearson fundamental lemma in E. L. Lehmann, J. P. Romano, "Testing Statistical Hypotheses" (theorem number to be confirmed)
 - used-in: most powerful tests for discrete data, where exact size requires randomization; ROC analysis; hypothesis-testing characterizations of differential privacy
 - prerequisites: Mathlib lower Lebesgue integral and `withDensity`
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/Statistics/NeymanPearson.lean` :: `neyman_pearson_dominated_two_simple` (real integrable densities, `k ≥ 0`; equivalent). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `μ` be a measure and `p₀, p₁` measurable densities with values in

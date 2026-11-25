@@ -11,6 +11,7 @@ import Mathlib.Data.Fintype.Basic
 - source: I. Caragiannis et al., "The unreasonable fairness of maximum Nash welfare", EC 2016 (problem); B. Plaut, T. Roughgarden, SODA 2018 (two agents); B. Chaudhury, J. Garg, K. Mehlhorn, "EFX exists for three agents", EC 2020
 - used-in: fair division of indivisible goods (inheritance, course allocation, resource scheduling)
 - prerequisites: finite sums only
+- formalized-elsewhere: the open statement: econcslib-bei `EconCSLib/OpenProblem/EFXExistence.lean` :: `EFXExistenceStatement` and `EconCSLib/OpenProblem/New/EFXAdditiveExistence/Problem.lean` (same strong EFX definition; stated for `n ≥ 4`, here for all `n ≥ 1`). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. `n` agents with additive non-negative valuations divide `m` indivisible

@@ -10,6 +10,7 @@ import Targets.Economics.EFX
 - source: B. Plaut, T. Roughgarden, "Almost envy-freeness with general valuations", SODA 2018 (identical valuations and two agents, for general valuations; theorem numbers to be confirmed)
 - used-in: fair division of indivisible goods
 - prerequisites: finite sums only
+- formalized-elsewhere: two agents: econcslib-bei `EconCSLib/SocialChoice/FairDivision/Indivisible/EFX.lean` :: `efx_exists_two_agents` (same strong form of EFX; equivalent); elazarg/GameTheory `FairDivision/TwoAgentEFX.lean` :: `exists_efx_two_agents` (removal of positively valued goods only: weaker). The identical-valuations case: no precedent found. Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Agents have additive non-negative valuations over `m` indivisible goods.

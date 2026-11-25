@@ -9,7 +9,7 @@ import Applied.Economics.SecretaryArrivalOptimal
 - source: D. V. Lindley, "Dynamic programming and decision theory", Applied Statistics 10 (1961); E. B. Dynkin, "The optimum choice of the instant for stopping a Markov process", Soviet Math. Dokl. 4 (1963); textbook account: T. S. Ferguson, "Who solved the secretary problem?", Statistical Science 4 (1989), Section 2 (exact statements to be confirmed). The bijection between permutations and relative-rank (inversion) sequences is the classical Lehmer code / inversion table (e.g. D. E. Knuth, The Art of Computer Programming, Vol. 3, Section 5.1.1; to be confirmed)
 - used-in: online selection, optimal stopping
 - prerequisites: finite counting over permutations and dependent function spaces
-- formalized-elsewhere: according to `PRIOR-ART-VERIFICATION.md` (row 8a), atlas-lean (`SecretaryOptimality.lean`, `card_rankRule_wins_div_factorial_le`) and cslib-frontier (`Secretary.lean`) formalize optimality results for the classical secretary problem; their models were not compared with this one
+- formalized-elsewhere: atlas-lean `MathlibExt/Probability/OptimalStopping/SecretaryOptimality.lean` :: `card_rankRule_wins_div_factorial_le` (optimality among rules that must select someone; the class here also admits rules that may never stop, so it is slightly larger); cslib-frontier `CslibFrontier/Probability/OptimalStopping/Secretary.lean` :: `successProb_cutoffRule`. Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. Let `E` be a finite set with `n = |E|` elements, `w : E → ℝ`, and

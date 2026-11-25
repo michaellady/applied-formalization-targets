@@ -9,6 +9,7 @@ import Applied.Economics.Kelly
 - source: J. L. Kelly Jr., "A new interpretation of information rate", Bell System Technical Journal 35 (1956); textbook form to be confirmed (e.g. T. Cover, J. Thomas, "Elements of Information Theory", chapter on gambling)
 - used-in: bet sizing, portfolio growth-optimal strategies, information-theoretic gambling
 - prerequisites: the real logarithm and `log x ≤ x - 1`
+- formalized-elsewhere: formal-mathfin `MathFin/Choice/Performance/Ratios.lean` :: `kellyGrowth_deriv_at_kelly` (first-order condition only: derivative zero at the Kelly fraction; global and strict maximality are not there). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. A bet pays net odds `b > 0` with probability `p` (`0 < p < 1`) and loses

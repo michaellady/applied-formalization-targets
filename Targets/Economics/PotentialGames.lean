@@ -9,6 +9,7 @@ import Applied.Economics.Nash
 - source: D. Monderer, L. S. Shapley, "Potential games", Games Econ. Behav. 14 (1996) (corollary numbering to be confirmed); for congestion games, R. W. Rosenthal, "A class of games possessing pure-strategy Nash equilibria", Int. J. Game Theory 2 (1973)
 - used-in: congestion and routing games, network formation, convergence of best-response dynamics, distributed optimisation
 - prerequisites: none beyond finiteness (`Finite.exists_max`)
+- formalized-elsewhere: elazarg/GameTheory `GameTheory/Core/Potential.lean` :: `IsOrdinalPotential.exists_isNash` (ordinal potentials; the generalized-ordinal hypothesis here is slightly weaker). Statements read and compared, not compiled here.
 - statement-review: unreviewed
 
 Informal statement. A game has players `i : ι`, a type `S i` of pure strategies for each
