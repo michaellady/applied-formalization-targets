@@ -453,6 +453,47 @@ theorem fredmanKomlos_core {m : ℕ} (w : β → Fin n → Fin (m + 2))
         rw [sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul]
         ring
 
+/-- **Fredman–Komlós bound** (1984) for perfect `k`-hash codes, `k ≥ 2`. If `C ⊆ {0,…,k-1}ⁿ`
+is a perfect `k`-hash code with `N` words, then
+`N (N-1) ⋯ (N-k+2) · k^{k-1} · log₂ (N - k + 2) ≤ n · k! · N^{k-1}`.
+(Here `N - (k - 2)` is natural-number subtraction; for `N < k - 1` the left side is `0`.)
+As `N → ∞` this gives `log₂ N ≤ (1 + o(1)) · n · k! / k^{k-1}`. -/
+theorem IsPerfectHashCode.fredmanKomlos {k n : ℕ} (hk : 2 ≤ k) {C : Finset (Fin n → Fin k)}
+    (hC : IsPerfectHashCode k C) :
+    (C.card.descFactorial (k - 1) : ℝ) * (k : ℝ) ^ (k - 1) *
+        Real.logb 2 ((C.card - (k - 2) : ℕ) : ℝ) ≤
+      n * k.factorial * (C.card : ℝ) ^ (k - 1) := by
+  classical
+  obtain ⟨m, rfl⟩ : ∃ m, k = m + 2 := ⟨k - 2, by omega⟩
+  have e1 : m + 2 - 1 = m + 1 := by omega
+  have e2 : m + 2 - 2 = m := by omega
+  rw [e1, e2]
+  have H : ∀ S : Finset C, S.card = m + 2 →
+      ∃ i, Set.InjOn (fun b : C => (b : Fin n → Fin (m + 2)) i) S := by
+    intro S hS
+    obtain ⟨i, hi⟩ := hC (S.map (Function.Embedding.subtype _))
+      (fun x hx => by
+        obtain ⟨y, -, rfl⟩ := mem_map.mp hx
+        exact y.2)
+      (by rw [card_map, hS])
+    refine ⟨i, fun a ha b hb e => Subtype.ext ?_⟩
+    exact hi (mem_coe.mpr (mem_map_of_mem _ (mem_coe.mp ha)))
+      (mem_coe.mpr (mem_map_of_mem _ (mem_coe.mp hb))) e
+  have h := fredmanKomlos_core (β := C) (fun b => (b : Fin n → Fin (m + 2))) H
+  rw [Fintype.card_coe] at h
+  have hk0 : (0 : ℝ) < ((m + 2 : ℕ) : ℝ) := by positivity
+  have hpow : ((C.card : ℝ) / ((m + 2 : ℕ) : ℝ)) ^ (m + 1) * ((m + 2 : ℕ) : ℝ) ^ (m + 1) =
+      (C.card : ℝ) ^ (m + 1) := by
+    rw [div_pow]; field_simp
+  calc (C.card.descFactorial (m + 1) : ℝ) * ((m + 2 : ℕ) : ℝ) ^ (m + 1) *
+        Real.logb 2 ((C.card - m : ℕ) : ℝ)
+      = ((C.card.descFactorial (m + 1) : ℝ) * Real.logb 2 ((C.card - m : ℕ) : ℝ)) *
+          ((m + 2 : ℕ) : ℝ) ^ (m + 1) := by ring
+    _ ≤ (n * (m + 2).factorial * ((C.card : ℝ) / ((m + 2 : ℕ) : ℝ)) ^ (m + 1)) *
+          ((m + 2 : ℕ) : ℝ) ^ (m + 1) :=
+        mul_le_mul_of_nonneg_right h (by positivity)
+    _ = n * (m + 2).factorial * (C.card : ℝ) ^ (m + 1) := by rw [mul_assoc, hpow]
+
 end FK
 
 end Applied.Coding
