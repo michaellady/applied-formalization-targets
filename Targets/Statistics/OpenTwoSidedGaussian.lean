@@ -42,8 +42,26 @@ statistics with any correlation in `[-1, 1]` (`simesTwoSidedGaussian_of_le_two`,
 for `m = 2`); the Simes bound holds for any number of statistics that agree in absolute value
 (perfect correlation `± 1`); and Hochberg's and Hommel's procedures on two-sided p-values control
 the family-wise error rate whenever at most two hypotheses are true nulls with jointly normal
-statistics. Neither the case of three or more correlated statistics nor `BHTwoSidedGaussian` is
-touched by these results.
+statistics.
+
+Partial results for any number of statistics. `SimesTwoSidedGaussian` holds with either of the
+following extra hypotheses on the correlation matrix: (a) one-factor form,
+`Cov(Z i, Z j) = a i a j` for `i ≠ j` with `a i ² ≤ 1`, in particular equicorrelated statistics
+with `0 ≤ ρ ≤ 1` (`simesTwoSidedGaussian_of_oneFactorCov`,
+`simesTwoSidedGaussian_of_equicorrelated`, `Targets/Statistics/TwoSidedOneFactor.lean`);
+(b) covariance `M Mᵀ` with `M` invertible whose inverse has non-positive off-diagonal entries
+after a change of signs, the condition of Karlin and Rinott (1981)
+(`simesTwoSidedGaussian_of_karlinRinott`, `Targets/Statistics/TwoSidedKarlinRinott.lean`).
+Hochberg and Hommel are proved under corresponding hypotheses on the true nulls. These are the
+cases covered by the literature (absolute values MTP2; Sarkar 1998). What remains open is
+`SimesTwoSidedGaussian` for correlation matrices outside these classes, already for three
+statistics (for example equicorrelated with negative correlation).
+
+`BHTwoSidedGaussian`: according to information given to us (E. Dobriban, arXiv:2607.12208; L.
+Lei, arXiv:2607.14812; not verified by us and not formalised in this file) the proposition is
+false, with a one-factor counterexample having mean-shifted false nulls. The false discovery
+rate bounds proved in `TwoSidedOneFactor.lean` and `TwoSidedKarlinRinott.lean` concern only false
+nulls that are centred or do not load on the factor, and do not contradict this.
 -/
 
 open MeasureTheory ProbabilityTheory Finset
