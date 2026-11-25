@@ -30,9 +30,10 @@ standard normal `Z₀`.
 `a` such that for every measurable space, every measure `P` and every measurable `Z` with law
 `N(0, 1)` under `P`, the Benjamini–Hochberg procedure applied to the two two-sided p-values
 `2 (1 - Φ(|Z|))` (true null) and `2 (1 - Φ(|Z + a|))` (false null) has false discovery rate
-strictly greater than `α / 2 = α m₀ / m`. The shift is `a = -(c₁ + c₂)` with `Φ(c₂) = 1 - α/2`
-and `c₁ ≥ c₂` any point with `Φ(c₁) ≥ 1 - α/4`; the proof shows the false discovery rate is at
-least `α/2 + (Φ(c₁ + 2 c₂) - Φ(c₁)) / 2`.
+strictly greater than `α / 2 = α m₀ / m`. The Lean statement only asserts that such an `a`
+exists. In the proof (not in the statement) the shift is `a = -(c₁ + c₂)` with
+`Φ(c₂) = 1 - α/2` and `c₁ ≥ c₂` a point with `Φ(c₁) ≥ 1 - α/4`, and the false discovery rate is
+shown to be at least `α/2 + (Φ(c₁ + 2 c₂) - Φ(c₁)) / 2`.
 
 Differences from the textbook statement. There is no textbook statement. (1) is the remark that
 a false discovery forces the common null p-value below `α`, so the false discovery rate is at
