@@ -27,30 +27,34 @@ States: **done** (all three points), **partial** (statement plus some proved con
 
 ## B. Applied open problems (ProofAtlas Top 500, edition 12 Nov 2026)
 
-| Rank | Problem | State | Proved here |
+| Rank | Problem | State | Proved here, or what blocks it |
 |---|---|---|---|
 | 441 | Trifference problem | partial | Körner's bound `T(n) ≤ 2 (3/2)ⁿ` |
 | 138 | Binary Gilbert–Varshamov tightness | partial | Finite Gilbert–Varshamov bound |
 | 260 | Sample compression conjecture | stated | Definition is satisfiable |
 | 343 | Matroid secretary conjecture | todo | |
-| 136 | Polynomial pivot rule for simplex | todo | |
+| 136 | Polynomial pivot rule for simplex | todo | Needs a usable formal model of polynomial-time computation first |
 | 342 | Li–Li network coding conjecture | todo | |
-| 94 | Strongly polynomial linear programming | todo | |
-| 223 | Semidefinite feasibility in polynomial time | todo | |
-| 207 | Capacity of the binary deletion channel | todo | |
-| 155 | Capacity of the relay channel | todo | |
-| 390 | Capacity region of 3-receiver broadcast channels | todo | |
-| 229 | Reliability function of the binary symmetric channel | todo | |
+| 94 | Strongly polynomial linear programming | todo | Needs a usable formal model of polynomial-time computation first |
+| 223 | Semidefinite feasibility in polynomial time | todo | Needs a usable formal model of polynomial-time computation first |
+| 207 | Capacity of the binary deletion channel | todo | Needs channel capacity definitions first |
+| 155 | Capacity of the relay channel | todo | Needs channel capacity definitions first |
+| 390 | Capacity region of 3-receiver broadcast channels | todo | Needs channel capacity definitions first |
+| 229 | Reliability function of the binary symmetric channel | todo | Needs channel capacity definitions first |
 | 325 | Computability of Shannon capacity of graphs | todo | |
 | 226 | Constant-query locally decodable codes | todo | |
-| 204 | PAC learning of DNF in polynomial time | todo | |
-| 131 | Planted clique conjecture | todo | |
-| 232 | Classical worst-case reduction for LWE | todo | |
-| 286 | Worst-case to average-case reduction for LPN | todo | |
+| 204 | PAC learning of DNF in polynomial time | todo | Needs a usable formal model of polynomial-time computation first |
+| 131 | Planted clique conjecture | todo | Needs a usable formal model of polynomial-time computation first |
+| 232 | Classical worst-case reduction for LWE | todo | Needs a usable formal model of polynomial-time computation first |
+| 286 | Worst-case to average-case reduction for LPN | todo | Needs a usable formal model of polynomial-time computation first |
 | 422 | Witsenhausen counterexample | todo | |
 | 406 | Uniform ε-equilibrium in stochastic games | todo | |
-| 233 | Quantum capacity of the depolarizing channel | todo | |
+| 233 | Quantum capacity of the depolarizing channel | todo | Needs channel capacity definitions first |
 | 315 | Good quantum locally testable codes | todo | |
+
+Seven of these are questions about polynomial-time algorithms and five about channel
+capacity. They cannot be stated faithfully until those foundations exist in Lean, so the
+foundations are the real next piece of work for this group.
 
 ## C. First registry batch
 
