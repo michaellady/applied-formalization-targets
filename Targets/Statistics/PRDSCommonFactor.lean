@@ -62,6 +62,11 @@ from `Z j` being standard normal but is not stated); two-sided tests (see
 `Targets/Statistics/OpenTwoSidedGaussian.lean`); the classical PRDS definition; general
 multivariate normal vectors with non-negative correlations; multivariate `t` statistics;
 negative `ρ`.
+
+See also: end-to-end Benjamini–Hochberg, Simes, Hochberg and Hommel theorems for the one-factor
+model with unequal loadings (`Targets/Statistics/BHOneFactor.lean`), independent groups with
+one factor each (`Targets/Statistics/PRDSGroupFactor.lean`) and many-to-one comparisons with a
+shared control (`Targets/Statistics/ManyToOneControl.lean`).
 -/
 
 namespace Targets.Statistics
