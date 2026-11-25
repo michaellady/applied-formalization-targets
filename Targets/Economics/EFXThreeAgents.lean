@@ -7,7 +7,7 @@ import Targets.Economics.EFXTwoTypes
 - id: econ-efx-three-agents
 - area: economics
 - status: formalized
-- source: B. R. Chaudhury, J. Garg, K. Mehlhorn, "EFX exists for three agents", EC 2020, journal version J. ACM 71(1), 2024 (the theorem; volume and theorem number to be confirmed); proof followed here: H. Akrami, N. Alon, B. R. Chaudhury, J. Garg, K. Mehlhorn, R. Mehta, "EFX: a simpler approach and an (almost) optimal guarantee via rainbow cycle number", arXiv:2205.07638, Section 4, Theorem 10 (extended abstract EC 2023, to be confirmed)
+- source: B. R. Chaudhury, J. Garg, K. Mehlhorn, "EFX exists for three agents", EC 2020; arXiv:2002.05119v3, Theorem 20 (read at source); journal version J. ACM 71(1), 2024 (volume not verified at source); proof followed here: H. Akrami, N. Alon, B. R. Chaudhury, J. Garg, K. Mehlhorn, R. Mehta, arXiv:2205.07638v2, "EFX Allocations: Simplifications and Improvements", Section 4, Theorem 10 (read at source; the EC 2023 / journal version carries the title "EFX: a simpler approach and an (almost) optimal guarantee via rainbow cycle number", not verified at source)
 - used-in: partial result towards `Targets.Economics.EFXExists`; it is the proposition `Targets.Economics.EFXExistsThree`
 - prerequisites: finite sums, finite maxima and minima, binary expansions (through the perturbation lemma of `EFXTwoTypes.lean`)
 - formalized-elsewhere: not found in the searches recorded in `PRIOR-ART-VERIFICATION-2.md` (two-agent EFX exists elsewhere; three agents does not)
@@ -62,8 +62,10 @@ choice of `g_i` as the least valuable good of `X3` for agent `i` is replaced by 
 with `X3 \ g` worth more than `X1` and `X2`. (5) Non-degeneracy is only assumed for the first
 agent in `efx3_nondegenerate`. These rearrangements are ours and are checked by Lean; they are
 not claimed to appear in the papers. The definition of EFX in both papers is the strong form
-used here (removing any good); for Chaudhury–Garg–Mehlhorn this is from memory and to be
-confirmed, for Akrami et al. it was read in the arXiv text (Section 2).
+used here (removing any good); this was read in the arXiv texts (Chaudhury–Garg–Mehlhorn,
+arXiv:2002.05119v3: "`i` strongly envies `S` if `X_i <_i S \ g` for some `g ∈ S`"; Akrami et
+al., arXiv:2205.07638v2, Section 2). Both papers compare distinct agents; `IsEFX` also
+contains the case `i = j`, which is automatic for non-negative valuations (see `EFX.lean`).
 
 Not covered: four or more agents (`Targets.Economics.EFXExists`, open); non-additive
 valuations (general monotone, MMS-feasible, nice-cancelable); chores; any efficiency or

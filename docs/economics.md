@@ -1,6 +1,6 @@
 # Economics: reader's guide
 
-Scope: `Applied/Economics/` (library, 46 files) and the registry entries in
+Scope: `Applied/Economics/` (library, 46 files plus `All.lean`, which imports all of them and exists only so that name clashes between files are caught by the build) and the registry entries in
 `Targets/Economics/`. Everything listed here is proved in Lean without `sorry` or extra
 axioms. Namespace: `Applied.Economics` (the secretary files use
 `Applied.Economics.MatroidSecretary`). A registry file `Targets/Economics/X.lean` restates or
@@ -128,15 +128,17 @@ Fair division.
 
 Secretary problems.
 
-8. `HasCompetitiveRandomized M c` — the matroid `M` admits a family of feasible online
+8. `HasCompetitiveRandomized M c` — the matroid `M` (known to the algorithm in advance; the
+   algorithm sees identity and weight of each arrival) admits a family of feasible online
    algorithms, indexed by a probability space, whose expected accepted weight (over the
    seed and a uniformly random arrival order) is at least `c · w(I)` for all non-negative
    weights `w` and every independent set `I`.
 9. `thresholdRule_success_prob`, `thresholdRule_success_one_div_e` — the rule "skip `r`
    arrivals, then take the first record" picks the best element with probability
    `(r/n) ∑_{j=r}^{n-1} 1/j`, and with `r = ⌊n/e⌋` this is at least `1/e`.
-10. `secretary_optimal`, `tendsto_M_inv_exp` — no ordinal online rule beats the best threshold
-    rule, and the optimal success probability tends to `1/e`.
+10. `secretary_optimal`, `tendsto_M_inv_exp` — no *ordinal* (rank-based) online rule beats the
+    best threshold rule, and the optimal success probability tends to `1/e`. (Rules that look
+    at the actual weights or identities are outside this statement.)
 11. `HasCompetitiveRandomized.blockSum`, `HasCompetitiveRandomized.restrict` — competitive
     ratios pass to direct sums and to restrictions.
 12. `hasCompetitiveRandomized_uniform_top`, `hasCompetitiveRandomized_partitionCap_top`,
@@ -191,9 +193,12 @@ only).
   the allocations; no algorithms or running times (all proofs are extremal arguments);
   `m = n + 3` goods; three or more valuation types; bi-valued valuations; tightness of the
   factor `2/3` between EFX and PMMS.
-* Classical secretary: rules that use the actual values (full-information problem);
-  randomized rules; asymptotics of the optimal threshold `r_n / n → 1/e`.
-* Matroid secretary: the known constants are not reached (`1/e` and `1 - O(1/√k)` for uniform
+* Classical secretary: optimality is proved among ordinal (rank-based) rules only; rules
+  that use the actual values, the i.i.d. full-information problem and randomized rules are
+  not treated; asymptotics of the optimal threshold `r_n / n → 1/e`.
+* Matroid secretary: the matroid is known in advance (for graphic matroids this is weaker
+  than the model of Korula–Pál, where the graph is revealed online); the known constants are
+  not reached (`1/e` and `1 - O(1/√k)` for uniform
   matroids, better constants for graphic matroids, a depth-independent constant for laminar
   matroids); transversal and co-graphic matroids; truncation and contraction; the
   equivalence of `graphic` with the acyclicity definition; models with unknown blocks or an
@@ -223,6 +228,8 @@ only).
 * `Applied.Economics.StochasticGame` (`n` players, `StochasticGame.lean`) and
   `Applied.Economics.ZeroSumStochasticGame` (`ShapleyStochastic.lean`) are two independent
   structures with their own strategy types; no lemma relates them.
+* `IsEFX` also quantifies over `i = j`, which says that every agent values each of their own
+  goods at `≥ 0`; this is automatic under the hypothesis `0 ≤ v` of all existence theorems.
 * `IsBimatrixNash` (`Nash.lean`, two payoff matrices) and `IsMixedNash` (any number of
   players) are related only for two players, by `isMixedNash_fin_two_iff` in
   `NashTwoPlayer.lean`.

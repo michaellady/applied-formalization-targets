@@ -30,8 +30,9 @@ What is proved in this project (separate entries, not in this file):
 * Identical valuations, any `n ≥ 1`: `Targets.Economics.pmms_exists_identical`
   (`PMMSSpecialCases.lean`).
 * Relations with EFX (`PMMSEFX.lean`): PMMS implies EFX (strong form `Targets.Economics.IsEFX`)
-  when all values are strictly positive (`isEFX_of_isPMMS`), but not when zero values are
-  allowed (`not_isPMMS_imp_isEFX`); EFX implies `2/3`-PMMS for non-negative valuations
+  when all values are strictly positive (`isEFX_of_isPMMS`); for this strong form the
+  positivity is needed (`not_isPMMS_imp_isEFX`; the literature states the implication for
+  positive values, so this is not a correction of it); EFX implies `2/3`-PMMS for non-negative valuations
   (`isApproxPMMS_two_thirds_of_isEFX`). Since EFX existence (`Targets.Economics.EFXExists`) is
   itself open for `n ≥ 4`, PMMS existence for strictly positive valuations would imply EFX
   existence for strictly positive valuations; this consequence is not stated as a theorem here.

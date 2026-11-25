@@ -76,6 +76,13 @@ Differences from the textbook statement.
 * Uniform matroids are defined here (`uniform`); Mathlib's `Matroid.unif` / `unifOn` are not
   used, and no comparison with them is proved.
 
+Model and status (common to all matroid secretary entries of this project). The matroid is
+known to the algorithm in advance, and the algorithm sees the identity as well as the weight
+of each arriving element; models in which the matroid is revealed online are not treated. The
+constants proved in this project are weaker than the best constants in the literature for the
+same classes. Partition matroids with capacities one (constant `1/e`) are already formalized
+in cslib-frontier (`MatroidSecretary.lean`); no novelty is claimed for that case.
+
 Not covered: the optimal or known constants (`1/e`, `1 - O(1/√k)`); truncations of other
 matroids; graphic matroids (the Korula–Pál `1/(2e)` reduction), laminar, transversal and
 general matroids; the matroid secretary conjecture itself, which remains open.

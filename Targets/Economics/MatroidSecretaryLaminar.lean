@@ -77,6 +77,13 @@ What is proved (all in `Applied/Economics/MatroidSecretaryLaminar.lean`).
   `MatroidSecretaryConjecture` restricted to laminar matroids in which every element lies in at
   most `h` members, with `c = 1/(8e(h+1))`.
 
+Model and status (common to all matroid secretary entries of this project). The matroid is
+known to the algorithm in advance, and the algorithm sees the identity as well as the weight
+of each arriving element; models in which the matroid is revealed online are not treated. The
+constants proved in this project are weaker than the best constants in the literature for the
+same classes. Partition matroids with capacities one (constant `1/e`) are already formalized
+in cslib-frontier (`MatroidSecretary.lean`); no novelty is claimed for that case.
+
 Not covered: a constant independent of the depth for all laminar matroids (the Im–Wang /
 Jaillet–Soto–Zenklusen theorem); this file does not decide whether weight-oblivious colourings
 of this kind can achieve one. Transversal matroids (Korula–Pál; Dimitrov–Plaxton) are not
