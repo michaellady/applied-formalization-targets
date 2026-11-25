@@ -1,6 +1,7 @@
 import Applied.Statistics.PRDSFactorModels
 import Applied.Statistics.Simes
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
+import Mathlib.Probability.Distributions.Gaussian.HasGaussianLaw.Independence
 
 /-!
 # The Simes test for two-sided z-tests: two statistics, and boundary cases
@@ -706,6 +707,93 @@ theorem measure_simes_twoSided_oneFactor_two (P : Measure Ω) [IsProbabilityMeas
   · exact absurd rfl hik
 
 end SimesTwo
+
+section BivariateGaussian
+
+variable {Ω : Type*} [MeasurableSpace Ω]
+
+/-- **Key inequality for a bivariate normal pair with `|ρ| < 1`.** If `(X, V)` is jointly
+Gaussian with standard normal coordinates and `Cov(X, V) ^ 2 < 1`, then for measurable
+`U₁ ⊆ U₀` and `D` upward closed on `[0, ∞)`,
+`P (|X| ∈ U₀, |V| ∈ D) P (|X| ∈ U₁) ≤ P (|X| ∈ U₁, |V| ∈ D) P (|X| ∈ U₀)`. Proof: write
+`V = ρ X + √(1 - ρ²) Y` with `Y = (V - ρ X) / √(1 - ρ²)`, which is standard normal and, being
+jointly Gaussian with `X` and uncorrelated with it, independent of `X`. -/
+theorem twoSided_key_ineq_gaussianPair (P : Measure Ω) [IsProbabilityMeasure P] {X V : Ω → ℝ}
+    (hX : Measurable X) (hV : Measurable V) (hXV : HasGaussianLaw (fun ω => (X ω, V ω)) P)
+    (hlawX : P.map X = gaussianReal 0 1) (hlawV : P.map V = gaussianReal 0 1)
+    (hρ : cov[X, V; P] ^ 2 < 1) {U₀ U₁ D : Set ℝ}
+    (hU₀ : MeasurableSet U₀) (hU₁ : MeasurableSet U₁) (hD : MeasurableSet D) (hsub : U₁ ⊆ U₀)
+    (hU₁up : ∀ x y, 0 ≤ x → x ≤ y → x ∈ U₁ → y ∈ U₁)
+    (hDup : ∀ x y, 0 ≤ x → x ≤ y → x ∈ D → y ∈ D) :
+    P ({ω | |X ω| ∈ U₀} ∩ {ω | |V ω| ∈ D}) * P {ω | |X ω| ∈ U₁}
+      ≤ P ({ω | |X ω| ∈ U₁} ∩ {ω | |V ω| ∈ D}) * P {ω | |X ω| ∈ U₀} := by
+  set ρ := cov[X, V; P] with hρdef
+  set β := √(1 - ρ ^ 2) with hβ
+  have hβpos : 0 < β := Real.sqrt_pos.mpr (by linarith)
+  have hβsq : β ^ 2 = 1 - ρ ^ 2 := Real.sq_sqrt (by linarith)
+  set Y : Ω → ℝ := fun ω => β⁻¹ * (V ω - ρ * X ω) with hY
+  have hYm : Measurable Y := (hV.sub (hX.const_mul ρ)).const_mul _
+  have hHX : HasLaw X (gaussianReal 0 1) P := ⟨hX.aemeasurable, hlawX⟩
+  have hHV : HasLaw V (gaussianReal 0 1) P := ⟨hV.aemeasurable, hlawV⟩
+  have hmX : MemLp X 2 P := hXV.fst.memLp_two
+  have hmV : MemLp V 2 P := hXV.snd.memLp_two
+  have hEX : P[X] = 0 := by rw [hHX.integral_eq, integral_id_gaussianReal]
+  have hEV : P[V] = 0 := by rw [hHV.integral_eq, integral_id_gaussianReal]
+  have hVX : Var[X; P] = 1 := by rw [hHX.variance_eq, variance_id_gaussianReal]; simp
+  have hVV : Var[V; P] = 1 := by rw [hHV.variance_eq, variance_id_gaussianReal]; simp
+  have hcXX : cov[X, X; P] = 1 := by rw [covariance_self hX.aemeasurable, hVX]
+  have hcVV : cov[V, V; P] = 1 := by rw [covariance_self hV.aemeasurable, hVV]
+  have hcVX : cov[V, X; P] = ρ := by rw [covariance_comm]
+  have hmρX : MemLp (fun ω => ρ * X ω) 2 P := hmX.const_mul ρ
+  have hmD : MemLp (fun ω => V ω - ρ * X ω) 2 P := hmV.sub hmρX
+  -- the pair `(X, Y)` is Gaussian
+  let L : ℝ × ℝ →L[ℝ] ℝ × ℝ :=
+    (ContinuousLinearMap.fst ℝ ℝ ℝ).prod
+      (β⁻¹ • (ContinuousLinearMap.snd ℝ ℝ ℝ - ρ • ContinuousLinearMap.fst ℝ ℝ ℝ))
+  have hXY : HasGaussianLaw (fun ω => (X ω, Y ω)) P := by
+    have h := hXV.map_fun L
+    have e : (fun ω => L (X ω, V ω)) = fun ω => (X ω, Y ω) := by
+      funext ω
+      simp [L, Y, smul_eq_mul]
+    rwa [e] at h
+  -- `X` and `Y` are uncorrelated
+  have hcov : cov[X, Y; P] = 0 := by
+    simp only [hY]
+    rw [covariance_const_mul_right, covariance_fun_sub_right hmX hmV hmρX,
+      covariance_const_mul_right, hcXX]
+    ring
+  have hind : IndepFun X Y P := hXY.indepFun_of_covariance_eq_zero hcov
+  -- `Y` is standard normal
+  have hEY : P[Y] = 0 := by
+    simp only [hY]
+    rw [integral_const_mul, integral_sub (hmV.integrable one_le_two) (hmρX.integrable one_le_two), integral_const_mul,
+      hEV, hEX]
+    ring
+  have hVY : Var[Y; P] = 1 := by
+    rw [← covariance_self hYm.aemeasurable]
+    simp only [hY]
+    rw [covariance_const_mul_left, covariance_const_mul_right,
+      covariance_fun_sub_left hmV hmρX hmD, covariance_fun_sub_right hmV hmV hmρX,
+      covariance_fun_sub_right hmρX hmV hmρX, covariance_const_mul_left,
+      covariance_const_mul_left, covariance_const_mul_right, covariance_const_mul_right,
+      hcVV, hcVX, hcXX, ← hρdef]
+    field_simp
+    linarith
+  have hlawY : P.map Y = gaussianReal 0 1 := by
+    rw [hXY.snd.map_eq_gaussianReal, hEY, hVY]
+    simp
+  -- `V = ρ X + β Y`
+  have hVeq : ∀ ω, V ω = ρ * X ω + β * Y ω := by
+    intro ω
+    simp only [hY]
+    field_simp
+    ring
+  have hset : ∀ U : Set ℝ, {ω | |V ω| ∈ U} = {ω | |ρ * X ω + β * Y ω| ∈ U} := by
+    intro U; ext ω; simp only [Set.mem_ofPred_eq, hVeq ω]
+  rw [hset D]
+  exact twoSided_key_ineq_direct P hX hYm hind hlawY ρ hβpos.ne' hU₀ hU₁ hD hsub hU₁up hDup
+
+end BivariateGaussian
 
 section Identical
 
