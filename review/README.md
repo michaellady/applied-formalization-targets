@@ -23,8 +23,9 @@ the project build on these statements.
 | [G](G-optimization-learning-sparse-recovery.md) | Frank–Wolfe, online gradient descent, AdaBoost, Johnson–Lindenstrauss, NSP and RIP | optimization; learning theory; compressed sensing (can be split) | 60 min total | all found |
 
 Also in this directory: [`UPSTREAM-DRAFTS.md`](UPSTREAM-DRAFTS.md), drafts (not posted
-anywhere) of a proposal to Statlib, a contribution description for a conjecture repository,
-and a disclosure statement.
+anywhere) of possible contributions to formal-conjectures, atlas-lean, LMLExplore and
+EconCSLib and of an announcement, each with a go/no-go recommendation, and a disclosure
+statement.
 
 ## How to use a packet
 
