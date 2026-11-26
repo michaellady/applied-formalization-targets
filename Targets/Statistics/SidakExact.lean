@@ -7,7 +7,7 @@ import Applied.Statistics.SidakExact
 - area: statistics
 - status: formalized
 - source: Z. Šidák, "Rectangular confidence regions for the means of multivariate normal distributions", J. Amer. Statist. Assoc. 62 (1967) (customary credit for the correction; this entry is about the Šidák correction under independence, not that paper's inequality for correlated normal statistics); the exactness under independence is the elementary computation `1 - (1 - c)^m = α` behind the threshold (not stated in Šidák 1967, which uses the independent case only to calibrate the rectangle, Section 3, p. 629)
-- used-in: shows that the Šidák threshold cannot be enlarged under independence
+- used-in: motivation: the Šidák threshold is exact, not conservative, under independence
 - prerequisites: mutual independence, product formula for independent events
 - statement-review: unreviewed
 

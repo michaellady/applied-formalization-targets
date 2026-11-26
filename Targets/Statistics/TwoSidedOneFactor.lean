@@ -17,7 +17,8 @@ finite type, `Φ` is the standard normal distribution function, the two-sided p-
 `2 (1 - Φ(|z|))`, the Simes test at level `α` rejects when `1 ≤ bhK α p` (some `p₍ₖ₎ ≤ k α / m`),
 and "positively regression dependent" means `Applied.MultipleTesting.IsPRDSOn`: the
 conditioning-on-`pᵢ ≤ t` form (weak PRDS), not the definition of Benjamini and Yekutieli. Every
-statement assumes `α ≥ 0` and measurable statistics.
+statement assumes `α ≥ 0` and measurable statistics; the two registry theorems in the shape of
+`SimesTwoSidedGaussian` carry its restriction `α ≤ 1`, which their proofs do not use.
 
 (1) Law-level Simes inequality (`simes_twoSided_oneFactorCov`,
 `simesTwoSidedGaussian_of_oneFactorCov`). If `Z` is jointly normal (Mathlib's `IsGaussian` for the
@@ -33,7 +34,8 @@ with `Cov(Z 0, Z 1) = r`, `Cov(Z 0, Z 2) = s`, `Cov(Z 1, Z 2) = r s`, `r² ≤ 1
 
 (2) Hochberg and Hommel (`hommel_twoSided_oneFactorCov`, `hochberg_twoSided_oneFactorCov`). If
 the true-null statistics `(Z i)_{i ∈ H₀}` are jointly normal, standard normal, with
-`Cov(Z i, Z j) = a i a j` for `i ≠ j` in `H₀` and `a i ² ≤ 1`, then Hommel's procedure and
+`Cov(Z i, Z j) = a i a j` for `i ≠ j` in `H₀` and `a i ² ≤ 1`, then Hommel's procedure (the closed Simes test;
+the equivalence with Hommel's 1988 stagewise rule is not formalized) and
 Hochberg's step-up procedure (textbook rule, ties included) on the two-sided p-values have
 family-wise error rate at most `α`. The false-null statistics are arbitrary measurable functions.
 
@@ -78,7 +80,7 @@ matrix; here the correlation matrix must have one-factor form `a i a j` off the 
 three statistics with non-zero correlations this means `r₀₁ r₀₂ r₁₂ > 0` and each
 `r_ij r_ik / r_jk ≤ 1` (informal remark, not a Lean statement). The dependence notion is weak
 PRDS. Joint normality is Mathlib's `IsGaussian` (degenerate laws allowed). In (3)–(5) the model
-is an explicit representation on the sample space. The level is any `α ≥ 0`.
+is an explicit representation on the sample space. The level is any `α ≥ 0` in the library theorems.
 
 Not covered: correlation matrices that are not of one-factor form (see
 `Targets/Statistics/TwoSidedKarlinRinott.lean` for the wider Karlin–Rinott class, stated for

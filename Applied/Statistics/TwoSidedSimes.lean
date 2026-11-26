@@ -298,7 +298,7 @@ variable {Ω : Type*} [MeasurableSpace Ω]
 
 /-- **Key inequality for a bivariate normal pair with `|ρ| < 1`.** If `(X, V)` is jointly
 Gaussian with standard normal coordinates and `Cov(X, V) ^ 2 < 1`, then for measurable
-`U₁ ⊆ U₀` and `D` upward closed on `[0, ∞)`,
+`U₁ ⊆ U₀` with `U₁` and `D` upward closed on `[0, ∞)`,
 `P (|X| ∈ U₀, |V| ∈ D) P (|X| ∈ U₁) ≤ P (|X| ∈ U₁, |V| ∈ D) P (|X| ∈ U₀)`. Proof: write
 `V = ρ X + √(1 - ρ²) Y` with `Y = (V - ρ X) / √(1 - ρ²)`, which is standard normal and, being
 jointly Gaussian with `X` and uncorrelated with it, independent of `X`. -/

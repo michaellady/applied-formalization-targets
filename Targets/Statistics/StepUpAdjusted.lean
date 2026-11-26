@@ -24,7 +24,8 @@ all `j` with `pᵢ ≤ pⱼ`. For every level `α ≥ 0`, the Benjamini–Hochbe
 `α` rejects `i` if and only if its adjusted p-value is at most `α`.
 
 With the adjusted p-values capped at one, as usually reported, the equivalences hold for
-levels `α < 1`. Also: adjusted p-values are ordered like the raw p-values, and a non-negative
+levels `α < 1` (`0 ≤ α < 1` for Benjamini–Hochberg). Also: adjusted p-values are ordered like the
+raw p-values, and a non-negative
 p-value is at most its adjustment.
 
 Conventions. Without ties the multipliers of the `l`-th smallest p-value are `m - l + 1` and

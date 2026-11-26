@@ -28,7 +28,9 @@ all sets `S` containing `i` (not capped at one). Then:
 
 Differences from the textbook statement. Textbooks write the Simes p-value as
 `min_k |S| p_(k) / k` over sorted p-values; without ties this is the same number, and with ties
-`c_S(j)` is the last position of the tie block, which gives the same minimum. Hommel's
+`c_S(j)` is the last position of the tie block, which gives the same minimum for non-negative
+p-values (a
+  remark, not a Lean theorem here; for tied negative values the two differ). Hommel's
 adjusted p-values are usually computed by an `O(m²)` shortcut algorithm; here they are
 defined directly through closed testing (maximum over all `2^(m-1)` sets containing `i`), and
 the equivalence with the shortcut algorithm is not proved. The level is assumed `α ≥ 0`

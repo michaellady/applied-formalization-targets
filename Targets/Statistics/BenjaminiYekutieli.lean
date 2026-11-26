@@ -13,7 +13,8 @@ import Applied.Statistics.BenjaminiYekutieli
 - statement-review: unreviewed
 
 Informal statement. With measurable p-values that are valid under their nulls and no
-assumption at all on their dependence, the Benjamini–Hochberg procedure at level `α` has false
+assumption at all on their dependence, the Benjamini–Hochberg procedure at level `α ≥ 0` has
+false
 discovery rate at most `α (m₀ / m) (1 + 1/2 + ⋯ + 1/m)`. Running it at level
 `α / (1 + 1/2 + ⋯ + 1/m)` therefore controls the false discovery rate at `α`.
 -/

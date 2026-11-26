@@ -24,7 +24,8 @@ namespace Applied.InformationTheory
 
 namespace C7Search
 
-/-- Two letters of `ℤ/7` (given as naturals) are *far*: they differ by `2, 3, 4` or `5` mod 7. -/
+/-- Two letters of `ℤ/7` (given as naturals `a, b < 7`; for larger `b` the truncated
+subtraction makes this meaningless) are *far*: they differ by `2, 3, 4` or `5` mod 7. -/
 def far (a b : ℕ) : Bool := decide (2 ≤ (a + 7 - b) % 7 ∧ (a + 7 - b) % 7 ≤ 5)
 
 /-- Digit `i` of `c` in base 7. -/

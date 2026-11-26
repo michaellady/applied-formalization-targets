@@ -111,7 +111,8 @@ whether the level is inflated depends on the rule); the Mehta–Pocock / Gao–W
 promising zone below 50% conditional power; power, bias of estimates and confidence
 intervals after adaptation; non-null drift; the general Müller–Schäfer principle with
 conditional expectations of test functions; a concrete probability space is not constructed
-here (one is `Applied.GroupSequential.canonicalMeasure` with the coordinate maps).
+here (one is `Applied.GroupSequential.canonicalMeasure` of
+`Applied/Statistics/GroupSequentialJointLaw.lean` with the coordinate maps).
 -/
 
 namespace Targets.Statistics

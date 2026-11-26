@@ -15,7 +15,11 @@ import Applied.Statistics.MultipleTesting
 
 Informal statement. For `m` hypotheses with p-values that are valid under their null (no
 independence assumed), the Bonferroni rule and Holm's step-down rule each reject a true null
-with probability at most `α`. Definitions and proofs live in `Applied.Statistics.MultipleTesting`.
+with probability at most `α`, for every level `α ≥ 0`. A p-value is valid when
+`P(p ≤ t) ≤ t` for all `t ≥ 0` (real-valued, not required to lie in `[0, 1]`); no measurability
+is assumed, the probability being the outer measure of the event. Holm's rule is written
+without sorting, and tied p-values are compared with the threshold of the first position of
+the tie. Definitions and proofs live in `Applied.Statistics.MultipleTesting`.
 -/
 
 namespace Targets.Statistics

@@ -21,7 +21,8 @@ Informal statement. Throughout, a set `D ⊆ ℝ` is called *closed under decrea
    `P` a probability measure and includes singular covariances, constant coordinates and the
    empty index type), with `E[X i] = 0` for all `i`. Then for all real `c i`,
    `∏ i, P(|X i| ≤ c i) ≤ P(∀ i, |X i| ≤ c i)`. `sidak_inequality_strict` is the same with
-   `<` in place of `≤`, and `sidak_inequality_sets` with events `X i ∈ D i` for measurable sets
+   events `|X i| < c i` (the conclusion is still `≤`), and `sidak_inequality_sets` with events `X i
+   ∈ D i` for measurable sets
    `D i` closed under decreasing `|t|`.
 2. (`sidak_multivariateGaussian`) The same for Mathlib's `multivariateGaussian 0 S` on
    `EuclideanSpace ℝ ι`, for every matrix `S` (for `S` not positive semidefinite Mathlib's
@@ -41,7 +42,8 @@ Informal statement. Throughout, a set `D ⊆ ℝ` is called *closed under decrea
    the vector `(Z i)_{i ∈ H₀}` has a Gaussian joint law. Then for `0 ≤ c ≤ 1`,
    `P(∃ i ∈ H₀, 2 (1 - Φ(|Z i|)) ≤ c) ≤ 1 - (1 - c)^|H₀|`.
 5. (`sidak_fwer_twoSided_gaussian`) Under the hypotheses of 4, with `m` the total number of
-   hypotheses (a finite index type) and `α ≥ 0`: rejecting `i` when
+   hypotheses (a finite index type) and `α ≥ 0` (meaningful for `α ≤ 1`; for `α > 1` the
+   threshold is a real power of a negative number and the bound is trivial): rejecting `i` when
    `2 (1 - Φ(|Z i|)) ≤ 1 - (1 - α)^(1/m)` rejects some `i ∈ H₀` with probability at most `α`.
    Nothing is assumed about `Z i` for `i ∉ H₀`.
 6. (`sidak_confidence_rectangle`) Let `(X i)`, `i` in a non-empty finite type with `k`

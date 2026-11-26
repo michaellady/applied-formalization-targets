@@ -21,7 +21,9 @@ the identification of this law with Mathlib's `IsGaussian` and with a given cova
 not formalised. Signs are coded by Booleans, `sg true = -1`, `sg false = 1`. The
 **Karlin–Rinott sign condition** is: there is `d : ι → Bool` with
 `B i j * sg (d i) * sg (d j) ≤ 0` for all `i ≠ j`. `Φ` is the standard normal distribution
-function and `P` a probability measure; `α ≥ 0`.
+function and `P` a probability measure; `α ≥ 0` (the registry theorem in the shape of
+`SimesTwoSidedGaussian` also carries that statement's `α ≤ 1`, which the proof does not use).
+Every statistic `Z i` is assumed measurable.
 
 (1) Total positivity of the sign sum (`signSum_totallyPositive`). For
 `signSum M w = ∑_{σ ∈ {±1}^ι} exp (∑ᵢ ∑ⱼ M i j (σ i w i) (σ j w j))`: if

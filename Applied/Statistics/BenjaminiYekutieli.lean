@@ -63,7 +63,7 @@ lemma one_div_le_sum_bands {k m : ℕ} (hk : 1 ≤ k) (hkm : k ≤ m) (t : ℕ �
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι] {α : ℝ}
 
-/-- The Benjamini–Yekutieli constant times `m`: `1 + ∑_{1 ≤ j < m} 1 / (j + 1)`, which equals
+/-- The Benjamini–Yekutieli constant: `1 + ∑_{1 ≤ j < m} 1 / (j + 1)`, which equals
 the harmonic number `1 + 1/2 + ⋯ + 1/m` for `m ≥ 1`. -/
 noncomputable def byConst (m : ℕ) : ℝ := ∑ j ∈ Ico 1 m, (1 : ℝ) / (j + 1) + 1
 

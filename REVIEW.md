@@ -181,9 +181,39 @@ carry them as row labels.
 - [`NEXT-TARGETS`](docs/reviews/NEXT-TARGETS.md): candidate targets with the absence checks
   made for them.
 
+### Audit pass 8: several reviewer models, 26 November 2026
+
+Done by machines only. 27 entries (23 statistics entries, three-agent EFX, EFX, the Lovász
+odd-cycle bound and the `C₇` lower bounds) were each sent, with their library files, to up
+to seven reviewer models from different vendors (Claude, GPT, Gemini, Muse, Grok, Composer,
+GLM), each asked to compare header, statement and source independently.
+
+- Participation, of 27 entries: Claude 26, GPT 26, Gemini 23, Muse 22, Composer 21, GLM 21,
+  Grok 13. Four entries had prompts above 128 KB; on a re-run Dunnett got six
+  reviewers, `TwoSidedOneFactor` three, `TwoSidedKarlinRinott` two, and
+  `BHTwoSidedCounterexample` (2.4 MB with its certificate data) one, so that last entry is
+  effectively not reviewed in this pass.
+- No reviewer reported a wrong theorem or a proof gap. One reviewer reported an import as
+  non-existent; it exists in the pinned Mathlib and the file compiles.
+- Reported and corrected (prose only, no statement changed): the two-stage self-consistency
+  bound in `AdaptiveBH` used an undefined count; "FDR `α m₀/m`" should read "at most";
+  `step` in three-agent EFX does not keep the same three bundles; `3.2578 < 367^{1/5}` is a
+  numerical remark, not a theorem; the Benjamini–Yekutieli constant docstring said "times
+  `m`"; the weight-monotonicity claim in the graphical approach holds only for hypotheses
+  that remain; the tie remark in `HommelAdjusted` needs non-negative p-values; the
+  "version of the conditional probability" remark in `ClassicalPRDS` needs a probability
+  measure; the registry theorems of the two two-sided Simes entries carry `α ≤ 1` while the
+  headers said any `α ≥ 0`; the Dunnett correlation remark needs normal treatment noises;
+  a docstring in `TwoSidedSimes` omitted a hypothesis; several headers did not say `α ≥ 0`,
+  that p-values are real-valued and only super-uniform, that all p-values are measurable,
+  or how ties and the empty family are handled.
+- Reported and not acted on: requests for separate Bonferroni citations and for theorem
+  locators in papers that were not opened; remarks that a referenced file was not shown to
+  the reviewer.
+
 ### Not yet done
 
-- An audit with more than one reviewer model.
+- A several-model audit of the other 214 entries, and of `BHTwoSidedCounterexample`.
 - A re-audit of the six entries corrected after pass 7, and an audit of the two entries that
   exceeded the prompt size.
 - Reading the primary sources listed above as not opened or abstract-only.

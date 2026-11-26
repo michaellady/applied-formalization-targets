@@ -83,8 +83,8 @@ inequality `Φ^k ≥ 1 - k (1 - Φ)` gives `dunnettCDF k ≥ 1 - α`. For compos
 
 Differences from the textbook statements. The variance is known (normal, not multivariate-`t`,
 critical values); Dunnett's 1955 tables are for the estimated-variance case, which is not
-covered. The design is balanced: every comparison has correlation `1/2` with every other
-(loading `1/√2` on the control); unequal group sizes are not covered. Comparisons are
+covered. The design is balanced: two comparisons whose treatment noises are
+standard normal have correlation `1/2` (loading `1/√2` on the control); unequal group sizes are not covered. Comparisons are
 one-sided (upper); the two-sided procedure is not covered. The law of the maximum is stated as
 "all statistics in `I` are at most `d`" rather than through a `max` function. The quantile
 `dunnettCrit` is characterized by the integral equation, not computed: no numerical value of a

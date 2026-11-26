@@ -5,8 +5,9 @@ import Mathlib.MeasureTheory.Measure.Prod
 /-!
 # Adaptive Benjamini–Hochberg procedures under independence
 
-The Benjamini–Hochberg procedure at level `α` has false discovery rate `α m₀ / m`
-(`fdr_bhReject_le`, `fdr_bhReject_eq`), so it is conservative when the proportion `m₀ / m` of
+The Benjamini–Hochberg procedure at level `α` has false discovery rate at most `α m₀ / m`
+(`fdr_bhReject_le`; with equality for exactly uniform true nulls and `α ≤ 1`,
+`fdr_bhReject_eq`), so it is conservative when the proportion `m₀ / m` of
 true nulls is small. Adaptive procedures estimate that proportion from the p-values and run
 the step-up procedure at a correspondingly larger, data-dependent level. This file proves
 false discovery rate control for such procedures when each true-null p-value is independent of

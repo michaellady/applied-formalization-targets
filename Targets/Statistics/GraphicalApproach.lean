@@ -22,7 +22,8 @@ zero otherwise.
 2. Removing `j` and then `k` gives the same weights and the same matrix as removing `k` and
    then `j`. Hence the graph after removing a set of hypotheses does not depend on the order.
 3. The weights obtained for each set `I` by removing all hypotheses outside `I` are
-   non-negative, sum to at most one, and are monotone: they do not decrease when `I` shrinks.
+   non-negative, sum to at most one, and are monotone: when `I` shrinks, the weight of a
+   hypothesis that remains in `I` does not decrease.
 4. Therefore the graphical procedure (reject a hypothesis whose p-value is at most its current
    weight times `α`, update the graph, repeat) rejects a true null with probability at most
    `α` when the p-values of the true nulls are valid, under arbitrary dependence, at whatever
