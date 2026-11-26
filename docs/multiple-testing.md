@@ -74,9 +74,11 @@ GraphicalInstances`.
 | File | Content |
 |---|---|
 | `Sidak`, `SidakExact` | Šidák correction (independence); exactness for uniform p-values |
+| `SidakGaussian`, `SidakGaussianFWER` (with `Applied/Probability/PrekopaLeindler`, `PiGaussian`) | Šidák's 1967 inequality for centred Gaussian vectors with arbitrary covariance; Šidák correction for correlated two-sided z-tests; confidence rectangle |
 | `BenjaminiHochberg` | `bhK`, `bhReject`, `fdp`, `fdr`; the **Benjamini–Hochberg theorem** under independence |
 | `BHMonotone` | number of rejections = cut-off; monotonicity in the p-values |
 | `BenjaminiYekutieli` | BH under **arbitrary dependence** with the harmonic factor |
+| `AdaptiveBH` | **adaptive BH** under independence: plug-in estimators, Storey, the two-stage procedure |
 | `Simes` | **Simes inequality**, **Hommel** (closed Simes), **Hochberg** ⊆ Hommel |
 | `SimesExact` | BH and Simes bounds are equalities for independent uniform p-values |
 | `SimesSharp` | the harmonic bound for Simes under arbitrary dependence is attained |
@@ -149,7 +151,14 @@ p-values and (where relevant) measurability.
 8. `fwer_sidak_le_of_null_measurable` — Šidák correction (`p i ≤ 1 - (1-α)^{1/m}`): FWER ≤ `α`
    when the true-null p-values are measurable, valid and independent. `fwer_sidak_eq`: exactly
    `α` under the global null with uniform p-values (`α ≤ 1`). This is the Šidák correction under
-   independence; the inequality for correlated normal statistics is not formalized.
+   independence.
+   `fwer_sidak_twoSided_gaussian` (`SidakGaussianFWER.lean`): for two-sided z-test p-values
+   `2 (1 - Φ(|Zᵢ|))` the same bound holds with *no* independence assumption, when the true-null
+   statistics are jointly Gaussian with `N(0, 1)` marginals (any correlation). This rests on
+   Šidák's inequality `∏ P(|Xᵢ| ≤ cᵢ) ≤ P(∀ i, |Xᵢ| ≤ cᵢ)`
+   (`hasGaussianLaw_prod_abs_le_le`), proved through the Prékopa–Leindler inequality (ported
+   from another project, see the file header). A Lean proof of the rectangle inequality itself
+   already existed elsewhere; see `docs/reviews/RESEARCH-SIDAK-GAUSSIAN.md`.
 9. `measure_one_le_bhK_le` — Simes inequality: for independent valid p-values, all nulls true,
    `P (∃ k, p₍ₖ₎ ≤ α k / m) ≤ α`. The Simes event is written `1 ≤ bhK α q`.
    `measure_one_le_bhK_eq`: equality for uniform p-values (`α ≤ 1`).
@@ -161,6 +170,13 @@ p-values and (where relevant) measurability.
 11. `fdr_bhReject_le` / `fdr_bhReject_le_of_iIndepFun` — Benjamini–Hochberg has FDR ≤
     `α m₀ / m` when each true-null p-value is independent of the others.
     `fdr_bhReject_eq`: equality for uniform true-null p-values (`α ≤ 1`).
+
+11a. `fdr_tstReject_le` — the two-stage procedure of Benjamini, Krieger and Yekutieli (BH at
+    level `α/(1+α)`, then BH at level `α/(1+α) · m/(m - r₁)`) has FDR ≤ `α`;
+    `fdr_storeyBH_le` — BH at level `α (1-λ) m / (#{pⱼ > λ} + 1)` has FDR ≤ `α`;
+    `fdr_adaptiveBH_le` — BH at level `α G(p)` has FDR ≤ `(α/m) ∑_{i∈H₀} E[G(p₀,ᵢ)]` for a
+    non-increasing estimator `G`. All three assume that each true-null p-value is independent
+    of the others.
 
 **Arbitrary dependence**
 
@@ -239,7 +255,13 @@ Collected from the "Not covered" paragraphs of the registry files.
   Hochberg/Hommel under arbitrary dependence; the Šidák FWER identity when some nulls are false.
 * **Combination of p-values.** Fisher, Stouffer and order-statistic (Rüger) combinations are not
   in this area (`CombinedPValues` has the Bonferroni minimum and the maximum only).
-* **Not attempted at all:** power and optimality, FDR procedures other than BH (adaptive BH,
-  Storey, knockoffs; e-BH is in `Applied/Statistics/EValues.lean`, outside this guide),
+* **Adaptive procedures.** `AdaptiveBH` covers independence only: the two-stage procedure of
+  Benjamini–Krieger–Yekutieli (`fdr_tstReject_le`), Storey's estimator without the cap at `λ`
+  (`fdr_storeyBH_le`) and the plug-in bound for a general estimator (`fdr_adaptiveBH_le`).
+  Missing: the version capped at `λ`, the quantile estimator, multi-stage procedures,
+  data-dependent `λ`, and anything under dependence
+  (`Targets/Statistics/AdaptiveBH.lean`).
+* **Not attempted at all:** power and optimality, FDR procedures other than BH and its
+  adaptive versions (knockoffs; e-BH is in `Applied/Statistics/EValues.lean`, outside this guide),
   k-FWER and false discovery exceedance, simultaneous confidence regions compatible with
   stepwise procedures (see `CompatibleBounds` and `SimultaneousIntervals`, outside this guide).
