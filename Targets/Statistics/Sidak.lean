@@ -16,8 +16,8 @@ Informal statement. For `m` mutually independent p-values that are valid under t
 most `α`. Full statement: `Applied.MultipleTesting.fwer_sidak_le`.
 
 Scope. This is the independent case only, an elementary product formula. Šidák's 1967 theorem,
-which gives the same bound for two-sided tests on correlated jointly normal statistics, is not
-formalized; describe this entry as "the Šidák correction under independence", not as
+which gives the same bound for two-sided tests on correlated jointly normal statistics, is the
+separate entry `SidakGaussian.lean`; describe this entry as "the Šidák correction under independence", not as
 "Šidák's inequality" or "Šidák's theorem".
 
 Redundant hypotheses. `α ≤ 1` is not needed (for `α > 1` the bound is trivial; the threshold

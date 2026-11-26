@@ -30,7 +30,8 @@ family-wise error rate at level `α`. This threshold is slightly larger than Bon
 
 The procedure is named after Šidák, but what is proved here is only the elementary independent
 case: `P (min p > c) = ∏ P (p i > c) ≥ (1 - c) ^ m₀`. Šidák's 1967 theorem, the same inequality
-for the absolute values of *correlated* jointly normal statistics, is not formalized.
+for the absolute values of *correlated* jointly normal statistics, is in `SidakGaussian.lean`
+and its multiple-testing consequence in `SidakGaussianFWER.lean`.
 
 ## Related files
 
@@ -39,8 +40,8 @@ error rate is exactly `α` (`fwer_sidak_eq`).
 
 ## Not in this file
 
-Šidák's inequality for correlated normal statistics (see Attribution) and the step-down
-Holm–Šidák procedure.
+The step-down Holm–Šidák procedure. (Šidák's inequality for correlated normal statistics is in
+`SidakGaussian.lean`.)
 -/
 
 open MeasureTheory ProbabilityTheory Finset
