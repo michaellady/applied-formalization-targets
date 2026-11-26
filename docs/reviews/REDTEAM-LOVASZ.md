@@ -227,7 +227,7 @@ line, left out as it is not Shannon's argument).
 * **Result 2.** "Θ(C₅) = √5 (supremum form) is included for completeness; it was formalized
   before us in cslib-frontier and atlas-lean (the latter in the limit form, which we do not
   prove)."
-* **Result 3.** "Kernel-checked (`decide`, no `native_decide`) certificates for
+* **Result 3.** *(Note, 26 November 2026: the "first kernel-checked Lean proof of α(C₇^⊠5) ≥ 367" sentence below is WITHDRAWN. atlas-lean commit `2f8b45d6d2`, authored 2026-11-25 before our certificate, proves `polakSchrijverLowerBound` and `polakSchrijverRateLowerBound` with `decide +kernel`. See `review/UPSTREAM-DRAFTS.md`.)* "Kernel-checked (`decide`, no `native_decide`) certificates for
   α(C₇^⊠k) ≥ 10, 33, 108, 367 (k = 2,…,5), hence Θ(C₇) ≥ 367^(1/5) > 3.2578. The 367-word set
   was found by our own search starting from the Polak–Schrijver construction and is not claimed
   to be their set. This is not the best known lower bound: spectra-research/shannon-capacity-lean
