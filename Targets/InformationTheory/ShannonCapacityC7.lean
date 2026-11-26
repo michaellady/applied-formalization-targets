@@ -39,7 +39,7 @@ aware; it is one natural candidate for the answer, not a consensus conjecture.
 What is proved (in `Applied/`): `3 ≤ Θ(C₇) ≤ 7` (the trivial bounds `α(G) ≤ Θ(G) ≤ |V|`);
 `α(G^{⊠k})^{1/k} ≤ Θ(G)` for every `k ≥ 1`; `α(C₅ ⊠ C₅) ≥ 5` and hence `√5 ≤ Θ(C₅)`.
 Better lower bounds from explicit independent sets, up to `α(C₇^{⊠5}) ≥ 367` and hence
-`367^{1/5} > 3.2578 ≤ Θ(C₇)`, are in `Targets/InformationTheory/ShannonCapacityC7Lower.lean`.
+`3.2578 < 367^{1/5} ≤ Θ(C₇)`, are in `Targets/InformationTheory/ShannonCapacityC7Lower.lean`.
 This is the best lower bound proved in this project, and it is checked by the Lean kernel
 (`decide`, no `native_decide`); it is not the best known lower bound (see above). So this
 project proves `367^{1/5} ≤ Θ(C₇) ≤ 7 cos(π/7) / (1 + cos(π/7))`.
