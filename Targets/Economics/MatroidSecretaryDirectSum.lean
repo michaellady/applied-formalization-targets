@@ -7,7 +7,7 @@ import Targets.Economics.MatroidSecretary
 - id: econ-matroid-secretary-direct-sum
 - area: economics
 - status: formalized
-- source: folklore facts about the matroid secretary problem of M. Babaioff, N. Immorlica, R. Kleinberg, "Matroids, secretary problems, and online mechanisms", SODA 2007 (closure of the competitive classes under direct sums and restriction is standard; a citable statement, with theorem number, to be confirmed)
+- source: folklore facts about the matroid secretary problem of M. Babaioff, N. Immorlica, R. Kleinberg, "Matroids, secretary problems, and online mechanisms", SODA 2007 (closure of the competitive classes under direct sums and restriction is standard; it is not stated in that paper, whose closure result is for truncations, Theorem 6.1; a citable statement is not known to us)
 - used-in: reductions in the matroid secretary literature (handling each connected component separately; deleting elements)
 - prerequisites: `Applied/Economics/MatroidSecretary.lean`; Mathlib's `Matroid.restrict`, `Measure.pi` and Bochner integral
 - statement-review: unreviewed

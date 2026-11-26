@@ -6,7 +6,7 @@ import Applied.Statistics.CombinationTests
 - id: stat-combination-tests
 - area: statistics
 - status: formalized
-- source: P. Bauer, K. Köhne, "Evaluation of experiments with adaptive interim analyses", Biometrics 50 (1994) 1029-1041 (product test and the level formula `α₁ + c (ln α₀ - ln α₁)`); W. Brannath, M. Posch, P. Bauer, "Recursive combination tests", J. Amer. Statist. Assoc. 97 (2002) 236-244 (the "p-clud" condition and general combination functions). Page numbers and the places of the formulas in the papers: to be confirmed; the papers were not consulted while formalizing.
+- source: P. Bauer, K. Köhne, "Evaluation of experiments with adaptive interim analyses", Biometrics 50 (1994) 1029-1041 (product test and the level formula `α₁ + c (ln α₀ - ln α₁)`); W. Brannath, M. Posch, P. Bauer, "Recursive combination tests", J. Amer. Statist. Assoc. 97 (2002) 236-244 (the "p-clud" condition and general combination functions). The page range of Brannath–Posch–Bauer and the first page of Bauer–Köhne are confirmed at Crossref. The last page of Bauer–Köhne, the places of the formulas in the papers and the term "p-clud" are to be confirmed: only the abstracts were read, and the papers were not consulted while formalizing.
 - used-in: type-I-error control of confirmatory adaptive clinical trials with data-driven second-stage design (sample-size re-estimation, treatment or population selection); the methods are named in FDA's adaptive-design guidance (2019) and EMA's reflection paper (2007) (to be confirmed)
 - prerequisites: outer measure and countable subadditivity, the layer-cake formula, Tonelli's theorem for the area of a planar set, `∫ 1/x`
 - formalized-elsewhere: not found in the Lean repositories searched (NEXT-TARGETS.md, 25 Nov 2026)

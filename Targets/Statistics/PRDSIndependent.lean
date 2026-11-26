@@ -6,7 +6,7 @@ import Applied.Statistics.PRDSIndependent
 - id: stat-prds-independent
 - area: statistics
 - status: formalized
-- source: stated as a remark in Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001) (independence is a special case of positive regression dependence; exact location to be confirmed); the condition is in the form of G. Blanchard, E. Roquain, Electron. J. Stat. 2 (2008)
+- source: stated in passing in Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Section 3.1, Case 3, p. 1174 (independent components are PRDS over any subset); the condition is in the form of G. Blanchard, E. Roquain, Electron. J. Stat. 2 (2008)
 - used-in: shows that the Benjamini–Hochberg theorem for independent p-values is a special case of the theorem under positive dependence
 - prerequisites: product measures, independence of random variables
 - statement-review: unreviewed

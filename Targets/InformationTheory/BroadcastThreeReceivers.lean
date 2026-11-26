@@ -6,7 +6,7 @@ import Applied.InformationTheory.MultiTerminal
 - id: info-broadcast-three-receivers
 - area: information-theory
 - status: open
-- source: T. M. Cover, "Broadcast channels", IEEE Trans. Inform. Theory 18 (1972); textbook form A. El Gamal, Y.-H. Kim, "Network Information Theory" (2011), Chapters 5 and 8 (chapter numbers to be confirmed); ProofAtlas Top 500 (Nov 2026), rank 390 (exact wording of the ranked problem to be confirmed, see the review notes)
+- source: T. M. Cover, "Broadcast channels", IEEE Trans. Inform. Theory 18 (1972); textbook form A. El Gamal, Y.-H. Kim, "Network Information Theory" (2011), Chapters 5 and 8 (chapter numbers to be confirmed)
 - used-in: downlink communication from one transmitter to several receivers
 - prerequisites: row-stochastic matrices (`Applied/InformationTheory/Channel.lean`); broadcast codes (`Applied/InformationTheory/MultiTerminal.lean`)
 - formalized-elsewhere: the three-receiver region was not found in any project checked on 2026-11-25. Two receivers only: FujiHaruka/information-theory (github.com/FujiHaruka/information-theory), `InformationTheory/Shannon/BroadcastChannel/Operational.lean` :: `BCAchievable`, `bcCapacityRegion` (an equivalent notion for two receivers, up to the error criterion and the restriction to nonnegative rates) (clones of 2026-11-25; statements read at source, proofs not re-checked)

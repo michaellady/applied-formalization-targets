@@ -6,7 +6,7 @@ import Applied.Statistics.PRDSExamples
 - id: stat-prds-comonotone-blocks
 - area: statistics
 - status: formalized
-- source: elementary consequences of the definition of positive regression dependence on a subset, Y. Benjamini, D. Yekutieli, Ann. Statist. 29 (2001), Section 3.1 (whether these two facts are stated there in this form is to be confirmed)
+- source: elementary consequences of the definition of positive regression dependence on a subset, Y. Benjamini, D. Yekutieli, Ann. Statist. 29 (2001), Section 1.3 (the two facts are not stated in that paper)
 - used-in: checking the assumption of Benjamini–Hochberg, Simes, Hommel and Hochberg for groups of hypotheses tested with a common statistic, with independent groups
 - prerequisites: product measures, independence of random variables
 - statement-review: unreviewed

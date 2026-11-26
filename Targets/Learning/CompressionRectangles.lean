@@ -6,7 +6,7 @@ import Applied.Learning.SampleCompressionBoxes
 - id: learning-compression-rectangles
 - area: machine-learning
 - status: formalized
-- source: folklore; axis-parallel rectangles are a standard example of a class with a compression scheme of size `4` (keep the extreme positive examples), e.g. N. Littlestone, M. Warmuth, "Relating data compression and learnability" (1986) and S. Floyd, M. Warmuth, Machine Learning 21 (1995) (location to be confirmed)
+- source: folklore; axis-parallel rectangles are a standard example of a class with a compression scheme of size `4` (keep the extreme positive examples), e.g. N. Littlestone, M. Warmuth, "Relating data compression and learnability" (1986) and S. Floyd, M. Warmuth, Machine Learning 21 (1995), Section 3 ("Example: rectangles"); the Littlestone–Warmuth report was not opened
 - used-in: a special case of the sample compression conjecture (scheme size equal to the VC dimension `4`, which is attained when both orders have at least three points; that equality is standard and not proved here)
 - prerequisites: the definitions of `Applied.Learning.SampleCompression`
 - formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)

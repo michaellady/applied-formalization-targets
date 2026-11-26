@@ -6,7 +6,7 @@ import Applied.Statistics.PRDSFactorModels
 - id: stat-bh-many-to-one-control
 - area: statistics
 - status: formalized
-- source: Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Section 3.1 (comparisons of several treatments with a common control as an example of positive dependence; exact location to be confirmed); C. W. Dunnett, "A multiple comparison procedure for comparing several treatments with a control", J. Amer. Statist. Assoc. 50 (1955) (the model). The statements here use the conditioning-on-`pᵢ ≤ t` form of positive dependence, so they are not the statements of those papers.
+- source: Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Section 3.2, Problem 3 (many-to-one comparisons in clinical trials as an example of positive dependence, p. 1175; treated there for Studentized statistics, through Case 4 of Section 3.1); C. W. Dunnett, "A multiple comparison procedure for comparing several treatments with a control", J. Amer. Statist. Assoc. 50 (1955) (the model). The statements here use the conditioning-on-`pᵢ ≤ t` form of positive dependence, so they are not the statements of those papers.
 - used-in: clinical trials and screening experiments comparing several treatments or doses with one control group
 - prerequisites: `Applied/Statistics/PRDSFactorModels.lean` (one-factor model with unequal loadings)
 - statement-review: unreviewed

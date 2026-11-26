@@ -8,7 +8,7 @@ import Mathlib.Order.LiminfLimsup
 - id: coding-gilbert-varshamov-tightness
 - area: coding
 - status: open
-- source: E. N. Gilbert, Bell Syst. Tech. J. 31 (1952); R. R. Varshamov (1957); ProofAtlas Top 500 (Nov 2026), rank 138
+- source: E. N. Gilbert, Bell Syst. Tech. J. 31 (1952); R. R. Varshamov (1957)
 - used-in: error-correcting codes for storage and communication; the benchmark every binary code family is compared with
 - prerequisites: Hamming distance; counting
 - formalized-elsewhere: the open proposition `GilbertVarshamovTight` was not found stated in any project checked on 2026-11-25; tCSlib (github.com/Shilun-Allan-Li/tCSlib), `TCSlib/ErrorCorrectingCodes/MRRW.lean` :: `rate`, `codeA` defines the same rate `limsup log₂ A(n, ⌊δn⌋) / n`. The finite Gilbert–Varshamov bound is formalized in atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/Combinatorics/Coding/GilbertVarshamov.lean` :: `exists_code_pow_le_card_mul_sum` (`q`-ary) and cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Foundations/Data/Code/HammingBound.lean` :: `exists_le_minDist_and_prod_le_card_mul_card_filter_hammingDist_lt` (clones of 2026-11-25; statements read at source, proofs not re-checked)

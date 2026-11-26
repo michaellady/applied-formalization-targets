@@ -6,7 +6,7 @@ import Applied.Statistics.Simes
 - id: stat-simes-hommel-hochberg
 - area: statistics
 - status: formalized
-- source: R. J. Simes, Biometrika 73 (1986); G. Hommel, Biometrika 75 (1988); Y. Hochberg, Biometrika 75 (1988) 800–803
+- source: R. J. Simes, Biometrika 73 (1986); G. Hommel, Biometrika 75 (1988); Y. Hochberg, Biometrika 75 (1988) 800–802
 - used-in: confirmatory clinical trials (Hochberg is a standard multiplicity adjustment for multiple endpoints)
 - prerequisites: Benjamini–Hochberg theorem, closed testing
 - statement-review: unreviewed

@@ -6,7 +6,7 @@ import Applied.Learning.SampleCompressionBounds
 - id: learning-compression-lower-bound
 - area: machine-learning
 - status: formalized
-- source: S. Floyd, M. Warmuth, "Sample compression, learnability, and the Vapnik–Chervonenkis dimension", Machine Learning 21 (1995) (counting argument; the constant proved there to be confirmed); the constant `5` here comes from the bound `∑_{i ≤ k} C(d, i) 2^i ≤ 4^k (3/2)^d`
+- source: S. Floyd, M. Warmuth, "Sample compression, learnability, and the Vapnik–Chervonenkis dimension", Machine Learning 21 (1995) Theorem 14, Section 6.4 (counting argument: "For an arbitrary concept class C of VC dimension d, there is no sample compression scheme of size at most d/5"); the constant `5` here comes from the bound `∑_{i ≤ k} C(d, i) 2^i ≤ 4^k (3/2)^d`
 - used-in: showing that the sample compression conjecture is optimal up to the constant
 - prerequisites: the definitions of `Applied.Learning.SampleCompression`
 - formalized-elsewhere: cslib-frontier `CslibFrontier/MachineLearning/PACLearning/Compression/Shattering.lean` :: `two_pow_card_le_of_setShatters` (`2^d ≤ (2d+1)^k`, which gives only `d = O(k log k)`) — in a different scheme model (ordered list of kept examples; see "Scheme model" in `Targets/Learning/SampleCompression.lean`) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)

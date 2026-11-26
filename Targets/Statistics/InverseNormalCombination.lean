@@ -6,7 +6,7 @@ import Applied.Statistics.InverseNormalCombination
 - id: stat-inverse-normal-combination
 - area: statistics
 - status: formalized
-- source: W. Lehmacher, G. Wassmer, "Adaptive sample size calculations in group sequential trials", Biometrics 55 (1999) 1286-1290; L. Cui, H. M. J. Hung, S.-J. Wang, "Modification of sample size in group sequential clinical trials", Biometrics 55 (1999) 853-857. Page numbers and the places of the statements in the papers: to be confirmed; the papers were not consulted while formalizing.
+- source: W. Lehmacher, G. Wassmer, "Adaptive sample size calculations in group sequential trials", Biometrics 55 (1999) 1286-1290; L. Cui, H. M. J. Hung, S.-J. Wang, "Modification of sample size in group sequential clinical trials", Biometrics 55 (1999) 853-857. Page ranges confirmed at Crossref. The places of the statements in the papers are to be confirmed: only the abstracts were read, and the papers were not consulted while formalizing.
 - used-in: sample-size re-estimation and other data-driven second-stage changes in confirmatory adaptive trials; the weighted statistic with pre-specified weights is the method implemented in adaptive-design software (rpact, ADDPLAN, East; to be confirmed)
 - prerequisites: `Targets/Statistics/CombinationTests.lean` (lower-set bound), sums of independent normal variables, absolute continuity of the normal law with respect to Lebesgue measure in both directions
 - formalized-elsewhere: not found in the Lean repositories searched (NEXT-TARGETS.md, 25 Nov 2026)

@@ -7,7 +7,7 @@ import Targets.InformationTheory.ShannonCapacityC7
 - id: info-lovasz-odd-cycle
 - area: information-theory
 - status: formalized
-- source: L. Lovász, "On the Shannon capacity of a graph", IEEE Trans. Inform. Theory 25 (1979), Corollary 5 (`ϑ(Cₙ) = n cos(π/n)/(1 + cos(π/n))` for odd `n`; numbering to be confirmed)
+- source: L. Lovász, "On the Shannon capacity of a graph", IEEE Trans. Inform. Theory 25 (1979), Corollary 5 (`ϑ(Cₙ) = n cos(π/n)/(1 + cos(π/n))` for odd `n`; the number is confirmed via Hu–Tamo–Shayevitz, arXiv:1804.05529, Section 2, which quotes the statement as "[13, Corollary 5]"; the paper itself could not be opened)
 - used-in: the open problem `Targets/InformationTheory/ShannonCapacityC7.lean` (the upper bound in `ShannonCapacityC7EqLovaszTheta`)
 - prerequisites: Lovász's orthonormal-representation bound (`Targets/InformationTheory/LovaszThetaBound.lean`); sums of roots of unity (`geom_sum_eq`, `Complex.exp_eq_one_iff`, Mathlib)
 - formalized-elsewhere: not found proved in the projects checked on 2026-11-25. The case `n = 7` is stated without proof in atlas-lean (github.com/facebookresearch/atlas-lean), `WantedExt/Combinatorics/Coding/CycleShannonBoundsWanted.lean` :: `lovasz1979UpperBound` (`theorem_wanted`) and in formal-conjectures (github.com/google-deepmind/formal-conjectures), `FormalConjectures/GreensOpenProblems/38.lean` :: `green_38.variants.best_upper` (`sorry`); both statements are proved from the theorem here, in their own definitions copied verbatim, in `Applied/InformationTheory/LovaszBridge.lean` (`green_38_variants_best_upper`, `lovasz1979UpperBound`)

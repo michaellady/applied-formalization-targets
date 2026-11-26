@@ -6,7 +6,7 @@ import Applied.InformationTheory.DeletionUpperBound
 - id: info-deletion-channel-capacity
 - area: information-theory
 - status: open
-- source: R. L. Dobrushin, "Shannon's theorems for channels with synchronization errors", Problems Inform. Transmission 3 (1967) (existence of the capacity; details to be confirmed); M. Mitzenmacher, "A survey of results for deletion channels and related synchronization channels", Probability Surveys 6 (2009); ProofAtlas Top 500 (Nov 2026), rank 207
+- source: R. L. Dobrushin, "Shannon's theorems for channels with synchronization errors", Problems Inform. Transmission 3 (1967) (existence of the capacity; details to be confirmed); M. Mitzenmacher, "A survey of results for deletion channels and related synchronization channels", Probability Surveys 6 (2009)
 - used-in: synchronization errors in storage and communication (DNA storage, racetrack memory); the simplest channel with memory-free noise whose capacity is unknown
 - prerequisites: block codes and operational capacity (`Applied/InformationTheory/BlockCodes.lean`); the deletion kernel (`Applied/InformationTheory/DeletionChannel.lean`)
 - formalized-elsewhere: no Lean formalization found in the projects checked on 2026-11-25 (local clones and GitHub code search; see `PRIOR-ART-VERIFICATION-2.md`)

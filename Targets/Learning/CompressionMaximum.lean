@@ -6,7 +6,7 @@ import Applied.Learning.SampleCompressionMaximum
 - id: learning-compression-maximum
 - area: machine-learning
 - status: formalized
-- source: S. Floyd, M. Warmuth, "Sample compression, learnability, and the Vapnik–Chervonenkis dimension", Machine Learning 21 (1995) (maximum classes of VC dimension `d` have labelled compression schemes of size `d`; theorem number to be confirmed); the restriction and reduction facts for maximum classes are due to E. Welzl, "Complete range spaces" (unpublished notes, 1987) and appear in Floyd–Warmuth (exact location to be confirmed)
+- source: S. Floyd, M. Warmuth, "Sample compression, learnability, and the Vapnik–Chervonenkis dimension", Machine Learning 21 (1995) (maximum classes of VC dimension `d` have labelled compression schemes of size `d`: Theorems 10 and 11, Section 6.1); the restriction and reduction facts for maximum classes are due to E. Welzl, "Complete range spaces" (unpublished notes, 1987) and appear in Floyd–Warmuth as Theorem 9 and Corollaries 1 and 2 (Section 6)
 - used-in: the sample compression conjecture for maximum classes, with constant `1`
 - prerequisites: the definitions of `Applied.Learning.SampleCompression`; Mathlib's `Finset.Shatters`, `Finset.card_le_card_shatterer` (Pajor), `Finset.memberSubfamily` / `nonMemberSubfamily`
 - formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)

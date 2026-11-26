@@ -6,7 +6,7 @@ import Applied.Statistics.PRDSFactorModels
 - id: stat-bh-one-factor-unequal-loadings
 - area: statistics
 - status: formalized
-- source: Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Section 3.1 (positively correlated normal test statistics; case number to be confirmed); S. K. Sarkar, "Some probability inequalities for ordered MTP2 random variables: a proof of the Simes conjecture", Ann. Statist. 26 (1998) (Simes inequality under positive dependence; exact hypotheses to be confirmed). The statements here are for the one-factor structure and for the conditioning-on-`pᵢ ≤ t` form of positive dependence, so they are not the statements of those papers.
+- source: Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Section 3.1, Case 1 (multivariate normal test statistics); S. K. Sarkar, "Some probability inequalities for ordered MTP2 random variables: a proof of the Simes conjecture", Ann. Statist. 26 (1998) (Simes inequality for MTP2 statistics; hypothesis confirmed in the abstract only). The statements here are for the one-factor structure and for the conditioning-on-`pᵢ ≤ t` form of positive dependence, so they are not the statements of those papers.
 - used-in: tests whose statistics share one source of variation with different strengths (a common control, a shared batch or market factor), with heterogeneous correlations `aᵢ aⱼ`
 - prerequisites: `Applied/Statistics/PRDSCommonFactor.lean`, `Applied/Statistics/PRDS.lean`, validity of one-sided z-test p-values
 - statement-review: unreviewed

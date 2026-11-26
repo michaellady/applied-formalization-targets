@@ -6,7 +6,7 @@ import Applied.Learning.CompressionGeneralization
 - id: learning-compression-generalization
 - area: machine-learning
 - status: formalized
-- source: N. Littlestone, M. Warmuth, "Relating data compression and learnability", technical report (1986); S. Floyd, M. Warmuth, Machine Learning 21 (1995); textbook form in S. Shalev-Shwartz, S. Ben-David, "Understanding Machine Learning" (2014), chapter 30 (theorem number to be confirmed)
+- source: N. Littlestone, M. Warmuth, "Relating data compression and learnability", technical report (1986); S. Floyd, M. Warmuth, Machine Learning 21 (1995), Section 5, Theorems 5 and 6; textbook form in S. Shalev-Shwartz, S. Ben-David, "Understanding Machine Learning" (2014), chapter 30 (theorem number to be confirmed)
 - used-in: generalization bounds for learners that output a hypothesis determined by few examples (support vector machines, the perceptron, compression-based certificates)
 - prerequisites: independence of random variables, finite union bound
 - formalized-elsewhere: cslib-frontier `CslibFrontier/MachineLearning/PACLearning/Compression/Basic.lean` :: `SampleCompressionScheme.measure_pi_lt_error_learner_le` (bound `(m+1)^k (1-ε)^(m-k)`) — in a different scheme model (ordered list of kept examples; see "Scheme model" in `Targets/Learning/SampleCompression.lean`) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)

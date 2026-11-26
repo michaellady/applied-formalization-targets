@@ -6,7 +6,7 @@ import Applied.Learning.SampleCompressionBoxes
 - id: learning-compression-intervals
 - area: machine-learning
 - status: formalized
-- source: folklore; intervals and axis-parallel boxes are standard examples of classes with small compression schemes, e.g. N. Littlestone, M. Warmuth, "Relating data compression and learnability" (1986) and S. Floyd, M. Warmuth, Machine Learning 21 (1995) (location to be confirmed)
+- source: folklore; intervals and axis-parallel boxes are standard examples of classes with small compression schemes, e.g. N. Littlestone, M. Warmuth, "Relating data compression and learnability" (1986) and S. Floyd, M. Warmuth, Machine Learning 21 (1995), Section 3 ("Example: intervals on the line" and "Example: rectangles"); the Littlestone–Warmuth report was not opened
 - used-in: a special case of the sample compression conjecture (scheme size equal to the VC dimension `2`, which is attained when `|X| ≥ 2`; that equality is standard and not proved here)
 - prerequisites: the definitions of `Applied.Learning.SampleCompression`
 - formalized-elsewhere: cslib-frontier `CslibFrontier/MachineLearning/PACLearning/Compression/Order.lean` :: `ordConnectedScheme` (order-connected sets of any linear order, size `2`) — in a different scheme model (ordered list of kept examples; see "Scheme model" in `Targets/Learning/SampleCompression.lean`) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)

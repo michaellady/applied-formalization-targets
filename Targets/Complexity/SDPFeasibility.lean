@@ -6,7 +6,7 @@ import Applied.Complexity.SDP
 - id: complexity-sdp-feasibility-in-p
 - area: complexity
 - status: open
-- source: M. V. Ramana, "An exact duality theory for semidefinite programming and its complexity implications", Math. Programming 77 (1997) (complexity of the semidefinite feasibility problem in the Turing model; exact statement to be confirmed); L. Porkolab, L. Khachiyan (1997) for fixed dimension (to be confirmed); PROBLEMS.md #223 (ProofAtlas Top 500, Nov 2026, rank 223)
+- source: M. V. Ramana, "An exact duality theory for semidefinite programming and its complexity implications", Math. Programming 77 (1997) (complexity of the semidefinite feasibility problem in the Turing model; exact statement to be confirmed); L. Porkolab, L. Khachiyan (1997) for fixed dimension (to be confirmed); PROBLEMS.md #223
 - used-in: semidefinite programming, sum-of-squares certificates, approximation algorithms, quantum information
 - prerequisites: `Matrix.PosSemidef`, `Matrix.trace` (Mathlib); polynomial-time decidability (`Applied/Complexity/PolyTime.lean`)
 - formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)

@@ -7,9 +7,9 @@ import Targets.Economics.EFXTwoTypes
 - id: econ-efx-three-agents
 - area: economics
 - status: formalized
-- source: B. R. Chaudhury, J. Garg, K. Mehlhorn, "EFX exists for three agents", EC 2020; arXiv:2002.05119v3, Theorem 20 (read at source); journal version J. ACM 71(1), 2024 (volume not verified at source); proof followed here: H. Akrami, N. Alon, B. R. Chaudhury, J. Garg, K. Mehlhorn, R. Mehta, arXiv:2205.07638v2, "EFX Allocations: Simplifications and Improvements", Section 4, Theorem 10 (read at source; the EC 2023 / journal version carries the title "EFX: a simpler approach and an (almost) optimal guarantee via rainbow cycle number", not verified at source)
+- source: B. R. Chaudhury, J. Garg, K. Mehlhorn, "EFX exists for three agents", EC 2020; arXiv:2002.05119v3, Theorem 20 (read at source); journal version J. ACM 71(1), 2024 (volume and issue from Crossref; the theorem number in the journal version was not checked); proof followed here: H. Akrami, N. Alon, B. R. Chaudhury, J. Garg, K. Mehlhorn, R. Mehta, arXiv:2205.07638v2, "EFX Allocations: Simplifications and Improvements", Section 4, Theorem 10 (read at source; the EC 2023 / journal version carries the title "EFX: a simpler approach and an (almost) optimal guarantee via rainbow cycle number", not verified at source)
 - used-in: partial result towards `Targets.Economics.EFXExists`; it is the proposition `Targets.Economics.EFXExistsThree`
-- prerequisites: finite sums, finite maxima and minima, binary expansions (through the perturbation lemma of `EFXTwoTypes.lean`)
+- prerequisites: finite sums, finite maxima and minima, binary expansions (through the perturbation lemma `exists_pos_nondegenerate` of `Applied/Economics/FairDivisionBasic.lean`)
 - formalized-elsewhere: not found in the searches recorded in `PRIOR-ART-VERIFICATION-2.md` (two-agent EFX exists elsewhere; three agents does not)
 - statement-review: unreviewed
 

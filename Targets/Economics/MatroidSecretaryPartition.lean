@@ -8,7 +8,7 @@ import Targets.Economics.MatroidSecretary
 - id: econ-matroid-secretary-partition
 - area: economics
 - status: formalized
-- source: folklore special case of the matroid secretary problem of M. Babaioff, N. Immorlica, R. Kleinberg, "Matroids, secretary problems, and online mechanisms", SODA 2007 (whether and where that paper states the partition-matroid case, and with which constant, to be confirmed); the per-block rule is the classical secretary rule (Lindley 1961, Dynkin 1963)
+- source: folklore special case of the matroid secretary problem of M. Babaioff, N. Immorlica, R. Kleinberg, "Matroids, secretary problems, and online mechanisms", SODA 2007 (the partition-matroid case is a one-line remark in Section 6, before Theorem 6.1: an `e`-competitive algorithm, by running the classical rule on each part); the per-block rule is the classical secretary rule (Lindley 1961, Dynkin 1963)
 - used-in: online selection with one slot per category; building block for reductions in the matroid secretary literature
 - formalized-elsewhere: cslib-frontier `MatroidSecretary.lean` :: `exp_neg_one_mul_sum_le_expectedPartitionSecretary` (unit-capacity partition matroids, constant `1/e`; read, not compiled here)
 - prerequisites: `Applied/Economics/MatroidSecretary.lean` (model, half rule); Mathlib's `IndepMatroid.ofFinite`; `Measure.pi` is not needed here (deterministic algorithm)

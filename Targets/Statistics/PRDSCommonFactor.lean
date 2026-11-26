@@ -6,7 +6,7 @@ import Applied.Statistics.PRDSCommonFactor
 - id: stat-prds-gaussian-common-factor
 - area: statistics
 - status: formalized
-- source: Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Section 3.1 (positively correlated normal test statistics satisfy PRDS; case number to be confirmed). The statement proved here is for the common-factor structure and for the conditioning-on-`pᵢ ≤ t` form of the condition, so it is not the statement of that paper; whether this exact form appears in the literature is to be confirmed.
+- source: Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Section 3.1, Case 1 (positively correlated normal test statistics satisfy PRDS; latent-variable structures are Case 2). The statement proved here is for the common-factor structure and for the conditioning-on-`pᵢ ≤ t` form of the condition, so it is not the statement of that paper; whether this exact form appears in the literature is to be confirmed.
 - used-in: justification of Benjamini–Hochberg, Simes, Hommel and Hochberg for one-sided z-tests with equicorrelated statistics (many-to-one comparisons with a shared control, tests sharing a common noise component)
 - prerequisites: independence and product measures, the density of the real Gaussian distribution, `Applied/Statistics/PRDSIndependent.lean`
 - statement-review: unreviewed

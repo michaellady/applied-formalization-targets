@@ -7,7 +7,7 @@ import Applied.Optimization.SimplexExample
 - id: opt-polynomial-pivot-rule
 - area: optimization
 - status: open
-- source: the question goes back to G. B. Dantzig's simplex method (1947) and V. Klee, G. J. Minty, "How good is the simplex algorithm?", Inequalities III (1972), who showed Dantzig's rule is exponential; no single canonical statement, wording to be confirmed; PROBLEMS.md #136 (ProofAtlas Top 500, Nov 2026, rank 136)
+- source: the question goes back to G. B. Dantzig's simplex method (1947) and V. Klee, G. J. Minty, "How good is the simplex algorithm?", Inequalities III (1972), who showed Dantzig's rule is exponential; no single canonical statement, wording to be confirmed; PROBLEMS.md #136
 - used-in: linear programming, strongly polynomial algorithms (Smale's 9th problem), combinatorics of polytopes (polynomial Hirsch conjecture), Markov decision processes and parity games (policy iteration as pivoting)
 - prerequisites: matrices, linear independence, polynomials (Mathlib); Turing-machine polynomial time `Turing.TM2ComputableInPolyTime` (Mathlib) for the efficiency requirement on the rule
 - formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)

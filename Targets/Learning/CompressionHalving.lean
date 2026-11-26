@@ -6,7 +6,7 @@ import Applied.Learning.SampleCompressionBounds
 - id: learning-compression-halving
 - area: machine-learning
 - status: formalized
-- source: N. Littlestone, M. Warmuth, "Relating data compression and learnability", technical report (1986); S. Floyd, M. Warmuth, "Sample compression, learnability, and the Vapnik–Chervonenkis dimension", Machine Learning 21 (1995) (the halving-based scheme of size `log₂ |𝒞|`; exact location to be confirmed)
+- source: N. Littlestone, M. Warmuth, "Relating data compression and learnability", technical report (1986); S. Floyd, M. Warmuth, "Sample compression, learnability, and the Vapnik–Chervonenkis dimension", Machine Learning 21 (1995) (the halving-based scheme of size `log₂ |𝒞|`: Theorem 4, Section 4.1)
 - used-in: compression schemes far below the trivial size `|X|`; Occam-type bounds
 - prerequisites: the definitions of `Applied.Learning.SampleCompression`
 - formalized-elsewhere: cslib-frontier `CslibFrontier/MachineLearning/PACLearning/Compression/MistakeBound.lean` :: `ofMistakeBound` together with `CslibFrontier/MachineLearning/OnlineLearning/MistakeBound/Halving.lean` (the composition is not stated there) — in a different scheme model (ordered list of kept examples; see "Scheme model" in `Targets/Learning/SampleCompression.lean`) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)
