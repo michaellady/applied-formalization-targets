@@ -562,6 +562,13 @@ arbitrary correlation, Sidak's single-step procedure is valid, whereas BH is now
 GitHub `Sidak inequality Gaussian` 0, `Khatri Sidak` 0, exact phrase
 `"Gaussian correlation inequality"` 1 unrelated hit.
 
+**Update, 26 Nov 2026.** Done: `Targets/Statistics/SidakGaussian.lean`. The "zero hits" above
+was wrong: the rectangle inequality is formalized in `abhmul/weak-simplex-conjecture-lean`
+(`symmetricRectangle_ge_iid`, not indexed by GitHub code search) and follows from
+`royen_box_monotoneOn` in `shengtongz/bilu-linial-opus`; see
+`docs/reviews/RESEARCH-SIDAK-GAUSSIAN.md`. Anderson's lemma was not imported; the
+Prékopa–Leindler inequality was ported from `junwei-lu/Lean-Asymptotic-Statistical-Theory`.
+
 **Builds on.** `Applied/Statistics/Sidak.lean` (`sidak`, `fwer_sidak_le`, the product bound
 under independence), `PValues.lean` (`isValidPValue_zTest_twoSided`),
 `HarrisInequality.lean` (`integral_mul_integral_le_of_monotone`: Chebyshev's association
