@@ -188,8 +188,8 @@ odd-cycle bound and the `C₇` lower bounds) were each sent, with their library 
 to seven reviewer models from different vendors (Claude, GPT, Gemini, Muse, Grok, Composer,
 GLM), each asked to compare header, statement and source independently.
 
-- Participation: four reviewers answered 23 of 27 prompts each; the three slower ones
-  answered 20, 19 and 12. Four entries had prompts above 128 KB; on a re-run Dunnett got six
+- Participation, of 27 entries: Claude 26, GPT 26, Gemini 23, Muse 22, Composer 21, GLM 21,
+  Grok 13. Four entries had prompts above 128 KB; on a re-run Dunnett got six
   reviewers, `TwoSidedOneFactor` three, `TwoSidedKarlinRinott` two, and
   `BHTwoSidedCounterexample` (2.4 MB with its certificate data) one, so that last entry is
   effectively not reviewed in this pass.
