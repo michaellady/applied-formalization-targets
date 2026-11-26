@@ -6,7 +6,7 @@ import Applied.Learning.SampleCompressionReductions
 - id: learning-compression-d-log-n
 - area: machine-learning
 - status: formalized
-- source: folklore: the halving scheme of size `log₂ |𝒞|` (Littlestone–Warmuth 1986; Floyd–Warmuth, Machine Learning 21 (1995)) combined with the Sauer–Shelah bound `|𝒞| ≤ (n + 1)^d`; exact location in the literature to be confirmed
+- source: folklore: the halving scheme of size `log₂ |𝒞|` (Littlestone–Warmuth 1986; Floyd–Warmuth, Machine Learning 21 (1995), Theorem 4) combined with the Sauer–Shelah bound `|𝒞| ≤ (n + 1)^d`; a source stating the combined bound is to be confirmed
 - used-in: the sample compression conjecture up to a factor `log n`
 - prerequisites: `Targets/Learning/CompressionHalving.lean`, `Targets/Learning/SauerShelahVC.lean`
 - formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)

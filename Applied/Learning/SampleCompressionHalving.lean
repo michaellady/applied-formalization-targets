@@ -47,6 +47,7 @@ lemma versionSpace_insert (𝒞 : Finset (X → Bool)) (T : Finset (X × Bool)) 
   simp only [versionSpace, mem_filter, forall_mem_insert]
   tauto
 
+omit [DecidableEq X] in
 /-- Halving: if the majority vote errs on `e`, at most half of `V` agrees with `e`. -/
 lemma two_mul_card_filter_le {V : Finset (X → Bool)} {e : X × Bool}
     (h : majority V e.1 ≠ e.2) : 2 * (V.filter (fun c => c e.1 = e.2)).card ≤ V.card := by
@@ -63,6 +64,7 @@ lemma two_mul_card_filter_le {V : Finset (X → Bool)} {e : X × Bool}
   · simp only [ne_eq, decide_eq_true_eq, not_lt] at h
     omega
 
+omit [DecidableEq X] in
 lemma majority_eq_of_forall {V : Finset (X → Bool)} (hV : V.Nonempty) {x : X} {b : Bool}
     (h : ∀ c ∈ V, c x = b) : majority V x = b := by
   have hpos := hV.card_pos

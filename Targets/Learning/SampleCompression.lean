@@ -6,7 +6,7 @@ import Applied.Learning.SampleCompression
 - id: learning-sample-compression
 - area: machine-learning
 - status: open
-- source: N. Littlestone, M. Warmuth, "Relating data compression and learnability" (1986); S. Floyd, M. Warmuth, Machine Learning 21 (1995); M. Warmuth, COLT open problem (2003); S. Moran, A. Yehudayoff, J. ACM 63 (2016); ProofAtlas Top 500 (Nov 2026), rank 260
+- source: N. Littlestone, M. Warmuth, "Relating data compression and learnability" (1986); S. Floyd, M. Warmuth, Machine Learning 21 (1995); M. Warmuth, COLT open problem (2003); S. Moran, A. Yehudayoff, J. ACM 63 (2016)
 - used-in: generalization bounds in learning theory; compression-based certificates for learned models
 - prerequisites: VC dimension
 - formalized-elsewhere: the linear-size conjecture: no formal statement found; fltk `FLT_Proofs/Complexity/Structures.lean` :: `Open_NoInfoCompressionStrengthening` is a qualitative variant; cslib-frontier `CslibFrontier/MachineLearning/PACLearning/Compression/MoranYehudayoff.lean` :: `exists_sampleCompressionScheme_of_hasFiniteVCDim` proves the Moran–Yehudayoff exponential-size theorem in a different scheme model (ordered list of kept examples, see "Scheme model" below) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)

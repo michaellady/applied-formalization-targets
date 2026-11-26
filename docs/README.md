@@ -112,6 +112,7 @@ you compared (see `CONTRIBUTING.md`).
 | File | What it is |
 |---|---|
 | `REVIEW.md` | log of the automated statement audits: method, limits, findings and what was fixed |
+| `docs/reviews/` | adversarial review reports (`REDTEAM-*`), the source-verification report, declaration-level comparisons with other Lean projects (`COMPARE-*`) and the list of candidate targets, copied as written; summarized in `REVIEW.md` |
 | `review/` | review packets: one document per block of results, written so that a domain expert can check the statements in under an hour without reading proofs; `review/README.md` lists them |
 | `NOVELTY.md` | survey of which results appear to be new and which have precedents |
 | `PRIOR-ART-VERIFICATION.md`, `PRIOR-ART-VERIFICATION-2.md` | code-level searches of other Lean repositories; these correct several claims of `NOVELTY.md` |

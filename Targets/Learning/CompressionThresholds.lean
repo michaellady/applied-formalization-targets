@@ -6,7 +6,7 @@ import Applied.Learning.SampleCompressionBounds
 - id: learning-compression-thresholds
 - area: machine-learning
 - status: formalized
-- source: folklore; see e.g. S. Floyd, M. Warmuth, Machine Learning 21 (1995) for simple classes with small schemes (location to be confirmed)
+- source: folklore; see e.g. S. Floyd, M. Warmuth, Machine Learning 21 (1995) Section 3, for simple classes with small schemes (intervals and rectangles; thresholds are not a named example there)
 - used-in: a special case of the sample compression conjecture (scheme size equal to the VC dimension)
 - prerequisites: the definitions of `Applied.Learning.SampleCompression`
 - formalized-elsewhere: cslib-frontier `CslibFrontier/MachineLearning/PACLearning/Compression/Order.lean` :: `lowerSetScheme` (lower sets of any linear order, size `1`) — in a different scheme model (ordered list of kept examples; see "Scheme model" in `Targets/Learning/SampleCompression.lean`) (prior-art cross-check, Nov 2026: declarations read, not compiled by us)

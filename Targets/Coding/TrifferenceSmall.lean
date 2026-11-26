@@ -6,7 +6,7 @@ import Applied.Coding.TrifferenceLower
 - id: coding-trifference-small-cases
 - area: coding
 - status: formalized
-- source: upper bounds: the recursion `T(n + 1) ≤ ⌊3 T(n) / 2⌋` behind Körner's bound, J. Körner, "Coding of an information source having ambiguous alphabet and the entropy of graphs" (1973); the values `T(1), …, T(4) = 3, 4, 6, 9` and the tetracode example are reported in the literature on the trifference problem (exact reference to be confirmed)
+- source: upper bounds: the recursion `T(n + 1) ≤ ⌊3 T(n) / 2⌋` behind the elementary bound of J. Körner, K. Marton, "New bounds for perfect hashing via information theory", European J. Combin. 9 (1988) 523–530 (attribution as in Della Fiore–Gnutti–Polak, arXiv:2201.06846, and Kurz, arXiv:2310.13563; the problem is from J. Körner, "Coding of an information source having ambiguous alphabet and the entropy of graphs" (1973); neither paper was consulted); the values `T(1), …, T(4) = 3, 4, 6, 9`: S. Della Fiore, A. Gnutti, S. Polak, Examples and Counterexamples 2 (2022) 100051, arXiv:2201.06846, Section 1, where the code of length 4 and size 9 is credited to Körner–Marton (1988); a reference for the tetracode as an example of such a code is to be confirmed
 - used-in: base cases for computer searches and for lower-bound constructions for perfect 3-hash codes
 - prerequisites: finite combinatorics only
 - formalized-elsewhere: no Lean formalization found in the projects checked on 2026-11-25 (local clones and GitHub code search; see `PRIOR-ART-VERIFICATION-2.md`)

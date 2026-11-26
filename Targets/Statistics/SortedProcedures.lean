@@ -6,7 +6,7 @@ import Applied.Statistics.SortedProcedures
 - id: stat-sorted-stepwise-equivalence
 - area: statistics
 - status: formalized
-- source: S. Holm, "A simple sequentially rejective multiple test procedure", Scand. J. Statist. 6 (1979); Y. Hochberg, "A sharper Bonferroni procedure for multiple tests of significance", Biometrika 75 (1988); Y. Benjamini, Y. Hochberg, "Controlling the false discovery rate", J. R. Statist. Soc. B 57 (1995). The sorted rules below are the procedures as stated in these papers (exact wording and tie conventions to be confirmed); the sort-free forms are this library's definitions
+- source: S. Holm, "A simple sequentially rejective multiple test procedure", Scand. J. Statist. 6 (1979); Y. Hochberg, "A sharper Bonferroni procedure for multiple tests of significance", Biometrika 75 (1988) 800–802; Y. Benjamini, Y. Hochberg, "Controlling the false discovery rate", J. R. Statist. Soc. B 57 (1995). The sorted rules below are the procedures as stated in these papers (for Benjamini–Hochberg the rule `k = max{i : p(i) ≤ (i/m) q}` is confirmed via its restatement in Benjamini–Yekutieli, Ann. Statist. 29 (2001), p. 1167; for Holm and Hochberg only the abstracts were read, and the exact wording and tie conventions are to be confirmed); the sort-free forms are this library's definitions
 - used-in: every implementation of these procedures (e.g. R `p.adjust`) works with sorted p-values
 - prerequisites: `Tuple.sort` and `Tuple.monotone_sort` (Mathlib)
 - statement-review: unreviewed

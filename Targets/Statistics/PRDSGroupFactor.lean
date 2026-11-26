@@ -6,7 +6,7 @@ import Applied.Statistics.PRDSFactorModels
 - id: stat-prds-group-factor-blocks
 - area: statistics
 - status: formalized
-- source: Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Section 3.1 (positively correlated normal statistics; whether a block structure is discussed there is to be confirmed). The statements here are for a block-factor structure and for the conditioning-on-`pᵢ ≤ t` form of positive dependence, so they are not the statements of that paper.
+- source: Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Section 3.1, Case 1 (positively correlated normal statistics; a block structure is not discussed there). The statements here are for a block-factor structure and for the conditioning-on-`pᵢ ≤ t` form of positive dependence, so they are not the statements of that paper.
 - used-in: tests grouped by batch, laboratory, study arm or region, where tests in a group share a common source of variation and groups are independent
 - prerequisites: `Applied/Statistics/PRDSCommonFactor.lean` (one-factor theorem), `Applied/Statistics/PRDSExamples.lean` (independent-blocks lemma), independence of disjoint subfamilies of mutually independent variables
 - statement-review: unreviewed

@@ -6,7 +6,7 @@ import Applied.Statistics.StepUpAdjusted
 - id: stat-stepup-adjusted-pvalues
 - area: statistics
 - status: formalized
-- source: procedures from Y. Hochberg, "A sharper Bonferroni procedure for multiple tests of significance", Biometrika 75 (1988) 800–803 and Y. Benjamini, Y. Hochberg, J. R. Stat. Soc. B 57 (1995); the general adjusted-p-value approach as in S. P. Wright, "Adjusted p-values for simultaneous inference", Biometrics 48 (1992) (which predates Benjamini–Hochberg; exact formulas and statement numbers there to be confirmed); the Benjamini–Hochberg-adjusted formula as in the documentation of the R function `p.adjust` (method "BH")
+- source: procedures from Y. Hochberg, "A sharper Bonferroni procedure for multiple tests of significance", Biometrika 75 (1988) 800–802 and Y. Benjamini, Y. Hochberg, J. R. Stat. Soc. B 57 (1995); the general adjusted-p-value approach as in S. P. Wright, "Adjusted p-values for simultaneous inference", Biometrics 48 (1992) (its abstract covers adjusted p-values for the Bonferroni, Holm, Hochberg and Hommel procedures and for closed tests in general; it predates Benjamini–Hochberg, so the Benjamini–Hochberg-adjusted p-value is not there; exact formulas and statement numbers to be confirmed); the Benjamini–Hochberg-adjusted formula as in the documentation of the R function `p.adjust` (method "BH")
 - used-in: reporting of multiplicity-adjusted p-values by statistical software (for example the `hochberg` and `BH` methods of p-value adjustment functions)
 - prerequisites: finite sets and their cardinalities
 - statement-review: unreviewed

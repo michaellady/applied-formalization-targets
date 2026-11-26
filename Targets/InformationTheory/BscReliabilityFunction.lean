@@ -6,7 +6,7 @@ import Applied.InformationTheory.ReliabilityFunction
 - id: info-bsc-reliability-function
 - area: information-theory
 - status: open
-- source: C. E. Shannon, R. G. Gallager, E. R. Berlekamp, "Lower bounds to error probability for coding on discrete memoryless channels I, II", Information and Control 10 (1967); R. G. Gallager, "Information Theory and Reliable Communication" (1968), Chapter 5 (section numbers to be confirmed); ProofAtlas Top 500 (Nov 2026), rank 229
+- source: C. E. Shannon, R. G. Gallager, E. R. Berlekamp, "Lower bounds to error probability for coding on discrete memoryless channels I, II", Information and Control 10 (1967); R. G. Gallager, "Information Theory and Reliable Communication" (1968), Chapter 5 (section numbers to be confirmed)
 - used-in: how fast the error probability of the best codes decays with the block length; design of short-block-length communication
 - prerequisites: block codes (`Applied/InformationTheory/BlockCodes.lean`); `Filter.limsup`; `Real.binEntropy`
 - formalized-elsewhere: the reliability function was not found as an object in any project checked on 2026-11-25. atlas-lean (github.com/facebookresearch/atlas-lean), `MathlibExt/InformationTheory/RandomCodingBound.lean` :: `exists_code_avgError_le` and `GallagerExponent.lean` have Gallager's random-coding bound (a lower bound on the exponent), in a different channel model (no bridge formalized) (clones of 2026-11-25; statements read at source, proofs not re-checked)

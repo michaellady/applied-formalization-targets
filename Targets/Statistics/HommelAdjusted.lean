@@ -6,7 +6,7 @@ import Applied.Statistics.HommelAdjusted
 - id: stat-hommel-adjusted-pvalues
 - area: statistics
 - status: formalized
-- source: procedure from G. Hommel, "A stagewise rejective multiple test procedure based on a modified Bonferroni test", Biometrika 75 (1988); adjusted p-values of closed tests as the maximum of the local p-values over intersections containing the hypothesis, as in S. P. Wright, "Adjusted p-values for simultaneous inference", Biometrics 48 (1992) (exact statement there to be confirmed)
+- source: procedure from G. Hommel, "A stagewise rejective multiple test procedure based on a modified Bonferroni test", Biometrika 75 (1988) 383–386 (Section 2 defines the procedure as the closed test procedure with Simes tests); adjusted p-values of closed tests as the maximum of the local p-values over intersections containing the hypothesis, as in S. P. Wright, "Adjusted p-values for simultaneous inference", Biometrics 48 (1992) (exact statement there to be confirmed)
 - used-in: reporting of multiplicity-adjusted p-values by statistical software (for example the `hommel` method of p-value adjustment functions)
 - prerequisites: closed testing, Simes test
 - statement-review: unreviewed

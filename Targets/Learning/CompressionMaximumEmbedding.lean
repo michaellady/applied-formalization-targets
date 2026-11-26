@@ -7,7 +7,7 @@ import Targets.Learning.SampleCompression
 - id: learning-compression-maximum-embedding
 - area: machine-learning
 - status: formalized
-- source: S. Floyd, M. Warmuth, Machine Learning 21 (1995) (schemes for maximum classes restrict to subclasses; the question whether every class of VC dimension `d` embeds into a maximum class of dimension `O(d)` is raised there, exact location to be confirmed); see also B. Rubinstein, J. H. Rubinstein, P. Bartlett, "Bounding embeddings of VC classes into maximum classes", in Measures of Complexity (2015) (to be confirmed)
+- source: S. Floyd, M. Warmuth, Machine Learning 21 (1995) (schemes for maximum classes restrict to subclasses; Floyd–Warmuth note only the embedding into a *maximal* class of the same dimension, Section 7; embedding into *maximum* classes is the approach of Rubinstein–Rubinstein–Bartlett); see also B. Rubinstein, J. H. Rubinstein, P. Bartlett, "Bounding embeddings of VC classes into maximum classes", in Measures of Complexity (2015), arXiv:1401.7388 (content confirmed in the arXiv abstract; the book chapter data were not checked)
 - used-in: the sample compression conjecture via embeddings
 - prerequisites: `Targets/Learning/CompressionMaximum.lean`
 - formalized-elsewhere: none found in the Lean projects surveyed (atlas-lean, cslib-frontier, optlib, econcslib, fltk, lean-cksd, sampcert, tcslib, lmlexplore and others; prior-art cross-check, Nov 2026)

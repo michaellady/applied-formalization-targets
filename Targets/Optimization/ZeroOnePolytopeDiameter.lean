@@ -6,7 +6,7 @@ import Applied.Optimization.ZeroOnePolytope
 - id: opt-zero-one-polytope-diameter
 - area: optimization
 - status: formalized
-- source: D. Naddef, "The Hirsch conjecture is true for (0,1)-polytopes", Math. Programming 45 (1989) 109–110 (the bound "diameter ≤ d" for 0/1-polytopes in ℝ^d and the induction over the faces `x_i = 0`, `x_i = 1`; whether the paper states the bound with the ambient dimension or the dimension of the polytope is to be confirmed); the diameter `d` of the cube is folklore
+- source: D. Naddef, "The Hirsch conjecture is true for (0,1)-polytopes", Math. Programming 45 (1989) 109–110 (the bound "diameter ≤ d" for 0/1-polytopes in ℝ^d and the induction over the faces `x_i = 0`, `x_i = 1`; as restated by G. M. Ziegler, "Lectures on 0/1-polytopes", arXiv:math/9909177, Theorem 29, the bound is `dim P`; the paper itself was not opened; the theorem here is the weaker ambient-dimension form); the diameter `d` of the cube is folklore
 - used-in: the polynomial Hirsch conjecture (`Targets/Optimization/PolynomialHirsch.lean`): a class of polytopes for which a linear diameter bound holds
 - prerequisites: `convexHull`, `Set.extremePoints`, `IsExtreme`, `segment`, `hammingDist` (Mathlib)
 - formalized-elsewhere: not found in the Lean repositories searched (VERIFICATION-2.md)

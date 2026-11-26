@@ -6,7 +6,7 @@ import Applied.Statistics.ManyToOneGaussian
 - id: stat-many-to-one-unequal-allocation
 - area: statistics
 - status: formalized
-- source: C. W. Dunnett, "A multiple comparison procedure for comparing several treatments with a control", J. Amer. Statist. Assoc. 50 (1955) (the layout); Y. Benjamini, D. Yekutieli, Ann. Statist. 29 (2001), Section 3.1 (positively correlated normal statistics; that comparisons with a common control are named there as an example is to be confirmed). The statements are corollaries of `Targets/Statistics/PRDSGaussian.lean`; they are for known variances and are not Dunnett's procedure.
+- source: C. W. Dunnett, "A multiple comparison procedure for comparing several treatments with a control", J. Amer. Statist. Assoc. 50 (1955) (the layout); Y. Benjamini, D. Yekutieli, Ann. Statist. 29 (2001), Section 3.1, Case 1 (positively correlated normal statistics); comparisons with a common control are named as an example in Section 3.2, Problem 3 (p. 1175, for Studentized statistics). The statements are corollaries of `Targets/Statistics/PRDSGaussian.lean`; they are for known variances and are not Dunnett's procedure.
 - used-in: multi-arm trials and dose-finding studies with one control group and unequal group sizes, analysed with one-sided z-tests
 - prerequisites: `Applied/Statistics/PRDSGaussian.lean`
 - formalized-elsewhere: not found (see `PRIOR-ART-VERIFICATION.md`); the balanced case with correlation `1/2` is `Targets/Statistics/ManyToOneControl.lean`

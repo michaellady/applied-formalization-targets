@@ -6,7 +6,7 @@ import Applied.Coding.PerfectHash
 - id: coding-perfect-hash-elementary-bound
 - area: coding
 - status: formalized
-- source: the shortening argument of J. Körner (1973) for `k = 3`, extended to general `k`; the setting is that of M. L. Fredman, J. Komlós, "On the size of separating systems and families of perfect hash functions" (1984), whose own (stronger) bound is formalized in `Targets/Coding/FredmanKomlos.lean`; attribution of the general-`k` elementary bound to be confirmed
+- source: the elementary shortening argument for `k = 3` (trifference), extended to general `k`; the setting is that of M. L. Fredman, J. Komlós, "On the size of separating systems and families of perfect hash functions" (1984), whose own (stronger) bound is formalized in `Targets/Coding/FredmanKomlos.lean`; the elementary bound for general `k` is attributed to J. Körner, K. Marton, "New bounds for perfect hashing via information theory", European J. Combin. 9 (1988) 523–530, by Della Fiore–Gnutti–Polak, arXiv:2201.06846, and Kurz, arXiv:2310.13563; neither that paper nor Körner (1973) was consulted
 - used-in: perfect hashing, zero-error list decoding
 - prerequisites: finite combinatorics only
 - formalized-elsewhere: the size bound was not found in the projects checked on 2026-11-25. cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Foundations/Combinatorics/PerfectHashFamily/Defs.lean` :: `IsPerfectHashFamily` is the same notion up to transposition (bridge not formalized), with upper-bound constructions only (`Basic.lean` :: `card_perfectHashFamily_le`) (clones of 2026-11-25; statements read at source, proofs not re-checked)

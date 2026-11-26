@@ -6,7 +6,7 @@ import Applied.Coding.TrifferenceLower
 - id: coding-trifference
 - area: coding
 - status: open
-- source: J. Körner, "Coding of an information source having ambiguous alphabet and the entropy of graphs" (1973); V. Guruswami, A. Riazanov, "Beating Fredman–Komlós for perfect k-hashing" (2022); ProofAtlas Top 500 (Nov 2026), rank 441 (listing and rank not verifiable by us)
+- source: J. Körner, K. Marton, "New bounds for perfect hashing via information theory", European J. Combin. 9 (1988) 523–530 (the elementary bound `T(n) ≤ 2 (3/2)ⁿ`, as attributed by Della Fiore–Gnutti–Polak, arXiv:2201.06846, and Kurz, arXiv:2310.13563; not consulted); J. Körner, "Coding of an information source having ambiguous alphabet and the entropy of graphs" (1973) (origin of the problem; not consulted); V. Guruswami, A. Riazanov, "Beating Fredman–Komlós for perfect k-hashing" (2022)
 - used-in: perfect hashing, zero-error information theory, list decoding
 - prerequisites: finite combinatorics only
 - formalized-elsewhere: no Lean formalization found in the projects checked on 2026-11-25 (local clones and GitHub code search; see `PRIOR-ART-VERIFICATION-2.md`); the only related item is the perfect-hash-family definition in cslib-frontier (github.com/cslib-community/cslib-frontier), `CslibFrontier/Foundations/Combinatorics/PerfectHashFamily/Defs.lean` :: `IsPerfectHashFamily`

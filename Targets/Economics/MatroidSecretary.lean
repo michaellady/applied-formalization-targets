@@ -6,7 +6,7 @@ import Applied.Economics.MatroidSecretary
 - id: econ-matroid-secretary
 - area: economics
 - status: open
-- source: M. Babaioff, N. Immorlica, R. Kleinberg, "Matroids, secretary problems, and online mechanisms", SODA 2007 (the conjecture; exact wording and numbering to be confirmed); classical secretary problem: D. V. Lindley (1961), E. B. Dynkin (1963); PROBLEMS.md #343
+- source: M. Babaioff, N. Immorlica, R. Kleinberg, "Matroids, secretary problems, and online mechanisms", SODA 2007, pp. 434–443 (posed there as Question 1 in Section 3, with the authors' "hypothesis" that the answer is yes, not as a conjecture; it is called a conjecture in later papers); classical secretary problem: D. V. Lindley (1961), E. B. Dynkin (1963); PROBLEMS.md #343
 - used-in: online mechanism design, online selection and allocation under combinatorial constraints
 - prerequisites: Mathlib's `Matroid`; finite sums over bijections `Fin n ≃ E`; Bochner integral (only to state randomized algorithms)
 - statement-review: unreviewed
@@ -33,9 +33,10 @@ Review notes (modelling choices to check).
   whole matroid, including `n` and the identities of all elements ("matroid known in
   advance"). On arrival it sees the identity and the weight of the element. Variants in the
   literature give the algorithm less (only `n` and an independence oracle on the elements seen
-  so far); the conjecture is open in all of them as far as we know, and the version here is
-  the one most favourable to the algorithm, hence the weakest conjecture. To be confirmed
-  against the source.
+  so far). The known-matroid, random-order model used here is the one of
+  Babaioff–Immorlica–Kleinberg (2007), Section 2: the algorithm is given the matroid structure
+  but not the weights. It is the version most favourable to the algorithm; whether the
+  question is open in the other variants was not checked.
 * The algorithm's decision is a function of the arrivals so far and their weights only; it
   does not receive its own past decisions (they are determined by the same data) and it cannot
   see weights of elements that have not arrived.

@@ -8,7 +8,7 @@ import Applied.Statistics.PValues
 - id: stat-bh-equicorrelated-z-tests
 - area: statistics
 - status: formalized
-- source: Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Section 3.1 (positively correlated normal statistics; section number to be confirmed)
+- source: Y. Benjamini, D. Yekutieli, "The control of the false discovery rate in multiple testing under dependency", Ann. Statist. 29 (2001), Section 3.1, Case 1 (multivariate normal test statistics; the equicorrelated case is the simulation setting named in Section 1.3)
 - used-in: studies where test statistics share a common source of variation (a shared control group, a batch effect, a market factor)
 - prerequisites: one-factor positive dependence and Benjamini–Hochberg under positive dependence, both in the weak (conditioning on `p ≤ t`; Ramdas et al. 2019, Def. 1) PRDS form `IsPRDSOn`; validity of one-sided z-test p-values
 - statement-review: unreviewed

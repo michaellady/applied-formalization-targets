@@ -8,7 +8,7 @@ import Targets.Economics.PMMS
 - id: econ-pmms-efx-relations
 - area: economics
 - status: formalized
-- source: I. Caragiannis, D. Kurokawa, H. Moulin, A. D. Procaccia, N. Shah, J. Wang, "The unreasonable fairness of maximum Nash welfare", EC 2016 / ACM Trans. Econ. Comput. 7(3) (2019) (PMMS implies EFX for additive valuations with positive values, equivalently for EFX restricted to positively valued goods; this paper was not read at source, the form of its statement is taken from the two papers cited next); G. Amanatidis, G. Birmpas, E. Markakis, "Comparing approximate relaxations of envy-freeness", IJCAI 2018, arXiv:1806.03114, Proposition 3.7 (every `α`-EFX allocation is `2/(2+α)`-PMMS, and this is tight; their EFX is the positive-goods form; read at source); G. Amanatidis, E. Markakis, A. Ntokos, arXiv:1909.07650 (proof of Corollary 5.4 quotes Caragiannis et al. as "each pmms allocation is an efx allocation when all values are positive")
+- source: I. Caragiannis, D. Kurokawa, H. Moulin, A. D. Procaccia, N. Shah, J. Wang, "The unreasonable fairness of maximum Nash welfare", EC 2016 / ACM Trans. Econ. Comput. 7(3) (2019) (journal version, Theorem 4.6: for additive valuations PMMS implies EFX, where EFX is their Definition 4.5, in which only goods of positive value are removed); G. Amanatidis, G. Birmpas, E. Markakis, "Comparing approximate relaxations of envy-freeness", IJCAI 2018, arXiv:1806.03114, Proposition 3.7 (every `α`-EFX allocation is `2/(2+α)`-PMMS, and this is tight; their EFX is the positive-goods form; read at source); G. Amanatidis, E. Markakis, A. Ntokos, arXiv:1909.07650 (proof of Corollary 5.4 quotes Caragiannis et al. as "each pmms allocation is an efx allocation when all values are positive")
 - used-in: fair division of indivisible goods; partial results around `Targets.Economics.PMMSExists` and `Targets.Economics.EFXExists`
 - prerequisites: finite sums, finite maxima
 - formalized-elsewhere: not found in the Lean repositories searched (VERIFICATION-2.md)
@@ -39,10 +39,10 @@ The library versions (`Applied.Economics.IsPMMS.efx_of_pos`, `IsPMMS.isEFX`,
 finite types of goods and arbitrary types of agents; the registry definitions agree with the
 library ones on `Fin` (`isPMMS_iff_applied`, `isApproxPMMS_iff_applied`).
 
-Differences from the textbook statement. Caragiannis et al. state that PMMS implies EFX for
-positive values, i.e. for EFX restricted to positively valued goods (as reported by
-Amanatidis–Markakis–Ntokos and Amanatidis–Birmpas–Markakis; the original was not read at
-source). That is `efx_of_isPMMS_of_pos`, and `isEFX_of_isPMMS` is its consequence for strictly
+Differences from the textbook statement. In Caragiannis et al. (journal version), EFX is
+Definition 4.5: envy-freeness up to the removal of any good that the envious agent values
+positively. Their Theorem 4.6 says that for additive valuations PMMS implies that form of EFX.
+That is `efx_of_isPMMS_of_pos`, and `isEFX_of_isPMMS` is its consequence for strictly
 positive values. `not_isPMMS_imp_isEFX` does not contradict or correct the literature: it only
 shows that for the *strong* form of EFX used in this project (removal of zero-valued goods
 included) the positivity hypothesis cannot be dropped. `isApproxPMMS_two_thirds_of_efx_pos` is

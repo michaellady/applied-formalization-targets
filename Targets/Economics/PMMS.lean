@@ -10,7 +10,7 @@ import Mathlib.Data.Fintype.Basic
 - id: econ-pmms-existence
 - area: economics
 - status: open
-- source: I. Caragiannis, D. Kurokawa, H. Moulin, A. D. Procaccia, N. Shah, J. Wang, "The unreasonable fairness of maximum Nash welfare", EC 2016 / ACM Trans. Econ. Comput. 7(3) (2019) (definition of PMMS and the question of existence); that the problem is open for every `n ≥ 3`, including `n = 3`, is our understanding of the literature and is to be confirmed
+- source: I. Caragiannis, D. Kurokawa, H. Moulin, A. D. Procaccia, N. Shah, J. Wang, "The unreasonable fairness of maximum Nash welfare", EC 2016 / ACM Trans. Econ. Comput. 7(3) (2019) (journal version: Definition 4.3 is the pairwise maximin share guarantee; Section 4.2 leaves open whether a PMMS allocation always exists); whether the question has been settled since, for `n = 3` or any larger `n`, was not checked
 - used-in: fair division of indivisible goods; PMMS is a strengthening of EFX for positive additive valuations
 - prerequisites: finite sums, finite maxima (`Finset.sup'`)
 - formalized-elsewhere: the existence statement is stated without proof in econcslib-bei `OpenProblem/New/PMMSAndEpistemicPMMS/Problem.lean` :: `pmmsExistence`; no partial results were found in the Lean repositories searched (VERIFICATION-2.md)
@@ -39,8 +39,8 @@ What is proved in this project (separate entries, not in this file):
 
 Conventions: valuations are real-valued and additive; allocations are complete (every good is
 given to exactly one agent); `PMMSExists` assumes `0 < n` (with no agents and `m > 0` goods no
-allocation exists). `PMMSExistsThree` is the case `n = 3`, the smallest open case to our
-understanding (to be confirmed).
+allocation exists). `PMMSExistsThree` is the case `n = 3`, the smallest case not covered by the
+two-agent argument; its status after Caragiannis et al. (2019) was not checked.
 -/
 
 namespace Targets.Economics

@@ -6,7 +6,7 @@ import Applied.Coding.SingleDeletionUpper
 - id: coding-single-deletion-upper-bound
 - area: coding
 - status: formalized
-- source: V. I. Levenshtein, "Binary codes capable of correcting deletions, insertions, and reversals", Doklady Akad. Nauk SSSR 163 (1965) 845–848, English transl. Soviet Physics Doklady 10 (1966) 707–710 (the asymptotic bound `|C| ≲ 2ⁿ / n`; the run-counting proof as presented e.g. in N. J. A. Sloane, "On single-deletion-correcting codes" (2002); details to be confirmed)
+- source: V. I. Levenshtein, "Binary codes capable of correcting deletions, insertions, and reversals", Doklady Akad. Nauk SSSR 163 (1965) 845–848, English transl. Soviet Physics Doklady 10 (1966) 707–710 (the asymptotic bound `|C| ≲ 2ⁿ / n`; the run-counting proof as presented in N. J. A. Sloane, "On single-deletion-correcting codes", arXiv:math/0207197 (2002), Theorem 2.5, which attributes the bound to Levenshtein; the primary paper was not opened)
 - used-in: asymptotic optimality of Varshamov–Tenengolts codes; benchmark for deletion codes
 - prerequisites: single-deletion balls (`Applied/Coding/VarshamovTenengolts.lean`); the entropy bound for Hamming balls (`Applied/Coding/BallCard.lean`)
 - formalized-elsewhere: not found in the Lean repositories searched (VERIFICATION-2.md)

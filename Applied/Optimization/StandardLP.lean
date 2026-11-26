@@ -69,7 +69,8 @@ def objective (x : Fin n → K) : K := P.c ⬝ᵥ x
 def IsOptimal (x : Fin n → K) : Prop :=
   P.IsFeasible x ∧ ∀ y, P.IsFeasible y → P.objective y ≤ P.objective x
 
-/-- The objective is bounded above on the feasible region. -/
+/-- The objective is bounded above on the feasible region. For an infeasible program this
+holds vacuously (any `M` works), so `IsBounded` does not imply feasibility. -/
 def IsBounded : Prop := ∃ M, ∀ x, P.IsFeasible x → P.objective x ≤ M
 
 /-- `B` is a basis: a set of `m` column indices whose columns are linearly independent. -/

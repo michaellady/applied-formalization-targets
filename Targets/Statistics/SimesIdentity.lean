@@ -6,7 +6,7 @@ import Applied.Statistics.SimesExact
 - id: stat-simes-identity
 - area: statistics
 - status: formalized
-- source: R. J. Simes, "An improved Bonferroni procedure for multiple tests of significance", Biometrika 73 (1986), the main result (equality under independence; theorem numbering to be confirmed). The proof here goes through the exact false discovery rate of Benjamini–Hochberg (see `stat-fdr-bh-exact`), not Simes' induction
+- source: R. J. Simes, "An improved Bonferroni procedure for multiple tests of significance", Biometrika 73 (1986), the main result (equality under independence; theorem numbering to be confirmed; only the abstract was read). According to Benjamini–Yekutieli, Ann. Statist. 29 (2001), Section 2.3, the equality had already been proved by Seeger (1968). The proof here goes through the exact false discovery rate of Benjamini–Hochberg (see `stat-fdr-bh-exact`), not Simes' induction
 - used-in: Simes test, Hommel and Hochberg procedures; shows the Simes inequality is sharp
 - prerequisites: Benjamini–Hochberg leave-one-out argument
 - statement-review: unreviewed
