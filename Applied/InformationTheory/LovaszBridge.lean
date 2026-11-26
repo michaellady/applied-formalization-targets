@@ -28,7 +28,10 @@ so that no dependency is added) and proves their statements from the library's t
   `WantedExt/Combinatorics/Coding/CycleShannonBoundsWanted.lean`: the definitions in
   `namespace CycleGraphCode` below are copied from there. Proved here: `lovasz1979UpperBound`,
   `polakSchrijverLowerBound`, `polakSchrijverRateLowerBound`, `veselZerovnik2002LowerBound`,
-  `mathewOstergard2017LowerBound` (all `theorem_wanted` upstream), and the identification
+  `mathewOstergard2017LowerBound` (`theorem_wanted` upstream in our clone of 2026-11-25; since
+  then atlas-lean has proved `polakSchrijverLowerBound` and `polakSchrijverRateLowerBound` itself, in
+  `MathlibExt/Combinatorics/Coding/PolakSchrijver.lean`, commit `2f8b45d6d2`, so for those two
+  this file is an independent second proof, not a first), and the identification
   `shannonCapacityCycle_seven_eq`: their `shannonCapacityCycle 7 : ENNReal` is
   `ENNReal.ofReal (shannonCapacity (cycleGraph 7))`.
 
@@ -399,14 +402,14 @@ theorem rpow_le_shannonCapacityCycle_seven {n M : ℕ} (hn : 1 ≤ n)
   exact le_iSup_of_le (⟨n, hn⟩ : PositiveNat)
     (le_iSup (cycleCodeRate 7 (⟨n, hn⟩ : PositiveNat)) ⟨A, hA⟩)
 
-/-- **atlas-lean `polakSchrijverLowerBound`** (`theorem_wanted` upstream), statement copied
+/-- **atlas-lean `polakSchrijverLowerBound`** (now proved upstream in `PolakSchrijver.lean`, atlas-lean commit `2f8b45d6d2`), statement copied
 verbatim. The code is the library's 367-word independent set (found by our own search; see
 `Targets/InformationTheory/ShannonCapacityC7Lower.lean`), not the Polak–Schrijver set itself. -/
 theorem polakSchrijverLowerBound :
     ∃ A : Finset (Fin 5 → ZMod 7), IsCycleCode 7 A ∧ A.card = 367 :=
   exists_cycleCode_of_le_indepNum threeHundredSixtySeven_le_indepNum_strongPow_five
 
-/-- **atlas-lean `polakSchrijverRateLowerBound`** (`theorem_wanted` upstream), statement copied
+/-- **atlas-lean `polakSchrijverRateLowerBound`** (now proved upstream in `PolakSchrijver.lean`, atlas-lean commit `2f8b45d6d2`), statement copied
 verbatim. -/
 theorem polakSchrijverRateLowerBound :
     ENNReal.rpow 367 ((5 : ℝ)⁻¹) ≤ shannonCapacityCycle 7 := by
