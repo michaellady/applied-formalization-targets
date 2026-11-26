@@ -77,6 +77,7 @@ GraphicalInstances`.
 | `BenjaminiHochberg` | `bhK`, `bhReject`, `fdp`, `fdr`; the **Benjamini–Hochberg theorem** under independence |
 | `BHMonotone` | number of rejections = cut-off; monotonicity in the p-values |
 | `BenjaminiYekutieli` | BH under **arbitrary dependence** with the harmonic factor |
+| `AdaptiveBH` | **adaptive BH** under independence: plug-in estimators, Storey, the two-stage procedure |
 | `Simes` | **Simes inequality**, **Hommel** (closed Simes), **Hochberg** ⊆ Hommel |
 | `SimesExact` | BH and Simes bounds are equalities for independent uniform p-values |
 | `SimesSharp` | the harmonic bound for Simes under arbitrary dependence is attained |
@@ -162,6 +163,13 @@ p-values and (where relevant) measurability.
     `α m₀ / m` when each true-null p-value is independent of the others.
     `fdr_bhReject_eq`: equality for uniform true-null p-values (`α ≤ 1`).
 
+11a. `fdr_tstReject_le` — the two-stage procedure of Benjamini, Krieger and Yekutieli (BH at
+    level `α/(1+α)`, then BH at level `α/(1+α) · m/(m - r₁)`) has FDR ≤ `α`;
+    `fdr_storeyBH_le` — BH at level `α (1-λ) m / (#{pⱼ > λ} + 1)` has FDR ≤ `α`;
+    `fdr_adaptiveBH_le` — BH at level `α G(p)` has FDR ≤ `(α/m) ∑_{i∈H₀} E[G(p₀,ᵢ)]` for a
+    non-increasing estimator `G`. All three assume that each true-null p-value is independent
+    of the others.
+
 **Arbitrary dependence**
 
 12. `fdr_bhReject_le_of_arbitrary_dependence` — Benjamini–Yekutieli: FDR ≤
@@ -239,7 +247,13 @@ Collected from the "Not covered" paragraphs of the registry files.
   Hochberg/Hommel under arbitrary dependence; the Šidák FWER identity when some nulls are false.
 * **Combination of p-values.** Fisher, Stouffer and order-statistic (Rüger) combinations are not
   in this area (`CombinedPValues` has the Bonferroni minimum and the maximum only).
-* **Not attempted at all:** power and optimality, FDR procedures other than BH (adaptive BH,
-  Storey, knockoffs; e-BH is in `Applied/Statistics/EValues.lean`, outside this guide),
+* **Adaptive procedures.** `AdaptiveBH` covers independence only: the two-stage procedure of
+  Benjamini–Krieger–Yekutieli (`fdr_tstReject_le`), Storey's estimator without the cap at `λ`
+  (`fdr_storeyBH_le`) and the plug-in bound for a general estimator (`fdr_adaptiveBH_le`).
+  Missing: the version capped at `λ`, the quantile estimator, multi-stage procedures,
+  data-dependent `λ`, and anything under dependence
+  (`Targets/Statistics/AdaptiveBH.lean`).
+* **Not attempted at all:** power and optimality, FDR procedures other than BH and its
+  adaptive versions (knockoffs; e-BH is in `Applied/Statistics/EValues.lean`, outside this guide),
   k-FWER and false discovery exceedance, simultaneous confidence regions compatible with
   stepwise procedures (see `CompatibleBounds` and `SimultaneousIntervals`, outside this guide).
