@@ -25,7 +25,8 @@ General part (arbitrary index type, arbitrary family of measures, no measurabili
   `fwer_fixedSequence_le`.
 
 Normal mean with known standard error `s` (the estimate has law `N(θ, s²)` on the real line;
-`Φ` is the standard normal cdf, the critical value `c` is arbitrary and the one-sided level is
+`Φ` is the standard normal cdf, the critical value `c` is arbitrary (`c ≥ 0` for the
+confidence-interval form) and the one-sided level is
 `1 - Φ c`):
 
 * `zTest_upper_level`, `zTest_lower_level`: the one-sided z-tests have level `1 - Φ c`.

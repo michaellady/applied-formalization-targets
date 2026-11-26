@@ -345,7 +345,8 @@ theorem stdGaussian_preimage_inter_ge (L : StrongDual ℝ E) {D : Set ℝ} (hDm 
 
 omit [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
   [BorelSpace E] in
-/-- The symmetric polyhedron cut out by finitely many slabs is measurable. -/
+/-- A finite intersection of preimages of measurable sets under continuous linear functionals
+is measurable (for intervals `D i` this is the polyhedron cut out by finitely many slabs). -/
 lemma measurableSet_forall_mem {G : Type*} [NormedAddCommGroup G] [NormedSpace ℝ G]
     [MeasurableSpace G] [BorelSpace G] {ι : Type*} (s : Finset ι) (L : ι → StrongDual ℝ G)
     {D : ι → Set ℝ} (hDm : ∀ i ∈ s, MeasurableSet (D i)) :

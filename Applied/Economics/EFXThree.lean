@@ -19,8 +19,9 @@ additive valuations, with the algorithms replaced by extremal arguments.
 * `Inv a b c X1 X2 X3`: the invariant of the paper: `(X1, X2, X3)` is a partition, the first
   agent does not strongly envy anybody with `X1` or with `X2`, and the second or the third
   agent does not strongly envy anybody with `X3`.
-* `step`: from a partition satisfying the invariant one obtains an EFX allocation of the three
-  bundles, or another partition satisfying the invariant with a larger value of
+* `step`: from a partition satisfying the invariant one obtains an EFX allocation (not
+  necessarily of the same three bundles), or another partition satisfying the invariant
+  with a larger value of
   `min (a X1) (a X2)`. Here valuations are positive and the first agent values different sets
   differently.
 * `efx3_nondegenerate`: a partition satisfying the invariant with the largest potential gives

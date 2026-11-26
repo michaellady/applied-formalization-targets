@@ -28,8 +28,8 @@ For a vector of p-values `q : ι → ℝ` with `m = |ι|`:
 * `fdr P H₀ R`: the false discovery rate, the expectation of `fdp H₀ (R ω)`.
 * `fdr_bhReject_le`: the **Benjamini–Hochberg theorem**. If every true-null p-value is valid and
   independent of the vector of the other p-values, the procedure at level `α ≥ 0` has false
-  discovery rate at most `α m₀ / m`. Nothing is assumed about the false nulls or about
-  dependence among them.
+  discovery rate at most `α m₀ / m`. All p-values are assumed measurable; nothing else is
+  assumed about the false nulls or about dependence among them.
 * `fdr_bhReject_le_of_iIndepFun`: the textbook corollary for mutually independent p-values,
   with the bound `α`.
 
@@ -39,7 +39,7 @@ For a vector of p-values `q : ι → ℝ` with `m = |ι|`:
 `Applied.Statistics.SortedProcedures` proves that it agrees with the textbook step-up rule on
 sorted p-values (for `α ≥ 0`, any tie-breaking). `fdr_bhReject_eq` in
 `Applied.Statistics.SimesExact` shows that the bound `α m₀ / m` is attained for exactly uniform
-independent null p-values.
+independent null p-values and levels `0 ≤ α ≤ 1`.
 
 ## Related files
 

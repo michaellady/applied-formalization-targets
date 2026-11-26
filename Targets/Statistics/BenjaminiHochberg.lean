@@ -18,7 +18,10 @@ nulls, and mutually independent. Sort the p-values, find the largest `k` with
 are false is at most `α m₀ / m ≤ α`, where `m₀` is the number of true nulls.
 
 The library version `fdr_bhReject_le` needs less: each true-null p-value must be independent
-of the vector of the other p-values. Nothing is assumed about the false nulls beyond that.
+of the vector of the other p-values. Nothing is assumed about the false nulls beyond
+measurability. Valid means `P(p ≤ t) ≤ t` for all `t ≥ 0`; p-values are real-valued and need
+not lie in `[0, 1]`. `bhReject` is written without sorting; it is the sorted rule by
+`bhSorted_eq_bhReject` (`Targets/Statistics/SortedProcedures.lean`).
 -/
 
 namespace Targets.Statistics

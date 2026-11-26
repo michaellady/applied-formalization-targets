@@ -54,8 +54,9 @@ rejected, `pᵢ ≤ cᵢ(p₀,ᵢ) |R|`. Then the false discovery rate is at mos
 
 Deterministic facts: the two-stage procedure rejects everything its first stage rejects
 (`two_stage_contains_first_stage`), nothing when the first stage rejects nothing
-(`two_stage_empty`), and a hypothesis it rejects has `pᵢ ≤ a |R| / (Nᵢ + 1)`
-(`two_stage_self_consistency`).
+(`two_stage_empty`), and a hypothesis it rejects has `pᵢ ≤ a |R| / (Mᵢ + 1)`
+(`two_stage_self_consistency`), where `Mᵢ` is the number of `j ≠ i` with `pⱼ > a`, `a` being
+the first-stage level (this is not the `Nᵢ` of (6), which uses `λ`).
 
 Expectations are Lebesgue integrals with values in `[0, ∞]`; bounds are `ENNReal.ofReal`.
 

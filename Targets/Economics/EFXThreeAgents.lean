@@ -42,8 +42,9 @@ they are positive and non-degenerate and EFX for the perturbed valuations implie
 original ones. For the perturbed instance we follow Akrami et al.: among all partitions
 `(X1, X2, X3)` such that `X1` and `X2` are EFX-feasible for the first agent and `X3` is
 EFX-feasible for the second or the third agent (`Inv`), take one maximising
-`min (v₁ X1) (v₁ X2)`. The lemma `step` shows that such a partition either gives an EFX
-allocation of its three bundles or can be replaced by one with a larger potential, by the case
+`min (v₁ X1) (v₁ X2)`. The lemma `step` shows that such a partition either yields an EFX
+allocation (of all goods; not necessarily of the same three bundles) or can be
+replaced by one with a larger potential, by the case
 analysis of Section 4.1 of the paper.
 
 Differences from the textbook statement. (1) The source theorem of Chaudhury–Garg–Mehlhorn is

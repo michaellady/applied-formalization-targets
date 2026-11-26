@@ -16,8 +16,11 @@ Informal statement. Let `P` be a probability measure, `p i` (`i` in a finite set
 measurable p-values, `H₀` the set of true nulls (`m₀ = |H₀|`), and `0 ≤ α ≤ 1`. Assume that
 each true-null p-value is exactly uniform on `[0, 1]` (`P(pᵢ ≤ t) = t` for `0 ≤ t ≤ 1`) and is
 independent of the vector obtained from all p-values by setting its own coordinate to `0`
-(this is implied by mutual independence; no assumption on the false-null p-values). Then the
+(this is implied by mutual independence; nothing beyond measurability is assumed of
+the false-null p-values). Then the
 Benjamini–Hochberg procedure at level `α` has false discovery rate exactly `α m₀ / m`.
+(For `m = 0` the Lean
+statement reads `0 = 0`, by the conventions `0/0 = 0`.)
 
 Also proved, deterministically: the exact pointwise decomposition of the false discovery
 proportion, and that if `qᵢ ≤ α k / m` where `k` is the cut-off after setting `qᵢ` to `0`,

@@ -154,7 +154,8 @@ variable {Ω : Type*} {mΩ : MeasurableSpace Ω} {P : Measure Ω}
 section Calculus
 
 /-- The second-stage critical value of the conventional test on the z-scale: with first-stage
-size `n1`, first-stage z-statistic `z`, final critical value `c` and second-stage size `m`,
+size `n1`, first-stage z-statistic `z`, final critical value `c` and second-stage
+size `m > 0` (for `m ≤ 0` the definition is Lean's division by zero and has no meaning),
 the final statistic `(√n1 z + √m z2) / √(n1 + m)` is at least `c` exactly when the second-stage
 z-statistic `z2` is at least `critValue n1 c z m = (c √(n1 + m) - z √n1) / √m`. -/
 noncomputable def critValue (n1 : ℕ) (c z m : ℝ) : ℝ :=

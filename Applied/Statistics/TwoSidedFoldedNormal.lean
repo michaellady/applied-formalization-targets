@@ -64,7 +64,8 @@ lemma cosh_mul_cosh_le {a b x y : ℝ} (hb : 0 ≤ b) (hab : b ≤ a) (hy : 0 �
     nlinarith [mul_nonneg hA hX]
   linarith
 
-/-- Density of `|X|` on `(0, ∞)` for `X ∼ N(m, v)`. -/
+/-- Density of `|X|` on `(0, ∞)` for `X ∼ N(m, v)`, `v ≠ 0` (for `v = 0` this is `0`, not a
+density). -/
 noncomputable def foldedPDF (m : ℝ) (v : ℝ≥0) (x : ℝ) : ℝ :=
   gaussianPDFReal m v x + gaussianPDFReal (-m) v x
 

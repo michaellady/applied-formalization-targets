@@ -18,7 +18,8 @@ are real functions on it and `H₀` is a finite set of indices.
 (1) Definition. `Applied.MultipleTesting.IsClassicalPRDSOn P p H₀` says: for every `i ∈ H₀` and
 every measurable increasing set `D` of vectors in `ι → ℝ` there is a non-decreasing function
 `g : ℝ → [0, ∞]` such that `P(p ∈ D, pᵢ ∈ A) = ∫_A g d(law of pᵢ)` for every measurable
-`A ⊆ ℝ`. Such a `g` is a version of the conditional probability `x ↦ P(p ∈ D | pᵢ = x)`; the
+`A ⊆ ℝ`. When `P` is a probability measure, such a `g` is a version of the conditional probability
+`x ↦ P(p ∈ D | pᵢ = x)`; the
 definition says that a non-decreasing version exists. (The law of `pᵢ` is `P.map (p i)`; in
 Lean this is only meaningful when `p i` is almost everywhere measurable.)
 

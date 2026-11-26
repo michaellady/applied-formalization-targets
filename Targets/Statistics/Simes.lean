@@ -11,8 +11,10 @@ import Applied.Statistics.Simes
 - prerequisites: Benjamini–Hochberg theorem, closed testing
 - statement-review: unreviewed
 
-Informal statement. For independent valid p-values under the global null, the chance that
-`p₍ₖ₎ ≤ α k / m` for some `k` is at most `α` (Simes). The closed test built from Simes tests
+Informal statement. For independent valid p-values under the global null and a level `α ≥ 0`,
+the chance that `p₍ₖ₎ ≤ α k / m` for some `k` is at most `α` (Simes). Valid means
+`P(p ≤ t) ≤ t` for all `t ≥ 0`; the p-values are real-valued and need not lie in `[0, 1]`. The
+closed test built from Simes tests
 (Hommel) therefore controls the family-wise error rate, and so does Hochberg's step-up
 procedure, because everything Hochberg rejects Hommel also rejects.
 

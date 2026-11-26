@@ -16,7 +16,8 @@ Informal statement. With `C₇` Mathlib's `cycleGraph 7`, `G^{⊠k}` the strong 
 `Applied/InformationTheory/ShannonCapacity.lean` and `α` Mathlib's `indepNum`:
 `α(C₇^{⊠2}) ≥ 10`, `α(C₇^{⊠3}) ≥ 33`, `α(C₇^{⊠4}) ≥ 108`, `α(C₇^{⊠5}) ≥ 367`; hence
 `√10 ≤ Θ(C₇)`, `33^{1/3} ≤ Θ(C₇)`, `108^{1/4} ≈ 3.2237 ≤ Θ(C₇)`, `16/5 < Θ(C₇)`,
-`3.2578 < 367^{1/5} ≤ Θ(C₇)` and `13/4 < Θ(C₇)`, where `Θ` is
+`367^{1/5} ≤ Θ(C₇)` and `13/4 < Θ(C₇)` (numerically `367^{1/5} > 3.2578`; that decimal
+is a remark, the proved strict bound is `13/4`), where `Θ` is
 `shannonCapacity`, the supremum over `k ≥ 1` of `α(G^{⊠k})^{1/k}`. Also proved: the generic
 step `m ≤ α(G^{⊠(k+1)}) → m^{1/(k+1)} ≤ Θ(G)` for finite `G`
 (`rpow_le_shannonCapacity_of_le`). The independent sets are explicit lists of base-7 codes,
