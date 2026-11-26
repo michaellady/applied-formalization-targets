@@ -11,10 +11,10 @@ import Mathlib.Analysis.SpecialFunctions.Pow.Real
 Ported from `junwei-lu/Lean-Asymptotic-Statistical-Theory`
 (`AsymptoticStatistics/ForMathlib/PrekopaLeindler.lean`, commit 8e7f22c, Lean v4.29.1),
 Copyright 2024 Junwei Lu, released under the Apache 2.0 license.
-Changes made here: the namespace, the import of the sibling file, and names that were
+Changes made here: the namespace (`AsymptoticStatistics` upstream), names that were
 deprecated or changed between the Mathlib of that project and the Mathlib pinned here
-(`zero_le _` → `zero_le`, `Set.mem_setOf_eq` → `Set.mem_ofPred_eq`). The proofs are otherwise
-unchanged. The original module comment below still speaks of "gaps" and a
+(`zero_le _` → `zero_le`, `Set.mem_setOf_eq` → `Set.mem_ofPred_eq`), and one `letI` written
+`let`. The proofs are otherwise unchanged. The original module comment below still speaks of "gaps" and a
 "deferred" proof; the file contains no `sorry` and every statement in it is proved.
 -/
 

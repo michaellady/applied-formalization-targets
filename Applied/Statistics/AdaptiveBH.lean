@@ -47,8 +47,11 @@ the other p-values. Notation as in `Applied.Statistics.BenjaminiHochberg`.
 
 ## Not in this file
 
-Positive dependence (the level-`α` statements are false under PRDS, see Blanchard–Roquain 2009,
-Section 3.3), data-dependent `λ`, the quantile estimator, the multi-stage procedure of
+Positive dependence. For identical uniform p-values, Storey's procedure with `λ = 1/2`, `m ≥ 3`
+and `α < 1/2` has false discovery rate `min(1/2, α m / 2) > α` (Blanchard–Roquain 2009,
+Proposition 3.8), so `fdr_storeyBH_le` fails under PRDS. For the two-stage procedure the same
+model gives `α / (1 + α)`; no failure of `fdr_tstReject_le` under PRDS is claimed, and no proof
+either. Also not here: data-dependent `λ`, the quantile estimator, the multi-stage procedure of
 Benjamini–Krieger–Yekutieli, the sharper bound `(1 - λ^{m₀}) α` and step-down procedures.
 -/
 

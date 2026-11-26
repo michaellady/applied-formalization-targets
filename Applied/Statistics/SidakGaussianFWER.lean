@@ -133,8 +133,9 @@ theorem fwer_sidak_twoSided_gaussian [Fintype ι] (P : Measure Ω) [IsProbabilit
 
 /-- **Šidák's confidence rectangle** (1967, Section 3). Let `(X i)` be a centred Gaussian vector
 with unit variances (`P.map (X i) = N(0, 1)`) and arbitrary correlation, indexed by a type with
-`k ≥ 1` elements, and let `α ≤ 1` (for `α < 0` the calibration equation has no solution `c`,
-so the statement is then empty). If `Φ(c) = (1 + (1 - α)^(1/k)) / 2`, then
+`k ≥ 1` elements, and let `α ≤ 1` (for `α ≤ 0` the calibration equation has no real solution
+`c`, since it asks for `Φ(c) ≥ 1`, so the statement is then empty; for `0 < α ≤ 1` the solution
+exists and is unique, which is not proved here). If `Φ(c) = (1 + (1 - α)^(1/k)) / 2`, then
 `P(∀ i, |Xᵢ| ≤ c) ≥ 1 - α`. -/
 theorem simultaneous_coverage_sidak [Fintype ι] [Nonempty ι] (P : Measure Ω)
     (X : ι → Ω → ℝ) (hG : HasGaussianLaw (fun ω => (X · ω)) P)

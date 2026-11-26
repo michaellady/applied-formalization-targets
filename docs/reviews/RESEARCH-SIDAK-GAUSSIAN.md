@@ -88,8 +88,9 @@ controls the family-wise error rate whatever the correlation.
   clone): no Prékopa–Leindler, Brunn–Minkowski, Anderson, Šidák or Gaussian correlation
   statement (grep for `sidak|šidák|prekopa|anderson.s lemma|gaussian correlation`).
 - `google-deepmind/formal-conjectures` (local clone refreshed): no hit for
-  `sidak|šidák|gaussian correlation|Royen`. Open pull requests were **not** examined (the GitHub
-  API for that repository is not enabled in this session); gap noted.
+  `sidak|šidák|gaussian correlation|Royen`. Open pull requests were not examined when this was
+  written; the red-team pass (`REDTEAM-ADAPTIVE-SIDAK.md`) searched issues and pull requests of
+  that repository for `Sidak`, `Šidák`, `Khatri`, `Gaussian correlation`: no relevant hit.
 - The clones under `priorart/` (those of `PRIOR-ART-VERIFICATION*.md` plus the two above):
   `sidak|šidák` occurs only in `bilu-linial-opus` documentation/comments and as the
   Hájek–Šidák book elsewhere.
@@ -170,8 +171,8 @@ Checks made:
   only. Measurability of the true-null statistics is assumed (stronger than a.e.).
 - `simultaneous_coverage_sidak`: the hypothesis `Φ(c) = (1 + (1 − α)^{1/k})/2` is the paper's
   calibration; existence of `c` is not proved (no quantile function). The equation has a
-  solution exactly for `0 ≤ α < 1` and for `α = 1` (`c = 0`); for `α < 0` it has none and the
-  statement is empty. Only `α ≤ 1` is assumed because the lower bound is not used.
+  solution exactly for `0 < α ≤ 1` (`c = 0` at `α = 1`); for `α ≤ 0` it has none (it would need
+  `Φ(c) ≥ 1`) and the statement is empty. Only `α ≤ 1` is assumed because the lower bound is not used.
 - Numerical spot check (SciPy, bivariate, `ρ ∈ {0.3, 0.9, −0.7}`, `(c₁, c₂) ∈ {(1, 1),
   (0.5, 2.2)}`): joint rectangle probability exceeds the product in all six cases
   (e.g. `ρ = 0.9`, `c = (1, 1)`: `0.5964` vs `0.4661`).
@@ -181,5 +182,4 @@ Checks made:
 Open after this work: equality case / strictness (exists in weak-simplex-conjecture-lean);
 Studentized statistics (Šidák's Theorem 2, multivariate `t`); Šidák's Remark 1 conjecture and
 the general Gaussian correlation inequality in this library; Holm–Šidák step-down; opening
-Anderson (1955) and Khatri (1967) to confirm the citations; formal-conjectures open pull
-requests not checked.
+Anderson (1955) and Khatri (1967) to confirm the citations.

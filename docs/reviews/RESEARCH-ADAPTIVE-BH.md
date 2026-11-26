@@ -61,8 +61,10 @@ Where this was looked for:
   FalseDiscoveryRate.lean`: plain BH), `tauceti` (`Statistics/HighDimensional/
   BenjaminiHochberg.lean`: plain BH), and the others listed in `PRIOR-ART-VERIFICATION-2.md`:
   no hit for `Storey`, `Krieger`, `two-stage` (in the FDR sense), `BKY`.
-* A "Mnehmos" BH formalization mentioned in the brief was not present among the clones and was
-  not searched for separately.
+* `Mnehmos/BHFormalization` (commit `8875bef`, 17 Jul 2026; looked at in the red-team pass):
+  a Lean proof of Dobriban's counterexample to BH for correlated two-sided Gaussian tests. No
+  adaptive procedure (`grep -i "adaptive|storey|two-stage|krieger"` over its Lean and Markdown
+  files: no hit).
 
 GitHub code search only indexes default branches of indexed repositories, so absence there is
 weak evidence.
@@ -92,8 +94,13 @@ weak evidence.
     `p_{0,h}` replaced by a point `p̃_h`.
   - Proof of Theorem 3.3 uses Lemma 7.1 (`E[1{U ≤ c g(U)}/g(U)] ≤ c` for `U` stochastically
     lower bounded by a uniform variable and `g` non-increasing), conditionally on `p_{-h}`.
-  - Section 3.3: under maximal positive dependence these procedures do not control the FDR at
-    level `α` in general.
+  - Section 3.3, Proposition 3.8 (all p-values identical and uniform, `m₀ = m`):
+    `FDR(Storey-λ) = FDR(BKY06-λ) = min(λ, α(1-λ)m) + (α(1-λ)(1+1/m)⁻¹ - λ)₊`. This exceeds `α`
+    for `λ = 1/2`, `m ≥ 3`, `α < 1/2`, and equals `λ = α/(1+α) < α` at the two-stage choice
+    `λ = α/(1+α)`. So the paper shows failure under positive dependence for Storey's procedure
+    with unsuitable `λ`, not for the two-stage procedure. (Corrected in the red-team pass,
+    `REDTEAM-ADAPTIVE-SIDAK.md`; the first version of this note and of the registry header said
+    that "these procedures" fail.)
 * **Benjamini, Krieger & Yekutieli**, Biometrika 93 (2006) 491–507. The journal PDF
   (academic.oup.com) returned 403 and the authors' pages 403/404; Semantic Scholar lists the
   article as closed access. **Read instead: a 25-page authors' preprint** with the same title,
@@ -188,7 +195,9 @@ header. Points checked specifically:
   of the two-stage procedure and of the uncapped Storey procedure with `λ = 1/2` and
   `λ = α/(1+α)`, implemented from the Lean definitions: all estimated FDRs are below `α`
   (largest ratio about 0.98 at `m = m₀ = 5`, `α = 0.1`, Storey; the two-stage procedure with
-  `m = m₀` gives `α/(1+α)` up to noise). Script not kept in the repository.
+  `m = m₀` gives `α/(1+α)` up to noise). Script not kept in the repository. The red-team pass
+  redid this independently, with exact rational enumeration and scripts kept under
+  `priorart/redteam-adaptive-sidak-scripts/` (see `REDTEAM-ADAPTIVE-SIDAK.md`).
 * **Attempt to break (1).** Hand computation for `m = m₀ = 2`: the two-stage procedure rejects
   iff `max ≤ a` or `min ≤ a/2`, probability `a² + a - a²/4 - 3a²/4 = a = α/(1+α) ≤ α`.
 

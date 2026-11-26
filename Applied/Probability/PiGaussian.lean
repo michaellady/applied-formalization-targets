@@ -7,10 +7,14 @@ import Mathlib.Probability.Distributions.Gaussian.Real
 Ported from `junwei-lu/Lean-Asymptotic-Statistical-Theory`
 (`AsymptoticStatistics/ForMathlib/PiWithDensity.lean` and `PiGaussian.lean`, commit 8e7f22c, Lean v4.29.1),
 Copyright 2024 Junwei Lu, released under the Apache 2.0 license.
-Changes made here: the namespace, the import of the sibling file, and names that were
-deprecated or changed between the Mathlib of that project and the Mathlib pinned here
-(`zero_le` → `zero_le`, `Set.mem_ofPred_eq` → `Set.mem_ofPred_eq`). The proofs are otherwise
-unchanged. The two files are concatenated.
+Changes made here: the two files are concatenated (so the import of the first by the second
+is gone, and the module comment of the second is replaced by a section heading); the namespaces
+(`MeasureTheory` and `AsymptoticStatistics` upstream) are `Applied.Probability`; in
+`lintegral_fin_nat_prod_eq_prod` (the first lemma) `set_option backward.isDefEq.respectTransparency
+false in` is added and a closing `rfl` that is no longer needed is removed, for the Mathlib
+pinned here (Lean v4.36.0); one `haveI` is written `have`, and one reference
+`MeasureTheory.pi_withDensity_prod` loses its namespace prefix. The proofs are otherwise
+unchanged.
 -/
 
 /-!

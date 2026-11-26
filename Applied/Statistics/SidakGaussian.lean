@@ -30,8 +30,9 @@ law is needed.
    non-increasing in `|t|` by step 1 (this is Anderson's 1955 theorem along a ray), and step 2
    finishes.
 4. `stdGaussian_forall_mem_ge`: induction over a finite family of functionals.
-5. `multivariateGaussian_forall_abs_le_ge`, `HasGaussianLaw.prod_measure_abs_le_le`: transport
-   to `multivariateGaussian 0 S` (any positive semidefinite `S`) and to random vectors with a
+5. `multivariateGaussian_forall_abs_le_ge`, `hasGaussianLaw_prod_abs_le_le`: transport
+   to `multivariateGaussian 0 S` (any matrix `S`; Mathlib's measure is the point mass at `0`
+   when `S` is not positive semidefinite) and to random vectors with a
    centred Gaussian law.
 
 ## Main definitions

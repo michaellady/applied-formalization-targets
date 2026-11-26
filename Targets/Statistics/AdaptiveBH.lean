@@ -9,7 +9,7 @@ import Applied.Statistics.AdaptiveBH
 - source: (two-stage procedure) Y. Benjamini, A. M. Krieger, D. Yekutieli, "Adaptive linear step-up procedures that control the false discovery rate", Biometrika 93 (2006) 491–507, Definition 6 and Theorem 1, read in the authors' preprint (25 pages, typeset.io copy; the journal version is paywalled and was not opened, so the numbering is to be confirmed against it). (plug-in theorem and Storey's estimator) G. Blanchard, É. Roquain, "Adaptive FDR control under independence and dependence", arXiv:0707.0536v3 (J. Mach. Learn. Res. 10 (2009) 2837–2871), Definition 2.8, Theorem 3.3 and Corollary 3.4 (estimator `G₁`), numbering of the arXiv version. Also read: J. D. Storey, J. E. Taylor, D. Siegmund, J. R. Statist. Soc. B 66 (2004) 187–205, Theorem 3 (the version capped at `λ`, not the statement formalized here).
 - used-in: adaptive false discovery rate procedures in genomics and neuroimaging software (the "two-stage" option of multiple-comparison routines, Storey's q-value pipeline); motivates estimating the proportion of true nulls
 - prerequisites: Benjamini–Hochberg cut-off and its monotonicity (`Applied/Statistics/BHMonotone.lean`), independence and product measures (Tonelli)
-- formalized-elsewhere: Storey's procedure in the form capped at `λ` (Storey–Taylor–Siegmund 2004, Theorem 3): facebookresearch/atlas-lean, `MathlibExt/Probability/Statistics/MultipleTesting/Adaptive/StoreyBH.lean` :: `integral_falseDiscoveryProportion_storeyBHRejections_le` (complete proof; read at commit 398ebeb, 26 Nov 2026; not compiled here). The step `sum_lintegral_storey_le_one` below follows the argument of `sum_integral_loo_le_one` in that file. Not found (26 Nov 2026; GitHub code search, Mathlib, google-deepmind/formal-conjectures including open pull requests, and the local clones listed in `docs/reviews/RESEARCH-ADAPTIVE-BH.md`): the two-stage procedure of Benjamini–Krieger–Yekutieli, the plug-in theorem for a general estimator `G`, Storey's procedure without the cap.
+- formalized-elsewhere: Storey's procedure in the form capped at `λ` (Storey–Taylor–Siegmund 2004, Theorem 3): facebookresearch/atlas-lean, `MathlibExt/Probability/Statistics/MultipleTesting/Adaptive/StoreyBH.lean` :: `integral_falseDiscoveryProportion_storeyBHRejections_le` (complete proof; read at commit 398ebeb, 26 Nov 2026; not compiled here). The step `sum_lintegral_storey_le_one` below follows the argument of `sum_integral_loo_le_one` (a private lemma) in that file. The same repository has the capped procedure under positive regression dependence, with the bound `(1 - λ) |H₀| α` and a counterexample to level `α`: `…/Adaptive/StoreyPRDS.lean` :: `integral_falseDiscoveryProportion_storeyBHRejections_le_of_isPRDSOn`. Not found (26 Nov 2026; GitHub code search, Mathlib, google-deepmind/formal-conjectures including open pull requests, and the local clones listed in `docs/reviews/RESEARCH-ADAPTIVE-BH.md`): the two-stage procedure of Benjamini–Krieger–Yekutieli, the plug-in theorem for a general estimator `G`, Storey's procedure without the cap.
 - statement-review: unreviewed
 
 Informal statement. Notation: `P` is a probability measure, `p i` (`i` in a finite index set of
@@ -91,8 +91,12 @@ Not covered: Storey's procedure capped at `λ` and the sharper bound `(1 - λ^{m
 chosen from the data; the quantile estimator (Benjamini–Krieger–Yekutieli Theorem 2,
 Blanchard–Roquain `G₂`) and the estimators `G₃`, `G₄` with the extra `+ 1`; the multiple-stage
 procedure (Benjamini–Krieger–Yekutieli Definition 7); the refinement of Blanchard–Roquain's
-Remark 3.5; any dependence (the level-`α` statements fail under positive dependence,
-Blanchard–Roquain Section 3.3); step-down procedures; power comparisons; that the two-stage
+Remark 3.5; any dependence. (For identical uniform p-values, Blanchard–Roquain
+Proposition 3.8 gives false discovery rate `min(λ, α (1 - λ) m)` for Storey's procedure when
+`λ ≥ α (1 - λ)`; this exceeds `α` for instance at `λ = 1/2`, `m ≥ 3`, `α < 1/2`, so
+statement (2) fails under positive dependence. For the two-stage procedure (1) the same model
+gives `α / (1 + α) ≤ α`; no failure of (1) under positive dependence is claimed here, and no
+proof either.) Also not covered: step-down procedures; power comparisons; that the two-stage
 bound is attained.
 -/
 
