@@ -36,9 +36,11 @@ variable {X : Type*} [Fintype X] [DecidableEq X]
 /-- The support `{x | c x = true}` of a Boolean function. -/
 def boolSupport (c : X → Bool) : Finset X := univ.filter (fun x => c x = true)
 
+omit [DecidableEq X] in
 lemma mem_boolSupport {c : X → Bool} {x : X} : x ∈ boolSupport c ↔ c x = true := by
   simp [boolSupport]
 
+omit [DecidableEq X] in
 lemma boolSupport_injective : Function.Injective (boolSupport (X := X)) := by
   intro c d h
   funext x

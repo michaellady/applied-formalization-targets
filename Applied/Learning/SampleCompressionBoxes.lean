@@ -42,6 +42,7 @@ noncomputable def keepMin (f : X → α) (S : Finset (X × Bool)) : Finset (X ×
 noncomputable def keepMax (f : X → α) (S : Finset (X × Bool)) : Finset (X × Bool) :=
   if h : (positives S).Nonempty then {(exists_max_image _ (fun e => f e.1) h).choose} else ∅
 
+omit [DecidableEq X] in
 lemma mem_keepMin {f : X → α} {S : Finset (X × Bool)} {e : X × Bool} (he : e ∈ keepMin f S) :
     e ∈ S ∧ e.2 = true := by
   unfold keepMin at he
@@ -50,6 +51,7 @@ lemma mem_keepMin {f : X → α} {S : Finset (X × Bool)} {e : X × Bool} (he : 
     exact mem_filter.1 (exists_min_image _ (fun e => f e.1) h).choose_spec.1
   · simp at he
 
+omit [DecidableEq X] in
 lemma mem_keepMax {f : X → α} {S : Finset (X × Bool)} {e : X × Bool} (he : e ∈ keepMax f S) :
     e ∈ S ∧ e.2 = true := by
   unfold keepMax at he
@@ -58,12 +60,15 @@ lemma mem_keepMax {f : X → α} {S : Finset (X × Bool)} {e : X × Bool} (he : 
     exact mem_filter.1 (exists_max_image _ (fun e => f e.1) h).choose_spec.1
   · simp at he
 
+omit [DecidableEq X] in
 lemma card_keepMin_le (f : X → α) (S : Finset (X × Bool)) : (keepMin f S).card ≤ 1 := by
   unfold keepMin; split_ifs <;> simp
 
+omit [DecidableEq X] in
 lemma card_keepMax_le (f : X → α) (S : Finset (X × Bool)) : (keepMax f S).card ≤ 1 := by
   unfold keepMax; split_ifs <;> simp
 
+omit [DecidableEq X] in
 lemma exists_keepMin_le {f : X → α} {S : Finset (X × Bool)} {y : X} (hy : (y, true) ∈ S) :
     ∃ e ∈ keepMin f S, e.2 = true ∧ f e.1 ≤ f y := by
   have hpos : (y, true) ∈ positives S := mem_filter.2 ⟨hy, rfl⟩
@@ -74,6 +79,7 @@ lemma exists_keepMin_le {f : X → α} {S : Finset (X × Bool)} {y : X} (hy : (y
   rw [dite_eq_left h]
   exact mem_singleton_self _
 
+omit [DecidableEq X] in
 lemma exists_le_keepMax {f : X → α} {S : Finset (X × Bool)} {y : X} (hy : (y, true) ∈ S) :
     ∃ e ∈ keepMax f S, e.2 = true ∧ f y ≤ f e.1 := by
   have hpos : (y, true) ∈ positives S := mem_filter.2 ⟨hy, rfl⟩
@@ -84,6 +90,7 @@ lemma exists_le_keepMax {f : X → α} {S : Finset (X × Bool)} {y : X} (hy : (y
   rw [dite_eq_left h]
   exact mem_singleton_self _
 
+omit [DecidableEq X] in
 /-- A finite set of more than `k` points, from which at most `k` points have been chosen, has a
 point that was not chosen. (This is Mathlib's `Finset.exists_mem_notMem_of_card_lt_card`; the
 local name is kept for the two uses below.) -/
@@ -104,6 +111,7 @@ def intervalClass [LinearOrder X] : Finset (X → Bool) :=
 
 variable [LinearOrder X]
 
+omit [DecidableEq X] in
 /-- Concepts of `intervalClass` are convex. -/
 lemma intervalClass_convex {c : X → Bool} (hc : c ∈ intervalClass X) {u w y : X}
     (hu : c u = true) (hw : c w = true) (huy : u ≤ y) (hyw : y ≤ w) : c y = true := by
@@ -187,6 +195,7 @@ def rectClass : Finset (A × B → Bool) :=
   insert (fun _ => false) (univ.image (fun p : (A × A) × (B × B) => fun z =>
     decide ((p.1.1 ≤ z.1 ∧ z.1 ≤ p.1.2) ∧ (p.2.1 ≤ z.2 ∧ z.2 ≤ p.2.2))))
 
+omit [DecidableEq A] [DecidableEq B] in
 /-- Concepts of `rectClass` contain the bounding box of any four of their points. -/
 lemma rectClass_convex {c : A × B → Bool} (hc : c ∈ rectClass A B) {u₁ u₂ v₁ v₂ z : A × B}
     (hu₁ : c u₁ = true) (hu₂ : c u₂ = true) (hv₁ : c v₁ = true) (hv₂ : c v₂ = true)

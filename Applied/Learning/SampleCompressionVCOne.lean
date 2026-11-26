@@ -36,6 +36,7 @@ variable {X : Type*} [Fintype X] [DecidableEq X]
 noncomputable def baseConcept (𝒞 : Finset (X → Bool)) : X → Bool :=
   if h : 𝒞.Nonempty then h.choose else fun _ => false
 
+omit [DecidableEq X] in
 lemma baseConcept_mem {𝒞 : Finset (X → Bool)} (h : 𝒞.Nonempty) : baseConcept 𝒞 ∈ 𝒞 := by
   rw [baseConcept, dite_eq_left h]
   exact h.choose_spec

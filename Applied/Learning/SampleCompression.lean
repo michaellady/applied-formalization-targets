@@ -107,12 +107,14 @@ noncomputable def CompressionScheme.trivial (𝒞 : Finset (X → Bool)) :
 
 set_option linter.unusedSectionVars false
 
+omit [DecidableEq X] in
 /-- A sample realizable by a class is realizable by every larger class. -/
 lemma Realizable.mono {𝒞 𝒞' : Finset (X → Bool)} (h : 𝒞 ⊆ 𝒞') {S : Finset (X × Bool)}
     (hS : Realizable 𝒞 S) : Realizable 𝒞' S := by
   obtain ⟨c, hc, hcS⟩ := hS
   exact ⟨c, h hc, hcS⟩
 
+omit [DecidableEq X] in
 /-- A shattered set has at most `vcDim 𝒞` elements. -/
 lemma card_le_vcDim {𝒞 : Finset (X → Bool)} {A : Finset X} (h : Shatters 𝒞 A) :
     A.card ≤ vcDim 𝒞 := by
@@ -120,6 +122,7 @@ lemma card_le_vcDim {𝒞 : Finset (X → Bool)} {A : Finset X} (h : Shatters �
   unfold Applied.Learning.vcDim
   exact le_sup (f := Finset.card) (mem_filter.2 ⟨mem_univ _, h⟩)
 
+omit [DecidableEq X] in
 /-- To bound the VC dimension by `d` it suffices (and is necessary) to bound the size of every
 shattered set by `d`. -/
 lemma vcDim_le_iff {𝒞 : Finset (X → Bool)} {d : ℕ} :
@@ -128,12 +131,14 @@ lemma vcDim_le_iff {𝒞 : Finset (X → Bool)} {d : ℕ} :
   unfold Applied.Learning.vcDim
   simp only [Finset.sup_le_iff, mem_filter, mem_univ, true_and]
 
+omit [DecidableEq X] in
 /-- A nonempty class shatters the empty set. -/
 lemma shatters_empty_of_nonempty {𝒞 : Finset (X → Bool)} (h : 𝒞.Nonempty) :
     Shatters 𝒞 ∅ := by
   obtain ⟨c, hc⟩ := h
   exact fun _ => ⟨c, hc, by simp⟩
 
+omit [DecidableEq X] in
 /-- A nonempty class shatters some set whose size is its VC dimension. -/
 lemma exists_shatters_card_eq_vcDim {𝒞 : Finset (X → Bool)} (h : 𝒞.Nonempty) :
     ∃ A, Shatters 𝒞 A ∧ A.card = vcDim 𝒞 := by
@@ -143,6 +148,7 @@ lemma exists_shatters_card_eq_vcDim {𝒞 : Finset (X → Bool)} (h : 𝒞.Nonem
     ⟨∅, mem_filter.2 ⟨mem_univ _, shatters_empty_of_nonempty h⟩⟩ Finset.card
   exact ⟨A, (mem_filter.1 hA).2, heq.symm⟩
 
+omit [DecidableEq X] in
 /-- The empty class shatters nothing (not even `∅`), so its VC dimension is `0` by the
 convention `sup ∅ = 0`. -/
 lemma vcDim_empty : vcDim (∅ : Finset (X → Bool)) = 0 :=

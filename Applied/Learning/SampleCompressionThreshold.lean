@@ -35,6 +35,7 @@ def thresholdClass [LinearOrder X] : Finset (X → Bool) :=
 
 variable [LinearOrder X]
 
+omit [DecidableEq X] in
 lemma lt_of_mem_thresholdClass {c : X → Bool} (hc : c ∈ thresholdClass X) {m y : X}
     (hm : c m = true) (hy : c y = false) : y < m := by
   rcases mem_insert.1 hc with rfl | hc
